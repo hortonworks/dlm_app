@@ -20,4 +20,4 @@ export const simpleSearch = (str: string, search: string): boolean => {
   return reg.test(str);
 };
 
-export const genId = (): String => uuid.v4();
+export const genId = (): string => uuid.v4();

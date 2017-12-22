@@ -9,7 +9,7 @@
 
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
 
 import { Policy } from 'models/policy.model';
@@ -26,38 +26,44 @@ export class JobService {
   }
 
   private doJobsRequest(url) {
-    return mapResponse(this.http.get(url)).map(response => {
+    return this.httpClient.get<any>(url).map(response => {
       response.jobs = response.jobs.map(this.normalizeJob);
       return response;
     });
   }
 
   normalizeJob(job): Job {
-    const duration = moment(job.endTime).diff(moment(job.startTime));
-    job.duration = duration >= 0 ? duration : -1;
-    job.isCompleted = job.status !== JOB_STATUS.RUNNING;
+    const duration = job.endTime && job.startTime ?
+      moment(job.endTime).diff(moment(job.startTime)) : -1;
+    let trackingInfo: JobTrackingInfo;
     try {
-      job.trackingInfo = <JobTrackingInfo>JSON.parse(job.trackingInfo);
+      trackingInfo = JSON.parse(job.trackingInfo) as JobTrackingInfo;
     } catch (e) {
-      job.trackingInfo = {};
+      trackingInfo = {} as JobTrackingInfo;
     }
-    return job;
+    return {
+      ...job,
+      duration: duration >= 0 ? duration : -1,
+      isCompleted: job.status !== JOB_STATUS.RUNNING,
+      trackingInfo
+    };
   }
 
-  constructor(private http: Http) {}
+  constructor(private httpClient: HttpClient) {}
 
   getJobs(): Observable<any> {
     return this.doJobsRequest('jobs');
   }
 
   getJob(id: string): Observable<any> {
-    return this.http.get(`jobs/${id}`).map(r => r.json());
+    return this.httpClient.get<any>(`jobs/${id}`);
   }
 
   getJobsForClusters(clusterIds: string[], numResults = 1000): Observable<any> {
-    const requests = clusterIds.map(id => this.http.get(`clusters/${id}/jobs?numResults=${numResults}`).map(response => response.json()));
+    const requests = clusterIds.map(id =>
+      this.httpClient.get<any>(`clusters/${id}/jobs?numResults=${numResults}`));
     return Observable.forkJoin(requests).map(responses =>
-      responses.reduce((response, combined) => ({jobs: [...combined.jobs, ...response.jobs.map(this.normalizeJob)]}), {jobs: []}));
+      responses.reduce((allJobs, response) => ({ jobs: [...allJobs.jobs, ...response.jobs.map(this.normalizeJob)] }), { jobs: [] }));
   }
 
   getJobsForPolicy(policy: Policy, numResults = 1000): Observable<any> {
@@ -90,11 +96,11 @@ export class JobService {
 
   abortJob(policy: Policy): Observable<any> {
     const url = `${this.getUrlForJobs(policy)}/abort`;
-    return mapResponse(this.http.put(url, {}));
+    return this.httpClient.put(url, {});
   }
 
   rerunJob(policy: Policy): Observable<any> {
     const url = `${this.getUrlForJobs(policy)}/rerun`;
-    return mapResponse(this.http.post(url, {}));
+    return this.httpClient.post(url, {});
   }
 }

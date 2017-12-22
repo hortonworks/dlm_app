@@ -8,20 +8,16 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { TypeaheadModule, TooltipModule, ModalModule, ProgressbarModule } from 'ng2-bootstrap';
+import { TypeaheadModule, TooltipModule, ModalModule, ProgressbarModule } from 'ngx-bootstrap';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as moment from 'moment';
 
 import { CommonComponentsModule } from 'components/common-components.module';
-import { MockTranslateLoader } from 'mocks/mock-translate-loader';
-import { MockStore } from 'mocks/mock-store';
 import { OverviewComponent } from './overview.component';
 import { IssuesListComponent } from './issues-list/issues-list.component';
 import { IssuesListItemComponent } from './issues-list-item/issues-list-item.component';
@@ -43,13 +39,11 @@ import { Cluster } from 'models/cluster.model';
 import { PrevJobsComponent } from '../policies/components/prev-jobs/prev-jobs.component';
 import { PipesModule } from 'pipes/pipes.module';
 import { LogService } from 'services/log.service';
-import {MockBackend} from '@angular/http/testing';
-import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
-import {HttpService} from 'services/http.service';
 import { OverviewModule } from './overview.module';
 import { HortonStyleModule } from 'common/horton-style.module';
 import { NotificationService } from 'services/notification.service';
 import { TableFilterComponent } from 'common/table/table-filter/table-filter.component';
+import { configureComponentTest } from 'testing/configure';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -88,16 +82,13 @@ describe('OverviewComponent', () => {
   let fixture: ComponentFixture<OverviewComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
+    configureComponentTest({
       imports: [
         RouterTestingModule,
         ModalModule.forRoot(),
         ProgressbarModule.forRoot(),
         TypeaheadModule.forRoot(),
         TooltipModule,
-        TranslateModule.forRoot({
-          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-        }),
         MomentModule,
         NgxDatatableModule,
         ChartsModule,
@@ -126,18 +117,11 @@ describe('OverviewComponent', () => {
         EventMessageComponent
       ],
       providers: [
-        { provide: Store, useClass: MockStore },
         {
           provide: OverviewJobsExternalFiltersService, useValue: {
             filters$: new BehaviorSubject({})
           }
         },
-        { provide: ConnectionBackend, useClass: MockBackend },
-        { provide: RequestOptions, useClass: BaseRequestOptions },
-        { provide: Http, useClass: HttpService },
-        Http,
-        HttpService,
-        NavbarService,
         {
           provide: NotificationService,
           useValue: jasmine.createSpyObj('notificationService', ['create'])

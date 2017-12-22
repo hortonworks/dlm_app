@@ -17,7 +17,7 @@ import { getUnreachableClusters } from 'selectors/unreachable-beacon.selector';
 
 interface ClusterTranslate {
   [clusters: string]: string;
-};
+}
 
 @Component({
   selector: 'dlm-beacon-validity',

@@ -15,6 +15,9 @@ import { AuthUtils } from 'utils/auth-utils';
 
 @Injectable()
 export class AppConfig {
+  // prodMode = true;
+  prodMode = false;
+
   constructor(
     private t: TranslateService
   ) { }
@@ -48,7 +51,7 @@ export class AppConfig {
   }
 
   setUser(userService: UserService) {
-      userService.getUserDetail().subscribe(user => AuthUtils.setUser(user));
+    userService.getUserDetail().subscribe(user => AuthUtils.setUser(user));
   }
 
   setupTranslate() {
@@ -60,4 +63,4 @@ export class AppConfig {
 
 export function appConfigFactory(config: AppConfig, userService: UserService) {
   return () => config.load(userService);
-};
+}

@@ -7,34 +7,40 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+import { HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, getTestBed } from '@angular/core/testing';
+
+import { configureServiceTest } from 'testing/configure';
+import { API_PREFIX } from 'constants/api.constant';
 import { EventService } from './event.service';
-import {HttpService} from './http.service';
-import {BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOptions} from '@angular/http';
-import {MockBackend} from '@angular/http/testing';
-import {ReflectiveInjector} from '@angular/core';
 
 describe('EventService', () => {
+  let injector: TestBed;
+  let eventService: EventService;
+  let httpMock: HttpTestingController;
   beforeEach(() => {
-    this.injector = ReflectiveInjector.resolveAndCreate([
-      {provide: ConnectionBackend, useClass: MockBackend},
-      {provide: RequestOptions, useClass: BaseRequestOptions},
-      Http,
-      HttpService,
-      EventService
-    ]);
+    configureServiceTest({
+      providers: [
+        EventService
+      ]
+    });
 
-    this.eventService = this.injector.get(EventService);
-    this.backend = this.injector.get(ConnectionBackend) as MockBackend;
-    this.backend.connections.subscribe((connection: any) => this.lastConnection = connection);
+    injector = getTestBed();
+    eventService = injector.get(EventService);
+    httpMock = injector.get(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   describe('#getEvents', () => {
     beforeEach(() => {
-      this.eventService.getEvents();
+      eventService.getEvents().subscribe();
     });
     it('should do GET request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+      const req = httpMock.expectOne(`${API_PREFIX}events`);
+      expect(req.request.method).toBe('GET');
     });
   });
-
 });

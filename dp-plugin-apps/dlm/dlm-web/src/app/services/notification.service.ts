@@ -21,7 +21,7 @@ export interface State {
   errors: {[notificationId: string]: any};
   // error to be shown
   activeErrorId: null|string;
-};
+}
 
 export type NotificationState = BehaviorSubject<State>;
 

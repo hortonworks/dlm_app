@@ -14,6 +14,9 @@ import { MenuItem } from './menu-item';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
+declare var jquery: any;
+declare var $: any;
+
 @Component({
   selector: 'navbar',
   templateUrl: './navbar.component.html',

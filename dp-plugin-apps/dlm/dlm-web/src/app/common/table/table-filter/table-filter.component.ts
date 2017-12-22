@@ -16,7 +16,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { capitalize } from 'utils/string-utils';
 import { toKeyValueArray, multiLevelResolve } from 'utils/object-utils';
-import { TypeaheadDirective } from 'ng2-bootstrap';
+import { TypeaheadDirective } from 'ngx-bootstrap';
 
 @Component({
   selector: 'dlm-table-filter',

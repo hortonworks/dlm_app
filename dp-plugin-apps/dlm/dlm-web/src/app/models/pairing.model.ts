@@ -17,6 +17,6 @@ export interface Pairing {
 export interface PairingBodyItem {
   clusterId: number;
   beaconUrl: string;
-};
+}
 
 export type PairingRequestBody = PairingBodyItem[];

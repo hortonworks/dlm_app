@@ -9,7 +9,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { confirmationOptionsDefaults, ConfirmationOptions } from 'components/confirmation-modal/confirmation-options.type';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class ConfirmationService {
     this.updateState({ isVisible: false });
   }
 
-  initActionConfirmation(action: Action, confirmationOptions: ConfirmationOptions) {
+  initActionConfirmation(action: ActionWithPayload<any>, confirmationOptions: ConfirmationOptions) {
     this.showConfirmation();
     this.updateState({ nextAction: action, confirmationOptions });
   }

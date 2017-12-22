@@ -74,8 +74,6 @@ export class PolicyDetailsComponent {
 
   @Input() jobsInput = '';
 
-  @Input() jobsActiveActions = {};
-
   @Input() fileBrowserPage = 0;
 
   @Input() loadingJobs: boolean;

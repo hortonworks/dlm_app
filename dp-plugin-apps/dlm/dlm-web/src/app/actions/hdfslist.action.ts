@@ -8,14 +8,14 @@
  */
 
 import { type, requestType } from '../utils/type-action';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 
 export const ActionTypes = {
   LIST_FILES: requestType('LIST_FILES')
 };
 
-export const listFiles = (clusterId, path, meta = {}): Action => ({
+export const listFiles = (clusterId, path, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LIST_FILES.START, payload: { clusterId, path, meta }
 });
 

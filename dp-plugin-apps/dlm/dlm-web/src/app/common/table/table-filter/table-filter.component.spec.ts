@@ -10,7 +10,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TableFilterComponent } from './table-filter.component';
 import { FormsModule } from '@angular/forms';
-import { TypeaheadModule } from 'ng2-bootstrap';
+import { TypeaheadModule } from 'ngx-bootstrap';
 import { TruncatePipe } from 'pipes/truncate.pipe';
 import { TranslateModule } from '@ngx-translate/core';
 

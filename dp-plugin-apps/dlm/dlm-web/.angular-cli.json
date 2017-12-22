@@ -1,8 +1,9 @@
 {
   "project": {
-    "version": "1.0.0-beta.32.3",
+    "version": "1.6.0",
     "name": "dlm-web"
   },
+  "packageManager": "yarn",
   "apps": [
     {
       "root": "src",

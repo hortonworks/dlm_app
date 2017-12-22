@@ -9,7 +9,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TooltipModule } from 'ng2-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap';
 import { CommonComponentsModule} from 'components/common-components.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { ResourceSummaryComponent } from './resource-summary/resource-summary.component';

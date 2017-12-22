@@ -7,19 +7,19 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 
-export interface ActionSuccess extends Action {
-  payload: {
+export interface SuccessPayload {
     response: any;
     meta?: any;
     [propName: string]: any;
-  };
-};
+}
 
-export interface ActionFailure extends Action {
-  payload: {
+export interface ErrorPayload {
     error: any;
     meta?: any;
-  };
-};
+}
+
+export interface ActionSuccess extends ActionWithPayload<SuccessPayload> { }
+
+export interface ActionFailure extends ActionWithPayload<ErrorPayload> { }

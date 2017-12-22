@@ -9,7 +9,7 @@
 
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { mapResponse } from 'utils/http-util';
 import { HiveDatabase, HiveTable } from 'models/hive-database.model';
 
@@ -41,15 +41,15 @@ export class HiveService {
     }) as HiveTable);
   }
 
-  constructor(private http: Http) {}
+  constructor(private httpClient: HttpClient) {}
 
   fetchDatabases(clusterId): Observable<any> {
-    return mapResponse(this.http.get(`clusters/${clusterId}/hive/databases`))
+    return this.httpClient.get<any>(`clusters/${clusterId}/hive/databases`)
       .map(response => this.normalizeDatabases(response.dbList, clusterId));
   }
 
   fetchTables(clusterId: string, databaseId: string) {
-    return mapResponse(this.http.get(`clusters/${clusterId}/hive/database/${databaseId}/tables`))
+    return this.httpClient.get<any>(`clusters/${clusterId}/hive/database/${databaseId}/tables`)
       .map(response => this.normalizeTables(response.dbList[0].table, databaseId, clusterId));
   }
 

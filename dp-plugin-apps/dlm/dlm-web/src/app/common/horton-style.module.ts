@@ -9,7 +9,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalModule } from 'ng2-bootstrap';
+import { ModalModule } from 'ngx-bootstrap';
 import { ModalDialogBodyComponent, ModalDialogComponent, ModalDialogHeaderBlockComponent } from './modal-dialog/';
 import { TranslateModule } from '@ngx-translate/core';
 

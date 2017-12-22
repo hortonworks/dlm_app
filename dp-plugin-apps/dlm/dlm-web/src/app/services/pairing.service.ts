@@ -9,24 +9,24 @@
 
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { PairingRequestBody } from 'models/pairing.model';
 
 @Injectable()
 export class PairingService {
 
-  constructor(private http: Http) { }
+  constructor(private httpClient: HttpClient) { }
 
   createPairing(pairing: PairingRequestBody): Observable<any> {
-    return this.http.post('pair', pairing).map(r => r.json());
+    return this.httpClient.post('pair', pairing);
   }
 
   fetchPairings(): Observable<any> {
-    return this.http.get('pairs').map(r => r.json());
+    return this.httpClient.get<any>('pairs');
   }
 
   deletePairing(pairing: PairingRequestBody): Observable<any> {
-    return this.http.post('unpair', pairing).map(r => r.json());
+    return this.httpClient.post('unpair', pairing);
   }
 
 }

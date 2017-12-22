@@ -8,7 +8,7 @@
  */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { TooltipDirective } from 'ng2-bootstrap/tooltip';
+import { TooltipDirective } from 'ngx-bootstrap/tooltip';
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { LogService, LOG_REQUEST } from 'services/log.service';

@@ -8,13 +8,13 @@
  */
 
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { go } from '@ngrx/router-store';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment-timezone';
 
+import * as RouterActions from 'actions/router.action';
 import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';
 import { PolicyPayload, PolicyDefinition } from 'models/policy.model';
@@ -177,7 +177,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   }
 
   cancelReview() {
-    this.store.dispatch(go(['policies/create']));
+    this.store.dispatch(new RouterActions.Go({path: ['policies/create']}));
   }
 
   getDetailsField(name: string) {

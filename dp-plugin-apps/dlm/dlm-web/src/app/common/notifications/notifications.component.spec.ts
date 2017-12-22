@@ -11,10 +11,9 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NotificationsComponent } from './notifications.component';
-import { MockStore } from '../../mocks/mock-store';
 import { Store } from '@ngrx/store';
 import { MomentModule } from 'angular2-moment';
-import { TooltipModule } from 'ng2-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap';
 import { MockTranslateLoader } from '../../mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NavbarService } from 'services/navbar.service';
@@ -44,7 +43,6 @@ describe('NotificationsComponent', () => {
         EventMessageComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore},
         NavbarService,
         LogService
       ]

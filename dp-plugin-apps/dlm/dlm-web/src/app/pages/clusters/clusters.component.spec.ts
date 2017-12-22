@@ -14,11 +14,9 @@ import {ClusterListComponent} from './cluster-list/cluster-list.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {BytesSizePipe} from '../../pipes/bytes-size.pipe';
-import {MockStore} from '../../mocks/mock-store';
 import {Store} from '@ngrx/store';
 import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
-import {HttpService} from '../../services/http.service';
 
 xdescribe('ClustersComponent', () => {
   let component: ClustersComponent;
@@ -38,12 +36,9 @@ xdescribe('ClustersComponent', () => {
         BytesSizePipe
       ],
       providers: [
-        {provide: Store, useClass: MockStore},
         {provide: ConnectionBackend, useClass: MockBackend},
         {provide: RequestOptions, useClass: BaseRequestOptions},
-        {provide: Http, useClass: HttpService},
         Http,
-        HttpService,
       ]
     })
       .compileComponents();

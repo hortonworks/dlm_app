@@ -56,7 +56,7 @@ export class PairingsComponent implements OnInit {
 
   createPairingClickHandler() {
     this.router.navigate(['create'], {relativeTo: this.route});
-  };
+  }
 
   onUnpair(pair: Pairing) {
     const params = {

@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { BaseState } from 'models/base-resource-state';
 import { ProgressState } from 'models/progress-state.model';
 import { mapToList, toEntities } from 'utils/store-util';
@@ -23,7 +23,7 @@ export const initialState: State = {
   entities: {}
 };
 
-const makeProgressInstance = (requestId, action: Action): ProgressState => ({
+const makeProgressInstance = (requestId, action: ActionWithPayload<any>): ProgressState => ({
   isInProgress: false,
   error: false,
   success: false,
@@ -64,24 +64,25 @@ export const updateLoadingProgress = (request: ProgressState, action): ProgressS
   return request;
 };
 
-export function reducer(state = initialState, action: Action): State {
+export function reducer(state = initialState, action: ActionWithPayload<any>): State {
   switch (action.type) {
     case ActionTypes.RESET_PROGRESS_STATE: {
-      const {requestId} = action.payload;
+      const entityId = action.payload.requestId;
       return {
         entities: {
           ...state.entities,
-          [requestId]: makeProgressInstance(requestId, action)
+          [entityId]: makeProgressInstance(entityId, action)
         }
       };
     }
     case ActionTypes.UPDATE_PROGRESS_STATE: {
-      const { requestId, progressState } = action.payload;
-      const progressEntity = state.entities[requestId] || makeProgressInstance(requestId, action);
+      const { progressState } = action.payload;
+      const entityId = action.payload.requestId;
+      const progressEntity = state.entities[entityId] || makeProgressInstance(entityId, action);
       return {
         entities: {
           ...state.entities,
-          [requestId]: {
+          [entityId]: {
             ...progressEntity,
             ...progressState
           }
@@ -103,9 +104,9 @@ export function reducer(state = initialState, action: Action): State {
     return state;
   }
   if (isCompletedAction(action)) {
-    const requests = mapToList(state.entities).reduce((allRequests, request) => {
-      if (request.actionType === originalActionName(action)) {
-        return allRequests.concat(updateLoadingProgress(request, action));
+    const requests = mapToList(state.entities).reduce((allRequests, _request) => {
+      if (_request.actionType === originalActionName(action)) {
+        return allRequests.concat(updateLoadingProgress(_request, action));
       }
       return allRequests;
     }, []);

@@ -9,6 +9,7 @@
 
 import { Request, RequestMethod } from '@angular/http';
 import { API_PREFIX } from 'constants/api.constant';
+import { HttpRequest } from '@angular/common/http/src/request';
 
 const MOCK_FILES_PREFIX = '/assets/data/dlm/';
 
@@ -23,10 +24,10 @@ const MOCK_FILES_PREFIX = '/assets/data/dlm/';
  */
 export class MockRoute {
   apiPrefix = API_PREFIX;
-  constructor(private url: string, private jsonFile: string, private method?: RequestMethod) {
+  constructor(private url: string, private jsonFile: string, private method?: string) {
     this.url = this.apiPrefix + url;
     if (!method) {
-      this.method = RequestMethod.Get;
+      this.method = 'GET';
     }
   }
 
@@ -34,7 +35,7 @@ export class MockRoute {
     return url.split('?')[0].split('/');
   }
 
-  match(request: Request): boolean {
+  match(request: HttpRequest<any>): boolean {
     const sourceTokens: string[] = this.tokens(request.url);
     const selfTokens: string[] = this.tokens(this.url);
     if (this.method !== request.method || sourceTokens.length !== selfTokens.length) {
@@ -65,11 +66,11 @@ export class MockRoute {
     return isFullMatch || isDynamicMatch;
   }
 
-  toRequest(originalRequest: Request): Request {
-    return new Request({
-      ...originalRequest,
+  toRequest(originalRequest: HttpRequest<any>): HttpRequest<any> {
+    const request = originalRequest.clone({
       url: MOCK_FILES_PREFIX + this.jsonFile,
-      method: RequestMethod.Get
+      method: 'GET'
     });
+    return request;
   }
 }

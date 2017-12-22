@@ -7,13 +7,13 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { ActionReducer } from '@ngrx/store';
-import { combineReducers } from '@ngrx/store';
-import { routerReducer, RouterState } from '@ngrx/router-store';
-import { environment } from '../../environments/environment';
+import { ActionReducer, ActionReducerMap } from '@ngrx/store';
+import { RouterReducerState, routerReducer } from '@ngrx/router-store';
 import { storeLogger } from 'ngrx-store-logger';
 
-import { compose } from '@ngrx/core/compose';
+import { environment } from '../../environments/environment';
+
+import { compose } from '@ngrx/store';
 
 import * as fromCluster from './cluster.reducer';
 import * as fromPolicy from './policy.reducer';
@@ -31,7 +31,7 @@ import * as fromUnreachableBeacon from './unreachable-beacon.reducer';
 import * as fromYarnQueues from './yarn-queues.reducer';
 
 export interface State {
-  router: RouterState;
+  router: RouterReducerState;
   clusters: fromCluster.State;
   policies: fromPolicy.State;
   pairings: fromPairing.State;
@@ -48,7 +48,7 @@ export interface State {
   yarnQueues: fromYarnQueues.State;
 }
 
-const reducers = {
+export const reducers: ActionReducerMap<State> = {
   router: routerReducer,
   clusters: fromCluster.reducer,
   policies: fromPolicy.reducer,
@@ -66,12 +66,8 @@ const reducers = {
   yarnQueues: fromYarnQueues.reducer
 };
 
-const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);
-const prodReducer: ActionReducer<State> = combineReducers(reducers);
+export const logger = (reducer: ActionReducer<State>) => {
+  return storeLogger()(reducer);
+};
 
-export function reducer(state: any, action: any) {
-  if (environment.production) {
-    return prodReducer(state, action);
-  }
-  return devReducer(state, action);
-}
+export const metaReducers = environment.production ? [] : [logger];

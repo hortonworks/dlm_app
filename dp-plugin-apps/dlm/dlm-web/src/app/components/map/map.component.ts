@@ -27,7 +27,7 @@ import { isEmpty } from 'utils/object-utils';
 enum MOUSE_EVENT {
   MOUSE_OVER,
   MOUSE_OUT
-};
+}
 
 function getExistingMarker(collection: L.Marker[], latLng: LatLng): L.Marker {
   return collection.find(m => m.getLatLng().lat === latLng.lat && m.getLatLng().lng === latLng.lng);

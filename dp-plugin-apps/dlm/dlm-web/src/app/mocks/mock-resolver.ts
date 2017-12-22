@@ -9,11 +9,12 @@
 
 import { Request } from '@angular/http';
 import { routes } from './mock-routes';
+import { HttpRequest } from '@angular/common/http/src/request';
 
 export class MockResolver {
   constructor() {}
 
-  resolveRequest(request: Request): Request {
+  resolveRequest(request: HttpRequest<any>): HttpRequest<any> {
     return routes.filter((route) => {
       return route.match(request);
     }).map((matched) => {

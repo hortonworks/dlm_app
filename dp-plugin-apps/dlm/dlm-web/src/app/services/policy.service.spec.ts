@@ -7,100 +7,104 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { PolicyService } from './policy.service';
-import { HttpService } from './http.service';
+import { TestBed, getTestBed } from '@angular/core/testing';
+import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateService } from '@ngx-translate/core';
-import { BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOptions } from '@angular/http';
-import { MockBackend } from '@angular/http/testing';
-import { ReflectiveInjector } from '@angular/core';
-import { Policy, PolicyPayload } from '../models/policy.model';
+
+import { configureServiceTest } from 'testing/configure';
+import { Policy, PolicyPayload } from 'models/policy.model';
 import { JobService } from 'services/job.service';
+import { API_PREFIX } from 'constants/api.constant';
+import { PolicyService } from './policy.service';
 
 describe('PolicyService', () => {
-  beforeEach(() => {
-    this.injector = ReflectiveInjector.resolveAndCreate([
-      {provide: ConnectionBackend, useClass: MockBackend},
-      {provide: RequestOptions, useClass: BaseRequestOptions},
-      {provide: TranslateService, useValue: jasmine.createSpyObj('t', ['instant'])},
-      Http,
-      HttpService,
-      PolicyService,
-      JobService
-    ]);
+  let injector: TestBed;
+  let policyService: PolicyService;
+  let httpMock: HttpTestingController;
 
-    this.policyService = this.injector.get(PolicyService);
-    this.backend = this.injector.get(ConnectionBackend) as MockBackend;
-    this.backend.connections.subscribe((connection: any) => this.lastConnection = connection);
+  beforeEach(() => {
+    configureServiceTest({
+      providers: [
+        { provide: TranslateService, useValue: jasmine.createSpyObj('t', ['instant']) },
+        PolicyService,
+        JobService
+      ]
+    });
+    injector = getTestBed();
+    policyService = injector.get(PolicyService);
+    httpMock = injector.get(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   describe('#fetchPolicies', () => {
     beforeEach(() => {
-      this.policyService.fetchPolicies();
+      policyService.fetchPolicies().subscribe();
     });
     it('should do GET request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+      const req = httpMock.expectOne(`${API_PREFIX}policies`);
+      expect(req.request.method).toBe('GET');
     });
   });
 
   describe('#fetchPolicy', () => {
     beforeEach(() => {
-      this.id = '1';
-      this.policyService.fetchPolicy(this.id);
+      policyService.fetchPolicy('1').subscribe();
     });
     it('should do GET request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+      const req = httpMock.expectOne(`${API_PREFIX}policies/1`);
+      expect(req.request.method).toBe('GET');
     });
   });
 
   describe('#createPolicy', () => {
     beforeEach(() => {
       this.policy = <PolicyPayload>{
-        policyDefinition: {}
+        policyDefinition: { name: 'policyName' }
       };
-      this.policyService.createPolicy({policy: this.policy, sourceClusterId: 'clusterId'});
+      policyService.createPolicy({
+        policy: this.policy,
+        targetClusterId: 'clusterId'
+      }).subscribe();
     });
     it('should do POST request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Post);
+      const req = httpMock.expectOne(`${API_PREFIX}clusters/clusterId/policy/policyName/submit`);
+      expect(req.request.method).toBe('POST');
     });
   });
 
   describe('#deletePolicy', () => {
     beforeEach(() => {
       this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
-      this.policyService.deletePolicy(this.policy);
+      policyService.deletePolicy(this.policy).subscribe();
     });
     it('should do DELETE request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Delete);
-    });
-    it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/1/policy/n1');
+      const req = httpMock.expectOne(`${API_PREFIX}clusters/1/policy/n1`);
+      expect(req.request.method).toBe('DELETE');
     });
   });
 
   describe('#suspendPolicy', () => {
     beforeEach(() => {
       this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
-      this.policyService.suspendPolicy(this.policy);
+      policyService.suspendPolicy(this.policy).subscribe();
     });
     it('should do PUT request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Put);
-    });
-    it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/1/policy/n1/suspend');
+      const req = httpMock.expectOne(`${API_PREFIX}clusters/1/policy/n1/suspend`);
+      expect(req.request.method).toBe('PUT');
     });
   });
 
   describe('#resumePolicy', () => {
     beforeEach(() => {
       this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
-      this.policyService.resumePolicy(this.policy);
+      policyService.resumePolicy(this.policy).subscribe();
     });
     it('should do PUT request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Put);
-    });
-    it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/1/policy/n1/resume');
+      const req = httpMock.expectOne(`${API_PREFIX}clusters/1/policy/n1/resume`);
+      expect(req.request.method).toBe('PUT');
     });
   });
-
 });

@@ -70,6 +70,7 @@
     ],
     "radix": true,
     "semicolon": [
+      true,
       "always"
     ],
     "triple-equals": [
@@ -97,7 +98,6 @@
       "check-separator",
       "check-type"
     ],
-
     "directive-selector": [false, "attribute", "dlm", "camelCase"],
     "component-selector": [false, "element", "dlm", "kebab-case"],
     "use-input-property-decorator": true,
@@ -109,9 +109,6 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-    "no-access-missing-member": true,
-    "templates-use-public": true,
-    "invoke-injectable": true,
     "file-header": [true, "Copyright  \\(c\\) \\d{4}-\\d{4}"]
   }
 }

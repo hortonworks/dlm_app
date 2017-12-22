@@ -9,7 +9,7 @@
 
 export interface BeaconAdminStatusUI {
   id: number;
-};
+}
 
 export interface BeaconAdminStatus {
   clusterId: number;
@@ -21,4 +21,4 @@ export interface BeaconAdminStatus {
     wireEncryption: boolean;
     rangerCreateDenyPolicy: string;
   };
-};
+}

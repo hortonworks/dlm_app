@@ -9,7 +9,7 @@
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ModalDialogComponent } from './modal-dialog.component';
-import { ModalModule, TooltipModule } from 'ng2-bootstrap';
+import { ModalModule, TooltipModule } from 'ngx-bootstrap';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { MockTranslateLoader } from '../../mocks/mock-translate-loader';
 import { ClipboardModule } from 'ngx-clipboard';

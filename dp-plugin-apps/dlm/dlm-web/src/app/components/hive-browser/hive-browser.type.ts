@@ -12,7 +12,7 @@ import { HiveDatabase } from 'models/hive-database.model';
 
 export interface HiveBrowserTablesLoadingMap {
   [databaseEntityId: string]: ProgressState;
-};
+}
 
 export interface DatabaseTablesCollapsedEvent {
   database: HiveDatabase;

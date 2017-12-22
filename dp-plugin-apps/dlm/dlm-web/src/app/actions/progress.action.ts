@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { type } from 'utils/type-action';
 
 export const ActionTypes = {
@@ -16,12 +16,12 @@ export const ActionTypes = {
   REMOVE_PROGRESS_STATE: type('REMOVE_PROGRESS_STATE')
 };
 
-export const resetProgressState = (requestId): Action => ({ type: ActionTypes.RESET_PROGRESS_STATE, payload: {requestId}});
-export const updateProgressState = (requestId, progressState): Action => ({
+export const resetProgressState = (requestId): ActionWithPayload<any> => ({ type: ActionTypes.RESET_PROGRESS_STATE, payload: {requestId}});
+export const updateProgressState = (requestId, progressState): ActionWithPayload<any> => ({
   type: ActionTypes.UPDATE_PROGRESS_STATE,
   payload: {requestId, progressState}
 });
-export const removeProgressState = (requestIds: string | string[]): Action => ({
+export const removeProgressState = (requestIds: string | string[]): ActionWithPayload<any> => ({
   type: ActionTypes.REMOVE_PROGRESS_STATE,
   payload: { requestIds: Array.isArray(requestIds) ? requestIds : [requestIds] }
 });

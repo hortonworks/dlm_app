@@ -37,7 +37,7 @@ export class JobTransferredGraphComponent {
 
   get graphLabels(): Array<any> {
     return this.job.graphData.map(() => '');
-  };
+  }
 
   get graphColors(): Array<any> {
     const color = this.colorStatusMap[this.job.status];
@@ -51,13 +51,13 @@ export class JobTransferredGraphComponent {
         pointHoverBorderColor: color
       }
     ];
-  };
+  }
 
   get graphData(): Array<any> {
     return [
       {data: this.job.graphData, fill: false, label: ''}
     ];
-  };
+  }
 
   graphOptions = {
     animation: false,

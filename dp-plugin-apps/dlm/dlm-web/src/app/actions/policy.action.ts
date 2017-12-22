@@ -8,7 +8,7 @@
  */
 
 import { type, requestType } from 'utils/type-action';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { Policy, PolicyPayload } from 'models/policy.model';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 
@@ -21,7 +21,7 @@ export const ActionTypes = {
   LOAD_LAST_JOBS: requestType('LOAD_JOBS_FOR_POLICY')
 };
 
-export const loadPolicies = (queryParams = {}, meta = {}): Action => ({
+export const loadPolicies = (queryParams = {}, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_POLICIES.START,
   payload: {meta, queryParams}
 });
@@ -34,7 +34,7 @@ export const loadPoliciesFail = (error, meta): ActionFailure => ({
   type: ActionTypes.LOAD_POLICIES.FAILURE, payload: {error, meta}
 });
 
-export const createPolicy = (policy: PolicyPayload, targetClusterId: string|number, meta = {}): Action => ({
+export const createPolicy = (policy: PolicyPayload, targetClusterId: string|number, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.CREATE_POLICY.START, payload: { policy, targetClusterId, meta }
 });
 
@@ -43,7 +43,7 @@ export const createPolicySuccess = (creationStatus, meta): ActionSuccess => ({
 });
 export const createPolicyFail = (error, meta): ActionFailure => ({type: ActionTypes.CREATE_POLICY.FAILURE, payload: {error, meta}});
 
-export const deletePolicy = (policy: Policy, meta = {}): Action => ({
+export const deletePolicy = (policy: Policy, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.DELETE_POLICY.START, payload: {policy, meta}
 });
 export const deletePolicySuccess = (policyId, meta): ActionSuccess => ({
@@ -53,7 +53,7 @@ export const deletePolicyFail = (error, meta): ActionFailure => ({
   type: ActionTypes.DELETE_POLICY.FAILURE, payload: {error, meta}
 });
 
-export const suspendPolicy = (policy: Policy, meta = {}): Action => ({
+export const suspendPolicy = (policy: Policy, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.SUSPEND_POLICY.START, payload: {policy, meta}
 });
 export const suspendPolicySuccess = (policyId, meta): ActionSuccess => ({
@@ -63,7 +63,7 @@ export const suspendPolicyFail = (error, meta): ActionFailure => ({
   type: ActionTypes.SUSPEND_POLICY.FAILURE, payload: {error, meta}
 });
 
-export const resumePolicy = (policy: Policy, meta = {}): Action => ({
+export const resumePolicy = (policy: Policy, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.RESUME_POLICY.START, payload: {policy, meta}
 });
 export const resumePolicySuccess = (policyId, meta): ActionSuccess => ({
@@ -73,7 +73,7 @@ export const resumePolicyFail = (error, meta): ActionFailure => ({
   type: ActionTypes.RESUME_POLICY.FAILURE, payload: {error, meta}
 });
 
-export const loadLastJobs = ({policies, numJobs = 3}: {policies: Policy[], numJobs?: number}, meta = {}): Action => ({
+export const loadLastJobs = ({policies, numJobs = 3}: {policies: Policy[], numJobs?: number}, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_LAST_JOBS.START,
   payload: {policies, numJobs, meta}
 });

@@ -9,7 +9,7 @@
 
 import { type } from 'utils/type-action';
 import { OperationResponse } from 'models/operation-response.model';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { getError } from 'utils/http-util';
 import { genId } from 'utils/string-utils';
 
@@ -18,14 +18,14 @@ export const ActionTypes = {
   OPERATION_FAIL: type('OPERATION_FAIL')
 };
 
-export const operationComplete = (payload: OperationResponse): Action => {
+export const operationComplete = (payload: OperationResponse): ActionWithPayload<any> => {
   const operation = {id: genId(), ...payload};
   return {
     type: ActionTypes.OPERATION_COMPLETE,
     payload: operation
   };
 };
-export const operationFail = (payload: any): Action => {
+export const operationFail = (payload: any): ActionWithPayload<any> => {
   // @todo hack to get real response
   const operation = getError(payload);
   operation.id = genId();

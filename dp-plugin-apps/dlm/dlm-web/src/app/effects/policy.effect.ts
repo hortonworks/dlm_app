@@ -9,8 +9,8 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { go } from '@ngrx/router-store';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
+import * as RouterActions from 'actions/router.action';
 import { PolicyService } from 'services/policy.service';
 import { JobService } from 'services/job.service';
 import { ToastNotification } from 'models/toast-notification.model';
@@ -46,7 +46,7 @@ export class PolicyEffects {
       return this.policyService.createPolicy(payload)
         .mergeMap(response => [
           createPolicySuccess(response, payload.meta),
-          go(['/policies']),
+          new RouterActions.Go({path: ['/policies']}),
           resetFormValue(POLICY_FORM_ID)
         ])
         .catch(err => Observable.of(createPolicyFail(err.json(), payload.meta)));

@@ -8,29 +8,24 @@
  */
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {PairingsComponent} from './pairings.component';
 import {RouterTestingModule} from '@angular/router/testing';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {PairingCardListComponent} from './components/pairing-card-list/pairing-card-list.component';
 import {PairingCardComponent} from './components/pairing-card/pairing-card.component';
-import {MockStore} from '../../mocks/mock-store';
-import {ModalModule, TooltipModule} from 'ng2-bootstrap';
-import {Store} from '@ngrx/store';
+import {ModalModule, TooltipModule} from 'ngx-bootstrap';
 import { CommonComponentsModule } from 'components/common-components.module';
 import { PipesModule } from 'pipes/pipes.module';
 import { HortonStyleModule } from 'common/horton-style.module';
+import { configureComponentTest } from 'testing/configure';
 
 describe('PairingsComponent', () => {
   let component: PairingsComponent;
   let fixture: ComponentFixture<PairingsComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
+    configureComponentTest({
       imports: [
-        TranslateModule.forRoot({
-          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-        }),
         RouterTestingModule,
         ModalModule.forRoot(),
         CommonComponentsModule,
@@ -42,9 +37,6 @@ describe('PairingsComponent', () => {
         PairingsComponent,
         PairingCardComponent,
         PairingCardListComponent
-      ],
-      providers: [
-        {provide: Store, useClass: MockStore}
       ]
     })
       .compileComponents();

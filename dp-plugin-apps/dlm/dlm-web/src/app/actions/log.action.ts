@@ -8,16 +8,17 @@
  */
 
 import { requestType } from 'utils/type-action';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 import { EntityType } from 'constants/log.constant';
 export const ActionTypes = {
   LOAD_LOGS: requestType('LOAD_LOGS')
 };
 
-export const loadLogs = (clusterId: number, instanceId: string, logType: EntityType, requestId?, timestamp = ''): Action => ({
-  type: ActionTypes.LOAD_LOGS.START, payload: { clusterId, instanceId, logType, meta: {requestId, instanceId, timestamp} }
-});
+export const loadLogs =
+  (clusterId: number, instanceId: string, logType: EntityType, requestId?, timestamp = ''): ActionWithPayload<any> => ({
+    type: ActionTypes.LOAD_LOGS.START, payload: { clusterId, instanceId, logType, meta: { requestId, instanceId, timestamp } }
+  });
 
 export const loadLogsSuccess = (logs, meta = {}): ActionSuccess => ({
   type: ActionTypes.LOAD_LOGS.SUCCESS, payload: {response: logs, meta}

@@ -29,7 +29,7 @@ export class TimeZoneService {
       this._parsedTimezones = this._parseTimezones();
     }
     return this._parsedTimezones;
-  };
+  }
 
   get mappedByValueTimezones(): TimezonesMap {
     if (!this._mappedByValueTimezones) {
@@ -71,7 +71,7 @@ export class TimeZoneService {
       return moment(moment.tz(timestamp ? moment.tz(timestamp, serverTimezone) : new Date(), tz).toArray()).toDate().getTime();
     }
     return timestamp || new Date().getTime();
-  };
+  }
 
   /**
    * Convert UTC-timestamp to the formatted date string for user timezone
@@ -82,7 +82,7 @@ export class TimeZoneService {
   public formatDateTimeWithTimeZone(timestamp: number, format: string, serverTimezone?: string): string {
     const time = this.dateTimeWithTimeZone(timestamp, serverTimezone);
     return moment(time).format(format);
-  };
+  }
 
   private _mapTimezones(): TimezonesMap {
     const mapped = {};

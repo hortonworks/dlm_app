@@ -16,7 +16,7 @@ export interface JobTrackinfoProgress {
   bytesCopied: number;
   timeTaken: number;
   unit: string;
-};
+}
 
 export interface JobTrackingInfo {
   jobId: string;

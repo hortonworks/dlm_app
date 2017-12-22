@@ -9,7 +9,7 @@
 
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpModule } from '@angular/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import {
   CollapseModule,
   TabsModule,
@@ -19,20 +19,24 @@ import {
   TooltipModule,
   BsDropdownModule,
   ProgressbarModule
-} from 'ng2-bootstrap';
+} from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
-import { RouterStoreModule } from '@ngrx/router-store';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { reducer } from './reducers';
+import { metaReducers, reducers } from './reducers';
 import { RouterModule } from '@angular/router';
 
 import { MyDatePickerModule } from 'mydatepicker';
 import { ClipboardModule } from 'ngx-clipboard';
 
 import { AppConfig, appConfigFactory } from './app.config';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { MockResponseInterceptor } from './interceptors/mock-response.interceptor';
+import { ApiInterceptor } from './interceptors/api.interceptor';
+
 import { EffectsModule } from '@ngrx/effects';
 import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
@@ -49,6 +53,7 @@ import { BeaconEffects } from './effects/beacon.effect';
 import { YarnEffects } from './effects/yarn.effect';
 
 import { FormEffects } from './effects/form.effect';
+import { RouterEffects } from './effects/router.effect';
 
 import { ClusterService } from './services/cluster.service';
 import { PolicyService } from './services/policy.service';
@@ -85,7 +90,6 @@ import { NotificationsPageComponent } from './pages/notifications/notifications.
 import { NotificationsTableComponent } from './pages/notifications/notifications-table/notifications-table.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
 import { ModalDialogBodyComponent } from './common/modal-dialog/modal-dialog-body.component';
-import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
 import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.component';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
@@ -145,29 +149,36 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { HortonStyleModule } from 'common/horton-style.module';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 @NgModule({
   imports: [
     MomentModule,
     ChartsModule,
     CommonModule,
-    HttpModule,
+    HttpClientModule,
     NgxDatatableModule,
-    StoreModule.provideStore(reducer),
-    RouterStoreModule.connectRouter(),
-    EffectsModule.run(ClusterEffects),
-    EffectsModule.run(PolicyEffects),
-    EffectsModule.run(PairingEffects),
-    EffectsModule.run(JobEffects),
-    EffectsModule.run(FormEffects),
-    EffectsModule.run(EventEffects),
-    EffectsModule.run(HdfsListEffects),
-    EffectsModule.run(HiveListEffects),
-    EffectsModule.run(LogEffects),
-    EffectsModule.run(ConfirmationEffects),
-    EffectsModule.run(NotificationEffects),
-    EffectsModule.run(BeaconEffects),
-    EffectsModule.run(YarnEffects),
+    StoreModule.forRoot(reducers, {
+      initialState: {},
+      metaReducers
+    }),
+    StoreRouterConnectingModule,
+    EffectsModule.forRoot([
+      ClusterEffects,
+      PolicyEffects,
+      PairingEffects,
+      JobEffects,
+      FormEffects,
+      EventEffects,
+      HdfsListEffects,
+      HiveListEffects,
+      LogEffects,
+      ConfirmationEffects,
+      NotificationEffects,
+      BeaconEffects,
+      RouterEffects,
+      YarnEffects
+    ]),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
@@ -268,16 +279,31 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
     NotificationService,
     OverviewJobsExternalFiltersService,
     ConfirmationService,
-    httpServiceProvider,
     FrequencyPipe,
     UserService,
     BeaconService,
     YarnService,
+    AsyncActionsService,
     AppConfig,
     {
       provide: APP_INITIALIZER,
       useFactory: appConfigFactory,
       deps: [AppConfig, UserService],
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: MockResponseInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
       multi: true
     }
   ]

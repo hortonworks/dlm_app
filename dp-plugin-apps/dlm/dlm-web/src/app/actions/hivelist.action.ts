@@ -8,7 +8,7 @@
  */
 
 import { type, requestType } from '../utils/type-action';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 import { HiveDatabase } from 'models/hive-database.model';
 
@@ -18,7 +18,7 @@ export const ActionTypes = {
   LOAD_FULL_DATABASES: requestType('LOAD_FULL_DATABASES')
 };
 
-export const loadDatabases = (clusterId, meta = {}): Action => ({
+export const loadDatabases = (clusterId, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_DATABASES.START,
   payload: { clusterId, meta }
 });
@@ -44,7 +44,7 @@ export const loadTablesFail = (error, meta = {}): ActionFailure => ({
   payload: { error, meta }
 });
 
-export const loadFullDatabases = (clusterId, meta = {}): Action => ({
+export const loadFullDatabases = (clusterId, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_FULL_DATABASES.START,
   payload: { clusterId, meta }
 });

@@ -13,4 +13,4 @@ export interface ResourceChartData {
   clusters: DoughnutChartData;
   policies: DoughnutChartData;
   jobs: DoughnutChartData;
-};
+}

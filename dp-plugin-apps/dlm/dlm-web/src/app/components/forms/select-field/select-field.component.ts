@@ -18,6 +18,7 @@ import { SelectFieldValueDirective } from './select-field-value.directive';
 
 export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
+  /* tslint:disable-next-line:no-use-before-declare */
   useExisting: forwardRef(() => SelectFieldComponent),
   multi: true
 };
@@ -35,9 +36,7 @@ export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
           <div *ngIf="!valueView?.template">
             {{selectedOption.label || selectedOption.value || ('common.none' | translate)}}
           </div>
-          <ng-container
-            [ngTemplateOutlet]="valueView?.template"
-            [ngOutletContext]="{value: selectedOption.value, label: selectedOption.label}">
+          <ng-container *ngTemplateOutlet="valueView?.template; context: {value: selectedOption.value, label: selectedOption.label}">
           </ng-container>
           <span class="caret"></span>
         </div>
@@ -48,9 +47,7 @@ export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
           <div *ngIf="!optionView?.template">
             {{option.label || option.value}}
           </div>
-          <ng-container
-            [ngTemplateOutlet]="optionView?.template"
-            [ngOutletContext]="{value: option.value, label: option.label}">
+          <ng-container *ngTemplateOutlet="optionView?.template; context: {value: option.value, label: option.label}">
           </ng-container>
         </li>
       </ul>

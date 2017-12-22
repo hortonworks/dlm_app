@@ -7,47 +7,45 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { LogService } from './log.service';
-import { HttpService } from './http.service';
-import { BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOptions } from '@angular/http';
-import { MockBackend } from '@angular/http/testing';
-import { ReflectiveInjector } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { MockStore } from 'mocks/mock-store';
+import { HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, getTestBed } from '@angular/core/testing';
+
 import { EntityType } from 'constants/log.constant';
-import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from 'services/notification.service';
+import { configureServiceTest, mergeDefs, testStoreDef } from 'testing/configure';
+import { LogService } from './log.service';
+import { API_PREFIX } from 'constants/api.constant';
 
 describe('LogService', () => {
-  beforeEach(() => {
-    this.injector = ReflectiveInjector.resolveAndCreate([
-      {provide: ConnectionBackend, useClass: MockBackend},
-      {provide: RequestOptions, useClass: BaseRequestOptions},
-      {provide: Store, useClass: MockStore},
-      {
-        provide: NotificationService,
-        useValue: jasmine.createSpyObj('notificationService', ['create'])
-      },
-      Http,
-      HttpService,
-      {
-        provide: TranslateService,
-        useValue: jasmine.createSpyObj('t', ['instant'])
-      },
-      LogService
-    ]);
+  let injector: TestBed;
+  let logService: LogService;
+  let httpMock: HttpTestingController;
 
-    this.logService = this.injector.get(LogService);
-    this.backend = this.injector.get(ConnectionBackend) as MockBackend;
-    this.backend.connections.subscribe((connection: any) => this.lastConnection = connection);
+  beforeEach(() => {
+    configureServiceTest(
+      mergeDefs({
+        providers: [
+          {
+            provide: NotificationService,
+            useValue: jasmine.createSpyObj('notificationService', ['create'])
+          },
+          LogService
+        ]
+      }, testStoreDef)
+    );
+
+    injector = getTestBed();
+    logService = injector.get(LogService);
+    httpMock = injector.get(HttpTestingController);
   });
 
   describe('#fetchLogs', () => {
     beforeEach(() => {
-      this.logService.getLogs(1, '1', EntityType.policy);
+      logService.getLogs(1, '1', EntityType.policy, null).subscribe();
     });
     it('should do GET request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+      const req = httpMock.expectOne(`${API_PREFIX}clusters/1/logs?filterBy=policyId:1&`);
+      expect(req.request.method).toBe('GET');
     });
   });
 });

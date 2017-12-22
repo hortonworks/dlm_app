@@ -133,3 +133,9 @@ pre {
 a:focus {
   outline: none;
 }
+
+ng-select {
+  &:focus {
+    outline: none;
+  }
+}

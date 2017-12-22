@@ -9,17 +9,13 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
-import {Store} from '@ngrx/store';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {CollapseModule, TabsModule, TypeaheadModule, TimepickerModule} from 'ng2-bootstrap';
+import {CollapseModule, TabsModule, TypeaheadModule, TimepickerModule} from 'ngx-bootstrap';
 import { MyDatePickerModule } from 'mydatepicker';
 
 import { CommonComponentsModule } from 'components/common-components.module';
-import {MockTranslateLoader} from 'mocks/mock-translate-loader';
 import {RadioButtonComponent} from 'common/radio-button/radio-button.component';
 import {CheckboxListComponent} from 'common/checkbox-list/checkbox-list.component';
 import {CheckboxComponent} from 'common/checkbox/checkbox.component';
-import {MockStore} from 'mocks/mock-store';
 import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
 import {PolicyFormComponent} from './policy-form.component';
 import {HdfsBrowserComponent} from 'components/hdfs-browser/hdfs-browser.component';
@@ -30,12 +26,11 @@ import {ActionColumnComponent} from 'components/table-columns/action-column/acti
 import {MomentModule} from 'angular2-moment';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {NavbarService} from 'services/navbar.service';
-import {MockTimeZoneService} from 'mocks/mock-timezone';
-import {TimeZoneService} from 'services/time-zone.service';
 import {PipesModule} from 'pipes/pipes.module';
 import {HdfsService} from 'services/hdfs.service';
 import {Observable} from 'rxjs/Observable';
-import {TooltipModule} from 'ng2-bootstrap';
+import {TooltipModule} from 'ngx-bootstrap';
+import { configureComponentTest } from 'testing/configure';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
@@ -45,12 +40,9 @@ describe('PolicyFormComponent', () => {
     const mockHdfsService = {
       getFilesList() {return Observable.of([]); }
     };
-    TestBed.configureTestingModule({
+    configureComponentTest({
       imports: [
         TooltipModule.forRoot(),
-        TranslateModule.forRoot({
-          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-        }),
         TimepickerModule.forRoot(),
         ReactiveFormsModule, FormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule,
         CommonComponentsModule,
@@ -72,8 +64,6 @@ describe('PolicyFormComponent', () => {
         ActionColumnComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore},
-        {provide: TimeZoneService, useClass: MockTimeZoneService},
         {provide: HdfsService, useValue: mockHdfsService},
         NavbarService
       ]
