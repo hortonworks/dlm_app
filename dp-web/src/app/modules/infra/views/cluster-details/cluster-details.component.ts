@@ -21,7 +21,7 @@ import {LakeService} from '../../../../services/lake.service';
 import {ClusterService} from '../../../../services/cluster.service';
 import {LocationService} from '../../../../services/location.service';
 import {StringUtils} from '../../../../shared/utils/stringUtils';
-import {IdentityService} from '../../../../services/identity.service';
+import {UserService} from '../../../../services/user.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
 import {Loader} from '../../../../shared/utils/loader';
 import {CustomError} from "../../../../models/custom-error";
@@ -39,8 +39,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
               private lakeService: LakeService,
               private clusterService: ClusterService,
               private locationService: LocationService,
-              private identityService: IdentityService,
-              private  translateService: TranslateService) {
+              private userService: UserService,
+              private translateService: TranslateService) {
   }
 
   clusterStatus:any;
@@ -95,7 +95,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     this.clusterDetails = new ClusterDetails();
     this.clusterDetails.tags = tags;
     this.clusterDetails.dataCenter = this.lake.dcName;
-    this.identityService.getUserById(this.lake.createdBy).subscribe(user => {
+    this.userService.getUserById(this.lake.createdBy).subscribe(user => {
       this.user = user;
     });
   }

@@ -65,6 +65,13 @@ export class UserService {
       .catch(HttpUtil.handleError);
   }
 
+  getUserById(userId: string): Observable<User> {
+    return this.http
+      .get(`api/identity/${userId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   getUserByName(userName): Observable<User> {
     return this.http
       .get(`${this.url}/detail?userName=${userName}`, new RequestOptions(HttpUtil.getHeaders()))

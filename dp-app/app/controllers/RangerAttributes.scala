@@ -51,7 +51,7 @@ class RangerAttributes @Inject()(
         }
     }
 
-  def getPolicyDetails(clusterId: Long, offset: Long, limit: Long, serviceType: String, dbName: Option[String], tableName: Option[String], guid: Option[String]) =
+  def getPolicyDetails(clusterId: String, offset: Long, limit: Long, serviceType: String, dbName: Option[String], tableName: Option[String], guid: Option[String]) =
     AuthenticatedAction.async { req =>
       Logger.info("Received getPolicyDetails for entity")
       implicit val token = req.token
@@ -73,32 +73,32 @@ class RangerAttributes @Inject()(
         }
     }
 
-  private def getResourceBasedPolicies(clusterId: Long, offset: Long, limit: Long, dbName: String, tableName: String)(implicit token:Option[HJwtToken]): Future[JsValue] = {
+  private def getResourceBasedPolicies(clusterId: String, offset: Long, limit: Long, dbName: String, tableName: String)(implicit token:Option[HJwtToken]): Future[JsValue] = {
     rangerService
-      .getPolicyDetails(clusterId.toString, dbName, tableName, offset.toString, limit.toString)
+      .getPolicyDetails(clusterId, dbName, tableName, offset.toString, limit.toString)
       .map {
         case Left(errors) =>  throw WrappedErrorsException(errors)
         case Right(attributes) => attributes
       }
   }
 
-  private def getTagBasedPolicies(clusterId: Long, offset: Long, limit: Long, guid: String)(implicit token:Option[HJwtToken]): Future[JsValue] = {
+  private def getTagBasedPolicies(clusterId: String, offset: Long, limit: Long, guid: String)(implicit token:Option[HJwtToken]): Future[JsValue] = {
     for {
       tags <- getAtlasTagsByGuid(clusterId, guid)
       policies <- getPoliciesByTags(clusterId, tags, offset, limit)
     } yield policies
   }
 
-  private def getAtlasTagsByGuid(clusterId: Long, guid: String)(implicit token:Option[HJwtToken]): Future[Seq[String]] = {
+  private def getAtlasTagsByGuid(clusterId: String, guid: String)(implicit token:Option[HJwtToken]): Future[Seq[String]] = {
     atlasService
-      .getAssetDetails(clusterId.toString, guid)
+      .getAssetDetails(clusterId, guid)
       .map {
         case Left(errors) => throw WrappedErrorsException(errors)
         case Right(asset) => (asset \ "entity" \ "classifications" \\ "typeName").map(d => d.validate[String].get)
       }
   }
-  private def getPoliciesByTags(clusterId: Long, tags: Seq[String], offset: Long, limit: Long)(implicit token:Option[HJwtToken]): Future[JsValue] = {
-    rangerService.getPolicyDetailsByTagName(clusterId, tags.mkString(","), offset, limit)
+  private def getPoliciesByTags(clusterId: String, tags: Seq[String], offset: Long, limit: Long)(implicit token:Option[HJwtToken]): Future[JsValue] = {
+    rangerService.getPolicyDetailsByTagName(clusterId.toLong, tags.mkString(","), offset, limit)
       .map {
         case Left(errors) => throw WrappedErrorsException(errors)
         case Right(policies) => policies

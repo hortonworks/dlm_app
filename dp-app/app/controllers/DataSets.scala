@@ -96,19 +96,19 @@ class DataSets @Inject()(
           val entitiesToSave =
             enhanced.filter(cEntity => cEntity.datasetId.isEmpty)
           Right(entitiesToSave.map(cEntity =>
-                  getAssetFromEntity(cEntity, req.clusterId)),
+                  getAssetFromEntity(cEntity, req.clusterId.toString)),
                 entitiesToSave.size,
                 enhanced.size - entitiesToSave.size)
       }
   }
 
-  private def getAssetFromEntity(entity: Entity, clusterId: Long): DataAsset = {
+  private def getAssetFromEntity(entity: Entity, clusterId: String): DataAsset = {
     DataAsset(None,
               entity.typeName.get,
               entity.attributes.get.get("name").get,
               entity.guid.get,
               Json.toJson(entity.attributes.get),
-              clusterId)
+              clusterId.toLong)
   }
 
   def createDatasetWithAtlasSearch = AuthenticatedAction.async(parse.json) {
@@ -188,30 +188,26 @@ class DataSets @Inject()(
     }
   }
 
-  def getRichDatasetById(id: String) =  Action.async {
+  def getRichDatasetById(datasetId: String) =  Action.async {
     Logger.info("Received retrieve dataSet request")
-    if(Try(id.toLong).isFailure){
-      Future.successful(NotFound)
-    }else{
-      dataSetService
-        .getRichDatasetById(id.toLong)
-        .map {
-          case Left(errors)
+    dataSetService
+      .getRichDatasetById(datasetId.toLong)
+      .map {
+        case Left(errors)
             if errors.errors.size > 0 && errors.errors.head.code == "404" =>
             NotFound
           case Left(errors) =>
             InternalServerError(Json.toJson(errors))
           case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
         }
-    }
   }
 
-  def getDataAssetsByDatasetId(id: Long,
+  def getDataAssetsByDatasetId(datasetId: String,
                                queryName: String,
                                offset: Long,
                                limit: Long) =  Action.async {
     dataSetService
-      .getDataAssetByDatasetId(id, queryName, offset, limit)
+      .getDataAssetByDatasetId(datasetId.toLong, queryName, offset, limit)
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
@@ -254,9 +250,9 @@ class DataSets @Inject()(
     implicit val token = request.token
     Logger.info("Received delete dataSet request")
     (for {
-      dataset <- doGetDataset(dataSetId.toLong)
-      clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toLong)
-      deleted <- doDeleteDataset(dataset.id.get)
+      dataset <- doGetDataset(dataSetId)
+      clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toString)
+      deleted <- doDeleteDataset(dataset.id.get.toString)
       jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
       _ <- doDeleteProfilers(clusterId, jobName)
     }  yield {
@@ -359,7 +355,7 @@ class DataSets @Inject()(
     }
   }
 
-  private def doDeleteDataset(datasetId: Long): Future[Long] = {
+  private def doDeleteDataset(datasetId: String): Future[Long] = {
     dataSetService
       .delete(datasetId.toString)
       .flatMap {
@@ -368,9 +364,9 @@ class DataSets @Inject()(
       }
   }
 
-  private def doDeleteProfilers(clusterId: Long, jobName: String)(implicit token:Option[HJwtToken]): Future[Boolean] = {
+  private def doDeleteProfilers(clusterId: String, jobName: String)(implicit token:Option[HJwtToken]): Future[Boolean] = {
     dpProfilerService
-      .deleteProfilerByJobName(clusterId, jobName)
+      .deleteProfilerByJobName(clusterId.toLong, jobName)
       .flatMap {
         case Right(attributes) => {
           Logger.info(s"Delete Profiler, 200 response, ${Json.toJson(attributes)}")
@@ -383,18 +379,18 @@ class DataSets @Inject()(
       }
   }
 
-  private def doGetClusterIdFromDpClusterId(dpClusterId: Long): Future[Long] = {
+  private def doGetClusterIdFromDpClusterId(dpClusterId: String): Future[String] = {
     clusterService
-      .getLinkedClusters(dpClusterId)
+      .getLinkedClusters(dpClusterId.toLong)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
-        case Right(clusters) => Future.successful(clusters.head.id.get)
+        case Right(clusters) => Future.successful(clusters.head.id.get.toString)
       }
   }
 
-  private def doGetDataset(datasetId: Long): Future[Dataset] = {
+  private def doGetDataset(datasetId: String): Future[Dataset] = {
     dataSetService
-      .getRichDatasetById(datasetId)
+      .getRichDatasetById(datasetId.toLong)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
         case Right(dataset) => Future.successful(dataset.dataset)

@@ -49,13 +49,6 @@ export class DataSetService {
       .catch(HttpUtil.handleError);
   }
 
-  put(data: DataSetAndCategoryIds): Observable<DataSetAndCategories> {
-    return this.http
-      .put(`${this.url}`, data, new RequestOptions(HttpUtil.getHeaders()))
-      .map(HttpUtil.extractData)
-      .catch(HttpUtil.handleError);
-  }
-
   get(datasetId: number): Observable<DataSetAndCategories> {
     return this.http
       .get(`${this.url}/${datasetId}`, new RequestOptions(HttpUtil.getHeaders()))

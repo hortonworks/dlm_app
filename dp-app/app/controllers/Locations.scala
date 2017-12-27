@@ -35,8 +35,8 @@ class Locations @Inject()(@Named("locationService") val locationService: Locatio
       }
   }
 
-  def retrieve(locationId: Long) = Action.async {
-    locationService.retrieve(locationId)
+  def retrieve(locationId: String) = Action.async {
+    locationService.retrieve(locationId.toLong)
       .map { location =>
         location match {
           case Left(errors) => InternalServerError(Json.toJson(errors))
