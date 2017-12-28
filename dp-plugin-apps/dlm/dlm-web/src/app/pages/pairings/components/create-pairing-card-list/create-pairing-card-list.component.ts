@@ -13,6 +13,7 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
 export const CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
+  /* tslint:disable-next-line:no-use-before-declare */
   useExisting: forwardRef(() => CreatePairingCardListComponent),
   multi: true
 };

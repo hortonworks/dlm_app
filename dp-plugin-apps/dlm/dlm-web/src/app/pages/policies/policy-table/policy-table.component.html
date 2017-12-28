@@ -20,7 +20,6 @@
 
 <dlm-icon-column></dlm-icon-column>
 <dlm-policy-info
-  [expandedRows]="tableComponent.expandedRows"
   [activeContent]="activeContentType"
   (nameClick)="toggleRowDetail($event, policyContent.Files)">
 </dlm-policy-info>
@@ -54,7 +53,7 @@
 <ng-template #prevJobs let-row="row">
   <span class="actionable" [attr.qe-attr]="'policy-jobs-' + row.$$index" (click)="toggleRowDetail(row, policyContent.Jobs)">
     <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
-    <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isPrevJobsActive(row.id), 'fa-caret-down': !isPrevJobsActive(row.id)}">
+    <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isPrevJobsActive(row), 'fa-caret-down': !isPrevJobsActive(row.id)}">
     </span>
   </span>
 </ng-template>
@@ -86,7 +85,6 @@
     [loadingJobs]="loadingJobs"
     [loadingDatabases]="databaseRequest$ | async"
     [loadingTables]="tablesLoadingMap"
-    [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
     [fileBrowserPage]="getFilesPageForRow(row.id)"
     [tablesSearchPattern]="tablesSearchPattern"
     (onTablesFilter)="handleTablesFilterApplied($event)"
@@ -111,9 +109,7 @@
     [attr.qe-attr]="'policy-actions-' + row.$$index"
     [rowId]="row.id"
     [policy]="row"
-    [isOpen]="shouldShowAction(row.id)"
     [policyActions]="rowActions"
-    (openChange)="handleActionOpenChange($event)"
     (handler)="handleSelectedAction($event)">
   </dlm-policy-actions>
 </ng-template>

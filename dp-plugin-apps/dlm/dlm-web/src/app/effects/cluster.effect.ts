@@ -9,7 +9,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { ClusterService } from 'services/cluster.service';

@@ -14,4 +14,4 @@ export interface UnreachableBeacon {
     message: string;
     status: string;
   };
-};
+}

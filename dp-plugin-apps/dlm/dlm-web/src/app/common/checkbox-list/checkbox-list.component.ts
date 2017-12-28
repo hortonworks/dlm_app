@@ -12,6 +12,7 @@ import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormBuilder, FormGroup } from 
 
 export const CHECKBOX_LIST_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
+  /* tslint:disable-next-line:no-use-before-declare */
   useExisting: forwardRef(() => CheckboxListComponent),
   multi: true
 };

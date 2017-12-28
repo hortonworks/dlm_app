@@ -16,4 +16,4 @@ export interface ProgressState {
   actionType?: string;
   response?: any;
   [key: string]: any;
-};
+}

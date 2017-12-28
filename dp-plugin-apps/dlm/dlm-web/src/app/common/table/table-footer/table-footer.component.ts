@@ -34,11 +34,11 @@ export class TableFooterComponent {
 
   get pageSizeOptions(): DropdownItem[] {
     return this.limits.map(limit => (<DropdownItem>{label: '' + limit, value: limit}));
-  };
+  }
 
   get summary(): string {
     return this.translate.instant('common.table.summary', {shown: this.filteredRowsCount, count: this.rowsCount});
-  };
+  }
 
   get pagesCount(): number {
     const pagesCount = this.filteredRowsCount / this.pageSize;

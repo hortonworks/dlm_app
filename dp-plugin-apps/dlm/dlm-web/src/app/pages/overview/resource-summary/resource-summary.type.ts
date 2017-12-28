@@ -12,12 +12,12 @@ export interface SummaryData {
   value: string|number;
   actionable?: boolean;
   iconClass: string;
-};
+}
 
 export interface ResourceInfo {
   title: string;
   data: SummaryData[];
-};
+}
 
 export const SUMMARY_PANELS = {
   CLUSTER: 'CLUSTER',

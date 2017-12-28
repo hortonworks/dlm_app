@@ -8,7 +8,7 @@
  */
 
 import { type, requestType } from '../utils/type-action';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 import { PairingRequestBody } from 'models/pairing.model';
 
@@ -18,14 +18,14 @@ export const ActionTypes = {
   DELETE_PAIRING: requestType('DELETE_PAIRING'),
 };
 
-export const loadPairings = (requestId?): Action => ({type: ActionTypes.LOAD_PAIRINGS.START, payload: {meta: {requestId}}});
+export const loadPairings = (requestId?): ActionWithPayload<any> => ({type: ActionTypes.LOAD_PAIRINGS.START, payload: {meta: {requestId}}});
 export const loadPairingsSuccess = (pairings, meta = {}): ActionSuccess => ({
   type: ActionTypes.LOAD_PAIRINGS.SUCCESS,
   payload: {response: pairings, meta}
 });
 export const loadPairingsFail = (error, meta = {}): ActionFailure => ({type: ActionTypes.LOAD_PAIRINGS.FAILURE, payload: {error, meta}});
 
-export const createPairing = (pairing, meta = {}): Action => ({
+export const createPairing = (pairing, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.CREATE_PAIRING.START,
   payload: { pairing, meta }
 });
@@ -38,7 +38,7 @@ export const createPairingFail = (error, meta): ActionFailure => ({
   payload: { error, meta }
 });
 
-export const deletePairing = (pairing: PairingRequestBody, meta = {}): Action => ({
+export const deletePairing = (pairing: PairingRequestBody, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.DELETE_PAIRING.START,
   payload: { pairing, meta }
 });

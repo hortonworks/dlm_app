@@ -32,7 +32,7 @@ const DROPDOWN_MIN_LENGTH = 2;
       </span>
       <span *ngFor="let breadcrumb of breadcrumbs" class="breadcrumb-item">
         <a *ngIf="breadcrumb.url !== ''" class="nameLink" (click)="handleClick(breadcrumb.url)">
-          {{breadcrumb.label}}  
+          {{breadcrumb.label}}
         </a>
         <span *ngIf="breadcrumb.url === ''">{{breadcrumb.label}}</span>
       </span>

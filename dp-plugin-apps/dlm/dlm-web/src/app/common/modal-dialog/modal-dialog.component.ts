@@ -11,7 +11,7 @@ import {
   Component, OnInit, OnChanges, SimpleChange, Input, Output, EventEmitter, ViewChild,
   HostListener
 } from '@angular/core';
-import { ModalDirective } from 'ng2-bootstrap';
+import { ModalDirective } from 'ngx-bootstrap';
 import { ModalSize, SIZE_CLASS_MAP } from './modal-dialog.size';
 
 @Component({

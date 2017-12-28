@@ -7,46 +7,53 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { HttpService } from './http.service';
-import { BaseRequestOptions, ConnectionBackend, Http, RequestOptions, RequestMethod } from '@angular/http';
-import { MockBackend } from '@angular/http/testing';
-import { ReflectiveInjector } from '@angular/core';
-import { Pairing } from '../models/pairing.model';
+import { TestBed, getTestBed } from '@angular/core/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
+
+import { Pairing, PairingRequestBody } from 'models/pairing.model';
 import { PairingService } from './pairing.service';
+import { configureServiceTest } from 'testing/configure';
+import { API_PREFIX } from 'constants/api.constant';
 
 describe('PairingService', () => {
-  beforeEach(() => {
-    this.injector = ReflectiveInjector.resolveAndCreate([
-      { provide: ConnectionBackend, useClass: MockBackend },
-      { provide: RequestOptions, useClass: BaseRequestOptions },
-      { provide: Http, useClass: HttpService },
-      Http,
-      HttpService,
-      PairingService
-    ]);
+  let injector: TestBed;
+  let pairingService: PairingService;
+  let httpMock: HttpTestingController;
 
-    this.pairingService = this.injector.get(PairingService);
-    this.backend = this.injector.get(ConnectionBackend) as MockBackend;
-    this.backend.connections.subscribe((connection: any) => this.lastConnection = connection);
+  beforeEach(() => {
+    configureServiceTest({
+      providers: [
+        PairingService
+      ]
+    });
+
+    injector = getTestBed();
+    pairingService = injector.get(PairingService);
+    httpMock = injector.get(HttpTestingController);
   });
 
   describe('#fetchPairings', () => {
     beforeEach(() => {
-      this.pairingService.fetchPairings();
+      pairingService.fetchPairings().subscribe();
     });
     it('should do GET request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+      const req = httpMock.expectOne(`${API_PREFIX}pairs`);
+      expect(req.request.method).toBe('GET');
     });
   });
 
   describe('#createPairing', () => {
+    const pairing: PairingRequestBody = [
+      {clusterId: 1, beaconUrl: 'url1'},
+      {clusterId: 2, beaconUrl: 'url2'},
+    ];
     beforeEach(() => {
-      this.pairing = <Pairing>{id: '1'};
-      this.pair = {};
-      this.pairingService.createPairing(this.pairing);
+      pairingService.createPairing(pairing).subscribe();
     });
     it('should do POST request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Post);
+      const req = httpMock.expectOne(`${API_PREFIX}pair`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(pairing);
     });
   });
 

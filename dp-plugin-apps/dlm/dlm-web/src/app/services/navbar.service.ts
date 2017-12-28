@@ -20,4 +20,4 @@ export class NavbarService {
   toggleNavbar() {
     this.isCollapsed.next(!this.isCollapsed.getValue());
   }
-};
+}

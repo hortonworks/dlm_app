@@ -16,7 +16,8 @@ import {
   ViewEncapsulation,
   TemplateRef,
   OnDestroy,
-  EventEmitter
+  EventEmitter,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
@@ -94,7 +95,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   private selectedJobsInput$: BehaviorSubject<any> = new BehaviorSubject('');
   private selectedJobsActions = {};
   private subscriptions: Subscription[] = [];
-  private visibleActionMap = {};
   private selectedFileBrowserPage = {};
   private loadedDatabaseTables = {};
   private tableRequestPrefix = '[PolicyTableComponent] LOAD_TABLES ';
@@ -151,7 +151,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     const polling$ = Observable.interval(POLL_INTERVAL)
       .withLatestFrom(this.selectedPolicy$)
       .filter(([_, policy]) => Boolean(
-        this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.expandedRows[policy.id]
+        this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.isRowExpanded(policy)
       ))
       .do(([_, policy]) => {
         this.store.dispatch(loadJobsPageForPolicy(
@@ -425,7 +425,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.handleJobsPageChange({offset: 0}, policy.id);
     this.detailsToggle.emit({
       policy: policy.id,
-      expanded: this.tableComponent.expandedRows[policy.id],
+      expanded: this.tableComponent.isRowExpanded(policy),
       contentType
     });
   }
@@ -440,7 +440,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     const isContentChanged = contentType !== this.activeContentType;
     const isPolicyChanged = selectedPolicy.id !== nextPolicy.id;
     // always open details on сollapsed item
-    if (!this.tableComponent.expandedRows[nextPolicy.id]) {
+    if (!this.tableComponent.isRowExpanded(nextPolicy)) {
       this.tableComponent.toggleRowDetail(nextPolicy);
       // collapse active policy and show selected when non-active policy clicked
     } else if (isPolicyChanged) {
@@ -453,7 +453,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   }
 
   loadContentDetails(policy, contentType) {
-    if (!this.tableComponent.expandedRows[policy.id]) {
+    if (!this.tableComponent.isRowExpanded(policy)) {
       return;
     }
     if (contentType === PolicyContent.Files) {
@@ -500,17 +500,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     return rowId && rowId in this.selectedJobsPage ? this.selectedJobsPage[rowId] : 0;
   }
 
-  handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
-    const { rowId, isOpen } = event;
-    if (rowId) {
-      this.visibleActionMap[rowId] = isOpen;
-    }
-  }
-
-  shouldShowAction(rowId) {
-    return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
-  }
-
   handleOnSelectActionJobs(jobEvent: { rowId: string, isOpen: boolean}, rowId) {
     this.selectedJobsActions[rowId] = jobEvent;
   }
@@ -535,8 +524,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.selectedFileBrowserPage[rowId] = page.offset;
   }
 
-  isPrevJobsActive(rowId) {
-    return this.tableComponent.expandedRows[rowId] && this.activeContentType === PolicyContent.Jobs;
+  isPrevJobsActive(row) {
+    return this.tableComponent.isRowExpanded(row) && this.activeContentType === PolicyContent.Jobs;
   }
 
   handleTablesFilterApplied(event) {

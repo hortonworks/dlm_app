@@ -19,7 +19,7 @@ import com.hortonworks.dataplane.commons.domain.Ldap.LdapSearchResult.ldapConfig
 import com.hortonworks.dataplane.commons.domain.{Entities, RoleType}
 import com.hortonworks.dataplane.db.Webservice.{GroupService, UserService}
 import com.typesafe.scalalogging.Logger
-import models.{UserListInput, UsersAndRolesListInput}
+import models.{JsonResponses, UserListInput, UsersAndRolesListInput}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.LdapService
@@ -137,6 +137,13 @@ class UserManager @Inject()(val ldapService: LdapService,
     userService.getUsersWithRoles(request.getQueryString("offset"), request.getQueryString("pageSize"), request.getQueryString("searchTerm")).map {
       case Left(errors) => handleErrors(errors)
       case Right(users) => Ok(Json.toJson(users))
+    }
+  }
+
+  def getUser(userId: String) = Action.async {
+    userService.loadUserById(userId).map{
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(user) => Ok(Json.toJson(user))
     }
   }
 

@@ -88,9 +88,7 @@
     qe-attr="job-actions"
     [rowId]="row.id"
     [policy]="row"
-    [isOpen]="shouldShowAction(row.id)"
     [policyActions]="rowActions"
-    (openChange)="handleActionOpenChange($event)"
     (handler)="handleSelectedAction($event)">
   </dlm-policy-actions>
 </ng-template>

@@ -23,6 +23,7 @@ import {
     TemplateRef,
     ViewChild,
     ViewEncapsulation,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -57,16 +58,6 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     pagerDropup: false
   } as TableFooterOptions;
   private footerOpts: TableFooterOptions = this.footerOptsDefault;
-
-  /**
-   * Map for expanded rows
-   * Keys - model's ids
-   * Values - true for expanded, false for collapsed
-   *
-   * This map is need because ngx-datatable stores info about expanded rows in the rows itself (`$$expanded`-property)
-   * After table data is updated from store all `$$expanded` markers are removed and rows becomes collapsed
-   */
-  expandedRows = {};
 
   actions: ActionItemType[];
   limit = 10;
@@ -128,12 +119,8 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     return this.footerOpts;
   }
 
-  // hacky but seems like there is no other easy solution to set template for Row Detail
-  @Input() set rowDetailTemplate(template: TemplateRef<any>) {
-    if (template) {
-      this.table.rowDetail.template = template;
-    }
-  };
+  @Input()
+  rowDetailTemplate: TemplateRef<any>;
 
   @Input() trackByProp = 'id';
 
@@ -206,7 +193,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
 
   @HostBinding('class') get className() {
     return TableThemeSettings[this.theme].className;
-  };
+  }
 
   @HostListener('window:resize') onWindowResize() {
     this.recalculateTable();
@@ -288,30 +275,18 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
    * If `multiExpand` is false, previously expanded row will be collapsed
    */
   toggleRowDetail(row) {
-    const expandedRows = Object.keys(this.expandedRows).filter(k => !!this.expandedRows[k]);
-    if (!this.multiExpand && !this.expandedRows[row.id] && expandedRows.length) {
+    if (!this.multiExpand && !this.isRowExpanded(row)) {
       this.table.rowDetail.collapseAllRows();
-      this.expandedRows = {};
     }
     this.table.rowDetail.toggleExpandRow(row);
-    this.expandedRows[row.id] = !this.expandedRows[row.id];
   }
 
   ngOnChanges(changes) {
     if (changes.rows) {
-      const {firstChange, currentValue, previousValue} = changes.rows;
+      const { firstChange, currentValue, previousValue } = changes.rows;
       if (!firstChange && currentValue && previousValue && currentValue.length < previousValue.length) {
         this.table.offset = 0;
       }
-      // restore expanded rows after data update
-      Object.keys(this.expandedRows).forEach(id => {
-        if (this.expandedRows[id]) {
-          const policy = this.rows.find(p => '' + p.id === id);
-          if (policy) {
-            this.table.rowDetail.toggleExpandRow(policy);
-          }
-        }
-      });
     }
     if (changes.loadingIndicator) {
       const loadingIndicator = changes.loadingIndicator.currentValue;
@@ -342,6 +317,10 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     if (this.navbarCollapseSubscription) {
       this.navbarCollapseSubscription.unsubscribe();
     }
+  }
+
+  isRowExpanded(row): boolean {
+    return this.table.bodyComponent.getRowExpanded(row);
   }
 
 }

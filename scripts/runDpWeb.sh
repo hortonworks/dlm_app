@@ -9,4 +9,4 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-sbt ";project dbService;run -Dhttp.port=9005"
+cd ../dp-web; yarn dev; cd -

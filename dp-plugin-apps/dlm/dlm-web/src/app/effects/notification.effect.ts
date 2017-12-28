@@ -9,7 +9,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -19,6 +19,7 @@ import { NotificationService } from 'services/notification.service';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { getError } from 'utils/http-util';
 import { genId } from 'utils/string-utils';
+import { ErrorPayload } from 'utils/extended-actions.type';
 
 @Injectable()
 export class NotificationEffects {
@@ -26,7 +27,7 @@ export class NotificationEffects {
   @Effect()
   showNotification$ = this.actions$
     .filter(action => isCompletedAction(action) && this.hasNotification(action))
-    .switchMap(action => {
+    .switchMap((action: ActionWithPayload<any>) => {
       const payload = action.payload;
       const notification = payload.meta.notification;
       if (isSuccessAction(action) && NOTIFICATION_TYPES.SUCCESS in payload.meta.notification) {
@@ -54,7 +55,7 @@ export class NotificationEffects {
     return action.payload.meta && 'notification' in action.payload.meta;
   }
 
-  private getErrorBody(action: Action) {
+  private getErrorBody(action: ActionWithPayload<ErrorPayload>) {
     const err = action.payload.error;
     let errorMessage = getError(err.json && typeof err.json === 'function' ? err.json() : err);
     if (errorMessage.message) {

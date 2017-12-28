@@ -21,6 +21,7 @@ import javax.xml.xpath.{XPath, XPathConstants, XPathFactory}
 import org.w3c.dom.{Document, Element, Node, NodeList}
 
 import scala.collection.mutable
+import scala.util.Try
 
 object TopologyGenerator {
 
@@ -40,12 +41,14 @@ object TopologyGenerator {
     }
     None
   }
-  private def createParamElem(doc:Document,name:String,value:String): Node ={
-    val paramElem=doc.createElement("param")
-    val nameElem=doc.createElement("name")
+  private def createParamElem(doc: Document,
+                              name: String,
+                              value: String): Node = {
+    val paramElem = doc.createElement("param")
+    val nameElem = doc.createElement("name")
     nameElem.appendChild(doc.createTextNode(name))
     paramElem.appendChild(nameElem)
-    val valueElem=doc.createElement("value")
+    val valueElem = doc.createElement("value")
     valueElem.appendChild(doc.createTextNode(value))
     paramElem.appendChild(valueElem)
     paramElem
@@ -64,46 +67,67 @@ object TopologyGenerator {
     replaceParamValue(authParams.get("main.ldapRealm.contextFactory.url").get,
                       config.ldapUrl.get)
 
-    val gatewayProviders: NodeList = xPath.evaluate("/topology/gateway/provider", doc.getDocumentElement,XPathConstants.NODESET).asInstanceOf[NodeList]
+    val gatewayProviders: NodeList = xPath
+      .evaluate("/topology/gateway/provider",
+                doc.getDocumentElement,
+                XPathConstants.NODESET)
+      .asInstanceOf[NodeList]
     val authenticationNode = findByRoleName(gatewayProviders, "authentication")
-    if (config.userSearchBase.isDefined){
-      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.userSearchBase",config.userSearchBase.get))
-      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.userSearchAttributeName",config.userSearchAttributeName.get))
-      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.contextFactory.systemUsername",config.bindDn.get))
-      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.contextFactory.systemPassword","${ALIAS=ldcSystemPassword}"))
+    if (config.userSearchBase.isDefined) {
+      authenticationNode.get.appendChild(
+        createParamElem(doc,
+                        "main.ldapRealm.userSearchBase",
+                        config.userSearchBase.get))
+      authenticationNode.get.appendChild(
+        createParamElem(doc,
+                        "main.ldapRealm.userSearchAttributeName",
+                        config.userSearchAttributeName.get))
+      authenticationNode.get.appendChild(
+        createParamElem(doc,
+                        "main.ldapRealm.contextFactory.systemUsername",
+                        config.bindDn.get))
+      authenticationNode.get.appendChild(
+        createParamElem(doc,
+                        "main.ldapRealm.contextFactory.systemPassword",
+                        "${ALIAS=ldcSystemPassword}"))
     }
 
     val ssoServiceParams = getKnoxSsoServiceParams(doc)
     var ttlMilliSecs = config.signedTokenTtl match {
       case Some(ttlInMinutes) => ttlInMinutes * 60000
-      case None => defaultKnoxTokenTTLMinutes * 60000
+      case None               => defaultKnoxTokenTTLMinutes * 60000
     }
-    replaceParamValue(ssoServiceParams.get("knoxsso.token.ttl").get,
+    replaceParamValue(ssoServiceParams("knoxsso.token.ttl"),
                       ttlMilliSecs.toString)
     var httpsOnly = config.allowHttpsOnly match {
       case Some(httpsOnly) => httpsOnly
-      case None => false
+      case None            => false
     }
-    replaceParamValue(ssoServiceParams.get("knoxsso.cookie.secure.only").get,
+    replaceParamValue(ssoServiceParams("knoxsso.cookie.secure.only"),
                       httpsOnly.toString)
 
     val whiteListDomains = config.domains match {
-      case Some(domains) => {
-        if (domains.size>0) {
-          domains.mkString("|").trim+"|"
-        }else{
+      case Some(domains) =>
+        if (domains.size > 0) {
+          domains.mkString("|").trim + "|"
+        } else {
           ""
         }
-      }
       case None => ""
     }
-    val whitelistRegex="^https?:\\/\\/("+whiteListDomains+"localhost|127.0.0.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$"
-    replaceParamValue(ssoServiceParams.get("knoxsso.redirect.whitelist.regex").get,
+    val whitelistRegex =
+      if (Try(agentConfig.getBoolean("sso.disable.whitelist")).getOrElse(false))
+        "^https?:\\/\\/*.*$"
+      else
+        "^https?:\\/\\/(" + whiteListDomains + "localhost|127.0.0.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$"
+    replaceParamValue(
+      ssoServiceParams("knoxsso.redirect.whitelist.regex"),
       whitelistRegex)
     val transformerFactory = TransformerFactory.newInstance
     val transformer = transformerFactory.newTransformer
     transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
+    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
+                                  "4")
     val stringWriter: StringWriter = new StringWriter()
     transformer.transform(new DOMSource(doc), new StreamResult(stringWriter))
     stringWriter.toString

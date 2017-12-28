@@ -37,4 +37,4 @@ export const NOTIFICATION_TYPE_CLASSES = {
 export enum NOTIFICATION_CONTENT_TYPE {
   INLINE,
   MODAL_LINK
-};
+}

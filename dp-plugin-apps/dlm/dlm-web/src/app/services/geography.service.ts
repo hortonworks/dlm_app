@@ -7,10 +7,10 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import {Injectable, isDevMode} from '@angular/core';
-import {Http} from '@angular/http';
-import {mapResponse} from 'utils/http-util';
-import {Observable} from 'rxjs/Observable';
+import { Injectable, isDevMode } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { mapResponse } from 'utils/http-util';
+import { Observable } from 'rxjs/Observable';
 
 declare const L: any;
 
@@ -20,15 +20,13 @@ export class GeographyService {
   urlBase = isDevMode() ? '/assets/geojson/geo-no-antartica.json' : '/dlm/assets/geojson/geo-no-antartica.json';
   urlCountries = isDevMode() ? '/assets/geojson/countries.json' : '/dlm/assets/geojson/countries.json';
 
-  constructor(private http: Http) {}
+  constructor(private httpClient: HttpClient) {}
 
   public getBase(): Observable<any> {
-    return mapResponse(this.http
-      .get(this.urlBase));
+    return this.httpClient.get<any>(this.urlBase);
   }
 
   public getCountries(): Observable<any> {
-    return mapResponse(this.http
-      .get(this.urlCountries));
+    return this.httpClient.get<any>(this.urlCountries);
   }
 }

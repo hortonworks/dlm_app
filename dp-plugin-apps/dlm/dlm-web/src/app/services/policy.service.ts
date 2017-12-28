@@ -9,7 +9,7 @@
 
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import {Policy, PolicyPayload, Report} from 'models/policy.model';
 import { toSearchParams, mapResponse } from 'utils/http-util';
@@ -58,16 +58,16 @@ export class PolicyService {
     return this.t.instant(POLICY_DISPLAY_STATUS[displayStatus]);
   }
 
-  constructor(private http: Http, private jobService: JobService, private t: TranslateService) { }
+  constructor(private httpClient: HttpClient, private jobService: JobService, private t: TranslateService) { }
 
   createPolicy(payload: { policy: PolicyPayload, targetClusterId: string }): Observable<any> {
     const { policy, targetClusterId } = payload;
-    return mapResponse(this.http.post(`clusters/${targetClusterId}/policy/${policy.policyDefinition.name}/submit`, policy));
+    return this.httpClient.post(`clusters/${targetClusterId}/policy/${policy.policyDefinition.name}/submit`, policy);
   }
 
   fetchPolicies(queryParams = {}): Observable<any> {
-    const search = toSearchParams(queryParams);
-    return mapResponse(this.http.get('policies', {search})).map(response => {
+    const params = toSearchParams(queryParams);
+    return this.httpClient.get<any>('policies', {params}).map(response => {
       response.policies.forEach(policy => {
         policy.jobs = policy.jobs.map(job => this.jobService.normalizeJob(job));
         policy = {
@@ -80,11 +80,11 @@ export class PolicyService {
   }
 
   fetchPolicy(id: string): Observable<any> {
-    return mapResponse(this.http.get(`policies/${id}`));
+    return this.httpClient.get<any>(`policies/${id}`);
   }
 
   schedulePolicy(payload: { policyName: string, targetClusterId: string|number}) {
-    return mapResponse(this.http.put(`clusters/${payload.targetClusterId}/policy/${payload.policyName}/schedule`, {}));
+    return this.httpClient.put(`clusters/${payload.targetClusterId}/policy/${payload.policyName}/schedule`, {});
   }
 
   private getManagePolicyUrl(policy: Policy): string {
@@ -92,18 +92,15 @@ export class PolicyService {
   }
 
   deletePolicy(payload: Policy): Observable<any> {
-    return this.http.delete(this.getManagePolicyUrl(payload))
-      .map(r => r.json());
+    return this.httpClient.delete(this.getManagePolicyUrl(payload));
   }
 
   suspendPolicy(payload: Policy): Observable<any> {
-    return this.http.put(`${this.getManagePolicyUrl(payload)}/suspend`, {})
-      .map(r => r.json());
+    return this.httpClient.put(`${this.getManagePolicyUrl(payload)}/suspend`, {});
   }
 
   resumePolicy(payload: Policy): Observable<any> {
-    return this.http.put(`${this.getManagePolicyUrl(payload)}/resume`, {})
-      .map(r => r.json());
+    return this.httpClient.put(`${this.getManagePolicyUrl(payload)}/resume`, {});
   }
 
 }

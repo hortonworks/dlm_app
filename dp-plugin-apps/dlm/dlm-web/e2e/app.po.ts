@@ -48,8 +48,8 @@ export class Page {
   clickAddDropdownButton(buttonText) {
     const actionButton = this.getAddButton();
     actionButton.click();
-    const element = this.getDropDownItem(buttonText);
-    browser.actions().mouseMove(element).click().perform();
+    const dropdownOption = this.getDropDownItem(buttonText);
+    browser.actions().mouseMove(dropdownOption).click().perform();
   }
 
   getUrl() {

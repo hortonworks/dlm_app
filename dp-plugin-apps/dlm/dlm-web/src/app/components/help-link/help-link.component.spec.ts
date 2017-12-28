@@ -11,7 +11,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HelpLinkComponent } from './help-link.component';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
-import { TooltipModule } from 'ng2-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap';
 
 describe('HelpLinkComponent', () => {
   let component: HelpLinkComponent;

@@ -99,10 +99,10 @@ class DataplaneClusters @Inject()(
     }
   }
 
-  def retrieveServices(clusterId: String) = Action.async {
+  def retrieveServices(dpClusterId: String) = Action.async {
     Logger.info("Received retrieve data centre request")
     dpClusterService
-      .retrieveServiceInfo(clusterId)
+      .retrieveServiceInfo(dpClusterId)
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
@@ -110,21 +110,21 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def update = Action.async(parse.json) { request =>
+  def update(dpClusterId: String) = Action.async(parse.json) { request =>
     Logger.info("Received update data centre request")
     request.body
       .validate[DataplaneCluster]
-      .map { lake =>
+      .map { dpCluster =>
         (for {
-          cluster <- retrieveClusterById(lake.id.get)
+          cluster <- retrieveClusterById(dpClusterId)
           newCluster <- Future.successful(cluster.copy(
-            id = lake.id,
-            dcName = lake.dcName,
-            description = lake.description,
-            location= lake.location,
-            properties = lake.properties
+            id = dpCluster.id,
+            dcName = dpCluster.dcName,
+            description = dpCluster.description,
+            location= dpCluster.location,
+            properties = dpCluster.properties
           ))
-          updated <- updateClusterById(lake.id.get, newCluster)
+          updated <- updateClusterById(newCluster)
         } yield {
           Ok(Json.toJson(updated))
         })
@@ -168,15 +168,15 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  private def retrieveClusterById(clusterId: Long): Future[DataplaneCluster] = {
-    dpClusterService.retrieve(clusterId.toString)
+  private def retrieveClusterById(dpClusterId: String): Future[DataplaneCluster] = {
+    dpClusterService.retrieve(dpClusterId)
         .flatMap {
           case Left(errors) => Future.failed(WrappedErrorsException(errors))
           case Right(cluster) => Future.successful(cluster)
         }
   }
 
-  private def updateClusterById(clusterId: Long, cluster: DataplaneCluster): Future[DataplaneCluster] = {
+  private def updateClusterById(cluster: DataplaneCluster): Future[DataplaneCluster] = {
     dpClusterService.update(cluster)
         .flatMap {
           case Left(errors) => Future.failed(WrappedErrorsException(errors))

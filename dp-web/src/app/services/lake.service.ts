@@ -53,7 +53,7 @@ export class LakeService {
 
   update(lake: Lake): Observable<Lake> {
     return this.http
-      .put(`${this.url}`, lake, new RequestOptions(HttpUtil.getHeaders()))
+      .put(`${this.url}/${lake.id}`, lake, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

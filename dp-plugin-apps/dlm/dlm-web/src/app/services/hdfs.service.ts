@@ -9,15 +9,15 @@
 
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class HdfsService {
 
-  constructor(private http: Http) {}
+  constructor(private httpClient: HttpClient) {}
 
   getFilesList(clusterId, path): Observable<any> {
-    return this.http.get(`clusters/${clusterId}/hdfs/file?path=${path}`).map(r => r.json());
+    return this.httpClient.get<any>(`clusters/${clusterId}/hdfs/file?path=${path}`);
   }
 
 }

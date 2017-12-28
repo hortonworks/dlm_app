@@ -24,7 +24,7 @@ import { TableFooterOptions } from 'common/table/table-footer/table-footer.type'
 import { TableFilterItem } from 'common/table/table-filter/table-filter-item.type';
 
 @Component({
-  selector: 'dp-jobs-table',
+  selector: 'dlm-jobs-table',
   templateUrl: './jobs-table.component.html',
   styleUrls: ['./jobs-table.component.scss']
 })
@@ -54,7 +54,6 @@ export class JobsTableComponent implements OnInit {
   @Input() sorts = [];
   @Input() page = 0;
   @Input() filters = [];
-  @Input() visibleActionMap = {};
   @Input() footerOptions: TableFooterOptions;
 
   @Output() onSort = new EventEmitter<any>();
@@ -159,18 +158,6 @@ export class JobsTableComponent implements OnInit {
 
   isRunning(job: Job) {
     return job && !job.isCompleted;
-  }
-
-  handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
-    const { rowId, isOpen } = event;
-    if (rowId) {
-      this.visibleActionMap[rowId] = isOpen;
-      this.onSelectAction.emit({[rowId]: isOpen});
-    }
-  }
-
-  shouldShowAction(rowId) {
-    return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
   }
 
   handleOnSort(sorts) {

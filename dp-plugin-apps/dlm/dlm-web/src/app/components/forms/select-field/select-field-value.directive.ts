@@ -14,4 +14,4 @@ import { Directive, TemplateRef } from '@angular/core';
 })
 export class SelectFieldValueDirective {
   constructor(public template: TemplateRef<any>) {}
-};
+}

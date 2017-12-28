@@ -11,7 +11,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClusterCardComponent } from 'components/cluster-card/cluster-card.component';
 import { CreatePairingCardComponent } from './create-pairing-card.component';
 import { Cluster } from 'models/cluster.model';
-import { TooltipModule } from 'ng2-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { PipesModule } from 'pipes/pipes.module';

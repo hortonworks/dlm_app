@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 import { type } from 'utils/type-action';
 import { ConfirmationOptions, confirmationOptionsDefaults } from 'components/confirmation-modal';
 
@@ -16,7 +16,7 @@ export const ActionTypes = {
 };
 
 export const confirmNextAction =
-  (nextAction: Action, confirmationOptions: ConfirmationOptions = confirmationOptionsDefaults) => ({
+  (nextAction: ActionWithPayload<any>, confirmationOptions: ConfirmationOptions = confirmationOptionsDefaults) => ({
     type: ActionTypes.CONFIRM_NEXT_ACTION,
     payload: { nextAction, confirmationOptions }
   });

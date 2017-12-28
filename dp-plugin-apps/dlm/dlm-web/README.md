@@ -39,6 +39,7 @@ Run `npm run build` to build the project. The build artifacts will be stored in 
 
 ## Lint
 Run `npm run lint` before committing changes. You may also configure your editor/IDE to make lint checks using project lint configuration.
+Run `npm run lint:fix` to quickly fix misc lint errors.
 
 ## Running unit tests
 

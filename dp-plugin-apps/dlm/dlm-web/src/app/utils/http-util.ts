@@ -8,6 +8,7 @@
  */
 
 import { Response, RequestOptionsArgs, Headers, URLSearchParams } from '@angular/http';
+import { HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { User } from 'models/user.model';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,14 +16,12 @@ import { TranslateService } from '@ngx-translate/core';
 export const toJson = (response: Response) => response.json();
 export const mapResponse = (response$: Observable<Response>) => response$.map(toJson);
 
-export const getHeaders = (): RequestOptionsArgs => {
+export const getHeaders = (): HttpHeaders => {
   const headers = {
     'Content-Type': 'application/json',
     'X-Requested-With' : 'XMLHttpRequest'
   };
-  return ({
-    headers: new Headers(headers)
-  });
+  return new HttpHeaders(headers);
 };
 
 export const getError = (response) => {
@@ -46,11 +45,11 @@ export const getUrlDomain = (urlAddress: string): string => {
   return url;
 };
 
-export const toSearchParams = (queryParams = {}): URLSearchParams => {
-  const params = new URLSearchParams();
+export const toSearchParams = (queryParams = {}): HttpParams => {
+  const params = new HttpParams();
   for (const param in queryParams) {
     if (param && queryParams.hasOwnProperty(param)) {
-      params.set(param, queryParams[param]);
+      params.append(param, queryParams[param]);
     }
   }
   return params;

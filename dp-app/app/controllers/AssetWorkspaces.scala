@@ -44,8 +44,8 @@ class AssetWorkspaces @Inject()(@Named("assetWorkspaceService") val assetWorkspa
     }
   }
 
-  def getAssets(workspaceId: Long) = Action.async {
-    assetWorkspaceService.list(workspaceId)
+  def getAssets(workspaceId: String) = Action.async {
+    assetWorkspaceService.list(workspaceId.toLong)
       .map {
         case Left(errors) => InternalServerError(Json.toJson(errors))
         case Right(assets) => Ok(Json.toJson(assets))

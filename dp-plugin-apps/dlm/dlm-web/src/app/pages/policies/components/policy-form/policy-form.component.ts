@@ -14,12 +14,12 @@ import {
   FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn, ValidationErrors
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { go } from '@ngrx/router-store';
 import { IMyOptions, IMyDateModel, IMyInputFieldChanged } from 'mydatepicker';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
+import * as RouterActions from 'actions/router.action';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { State } from 'reducers/index';
 import { Pairing } from 'models/pairing.model';
@@ -146,7 +146,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         color: '#ff0000'
       }]
     };
-  };
+  }
   sectionCollapsedMap = {
     general: false,
     database: false,
@@ -485,7 +485,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   private setupDestinationChanges(policyForm: FormGroup): void {
     let skipFieldChange = this.formRestored;
     const valueChange$: Observable<number> = policyForm.valueChanges
-      .pluck('general', 'destinationCluster')
+      .pluck<any, number>('general', 'destinationCluster')
       .distinctUntilChanged();
     const loadQueues = valueChange$
       .subscribe(clusterId => {
@@ -704,7 +704,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   cancel() {
     this.store.dispatch(resetFormValue(POLICY_FORM_ID));
-    this.store.dispatch(go(['policies']));
+    this.store.dispatch(new RouterActions.Go({path: ['policies']}));
   }
 
   validateTime = (formGroup: FormGroup) => {

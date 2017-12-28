@@ -7,45 +7,54 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import {ClusterService} from './cluster.service';
-import {HttpService} from './http.service';
-import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions, RequestMethod} from '@angular/http';
-import {MockBackend} from '@angular/http/testing';
-import {ReflectiveInjector} from '@angular/core';
-import {Cluster} from '../models/cluster.model';
+import { HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, getTestBed } from '@angular/core/testing';
+
+import { configureServiceTest } from 'testing/configure';
+import { API_PREFIX } from 'constants/api.constant';
+import { Cluster } from 'models/cluster.model';
+import { ClusterService } from './cluster.service';
 
 describe('ClusterService', () => {
-  beforeEach(() => {
-    this.injector = ReflectiveInjector.resolveAndCreate([
-      {provide: ConnectionBackend, useClass: MockBackend},
-      {provide: RequestOptions, useClass: BaseRequestOptions},
-      {provide: Http, useClass: HttpService},
-      Http,
-      HttpService,
-      ClusterService
-    ]);
+  let injector: TestBed;
+  let httpMock: HttpTestingController;
+  let clusterService: ClusterService;
 
-    this.clusterService = this.injector.get(ClusterService);
-    this.backend = this.injector.get(ConnectionBackend) as MockBackend;
-    this.backend.connections.subscribe((connection: any) => this.lastConnection = connection);
+  beforeEach(() => {
+
+    configureServiceTest({
+      providers: [
+        ClusterService
+      ]
+    });
+
+    injector = getTestBed();
+    clusterService = injector.get(ClusterService);
+    httpMock = injector.get(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 
   describe('#fetchClusters', () => {
     beforeEach(() => {
-      this.clusterService.fetchClusters();
+      clusterService.fetchClusters().subscribe();
     });
     it('should do GET request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+      const req = httpMock.expectOne(`${API_PREFIX}clusters`);
+      expect(req.request.method).toBe('GET');
     });
   });
 
   describe('#fetchCluster', () => {
     beforeEach(() => {
       this.id = '1';
-      this.clusterService.fetchCluster(this.id);
+      clusterService.fetchCluster(this.id).subscribe();
     });
     it('should do GET request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+      const req = httpMock.expectOne(`${API_PREFIX}clusters/1`);
+      expect(req.request.method).toBe('GET');
     });
   });
 
@@ -53,10 +62,11 @@ describe('ClusterService', () => {
     beforeEach(() => {
       this.cluster = <Cluster>{id: 1};
       this.pair = {};
-      this.clusterService.pairWith(this.cluster);
+      clusterService.pairWith(this.cluster, this.pair).subscribe();
     });
     it('should do POST request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Post);
+      const req = httpMock.expectOne(`${API_PREFIX}pair/1`);
+      expect(req.request.method).toBe('POST');
     });
   });
 
@@ -64,10 +74,11 @@ describe('ClusterService', () => {
     beforeEach(() => {
       this.cluster = <Cluster>{id: 1};
       this.pair = {};
-      this.clusterService.unpair(this.cluster);
+      clusterService.unpair(this.cluster).subscribe();
     });
     it('should do DELETE request', () => {
-      expect(this.lastConnection.request.method).toBe(RequestMethod.Delete);
+      const req = httpMock.expectOne(`${API_PREFIX}pair/1`);
+      expect(req.request.method).toBe('DELETE');
     });
   });
 

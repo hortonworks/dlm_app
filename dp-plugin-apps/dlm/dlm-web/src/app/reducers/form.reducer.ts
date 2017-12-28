@@ -12,7 +12,7 @@ import * as formAction from 'actions/form.action';
 
 export interface State {
   entities: { [id: string]: FormStore};
-};
+}
 
 export const initialState: State = {
   entities: {}
@@ -41,4 +41,4 @@ export function reducer(state = initialState, action): State {
     default:
       return state;
   }
-};
+}

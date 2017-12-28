@@ -44,4 +44,4 @@ export function reducer(state = initialState, action): State {
     default:
       return state;
   }
-};
+}

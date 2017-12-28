@@ -15,6 +15,7 @@ import { ProgressState } from 'models/progress-state.model';
 
 export const HIVE_BROWSER_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
+  /* tslint:disable-next-line:no-use-before-declare */
   useExisting: forwardRef(() => HiveBrowserComponent),
   multi: true
 };

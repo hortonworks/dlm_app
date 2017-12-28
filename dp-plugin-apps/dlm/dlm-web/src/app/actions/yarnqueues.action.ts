@@ -12,12 +12,13 @@ import { Action } from '@ngrx/store';
 import { requestType } from 'utils/type-action';
 import { YarnQueueResponse } from 'models/yarnqueues.model';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
+import { ActionWithPayload } from 'actions/actions.type';
 
 export const ActionTypes = {
   LOAD_YARN_QUEUES: requestType('LOAD_YARN_QUEUES')
 };
 
-export const loadYarnQueues = (clusterId: number, meta = {}): Action => ({
+export const loadYarnQueues = (clusterId: number, meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_YARN_QUEUES.START,
   payload: {meta, clusterId}
 });

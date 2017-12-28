@@ -8,33 +8,27 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CreatePairingComponent } from './create-pairing.component';
 import { CreatePairingCardListComponent } from 'pages/pairings/components/create-pairing-card-list/create-pairing-card-list.component';
 import { PairingProgressCardComponent } from 'pages/pairings/components/pairing-progress-card/pairing-progress-card.component';
 import { CreatePairingCardComponent } from 'pages/pairings/components/create-pairing-card/create-pairing-card.component';
-import { MockStore } from 'mocks/mock-store';
-import { Store } from '@ngrx/store';
-import { ModalModule } from 'ng2-bootstrap';
-import { MockTranslateLoader } from 'mocks/mock-translate-loader';
+import { ModalModule } from 'ngx-bootstrap';
 import { RouterTestingModule } from '@angular/router/testing';
-import { TooltipModule } from 'ng2-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap';
 import { CommonComponentsModule } from 'components/common-components.module';
 import { NotificationService } from 'services/notification.service';
 import { PipesModule } from 'pipes/pipes.module';
 import { HortonStyleModule } from 'common/horton-style.module';
+import { configureComponentTest } from 'testing/configure';
 
 describe('CreatePairingComponent', () => {
   let component: CreatePairingComponent;
   let fixture: ComponentFixture<CreatePairingComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
+    configureComponentTest({
       imports: [
-        TranslateModule.forRoot({
-          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-        }),
         ReactiveFormsModule,
         ModalModule.forRoot(),
         RouterTestingModule,
@@ -50,10 +44,6 @@ describe('CreatePairingComponent', () => {
         CreatePairingCardComponent
       ],
       providers: [
-        {
-          provide: Store,
-          useClass: MockStore
-        },
         {
           provide: NotificationService,
           useValue: jasmine.createSpyObj('notificationService', ['create'])

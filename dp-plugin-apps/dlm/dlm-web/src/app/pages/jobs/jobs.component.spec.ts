@@ -8,8 +8,6 @@
  */
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {JobsTableComponent} from './jobs-table/jobs-table.component';
 import {JobTransferredGraphComponent} from './jobs-transferred-graph/job-transferred-graph.component';
 import {TableComponent} from '../../common/table/table.component';
@@ -18,34 +16,27 @@ import {JobsComponent} from './jobs.component';
 import {CheckboxColumnComponent, ActionColumnComponent} from '../../components/table-columns';
 import {CheckboxComponent} from '../../common/checkbox/checkbox.component';
 import {FormsModule} from '@angular/forms';
-import {MockStore} from '../../mocks/mock-store';
-import {Store} from '@ngrx/store';
 import {MomentModule} from 'angular2-moment';
 import {ChartsModule} from 'ng2-charts';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
 import { TableFilterComponent } from '../../common/table/table-filter/table-filter.component';
-import { TypeaheadModule, TooltipModule, ProgressbarModule, BsDropdownModule } from 'ng2-bootstrap';
+import { TypeaheadModule, TooltipModule, ProgressbarModule, BsDropdownModule } from 'ngx-bootstrap';
 import { JobsStatusFilterComponent } from './jobs-status-filter/jobs-status-filter.component';
 import { NavbarService } from 'services/navbar.service';
 import { PipesModule } from 'pipes/pipes.module';
 import { LogService } from 'services/log.service';
-import {MockBackend} from '@angular/http/testing';
-import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
-import {HttpService} from 'services/http.service';
 import { CommonComponentsModule } from 'components/common-components.module';
 import { NotificationService } from 'services/notification.service';
+import { configureComponentTest } from 'testing/configure';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
   let fixture: ComponentFixture<JobsComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
+    configureComponentTest({
       imports: [
-        TranslateModule.forRoot({
-          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-        }),
         TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule,
         TooltipModule.forRoot(),
         ProgressbarModule.forRoot(),
@@ -66,12 +57,6 @@ describe('JobsComponent', () => {
         ActionColumnComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore},
-        {provide: ConnectionBackend, useClass: MockBackend},
-        {provide: RequestOptions, useClass: BaseRequestOptions},
-        {provide: Http, useClass: HttpService},
-        Http,
-        HttpService,
         NavbarService,
         {
           provide: NotificationService,

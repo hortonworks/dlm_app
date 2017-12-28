@@ -33,6 +33,7 @@ import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { loadBeaconAdminStatus } from 'actions/beacon.action';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 export const ALL = 'all';
 const POLICIES_REQUEST = '[POLICY_PAGE] POLICIES_REQUEST';
@@ -59,7 +60,6 @@ export class PoliciesComponent implements OnInit, OnDestroy {
    * Flag is set to `false` after request for policies is started
    * @type {boolean}
    */
-  policiesLoaded = false;
 
   /**
    * Flag is set to `true` when initial loading is complete (spinner becomes hidden)
@@ -67,7 +67,6 @@ export class PoliciesComponent implements OnInit, OnDestroy {
    * Otherwise infinity "loading" state will be on the page
    * @type {boolean}
    */
-  initialLoadingComplete = false;
   activePolicyId = '';
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
   filteredPolicies$: Observable<Policy[]>;
@@ -87,29 +86,30 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   initialFilters: {propertyName: string, value: string []} [];
 
   private initPolling() {
-    const polling$ = Observable.interval(POLL_INTERVAL)
-      .filter(_ => !this.lastPolicyToggles ||
-        (this.lastPolicyToggles.expanded && this.lastPolicyToggles.contentType === PolicyContent.Jobs))
-      .filter(_ => this.policiesLoaded)
-      .filter(_ => this.initialLoadingComplete)
-      .do(_ => {
-        this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}));
-        this.policiesLoaded = false;
-      });
-    this.subscriptions.push(polling$.subscribe());
+
+    const pollingLoop = Observable.timer(POLL_INTERVAL)
+      .concatMap(_ => {
+        if (!this.lastPolicyToggles || (this.lastPolicyToggles.expanded && this.lastPolicyToggles.contentType === PolicyContent.Jobs)) {
+          return this.asyncActions.dispatch(loadPolicies({ numResults: ALL_POLICIES_COUNT }));
+        }
+        return Observable.of(null);
+      })
+      .repeat()
+      .subscribe();
+    this.subscriptions.push(pollingLoop);
   }
 
-  constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute, private router: Router) {
+  constructor(
+    private store: Store<fromRoot.State>,
+    private route: ActivatedRoute,
+    private router: Router,
+    private asyncActions: AsyncActionsService
+  ) {
     this.policies$ = this.store.select(getPoliciesTableData).distinctUntilChanged(isEqual);
-    this.subscriptions.push(this.policies$.subscribe(_ => this.policiesLoaded = true));
     this.clusters$ = store.select(getAllClusters).distinctUntilChanged(isEqual);
     this.pairings$ = store.select(getAllPairings);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, PAIRINGS_REQUEST, ADMIN_STATUS_REQUEST));
-    this.subscriptions.push(this.overallProgress$.subscribe(progress => {
-      if (progress.success) {
-        this.initialLoadingComplete = true;
-      }
-    }));
+
     const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
     this.filteredPolicies$ = Observable.combineLatest(this.policies$, this.filters$, this.filterByService$)
       .map(([policies, filters, filterByService]) => this.filterPoliciesWithCondition(policies, filters, filterByService));
@@ -117,14 +117,22 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     this.resourceAvailability$ = Observable
       .combineLatest(this.clusters$, pairsCount$)
       .map(AddEntityButtonComponent.availableActions);
+
+    const startPolling = this.overallProgress$
+      .pluck<any, boolean>('isInProgress')
+      .filter(isInProgress => !isInProgress)
+      .first()
+      .subscribe(progress => {
+        this.initPolling();
+      });
+    this.subscriptions.push(startPolling);
   }
 
   ngOnInit() {
     this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     this.store.dispatch(loadBeaconAdminStatus({requestId: ADMIN_STATUS_REQUEST}));
-    const clusterSubscription = this.clusters$.subscribe(clusters => {
-      const clusterIds = clusters.map(c => c.id);
+    const getPairings = this.clusters$.subscribe(clusters => {
       this.store.dispatch(loadPairings(PAIRINGS_REQUEST));
     });
     const lastJobsWorkaroundSubscription = this.policies$
@@ -137,7 +145,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
         this.postLoadPolicyIds = policies.map(policy => policy.id);
         this.store.dispatch(loadLastJobs({policies}));
       });
-    this.subscriptions.push(clusterSubscription);
+    this.subscriptions.push(getPairings);
     this.subscriptions.push(lastJobsWorkaroundSubscription);
     this.route.queryParams.subscribe(params => {
       this.activePolicyId = params['policy'];
@@ -150,7 +158,6 @@ export class PoliciesComponent implements OnInit, OnDestroy {
         ];
       }
     });
-    this.initPolling();
   }
 
   ngOnDestroy() {

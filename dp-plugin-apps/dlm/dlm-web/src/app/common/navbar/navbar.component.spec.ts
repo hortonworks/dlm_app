@@ -16,7 +16,7 @@ import { PersonaPopupComponent } from 'common/persona-popup/persona-popup.compon
 import { Persona } from 'models/header-data';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
-import { TooltipModule } from 'ng2-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;

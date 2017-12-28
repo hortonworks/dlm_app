@@ -11,7 +11,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ClusterCardComponent} from 'components/cluster-card/cluster-card.component';
 import {PairingProgressCardComponent} from './pairing-progress-card.component';
 import {Cluster} from 'models/cluster.model';
-import {TooltipModule} from 'ng2-bootstrap';
+import {TooltipModule} from 'ngx-bootstrap';
 
 describe('PairingProgressCardComponent', () => {
   let component: PairingProgressCardComponent;

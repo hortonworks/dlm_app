@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 
 import { requestType } from 'utils/type-action';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
@@ -16,7 +16,7 @@ export const ActionTypes = {
   LOAD_BEACON_ADMIN_STATUS: requestType('LOAD_BEACON_ADMIN_STATUS')
 };
 
-export const loadBeaconAdminStatus = (meta = {}): Action => ({
+export const loadBeaconAdminStatus = (meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_BEACON_ADMIN_STATUS.START,
   payload: {meta}
 });

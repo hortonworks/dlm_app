@@ -9,7 +9,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { mapResponse, getUrlDomain } from 'utils/http-util';
 import { Cluster } from 'models/cluster.model';
 import { PolicyService } from 'services/policy.service';
@@ -25,10 +25,10 @@ export class ClusterService {
     };
   }
 
-  constructor(private http: Http) { }
+  constructor(private httpClient: HttpClient) { }
 
   fetchClusters(): Observable<any> {
-    return mapResponse(this.http.get('clusters'))
+    return this.httpClient.get<any>('clusters')
       .map(({clusters}) => ({
         ...clusters,
         clusters: clusters.map(this.decorateCluster)
@@ -39,18 +39,18 @@ export class ClusterService {
    * @deprecated
    */
   fetchCluster(id: string): Observable<any> {
-    return mapResponse(this.http.get(`clusters/${id}`));
+    return this.httpClient.get<any>(`clusters/${id}`);
   }
 
   fetchClustersStatuses(): Observable<any> {
-    return mapResponse(this.http.get('clusters/status'));
+    return this.httpClient.get<any>('clusters/status');
   }
 
   pairWith(cluster: any, pair: any): Observable<any> {
-    return this.http.post(`pair/${cluster.id}`, pair).map(r => r.json());
+    return this.httpClient.post(`pair/${cluster.id}`, pair);
   }
 
   unpair(cluster: any): Observable<any> {
-    return this.http.delete(`pair/${cluster.id}`);
+    return this.httpClient.delete(`pair/${cluster.id}`);
   }
 }

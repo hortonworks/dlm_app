@@ -14,4 +14,4 @@ import { TemplateRef } from '@angular/core';
  */
 export interface TableColumn {
   cellRef: TemplateRef<any>;
-};
+}

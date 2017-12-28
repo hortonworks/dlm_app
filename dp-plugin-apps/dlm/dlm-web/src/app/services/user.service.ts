@@ -7,14 +7,15 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import {Injectable, isDevMode} from '@angular/core';
-import {Http, RequestOptions} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import { getHeaders, mapResponse } from 'utils/http-util';
-import {User} from 'models/user.model';
-import {Persona} from 'models/header-data';
-import {AuthUtils} from 'utils/auth-utils';
-import {ROLES} from 'constants/user.constant';
+import { Injectable, isDevMode } from '@angular/core';
+import { RequestOptions } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
+import { getHeaders } from 'utils/http-util';
+import { User } from 'models/user.model';
+import { Persona } from 'models/header-data';
+import { AuthUtils } from 'utils/auth-utils';
+import { ROLES } from 'constants/user.constant';
 
 @Injectable()
 export class UserService {
@@ -25,7 +26,7 @@ export class UserService {
   private personaMap = new Map();
   private ROLES = ROLES;
 
-  constructor(private http: Http) {
+  constructor(private httpClient: HttpClient) {
   }
 
   get user(): User {
@@ -53,17 +54,17 @@ export class UserService {
     const urlPrefix = this.getUrlPrefix();
     // Do not make a request in Dev mode
     if (!isDevMode()) {
-      return mapResponse(this.http.get(urlPrefix + '/api/identity', new RequestOptions(getHeaders())));
+      return this.httpClient.get<any>(urlPrefix + '/api/identity', { headers: getHeaders() });
     }
     // Get mock response
-    return mapResponse(this.http.get('api/identity'));
+    return this.httpClient.get<any>('api/identity');
   }
 
   logoutUser() {
     // Access Dataplane API directly to log the user out
     const urlPrefix = this.getUrlPrefix();
-    return this.http
-      .get(urlPrefix + UserService.signoutURL)
+    return this.httpClient
+      .get<any>(urlPrefix + UserService.signoutURL)
       .subscribe(response => {
         const challengeAt = response.headers.get(UserService.HEADER_CHALLENGE_HREF);
         window.location.href = `${window.location.protocol}//${window.location.host}/${challengeAt}?originalUrl=${window.location.href}`;

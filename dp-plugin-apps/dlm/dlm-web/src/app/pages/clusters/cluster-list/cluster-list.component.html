@@ -36,13 +36,13 @@
   <span class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + cluster.$$index" >{{name}}</span>
 </ng-template>
 
-<ng-template let-stats="value" let-cluster="row" #usageCell>
+<ng-template let-stats="value" let-cluster="row" #usageCell let-expanded="expanded">
   <div class="cell-content"
        [ngClass]="setStatsClass(cluster)"
        [tooltip]="getStatsTooltip(cluster)"
        [attr.qe-attr]="'cluster-details-' + cluster.$$index" (click)="toggleClusterDetails(cluster)">
     <span [innerHTML]="getCapacityUsed(stats)"></span> / <span [innerHTML]="getCapacityTotal(stats)"></span>
-    <i *ngIf="!isHDFSDisabled(cluster)" [ngClass]="{fa: true, 'fa-chevron-down': !isExpandedRow(cluster), 'fa-chevron-up': isExpandedRow(cluster)}"></i>
+    <i *ngIf="!isHDFSDisabled(cluster)" [ngClass]="{fa: true, 'fa-chevron-down': !expanded, 'fa-chevron-up': expanded}"></i>
   </div>
 </ng-template>
 
@@ -66,9 +66,7 @@
     [cluster]="cluster"
     [clusterActions]="clusterActions"
     [clustersLength]="clusters.length"
-    [isOpen]="shouldShowAction(cluster.id)"
-    (handler)="handleSelectedAction($event)"
-    (openChange)="handleActionOpenChange($event)">
+    (handler)="handleSelectedAction($event)">
   </dlm-cluster-actions>
 </ng-template>
 

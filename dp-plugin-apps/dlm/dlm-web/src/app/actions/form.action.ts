@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from 'actions/actions.type';
 
 import { type } from 'utils/type-action';
 
@@ -16,10 +16,10 @@ export const ActionTypes = {
   RESET_FORM_VALUE: type('RESET_FORM_VALUE')
 };
 
-export const saveFormValue = (formId: string, values: Object): Action => {
+export const saveFormValue = (formId: string, values: Object): ActionWithPayload<any> => {
   return { type: ActionTypes.SAVE_FORM_VALUE, payload: { formId, values } };
 };
 
-export const resetFormValue = (formId: string): Action => {
+export const resetFormValue = (formId: string): ActionWithPayload<any> => {
   return { type: ActionTypes.RESET_FORM_VALUE, payload: { formId }};
 };

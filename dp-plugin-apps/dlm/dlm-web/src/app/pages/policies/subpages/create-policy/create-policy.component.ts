@@ -11,10 +11,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { go } from '@ngrx/router-store';
 import { State } from 'reducers';
 import { Pairing } from 'models/pairing.model';
 import { getAllPairings } from 'selectors/pairing.selector';
+import * as RouterActions from 'actions/router.action';
 import { loadPairings } from 'actions/pairing.action';
 import { saveFormValue } from 'actions/form.action';
 
@@ -81,7 +81,7 @@ export class CreatePolicyComponent implements OnInit, OnDestroy {
 
   handleFormSubmit(values) {
     this.store.dispatch(saveFormValue(POLICY_FORM_ID, values));
-    this.store.dispatch(go(['policies/review']));
+    this.store.dispatch(new RouterActions.Go({path: ['policies/review']}));
   }
 
   ngOnDestroy() {

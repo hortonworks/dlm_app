@@ -8,7 +8,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 import { mapResponse } from 'utils/http-util';
 
@@ -32,9 +32,9 @@ export class BeaconService {
   }
 
   fetchBeaconAdminStatus() {
-    return mapResponse(this.http.get('beacon/admin/status'))
+    return this.httpClient.get<any>('beacon/admin/status')
       .map(response => ({...response, response: this.decorateStatuses(response.response)}));
   }
 
-  constructor(private http: Http) { }
+  constructor(private httpClient: HttpClient) { }
 }

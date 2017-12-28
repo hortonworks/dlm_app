@@ -31,11 +31,10 @@ import { HeaderData } from 'models/header-data';
 import { UserService } from 'services/user.service';
 import { AuthUtils } from 'utils/auth-utils';
 import { RELOAD_TIME } from './constants/application.constant';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 const POLL_EVENTS_ID = '[DLM_COMPONENT] POLL_EVENT_ID';
 const POLL_NEW_EVENTS_ID = '[DLM_COMPONENT] POLL_NEW_EVENTS_ID';
-const POLL_CLUSTER_STATUSES_ID = '[DLM_COMPONENT] POLL_CLUSTER_STATUSES_ID';
-const CLUSTERS_REQUEST = '[DLM_COMPONENT] CLUSTERS_REQUEST';
 
 let reloadTimeOut;
 
@@ -60,16 +59,12 @@ export class DlmComponent implements OnDestroy, OnInit {
   user: User = <User>{};
 
   private initPolling() {
-    const statusProgress$ = this.store
-      .select(getMergedProgress(POLL_CLUSTER_STATUSES_ID))
-      .map(r => r.isInProgress)
-      .distinctUntilChanged()
-      .filter(isInProgress => !isInProgress)
-      .delay(POLL_INTERVAL)
-      .do(_ => this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID)))
-      .repeat();
+    const pollingLoop = Observable.timer(POLL_INTERVAL)
+      .concatMap(_ => this.asyncActions.dispatch(loadClustersStatuses()))
+      .repeat()
+      .subscribe();
 
-    this.subscriptions.push(statusProgress$.subscribe());
+    this.subscriptions.push(pollingLoop);
   }
 
   constructor(t: TranslateService,
@@ -78,7 +73,8 @@ export class DlmComponent implements OnDestroy, OnInit {
               private timeZoneService: TimeZoneService,
               private userService: UserService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private asyncActions: AsyncActionsService) {
     this.user.timezone = timeZoneService.setupUserTimeZone();
 
     this.header = new MenuItem(
@@ -124,17 +120,13 @@ export class DlmComponent implements OnDestroy, OnInit {
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
     this.store.dispatch(loadEvents(null, { requestId: POLL_EVENTS_ID}));
-    this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const pathChange$ = router.events
       .filter(e => e instanceof NavigationEnd)
       .subscribe(_ => {
         clearTimeout(reloadTimeOut);
         reloadTimeOut = setTimeout(() => location.reload(), RELOAD_TIME);
       });
-    const clustersRequestSubscription = this.store.select(getProgressState(CLUSTERS_REQUEST))
-      .filter(progressState => !progressState.isInProgress)
-      .take(1)
-      .do(_ => this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID)))
+    const clustersRequestSubscription = this.asyncActions.dispatch(loadClusters())
       .subscribe(_ => this.initPolling());
     this.subscriptions.push(clustersRequestSubscription);
     this.subscriptions.push(pathChange$);

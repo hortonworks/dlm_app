@@ -9,7 +9,7 @@
 
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs/Subject';
 import * as moment from 'moment';
 import { saveAs } from 'file-saver';
@@ -37,7 +37,7 @@ export interface LogMetaInfo {
   entityType: EntityType;
   clusterId: number;
   timestamp: string;
-};
+}
 
 @Injectable()
 export class LogService {
@@ -58,7 +58,7 @@ export class LogService {
   }
 
   constructor(
-    private http: Http,
+    private httpClient: HttpClient,
     private store: Store<State>,
     private notificationService: NotificationService,
     private t: TranslateService
@@ -81,7 +81,7 @@ export class LogService {
       const end = date.add(12, 'h').format(DATE_FORMAT);
       timingQp = `start=${start}&end=${end}`;
     }
-    return this.http.get(`clusters/${clusterId}/logs?filterBy=${filterBy}:${instanceId}&${timingQp}`).map(r => r.json());
+    return this.httpClient.get<any>(`clusters/${clusterId}/logs?filterBy=${filterBy}:${instanceId}&${timingQp}`);
   }
 
   getChangeEmitter() {

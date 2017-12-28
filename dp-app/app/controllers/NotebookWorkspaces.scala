@@ -39,9 +39,9 @@ class NotebookWorkspaces @Inject()(
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def getNotebooks(workspaceId: Long) = Action.async {
+  def getNotebooks(workspaceId: String) = Action.async {
     notebookWorkspaceService
-      .list(workspaceId)
+      .list(workspaceId.toLong)
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))

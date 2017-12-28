@@ -16,7 +16,7 @@ $hex-color: $primary-color;
 
 #create_pairing {
   background: white;
-  height: 80vh;
+  min-height: 80vh;
   .content-row {
     margin: 0 15px;
     display: table;

@@ -16,14 +16,14 @@ import { Policy } from 'models/policy.model';
 @Component({
   selector: 'dlm-policy-info',
   template: `
-    <ng-template #policyInfoCell let-row="row">
+    <ng-template #policyInfoCell let-row="row" let-expanded="expanded">
       <div class="policy-info">
         <p class="policy-name text-primary actionable" qe-attr="policy-info" (click)="onNameClick(row)" [tooltip]="row.name">
           {{row.name}}&nbsp;
-          <span [ngClass]="{fa: true, 'fa-caret-up': isActive(row), 'fa-caret-down': !isActive(row)}">
+          <span [ngClass]="{fa: true, 'fa-caret-up': isActive(expanded), 'fa-caret-down': !isActive(expanded)}">
           </span>
         </p>
-        <p *ngIf="row.frequency" [tooltip]=popTemplate>{{row.frequency | frequency}}</p>
+        <p *ngIf="row.frequency" [tooltip]="popTemplate">{{row.frequency | frequency}}</p>
       </div>
       <ng-template #popTemplate>
         {{row.startTime | fmtTz:'MMM DD, Y HH:mm'}}
@@ -39,14 +39,13 @@ import { Policy } from 'models/policy.model';
 export class PolicyInfoComponent implements TableColumn {
   @ViewChild('policyInfoCell') cellRef: TemplateRef<any>;
   @Output() nameClick = new EventEmitter<any>();
-  @Input() expandedRows: any = {};
   @Input() activeContent: PolicyContent;
 
   onNameClick(row) {
     this.nameClick.emit(row);
   }
 
-  isActive(policy): boolean {
-    return this.expandedRows[policy.id] && PolicyContent.Files === this.activeContent;
+  isActive(expanded): boolean {
+    return expanded && PolicyContent.Files === this.activeContent;
   }
 }

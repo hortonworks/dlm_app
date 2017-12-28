@@ -8,7 +8,7 @@
  */
 
 import { type, requestType } from '../utils/type-action';
-import { Action } from '@ngrx/store';
+import { ActionWithPayload } from './actions.type';
 import { Cluster } from 'models/cluster.model';
 
 export const ActionTypes = {
@@ -16,42 +16,42 @@ export const ActionTypes = {
   LOAD_CLUSTERS_STATUSES: requestType('LOAD_CLUSTERS_STATUSES')
 };
 
-export class LoadClustersFailure implements Action {
+export class LoadClustersFailure implements ActionWithPayload<any> {
   type = ActionTypes.LOAD_CLUSTERS.FAILURE;
 
   constructor(public payload: string) {}
-};
+}
 
-export const loadClusters = (requestId?: string): Action => ({
+export const loadClusters = (requestId?: string): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_CLUSTERS.START,
   payload: {
     meta: { requestId }
   }
 });
 
-export const loadClustersSuccess = (clusters, meta): Action => ({
+export const loadClustersSuccess = (clusters, meta): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_CLUSTERS.SUCCESS,
   payload: { response: clusters, meta }
 });
 
-export const loadClustersFailure = (error, meta): Action => ({
+export const loadClustersFailure = (error, meta): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_CLUSTERS.FAILURE,
   payload: { error, meta }
 });
 
-export const loadClustersStatuses = (requestId?: string): Action => ({
+export const loadClustersStatuses = (requestId?: string): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_CLUSTERS_STATUSES.START,
   payload: {
     meta: { requestId }
   }
 });
 
-export const loadClustersStatusesSuccess = (clusters, meta): Action => ({
+export const loadClustersStatusesSuccess = (clusters, meta): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_CLUSTERS_STATUSES.SUCCESS,
   payload: { response: clusters, meta }
 });
 
-export const loadClustersStatusesFailure = (error, meta): Action => ({
+export const loadClustersStatusesFailure = (error, meta): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_CLUSTERS_STATUSES.FAILURE,
   payload: { error, meta }
 });

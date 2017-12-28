@@ -8,18 +8,17 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
-import { mapResponse } from 'utils/http-util';
 import { YarnQueueResponse } from 'models/yarnqueues.model';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class YarnService {
 
-  constructor(private http: Http) { }
+  constructor(private httpClient: HttpClient) { }
 
   fetchYarnQueues(clusterId: number): Observable<YarnQueueResponse> {
-    return mapResponse(this.http.get(`clusters/${clusterId}/yarn/queues`));
+    return this.httpClient.get<YarnQueueResponse>(`clusters/${clusterId}/yarn/queues`);
   }
 }

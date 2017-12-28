@@ -17,23 +17,23 @@ import { MockRoute } from './mock-route';
 export const routes: MockRoute[] = [
   // cluster mocks
   new MockRoute('clusters', 'clusters.json'),
-  new MockRoute('clusters', 'cluster.json', RequestMethod.Post),
+  new MockRoute('clusters', 'cluster.json', 'POST'),
   new MockRoute('clusters/status', 'clusters_status.json'),
   new MockRoute('clusters/:id', 'cluster.json'),
-  new MockRoute('clusters/:id', 'cluster.json', RequestMethod.Delete),
+  new MockRoute('clusters/:id', 'cluster.json', 'DELETE'),
 
   // policy mocks
   new MockRoute('policies', 'policies.json'),
   new MockRoute('policies/:id', 'policy.json'),
-  new MockRoute('clusters/:clusterId/policy/:policyName/submit', 'create_policy.json', RequestMethod.Post),
-  new MockRoute('clusters/:clusterId/policy/:policyName/schedule', 'create_policy.json', RequestMethod.Put),
-  new MockRoute('clusters/:clusterId/policy/:policyName/resume', 'create_policy.json', RequestMethod.Put),
-  new MockRoute('policies/:id', 'policies.json', RequestMethod.Delete),
+  new MockRoute('clusters/:clusterId/policy/:policyName/submit', 'create_policy.json', 'POST'),
+  new MockRoute('clusters/:clusterId/policy/:policyName/schedule', 'create_policy.json', 'PUT'),
+  new MockRoute('clusters/:clusterId/policy/:policyName/resume', 'create_policy.json', 'PUT'),
+  new MockRoute('policies/:id', 'policies.json', 'DELETE'),
 
   // Pairing
   new MockRoute('pairs', 'pairings.json'),
-  new MockRoute('pair', 'create_pairing.json', RequestMethod.Post),
-  new MockRoute('unpair', 'unpair.json', RequestMethod.Post),
+  new MockRoute('pair', 'create_pairing.json', 'POST'),
+  new MockRoute('unpair', 'unpair.json', 'POST'),
 
   // Jobs
   new MockRoute('clusters/:clusterId/policy/:policyName/jobs', 'jobs.json'),

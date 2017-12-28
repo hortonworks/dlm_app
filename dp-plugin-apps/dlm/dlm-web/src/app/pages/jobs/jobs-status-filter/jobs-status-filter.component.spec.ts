@@ -11,7 +11,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobsStatusFilterComponent } from './jobs-status-filter.component';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MockTranslateLoader } from '../../../mocks/mock-translate-loader';
-import { TooltipModule } from 'ng2-bootstrap';
+import { TooltipModule } from 'ngx-bootstrap';
 import { CommonComponentsModule } from 'components/common-components.module';
 
 describe('TableFilterComponent', () => {

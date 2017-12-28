@@ -7,8 +7,12 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding,
-  ChangeDetectorRef } from '@angular/core';
+import {
+  Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  OnDestroy
+} from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { Router } from '@angular/router';
@@ -26,7 +30,8 @@ import { Location } from 'models/location.model';
   selector: 'dlm-cluster-list',
   templateUrl: './cluster-list.component.html',
   styleUrls: ['./cluster-list.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class ClusterListComponent implements OnInit {
@@ -36,7 +41,6 @@ export class ClusterListComponent implements OnInit {
   hdfsRootPath = ROOT_PATH;
   columnMode = ColumnMode.flex;
   isOpen = false;
-  visibleActionMap = {};
   tableFooterOptions = {
     pagerDropup: true
   } as TableFooterOptions;
@@ -133,23 +137,8 @@ export class ClusterListComponent implements OnInit {
     }
   }
 
-  handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
-    const { rowId, isOpen } = event;
-    if (rowId) {
-      this.visibleActionMap[rowId] = isOpen;
-    }
-  }
-
   handleFileBrowserPageChange(event, rowId) {
     this.selectedFileBrowserPage[rowId] = event.offset;
-  }
-
-  shouldShowAction(rowId) {
-    return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
-  }
-
-  isExpandedRow(row: Cluster): boolean {
-    return this.tableComponent.expandedRows[row.id];
   }
 
   isHDFSDisabled(cluster): boolean {
