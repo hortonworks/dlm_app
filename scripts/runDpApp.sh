@@ -9,4 +9,4 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-sbt ";project dpApp;run"
+cd ..; sbt ";project dpApp;run"; cd -
