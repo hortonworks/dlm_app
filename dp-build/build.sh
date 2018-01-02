@@ -153,9 +153,8 @@ build_migrate() {
 build_legalese() {
 	log "Collecting legalese"
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/legalese
-	cp ../COPYRIGHT ${DP_DOCKER_ROOT_FOLDER}/legalese/
-	cp ../third_party_components.txt ${DP_DOCKER_ROOT_FOLDER}/legalese/
-	cp ../third_party_operating_system_components.txt ${DP_DOCKER_ROOT_FOLDER}/legalese/
+	cp ../docs/legal/* ${DP_DOCKER_ROOT_FOLDER}/legalese/
+	cp ../COPYRIGHT.md ${DP_DOCKER_ROOT_FOLDER}/legalese/
 }
 
 build_installer() {
