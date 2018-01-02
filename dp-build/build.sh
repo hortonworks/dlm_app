@@ -134,7 +134,7 @@ build_migrate() {
 	
 	# move flyway migration scripts
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
-	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
+	cp -R ../docs/database/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
 	
 	# removed unneccesary files
 	rm -rf ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/generators
