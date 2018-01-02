@@ -25,11 +25,6 @@ COPY ./dp-web /usr/dp-web
 COPY ./utils/services /etc/sv
 COPY ./utils/bootstrap.sh /bootstrap.sh
 
-RUN chmod +x /bootstrap.sh && \
-    chmod +x /etc/sv/nginx/run && \
-    chmod +x /etc/sv/play/run && \
-    chmod +x /usr/dp-app/bin/dp-app && \
-    chmod +x /etc/sv/consul_template/run
 
 RUN rm -rf /etc/sv/getty-5
 RUN mkdir -p /usr/dp-app/bin/logs/ && touch /usr/dp-app/bin/logs/application.log
