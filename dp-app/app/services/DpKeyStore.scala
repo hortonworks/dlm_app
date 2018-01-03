@@ -31,9 +31,9 @@ class DpKeyStore @Inject()(configuration: Configuration) {
   val credentialManager = new CredentialManager(storePath, storePassword)
 
   def getCredentialEntry(alias: String): Try[CredentialEntry] = {
-    credentialManager.read(alias)
+    credentialManager.readUserCredential(alias)
       .map { credential => CredentialEntry(alias, credential._2)}
   }
 
-  def createCredentialEntry(alias: String, password: String): Try[Unit] = credentialManager.write(alias, "dummy", password)
+  def createCredentialEntry(alias: String, password: String): Try[Unit] = credentialManager.writeUserCredential(alias, "dummy", password)
 }

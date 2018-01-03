@@ -52,6 +52,38 @@ destroy() {
     docker rm --force dlm-app
 }
 
+read_master_password() {
+    echo "Enter previously entered master password for DataPlane Service: "
+    read -s MASTER_PASSWD
+
+    if [ "${#MASTER_PASSWD}" -lt 6 ]; then
+        echo "Password needs to be at least 6 characters long."
+        exit 1
+    fi
+
+    echo "Reenter password: "
+    read -s MASTER_PASSWD_VERIFY
+
+    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s MASTER_PASSWD_VERIFY
+       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        exit 1
+       fi
+    fi
+    MASTER_PASSWORD="$MASTER_PASSWD"
+}
+
+
+read_master_password_safely() {
+   if [ "$MASTER_PASSWORD" == "" ]; then
+       read_master_password
+   fi
+}
+
 init_app() {
     docker start dlm-app >> install.log 2>&1 || \
         docker run \
@@ -59,7 +91,10 @@ init_app() {
             --network dp \
             --detach \
             --env "CONSUL_HOST=$CONSUL_HOST" \
+            --env "KEYSTORE_PATH=/dp-shared/dp-keystore.jceks" \
+            --env "KEYSTORE_PASSWORD=$MASTER_PASSWORD" \
             --env DLM_APP_HOME="/usr/dlm-app" \
+            --volume /usr/dp/current/core/bin/certs:/dp-shared \
             hortonworks/dlm-app:$VERSION
 }
 

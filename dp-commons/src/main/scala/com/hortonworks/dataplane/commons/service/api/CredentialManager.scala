@@ -17,7 +17,7 @@ import java.security.KeyStore
 import javax.crypto.spec.SecretKeySpec
 
 import scala.collection.mutable
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 
 case class KeystoreReloadEvent()
 
@@ -35,35 +35,46 @@ class CredentialManager(private val storePath: String, private val storePassword
   }
   watcher.start()
 
-  def read(key: String): Try[(String, String)] = {
-    keystore
-      .map { keystore =>
-        if (!keystore.containsAlias(s"$key.username") || !keystore.containsAlias(s"$key.password")) {
-          throw CredentialNotFoundInKeystoreException(s"Credential not found for key $key")
-        } else {
-          val username = new String(keystore.getKey(s"$key.username", storePassword.toCharArray).getEncoded, "UTF-8")
-          val password = new String(keystore.getKey(s"$key.password", storePassword.toCharArray).getEncoded, "UTF-8")
-
-          (username, password)
-        }
+  def readUserCredential(alias: String): Try[(String, String)] = {
+    read(alias, Set("username","password")) match {
+      case Success(keyValueMap) => keyValueMap.values.toList.map(x => new String(x, "UTF-8")) match {
+        case List(username, password) => Try {(username, password)}
       }
+      case Failure(t) => throw t
+    }
   }
 
-  def write(key: String, username: String, password: String): Try[Unit] = {
-    keystore
-      .map { keystore =>
-        if (keystore.containsAlias(s"$key.username")) {
-          keystore.deleteEntry(s"$key.username")
-        }
-        if(keystore.containsAlias(s"$key.password")){
-          keystore.deleteEntry(s"$key.password")
-        }
+  def read(alias: String, keys: Set[String]): Try[Map[String, Array[Byte]]] = {
+    keystore.map { keystore =>
+      (for {
+        key <- keys
+        value = if (!keystore.containsAlias(s"$alias.$key")) {
+            throw CredentialNotFoundInKeystoreException(s"Credential not found for key $key of $alias")
+          } else {
+            keystore.getKey(s"$alias.$key", storePassword.toCharArray).getEncoded
+          }
 
-        keystore.setKeyEntry(s"$key.username", new SecretKeySpec(username.getBytes("UTF-8"), "AES"), storePassword.toCharArray, null)
-        keystore.setKeyEntry(s"$key.password", new SecretKeySpec(password.getBytes("UTF-8"), "AES"), storePassword.toCharArray, null)
+      } yield {
+        key -> value
+      }).toMap
+    }
+  }
 
-        flush(storePath, storePassword, keystore)
+  def writeUserCredential(key: String, username: String, password: String): Try[Unit] = {
+    write(key, Map("username" -> username.getBytes("UTF-8"), "password" -> password.getBytes("UTF-8")))
+  }
+
+  def write(alias: String, keyValueMap: Map[String, Array[Byte]]): Try[Unit] = {
+    keystore.map { keystore =>
+      keyValueMap foreach {
+        case (key, value) =>
+          if (keystore.containsAlias(s"$alias.$key")) {
+            keystore.deleteEntry(s"$alias.$key")
+          }
+          keystore.setKeyEntry(s"$alias.$key", new SecretKeySpec(value, "AES"), storePassword.toCharArray, null)
       }
+      flush(storePath, storePassword, keystore)
+    }
   }
 
   private def load(storePath: String, storePassword: String): Try[KeyStore] = Try({
@@ -93,4 +104,8 @@ class CredentialManager(private val storePath: String, private val storePassword
       }
     }
   })
+}
+
+object CredentialManager {
+  def apply(storePath: String, storePassword: String): CredentialManager = new CredentialManager(storePath, storePassword)
 }
