@@ -45,7 +45,7 @@ class CredentialInterfaceImpl @Inject()(val config: Config) extends CredentialIn
   override def getCredential(key: String): Future[Credentials] =
     Future
       .fromTry(
-        credentialManager.read(key)
+        credentialManager.readUserCredential(key)
         .map (credential => Credentials(Some(credential._1), Some(credential._2)))
         .recover {
           case ex: CredentialNotFoundInKeystoreException => Credentials(Some(config.getString(s"$key.username")), Some(config.getString(s"$key.password")))

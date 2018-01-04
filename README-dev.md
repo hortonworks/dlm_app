@@ -30,9 +30,9 @@
   * Navigate to `<project_parent>/dataplane/services/db-service/db`
   * Run `flyway migrate`
 4. Start Play BE
-  * `sh runDbService.sh` for db service
-  * `sh runDpApp.sh` for app
-  * `sh runClusterService.sh` for cluster service
+  * `sh scripts/runDbService.sh` for db service
+  * `sh scripts/runDpApp.sh` for app
+  * `sh scripts/runClusterService.sh` for cluster service
 
   `dp-app` and `cluster-service` need to be supplied with keystore path and password as `dp.keystore.path` and `Ddp.keystore.password` as environment variables. This is already handled if you have been using pre-provided scripts.
 
