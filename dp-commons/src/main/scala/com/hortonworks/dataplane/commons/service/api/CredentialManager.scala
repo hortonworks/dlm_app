@@ -36,11 +36,12 @@ class CredentialManager(private val storePath: String, private val storePassword
   watcher.start()
 
   def readUserCredential(alias: String): Try[(String, String)] = {
-    read(alias, Set("username","password")) match {
-      case Success(keyValueMap) => keyValueMap.values.toList.map(x => new String(x, "UTF-8")) match {
-        case List(username, password) => Try {(username, password)}
+    read(alias, Set("username", "password")).map {
+      x => {
+        x.values.toList.map(x => new String(x, "UTF-8")) match {
+          case List(username, password) => (username, password)
+        }
       }
-      case Failure(t) => throw t
     }
   }
 
