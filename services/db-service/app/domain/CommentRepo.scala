@@ -16,7 +16,6 @@ import java.time.{LocalDate, LocalDateTime}
 import javax.inject.{Inject, Singleton}
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Comment, CommentWithUser}
-import play.api.Logger
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.concurrent.Future
@@ -58,7 +57,6 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
   }
 
   def update(commentText: String, commentId: Long) = {
-    Logger.info("db-service Comments controller:  Received update comment request")
     val query = (for {
       editVersion <- Comments.filter(_.id === commentId).map(t => t.editVersion).result.head
       _ <- Comments.filter(_.id === commentId).map(t => (t.comment,t.lastModified,t.editVersion)).update(Some(commentText),Some(LocalDateTime.now()), (editVersion ++ Some(1)).reduceLeftOption(_+_))

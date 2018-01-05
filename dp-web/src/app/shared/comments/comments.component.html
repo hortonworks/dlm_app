@@ -23,13 +23,13 @@
     <div class="mdl-cell mdl-cell--12-col load-comment-error">Could not fetch related Comments</div>
   </div>
   <div class="mdl-grid" *ngIf="fetchInProgress">
-    <div class="mdl-cell mdl-cell--12-col load-comment-error">Loading...</div>
+    <div class="mdl-cell mdl-cell--12-col">Loading...</div>
   </div>
   <div *ngIf="!fetchInProgress">
     <div class="comment-tree">
       <ul>
         <li *ngFor="let oneLevelComment of oneLevelComments">
-          <div class="comment">
+          <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(oneLevelComment.commentWithUser)}">
             <div class="flex-grid">
               <div class="primary-space">
                         <span class="comment-user" [ngClass]= "{'hwx-warning-bg': !isLoggedInUser(oneLevelComment.commentWithUser), 'hwx-external-bg': isLoggedInUser(oneLevelComment.commentWithUser)}">
@@ -64,7 +64,7 @@
                         <span class="comment-reply">
                             <i class="fa fa-reply"></i>
                         </span>
-                <div class="comment">
+                <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(child)}">
                   <div class="flex-grid">
                     <div class="primary-space">
                                     <span class="comment-user" [ngClass]= "{'hwx-warning-bg': !isLoggedInUser(child), 'hwx-external-bg': isLoggedInUser(child)}">

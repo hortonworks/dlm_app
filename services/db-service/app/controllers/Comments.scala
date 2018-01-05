@@ -42,21 +42,28 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def getCommentByObjectRef = Action.async { req =>
-    val objectId = req.getQueryString("objectId").get.toLong
-    val objectType = req.getQueryString("objectType").get
+  private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
 
-    commentRepo.findByObejctRef(objectId,objectType)
-      .map{ commentswithuser =>
-        success(commentswithuser)
-      }.recoverWith(apiError)
+  def getCommentByObjectRef = Action.async { req =>
+    val objectId = req.getQueryString("objectId")
+    val objectType  = req.getQueryString("objectType")
+    if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
+    else{
+      commentRepo.findByObejctRef(objectId.get.toLong,objectType.get)
+        .map{ commentswithuser =>
+          success(commentswithuser)
+        }.recoverWith(apiError)
+    }
   }
 
   def deleteById(id: String) = Action.async { req =>
     Logger.info("db-service Comments controller:  Received delete comment request")
-    val commentId = id.toLong
-    val futureId = commentRepo.deleteById(commentId)
-    futureId.map(i => success("Success")).recoverWith(apiError)
+    if(!isNumeric(id)) Future.successful(BadRequest)
+    else{
+      val commentId = id.toLong
+      val futureId = commentRepo.deleteById(commentId)
+      futureId.map(i => success("Success")).recoverWith(apiError)
+    }
   }
 
   def update(id: String) = Action.async(parse.json) { req =>

@@ -79,13 +79,13 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
   ) tupled
 
   def getByObjectRef = Action.async { req =>
-    val objectId = req.getQueryString("objectId").get
-    val objectType  = req.getQueryString("objectType").get
+    val objectId = req.getQueryString("objectId")
+    val objectType  = req.getQueryString("objectType")
     val objectTypes = config.getStringSeq("dp.comments.object.types").getOrElse(Nil)
-    if(!objectTypes.contains(objectType)) Future.successful(BadRequest)
+    if(objectId.isEmpty || objectType.isEmpty || !objectTypes.contains(objectType.get)) Future.successful(BadRequest)
     else{
       commentService
-        .getByObjectRef(objectId, objectType)
+        .getByObjectRef(objectId.get, objectType.get)
         .map {
           case Left(errors) =>
             InternalServerError(Json.toJson(errors))
@@ -94,13 +94,15 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     }
   }
 
+  private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
+
   def deleteCommentById(commentId: String) = AuthenticatedAction.async { req =>
     Logger.info("dp-app Comments Controller: Received delete comment request")
-    val paramUserId = req.getQueryString("userId").get.toLong
+    val paramUserId = req.getQueryString("userId")
     val loggedinUser = req.user.id.get
-    if(paramUserId != loggedinUser) Future.successful(Unauthorized("this user is not authorized to perform this action"))
+    if(paramUserId.isEmpty || !isNumeric(paramUserId.get) || paramUserId.get.toLong != loggedinUser) Future.successful(Unauthorized("this user is not authorized to perform this action"))
     else{
-      commentService.deleteById(commentId,paramUserId)
+      commentService.deleteById(commentId,paramUserId.get.toLong)
         .map{
           case Left(errors) =>
             InternalServerError(Json.toJson(errors))
