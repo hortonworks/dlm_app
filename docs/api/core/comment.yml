@@ -100,6 +100,11 @@ paths:
           name: id
           required: true
           type: string
+        - name: userId
+          in: query
+          description: the user id information associated with this comment. It will be used to determine whether the logged in user can delete this comment or not.
+          required: true
+          type: string
       responses:
         200:
           description: OK
