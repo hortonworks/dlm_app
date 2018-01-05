@@ -210,3 +210,9 @@ PUT          /ldapconfig                                                    cont
 # blacklisted tokens
 GET          /blacklisted-tokens                                            controllers.BlacklistedTokens.findByToken(token: String)
 POST         /blacklisted-tokens                                            controllers.BlacklistedTokens.insert
+
+#comments api
+POST        /comments                                                       controllers.Comments.addComment
+GET         /comments                                                       controllers.Comments.getCommentByObjectRef
+DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
+PATCH       /comments/:id                                                   controllers.Comments.update(id: String)

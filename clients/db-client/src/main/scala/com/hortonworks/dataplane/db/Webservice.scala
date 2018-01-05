@@ -187,6 +187,21 @@ object Webservice {
 
   }
 
+  trait CommentService extends DbClientService {
+
+    //def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
+
+    def add(comment: Comment): Future[Either[Errors, CommentWithUser]]
+
+    def getByObjectRef(objectId: String, objectType:String): Future[Either[Errors, Seq[OneLevelComment]]]
+
+    def deleteById(commentId: String,userId: Long): Future[Either[Errors, String]]
+
+    def update(commentText: String, commentId: String):Future[Either[Errors, CommentWithUser]]
+
+
+  }
+
   trait ClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]

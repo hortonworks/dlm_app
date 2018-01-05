@@ -191,3 +191,10 @@ GET           /api/workspaces/:workspaceId/assets                    controllers
 POST          /api/workspaces/notebooks                              controllers.NotebookWorkspaces.add
 DELETE        /api/workspaces/notebooks/:notebookId                  controllers.NotebookWorkspaces.delete(notebookId: String)
 GET           /api/workspaces/:workspaceId/notebooks                 controllers.NotebookWorkspaces.getNotebooks(workspaceId: String)
+
+# comments
+# ===========================================
+POST          /api/comments                                    controllers.Comments.addComments
+GET           /api/comments                                    controllers.Comments.getByObjectRef
+DELETE        /api/comments/:id                                controllers.Comments.deleteCommentById(id: String)
+PATCH         /api/comments/:id                                controllers.Comments.updateComments(id: String)

@@ -32,6 +32,7 @@ export class DsFullView implements OnInit {
   dsModel: RichDatasetModel = null;
   applicableListActions: AssetListActionsEnum[] = [];//[AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
+  clusterId: any;
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
@@ -42,6 +43,7 @@ export class DsFullView implements OnInit {
   ngOnInit() {
     this.activeRoute.params
       .subscribe(params => {
+        this.clusterId = params["id"];
         this.richDatasetService
           .getById(+params["id"])
           .subscribe(dsObj => this.dsModel = dsObj);
@@ -72,6 +74,10 @@ export class DsFullView implements OnInit {
 
   doCancelDelete() {
     this.dialogConfirm.nativeElement.close();
+  }
+
+  viewComments(){
+    this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection']}}], { relativeTo: this.activeRoute, skipLocationChange: true});
   }
 
 }

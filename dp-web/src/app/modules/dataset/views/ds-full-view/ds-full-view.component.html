@@ -9,6 +9,7 @@
   ~  */
   -->
 
+<router-outlet name="sidebar"></router-outlet>
 <div *ngIf="!dsModel">Loading ... </div>
 <div *ngIf="dsModel" class="dsFullView borderBox">
   <div class="div50Percent">
@@ -18,7 +19,7 @@
     </div>
     <div class="metaInfo">
       <div><span class="label">Datalake:</span><span>{{dsModel.datalakeName}}</span></div>
-      <div><span class="label">Creator:</span><span>{{dsModel.creatorName}}</span></div>
+      <div><span class="label" (click)='viewComments()' >Creator:</span><span>{{dsModel.creatorName}}</span></div>
     </div>
   </div>
   <div class="div50Percent dataset-view__action-wrapper">

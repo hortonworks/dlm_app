@@ -17,7 +17,9 @@ import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import domain.CommentRepo
 import com.hortonworks.dataplane.commons.domain.Entities.Comment
 import play.api.Logger
+import play.api.libs.json._
 import play.api.mvc._
+import play.mvc.BodyParser.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,8 +35,8 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
       .map { comment =>
         commentRepo
           .add(comment)
-          .map { cll =>
-            success(cll)
+          .map { cmnt =>
+            success(cmnt)
           }.recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
@@ -56,4 +58,20 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     val futureId = commentRepo.deleteById(commentId)
     futureId.map(i => success("Success")).recoverWith(apiError)
   }
+
+  def update(id: String) = Action.async(parse.json) { req =>
+    Logger.info("db-service Comments controller:  Received update comment request")
+    req.body
+      .validate[(String)]
+      .map { case (commentText) =>
+        commentRepo
+          .update(commentText,id.toLong)
+          .map { cmnt =>
+            success(cmnt)
+          }.recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  implicit val tupledCommentTextReads = ((__ \ 'commentText).read[String])
 }

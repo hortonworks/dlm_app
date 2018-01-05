@@ -369,6 +369,27 @@ object Entities {
                                    dataAssets: Seq[DataAsset] = Nil)
 
   case class BlacklistedToken(id: Option[Long], token: String, expiry: LocalDateTime)
+
+  case class Comment(id: Option[Long] = None,
+                      comment: Option[String],
+                      objectType: String,
+                      objectId: Long,
+                      createdBy: Long,
+                      createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      parentCommentId: Option[Long],
+                      editVersion: Option[Int] = Some(0))
+
+  case class CommentWithUser(comment:Comment,
+                             userName: String)
+
+  case class NestedComment(comment:Comment,
+                           children: Seq[NestedComment],
+                           userName: String)
+
+  case class OneLevelComment(commentWithUser: CommentWithUser,
+                             children: Seq[CommentWithUser])
+
 }
 
 object JsonFormatters {
@@ -540,6 +561,18 @@ object JsonFormatters {
 
   implicit val serviceDependencyWrites = Json.writes[ServiceDependency]
   implicit val serviceDependencyReads = Json.reads[ServiceDependency]
+
+  implicit val commentWrites = Json.writes[Comment]
+  implicit val commentReads = Json.reads[Comment]
+
+  implicit val commentWithUserWrites = Json.writes[CommentWithUser]
+  implicit val commentWithUserReads = Json.reads[CommentWithUser]
+
+  implicit val nestedCommentWrites = Json.writes[NestedComment]
+  implicit val nestedCommentReads = Json.reads[NestedComment]
+
+  implicit val oneLevelCommentWrites = Json.writes[OneLevelComment]
+  implicit val oneLevelCommentReads = Json.reads[OneLevelComment]
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 

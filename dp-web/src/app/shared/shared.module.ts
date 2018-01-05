@@ -17,6 +17,7 @@ import {RedirectUrlComponent} from './redirect-url/redirect-url.component';
 import { LdapConfigCommonComponent } from './ldap-config-common/ldap-config-common.component';
 import {TranslateModule} from "@ngx-translate/core";
 import {RouterModule} from "@angular/router";
+import { CommentsComponent } from './comments/comments.component';
 
 @NgModule({
   imports:  [
@@ -25,7 +26,7 @@ import {RouterModule} from "@angular/router";
     FormsModule,
     RouterModule,
   ],
-  declarations: [DpTableDirective, RedirectUrlComponent, LdapConfigCommonComponent],
+  declarations: [DpTableDirective, RedirectUrlComponent, LdapConfigCommonComponent, CommentsComponent],
   exports:  [
     CommonModule,
     FormsModule,

@@ -44,6 +44,13 @@ class Module extends AbstractModule {
     new GroupServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("commentService")
+  def provideCommentService(implicit ws: WSClient, configuration: Configuration): CommentService = {
+    new CommentServiceImpl(configuration.underlying)
+  }
+
 
   @Provides
   @Singleton

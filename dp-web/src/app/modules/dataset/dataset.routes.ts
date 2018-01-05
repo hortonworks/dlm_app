@@ -16,6 +16,7 @@ import {DsEditor} from "./views/ds-editor/ds-editor.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {AssetViewComponent} from './views/asset-view/asset-view.component';
 import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
+import {CommentsComponent} from "../../shared/comments/comments.component";
 
 export const routes: Routes = [{
     path: '',
@@ -44,7 +45,12 @@ export const routes: Routes = [{
       component: DsFullView,
       data: {
         crumb: 'dss.collections.cCollection'
-      }
+      },
+      children: [{
+        path: 'comments/:objectType',
+        component: CommentsComponent,
+        outlet: 'sidebar'
+      }]
     }, {
       path: ":id/edit",
       component: DsEditor,
