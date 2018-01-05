@@ -19,15 +19,18 @@
     </div>
     <div class="metaInfo">
       <div><span class="label">Datalake:</span><span>{{dsModel.datalakeName}}</span></div>
-      <div><span class="label" (click)='viewComments()' >Creator:</span><span>{{dsModel.creatorName}}</span></div>
+      <div><span class="label">Creator:</span><span>{{dsModel.creatorName}}</span></div>
     </div>
   </div>
   <div class="div50Percent dataset-view__action-wrapper">
-      <div class="dataset-item__action">
-        <button class="mdl-button mdl-js-button btn-hwx-primary" (click)="onDeleteDataset()">
-          {{'common.delete' | translate}}
-        </button>
-      </div>
+    <div class="comment-icon" (click)='viewComments()'>
+      <i class="fa fa-comments"></i>
+    </div>
+    <div class="dataset-item__action">
+      <button class="mdl-button mdl-js-button btn-hwx-primary" (click)="onDeleteDataset()">
+        {{'common.delete' | translate}}
+      </button>
+    </div>
   </div>
   <div style="clear: both;"></div>
 
