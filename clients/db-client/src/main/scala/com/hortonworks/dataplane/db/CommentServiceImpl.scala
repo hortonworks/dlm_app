@@ -125,7 +125,8 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
     val nestedCommentsList = commentswithuser.map{ comntwu =>                     // actually, this step is not needed. It can be combined with next step
       NestedComment(comment=comntwu.comment, children= Seq(),userName = comntwu.userName)
     }
-    val nestedCommentsMap: Map[Long, NestedComment] = processNestedComments(0,commentswithuser,nestedCommentsList.map(nCmnt => nCmnt.comment.id.get -> nCmnt).toMap)
+    val map = nestedCommentsList.map(nCmnt => nCmnt.comment.id.get -> nCmnt).toMap
+    val nestedCommentsMap: Map[Long, NestedComment] = processNestedComments(0,commentswithuser,map)
 
     val resSeq = nestedCommentsMap.values.toSeq.map{ nestedComment =>
       if(nestedComment.comment.parentCommentId.isEmpty){
@@ -143,7 +144,9 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       else{
         val nestedComment = nestedCommentsMap.get(commentswithuser(idx).comment.id.get).get
         val parentNestedComment = nestedCommentsMap.get(commentswithuser(idx).comment.parentCommentId.get).get
-        processNestedComments(idx+1,commentswithuser,nestedCommentsMap.updated(parentNestedComment.comment.id.get, NestedComment(comment=parentNestedComment.comment, children = parentNestedComment.children:+nestedComment,userName = parentNestedComment.userName)))
+        val nestedComment1 = NestedComment(comment = parentNestedComment.comment, children = parentNestedComment.children :+ nestedComment, userName = parentNestedComment.userName)
+        val updatedNestedComment = nestedCommentsMap.updated(parentNestedComment.comment.id.get, nestedComment1)
+        processNestedComments(idx+1,commentswithuser,updatedNestedComment)
       }
     }
   }
