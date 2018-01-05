@@ -18,6 +18,6 @@ sealed trait CloudType {
 
 case object S3 extends CloudType { val name = "S3" }
 
-case object ADSL extends CloudType { val name = "ADSL" }
+case object ADLS extends CloudType { val name = "ADLS" }
 
-case object AZURE extends CloudType { val name = "AZURE" }
+case object WASB extends CloudType { val name = "WASB" }

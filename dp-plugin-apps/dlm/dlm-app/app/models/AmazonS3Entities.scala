@@ -36,6 +36,8 @@ object AmazonS3Entities {
 
   case class CloudUserDetails(accountId: String, accountOwnerName: String, userName: String)
   case class Bucket (name: String, owner: String, creationDate: String)
+  case class BucketObject(pathSuffix: String, `type`: String, length: Option[Long] = None, modificationTime: Option[Long] = None)
+  case class BucketObjectsResponse(fileList: Seq[BucketObject])
 
 
   implicit val credentialReads = Json.reads[Credential]
@@ -55,6 +57,12 @@ object AmazonS3Entities {
 
   implicit val bucketReads = Json.reads[Bucket]
   implicit val bucketWrites = Json.writes[Bucket]
+
+  implicit val bucketObjectReads = Json.reads[BucketObject]
+  implicit val bucketObjectWrites = Json.writes[BucketObject]
+
+  implicit val bucketObjectsResponseReads = Json.reads[BucketObjectsResponse]
+  implicit val bucketObjectsResponseWrites = Json.writes[BucketObjectsResponse]
 
   implicit val deserializationErrorReads = Json.reads[DeserializationError]
   implicit val deserializationErrorWrites = Json.writes[DeserializationError]

@@ -10,7 +10,8 @@ package controllers
 
 import com.google.inject.Inject
 import models.AmazonS3Entities._
-import services.AmazonS3Service
+import models.WASBEntities._
+import services.{AmazonS3Service, WASBService}
 import play.api.mvc.{Action, Controller}
 import models.JsonResponses
 import play.api.Logger
@@ -20,7 +21,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Cloud @Inject()(
-  val amazonS3Service: AmazonS3Service
+  val amazonS3Service: AmazonS3Service,
+  val wasbService: WASBService
 ) extends Controller {
 
   def listAllBuckets(accountId: Long, userName: String) = Action.async {
@@ -30,7 +32,17 @@ class Cloud @Inject()(
       case Left(error) => {
         InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
       }
+    }
+  }
 
+  def listAllObjects(accountId: Long, userName: String, bucketName: String) = Action.async { request =>
+    Logger.info("Received list all objects request")
+    val path: String = request.getQueryString("path").getOrElse("/")
+    amazonS3Service.listAllObjects(accountId, userName, bucketName, path).map {
+      case Right(bucketObjects) => Ok(Json.toJson(bucketObjects))
+      case Left(error) => {
+        InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
+      }
     }
   }
 
@@ -50,7 +62,23 @@ class Cloud @Inject()(
       case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
       case Right(result) => Ok(JsonResponses.statusOk)
     }
+  }
 
+  def listAllContainers(accountName: String) = Action.async {
+    Logger.info("Received list all containers request")
+    wasbService.getContainers(accountName) map {
+      case Right(containers) => Ok(Json.toJson(containers))
+      case Left(err) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(err)}"))
+    }
+  }
+
+  def listAllBlobs(accountName: String, containerName: String) = Action.async { request =>
+    Logger.info("Received list all blobs request")
+    val path: String = request.getQueryString("path").getOrElse("/")
+    wasbService.getFiles(accountName, containerName, path) map {
+      case Right(filesResponse) => Ok(Json.toJson(filesResponse))
+      case Left(err) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(err)}"))
+    }
   }
 
 }

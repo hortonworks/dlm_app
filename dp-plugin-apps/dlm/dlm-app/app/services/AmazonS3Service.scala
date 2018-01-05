@@ -15,11 +15,11 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.identitymanagement.model.{GetUserPolicyRequest, ListAttachedUserPoliciesRequest}
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.identitymanagement.{AmazonIdentityManagement, AmazonIdentityManagementClient, AmazonIdentityManagementClientBuilder}
-import com.amazonaws.services.s3.model.{GetBucketPolicyRequest, ListBucketsRequest}
+import com.amazonaws.services.s3.model.{GetBucketPolicyRequest, ListBucketsRequest, S3ObjectSummary}
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient
 import com.amazonaws.services.securitytoken.model.{AWSSecurityTokenServiceException, GetCallerIdentityRequest}
 import com.typesafe.scalalogging.Logger
-import models.AmazonS3Entities.{CloudAccount, CloudUserDetails, Credential, Error, Bucket => DlmBucket}
+import models.AmazonS3Entities.{BucketObject, BucketObjectsResponse, CloudAccount, CloudUserDetails, Credential, Error, Bucket => DlmBucket}
 import models.AmazonS3Entities.Error.{AmazonS3Error, GenericError}
 import com.google.inject.{Inject, Singleton}
 
@@ -31,6 +31,15 @@ import scala.concurrent.Future
 class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
 
   private val logger = Logger(classOf[AmazonS3Service])
+
+  private def extractFileName(path: String): String = {
+    path.split("/")(0)
+  }
+
+  private def extractFileType(path: String): String = {
+    val splitted = path.split("/")
+    if (splitted.length > 1 || path.length - splitted(0).length == 1) "DIRECTORY" else "FILE"
+  }
 
   def getUserIdentity(credential: Credential) : Future[Either[AmazonS3Error, CloudUserDetails]] = {
     val basicAwsCredential = new BasicAWSCredentials(credential.accessKeyId, credential.secretAccessKey)
@@ -77,6 +86,31 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
         try {
           Right(amazonS3Client.listBuckets.asScala.toList.map(x =>
             DlmBucket(x.getName, x.getOwner.getDisplayName, x.getCreationDate.toString)))
+        } catch {
+          case ex : AmazonClientException =>
+            logger.error(ex.getMessage)
+            Left(GenericError(ex.getMessage))
+        }
+      case Left(error) => Left(GenericError(error.message))
+    }
+  }
+
+  def listAllObjects(accountId: Long, userName: String, bucketName: String, path: String) : Future[Either[GenericError, BucketObjectsResponse]] = {
+    val cloudAccount = CloudAccount(accountId, userName)
+    dlmKeyStore.getCloudAccount(cloudAccount) map {
+      case Right(result) =>
+        val credential = new BasicAWSCredentials(result.credential.accessKeyId, result.credential.secretAccessKey)
+        val amazonS3Client = new AmazonS3Client(credential)
+        try {
+          val bucketObjects = amazonS3Client.listObjects(bucketName, path.substring(1)).getObjectSummaries().asScala.toList.flatMap{
+            case x if x.getKey.substring(path.substring(1).length).split("/").length == 1 => {
+              val rest = x.getKey.substring(path.substring(1).length)
+              if (rest == "") None else
+              Some(BucketObject(extractFileName(rest), extractFileType(rest), Option(x.getSize), Option(x.getLastModified().getTime())))
+            }
+            case _ => None
+          }
+          Right(BucketObjectsResponse(bucketObjects))
         } catch {
           case ex : AmazonClientException =>
             logger.error(ex.getMessage)

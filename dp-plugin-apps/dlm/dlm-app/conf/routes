@@ -14,9 +14,12 @@ PUT      /api/store/credential                                        controller
 DELETE   /api/store/credential/accountId/:accountId/userName/:name    controllers.CredentialStore.deleteCredentialAccount(accountId : Long, name : String)
 
 #Cloud
-GET        /api/cloud/list/buckets/:accountId/username/:userName     controllers.Cloud.listAllBuckets(accountId: Long, userName: String)
-POST       /api/cloud/userIdentity                                   controllers.Cloud.getUserIdentity
-GET        /api/cloud/account/:accountId/username/:userName          controllers.Cloud.checkUserIdentity(accountId: Long, userName: String)
+GET      /api/cloud/list/buckets/:accountId/username/:userName                controllers.Cloud.listAllBuckets(accountId: Long, userName: String)
+GET      /api/cloud/list/objects/:accountId/username/:userName/bucket/:bucketName/files        controllers.Cloud.listAllObjects(accountId: Long, userName: String, bucketName: String)
+POST     /api/cloud/userIdentity                                      controllers.Cloud.getUserIdentity
+GET      /api/cloud/account/:accountId/username/:userName             controllers.Cloud.checkUserIdentity(accountId: Long, userName: String)
+GET      /api/cloud/list/containers/:accountName                             controllers.Cloud.listAllContainers(accountName: String)
+GET      /api/cloud/list/blobs/:accountName/container/:containerName/files   controllers.Cloud.listAllBlobs(accountName: String, containerName: String)
 
 #Clusters
 GET     /api/clusters                                         controllers.Clusters.list
@@ -65,6 +68,7 @@ GET     /api/clusters/:clusterId/hive/database/:dbName/tables     controllers.Hi
 
 GET     /api/clusters/:clusterId/yarn/queues                      controllers.YarnQueues.retrieve(clusterId: Long)
 
+#Cloud
 
 # Due to the regex involved, Following should be always placed at the end of the file
 # static resources
