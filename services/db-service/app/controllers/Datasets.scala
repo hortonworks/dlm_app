@@ -16,7 +16,7 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetCreateRequest}
 import domain.API.{dpClusters, users}
 import domain.{DatasetRepo, PaginatedQuery, SortQuery}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, __}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,25 +47,39 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   }
 
+  private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
+
   def allRichDataset = Action.async { req =>
-    datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req),req.getQueryString("userId").get.toLong)
-      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-      .recoverWith(apiError)
+    val userId = req.getQueryString("userId")
+    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
+    else{
+      datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
+        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+        .recoverWith(apiError)
+    }
   }
 
   def richDatasetByTag(tagName: String) = Action.async { req =>
-    datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),req.getQueryString("userId").get.toLong)
-      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-      .recoverWith(apiError)
+    val userId = req.getQueryString("userId")
+    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
+    else{
+      datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
+        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+        .recoverWith(apiError)
+    }
   }
 
   def richDatasetById(id: Long) = Action.async { req=>
-    datasetRepo.getRichDatasetById(id,req.getQueryString("userId").get.toLong).map { co =>
-      co.map { c =>
-        success(linkData(c, makeLink(c.dataset)))
-      }
-        .getOrElse(NotFound)
-    }.recoverWith(apiError)
+    val userId = req.getQueryString("userId")
+    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
+    else{
+      datasetRepo.getRichDatasetById(id,userId.get.toLong).map { co =>
+        co.map { c =>
+          success(linkData(c, makeLink(c.dataset)))
+        }
+          .getOrElse(NotFound)
+      }.recoverWith(apiError)
+    }
   }
 
   private def makeLink(c: Dataset) = {
@@ -87,19 +101,24 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     future.map(i => success(i)).recoverWith(apiError)
   }
 
-  def updateSharedStatus = Action.async(parse.json) { req =>
+  def updateSharedStatus(datasetId: String) = Action.async(parse.json) { req =>
     req.body
-      .validate[Dataset]
-      .map { ds =>
-        datasetRepo.updateSharedStatus(ds).map{ ds =>
-          ds.map { d =>
-            success(linkData(d, makeLink(d)))
-          }
-            .getOrElse(NotFound)
-        }.recoverWith(apiError)
+      .validate[(Int)]
+      .map { sstate =>
+        if(!isNumeric(datasetId)) Future.successful(BadRequest)
+        else {
+          datasetRepo.updateSharedStatus(datasetId.toLong, sstate).map{ ds =>
+            ds.map { d =>
+              success(linkData(d, makeLink(d)))
+            }
+              .getOrElse(NotFound)
+          }.recoverWith(apiError)
+        }
       }
       .getOrElse(Future.successful(BadRequest))
   }
+
+  implicit val tupledSharedInfoReads = ((__ \ 'sharedstatus).read[Int])
 
   def add = Action.async(parse.json) { req =>
     req.body

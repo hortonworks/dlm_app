@@ -152,7 +152,7 @@ POST          /datasetswithassets                                            con
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
-PATCH         /datasetsSStatus                                               controllers.Datasets.updateSharedStatus
+PATCH         /datasetsharedinfo/:datasetId                                  controllers.Datasets.updateSharedStatus(datasetId:String)
 
 #RichDataset
 GET           /richdatasets                                                  controllers.Datasets.allRichDataset

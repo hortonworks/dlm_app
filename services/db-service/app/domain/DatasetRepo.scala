@@ -238,11 +238,11 @@ class DatasetRepo @Inject()(
     db.run(query)
   }
 
-  def updateSharedStatus(dataset: Dataset) = {
+  def updateSharedStatus(datasetId: Long, shareStatus: Int) = {
     val query = ( for {
-      _ <- Datasets.filter(_.id === dataset.id).map(d => (d.sharedStatus)).update(dataset.sharedStatus)
+      _ <- Datasets.filter(_.id === datasetId).map(d => (d.sharedStatus)).update(shareStatus)
       //_ <- Datasets.filter(_.id === dataset.id).update((dataset)
-      dataset <- Datasets.filter(_.id === dataset.id).result.headOption
+      dataset <- Datasets.filter(_.id === datasetId).result.headOption
     } yield(dataset)).transactionally
 
     db.run(query)

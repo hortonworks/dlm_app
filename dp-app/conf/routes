@@ -84,7 +84,7 @@ POST          /api/datasets/categories                               controllers
 # Datasets ?
 # ===========================================
 GET           /api/dataset/:datasetId                                controllers.DataSets.getRichDatasetById(datasetId : String)
-PATCH         /api/datasetsSStatus                                   controllers.DataSets.updateDSetSharedStatus
+PATCH         /api/datasetsharedinfo/:datasetId                      controllers.DataSets.updateDSetSharedStatus(datasetId : String)
 GET           /api/dataset/list                                      controllers.DataSets.getRichDataset
 GET           /api/dataset/list/tag/:tagName                         controllers.DataSets.getRichDatasetByTag(tagName : String)
 

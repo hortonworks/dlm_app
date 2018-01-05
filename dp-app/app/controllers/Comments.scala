@@ -58,7 +58,7 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
       .validate[(String, String)]
       .map { case (commentTextWithUser) =>
         val loggedinUser = request.user.id.get
-        if(loggedinUser != commentTextWithUser._2) Future.successful(BadRequest)
+        if(loggedinUser != commentTextWithUser._2) Future.successful(Unauthorized("this user is not authorized to perform this action"))
         else{
           commentService
             .update(commentTextWithUser._1,commentId)

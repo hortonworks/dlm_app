@@ -118,7 +118,7 @@ object Webservice {
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
 
-    def updateDSetSharedStatus(dataset: Dataset): Future[Either[Errors, Seq[Dataset]]]
+    def updateDSetSharedStatus(sharedStatus: Int, datasetId : String): Future[Either[Errors, Seq[Dataset]]]
 
     def delete(dataSetId: String): Future[Either[Errors, Long]]
   }

@@ -21,18 +21,14 @@ import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
 import com.hortonworks.dataplane.db.Webservice._
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, __}
 import services.UtilityService
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
-import com.hortonworks.dataplane.db.Webservice.{
-  CategoryService,
-  DataAssetService,
-  DataSetCategoryService,
-  DataSetService
-}
+import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataAssetService, DataSetCategoryService, DataSetService}
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonResponses
 import play.api.mvc.{Action, Controller}
+import play.api.libs.functional.syntax._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -177,10 +173,11 @@ class DataSets @Inject()(
   }
 
   def getRichDatasetByTag(tagName: String) = AuthenticatedAction.async { req =>
+    val loggedinUserId = req.user.id.get
     val future =
       if (tagName.equalsIgnoreCase("all"))
-        dataSetService.listRichDataset(req.rawQueryString,req.user.id.get)
-      else dataSetService.listRichDatasetByTag(tagName, req.rawQueryString,req.user.id.get)
+        dataSetService.listRichDataset(req.rawQueryString,loggedinUserId)
+      else dataSetService.listRichDatasetByTag(tagName, req.rawQueryString, loggedinUserId)
 
     future.map {
       case Left(errors) =>
@@ -251,22 +248,31 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def updateDSetSharedStatus() = Action.async(parse.json) { request =>
+  def updateDSetSharedStatus(datasetId : String) = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Received update dataSet shredStatus request")
     request.body
-      .validate[Dataset]
-      .map { dataset =>
-        dataSetService
-          .updateDSetSharedStatus(dataset)
-          .map {
-            case Left(errors) =>
-              InternalServerError(Json.toJson(errors))
-            case Right(dataset) =>
-              Ok(Json.toJson(dataset))
-          }
+      .validate[(Int, Long)]
+      .map { sharedStatusWithUser =>
+        val loggedinUser = request.user.id.get
+        if(loggedinUser != sharedStatusWithUser._2) Future.successful(Unauthorized("this user is not authorized to perform this action"))
+        else{
+          dataSetService
+            .updateDSetSharedStatus(sharedStatusWithUser._1, datasetId)
+            .map {
+              case Left(errors) =>
+                InternalServerError(Json.toJson(errors))
+              case Right(dataset) =>
+                Ok(Json.toJson(dataset))
+            }
+        }
       }
       .getOrElse(Future.successful(BadRequest))
   }
+
+  implicit val tupledSharedStatusWithUserReads = (
+    (__ \ 'sharedstatus).read[Int] and
+      (__ \ 'userId).read[Long]
+    ) tupled
 
   def delete(dataSetId: String) =  AuthenticatedAction.async { request =>
     implicit val token = request.token
