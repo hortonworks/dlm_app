@@ -12,17 +12,17 @@ produces:
   - application/json
 
 paths:
-  /api/comments:
+  /api/{objectType}/{objectId}/comments:
     get:
       summary: Get a list of comments related to a particular object( e.g. a particular asset collection)
       parameters:
       - name: objectId
-        in: query
+        in: path
         description: the ID of the object for which comments are fetched
         required: true
         type: string
       - name: objectType
-        in: query
+        in: path
         description: the type of the object (e.g. assetCollection)
         required: true
         type: string
@@ -36,13 +36,15 @@ paths:
               $ref: '#/definitions/OneLevelComment'
         400:
           description: comment is not supported for the supplied objectType or request was malformed
+        404:
+          description: Not Found
         500:
           description: internal server error
           schema:
             type: array
             items:
               $ref: '#/definitions/Error'
-
+  /api/comments:
     post:
       summary: Add a new comment
       parameters:
@@ -52,8 +54,8 @@ paths:
           schema:
             $ref: '#/definitions/Comment'
       responses:
-        200:
-          description: OK
+        201:
+          description: CREATED
           schema:
             $ref: '#/definitions/CommentWithUser'
         400:
