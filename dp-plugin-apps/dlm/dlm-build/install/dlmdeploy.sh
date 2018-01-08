@@ -85,6 +85,7 @@ read_master_password_safely() {
 }
 
 init_app() {
+    read_master_password_safely
     docker start dlm-app >> install.log 2>&1 || \
         docker run \
             --name dlm-app \
