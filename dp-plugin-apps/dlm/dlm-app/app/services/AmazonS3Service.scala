@@ -9,19 +9,17 @@
 
 package services
 
-import com.amazonaws.{AmazonClientException, AmazonServiceException}
+import com.amazonaws.{AmazonClientException}
 import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.identitymanagement.model.{GetUserPolicyRequest, ListAttachedUserPoliciesRequest}
 import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.identitymanagement.{AmazonIdentityManagement, AmazonIdentityManagementClient, AmazonIdentityManagementClientBuilder}
-import com.amazonaws.services.s3.model.{GetBucketPolicyRequest, ListBucketsRequest, S3ObjectSummary}
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient
-import com.amazonaws.services.securitytoken.model.{AWSSecurityTokenServiceException, GetCallerIdentityRequest}
+import com.amazonaws.services.securitytoken.model.{GetCallerIdentityRequest}
 import com.typesafe.scalalogging.Logger
-import models.AmazonS3Entities.{BucketObject, BucketObjectsResponse, CloudAccount, CloudUserDetails, Credential, Error, Bucket => DlmBucket}
-import models.AmazonS3Entities.Error.{AmazonS3Error, GenericError}
+import models.AmazonS3Entities.{BucketObject, BucketObjectsResponse, CloudUserDetails, S3AccountCredential, Bucket => DlmBucket}
+import models.AmazonS3Entities.Error.{AmazonS3Error}
+import models.CloudAccountEntities.Error.{GenericError}
 import com.google.inject.{Inject, Singleton}
+import models.CloudAccountEntities.{CloudAccountCredentials}
 
 import collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -41,10 +39,22 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     if (splitted.length > 1 || path.length - splitted(0).length == 1) "DIRECTORY" else "FILE"
   }
 
-  def getUserIdentity(credential: Credential) : Future[Either[AmazonS3Error, CloudUserDetails]] = {
-    val basicAwsCredential = new BasicAWSCredentials(credential.accessKeyId, credential.secretAccessKey)
-    val awsStsClient = new AWSSecurityTokenServiceClient(basicAwsCredential)
-    val amazonS3Client = new AmazonS3Client(basicAwsCredential)
+  private def createBasicClient(credential: S3AccountCredential): BasicAWSCredentials = {
+    new BasicAWSCredentials(credential.accessKeyId, credential.secretAccessKey)
+  }
+
+  private def createS3Client(credential: S3AccountCredential): AmazonS3Client = {
+    new AmazonS3Client(createBasicClient(credential))
+  }
+
+  private def createSTSClient(credential: S3AccountCredential): AWSSecurityTokenServiceClient = {
+    new AWSSecurityTokenServiceClient(createBasicClient(credential))
+  }
+
+  def getUserIdentity(credential: CloudAccountCredentials) : Future[Either[AmazonS3Error, CloudUserDetails]] = {
+    val awsCredential: S3AccountCredential = credential.asInstanceOf[S3AccountCredential]
+    val awsStsClient = createSTSClient(awsCredential)
+    val amazonS3Client = createS3Client(awsCredential)
     try {
       val callerIdentityResult = awsStsClient.getCallerIdentity(new GetCallerIdentityRequest)
       val arn = callerIdentityResult.getArn
@@ -59,13 +69,11 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def checkUserIdentityValid(accountId: Long, userName: String) : Future[Either[GenericError, Unit]] = {
-    val cloudAccount = CloudAccount(accountId, userName)
-    dlmKeyStore.getCloudAccount(cloudAccount) map {
+  def checkUserIdentityValid(accountId: String) : Future[Either[GenericError, Unit]] = {
+    dlmKeyStore.getCloudAccount(accountId) map {
       case Right(result) =>
-        val basicAwsCredential = new BasicAWSCredentials(result.credential.accessKeyId, result.credential.secretAccessKey)
-        val awsStsClient = new AWSSecurityTokenServiceClient(basicAwsCredential)
-        val amazonS3Client = new AmazonS3Client(basicAwsCredential)
+        val credential = result.accountCredentials.asInstanceOf[S3AccountCredential]
+        val awsStsClient = createSTSClient(credential)
         try {
           Right(awsStsClient.getCallerIdentity(new GetCallerIdentityRequest))
         } catch {
@@ -77,12 +85,10 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def listAllBuckets(accountId: Long, userName: String) : Future[Either[GenericError, List[DlmBucket]]] = {
-    val cloudAccount = CloudAccount(accountId, userName)
-    dlmKeyStore.getCloudAccount(cloudAccount) map {
+  def listAllBuckets(accountId: String) : Future[Either[GenericError, List[DlmBucket]]] = {
+    dlmKeyStore.getCloudAccount(accountId) map {
       case Right(result) =>
-        val credential = new BasicAWSCredentials(result.credential.accessKeyId, result.credential.secretAccessKey)
-        val amazonS3Client = new AmazonS3Client(credential)
+        val amazonS3Client = createS3Client(result.accountCredentials.asInstanceOf[S3AccountCredential])
         try {
           Right(amazonS3Client.listBuckets.asScala.toList.map(x =>
             DlmBucket(x.getName, x.getOwner.getDisplayName, x.getCreationDate.toString)))
@@ -95,12 +101,10 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def listAllObjects(accountId: Long, userName: String, bucketName: String, path: String) : Future[Either[GenericError, BucketObjectsResponse]] = {
-    val cloudAccount = CloudAccount(accountId, userName)
-    dlmKeyStore.getCloudAccount(cloudAccount) map {
+  def listAllObjects(accountId: String, bucketName: String, path: String) : Future[Either[GenericError, BucketObjectsResponse]] = {
+    dlmKeyStore.getCloudAccount(accountId) map {
       case Right(result) =>
-        val credential = new BasicAWSCredentials(result.credential.accessKeyId, result.credential.secretAccessKey)
-        val amazonS3Client = new AmazonS3Client(credential)
+        val amazonS3Client = createS3Client(result.accountCredentials.asInstanceOf[S3AccountCredential])
         try {
           val bucketObjects = amazonS3Client.listObjects(bucketName, path.substring(1)).getObjectSummaries().asScala.toList.flatMap{
             case x if x.getKey.substring(path.substring(1).length).split("/").length == 1 => {

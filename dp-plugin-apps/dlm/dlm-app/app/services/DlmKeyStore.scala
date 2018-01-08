@@ -15,8 +15,8 @@ import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.hortonworks.dataplane.commons.service.api.{CredentialManager, KeystoreReloadEvent}
 import com.google.inject.{Inject, Singleton}
 import com.typesafe.scalalogging.Logger
-import models.AmazonS3Entities.Error._
-import models.AmazonS3Entities.{CloudAccount, CloudAccountWithCredential, CloudAccounts, Error}
+import models.CloudAccountEntities.Error._
+import models.CloudAccountEntities.{CloudAccountWithCredentials, CloudAccountsBody, CloudAccountsItem}
 import play.api.cache._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,7 +31,8 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
   mutable.Subscriber[KeystoreReloadEvent, mutable.Publisher[KeystoreReloadEvent]] {
 
   private val logger = Logger(classOf[DlmKeyStore])
-  private val cloudAccountsCache: LoadingCache[String,Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredential]]]] =
+
+  private val cloudAccountsCache: LoadingCache[String,Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredentials]]]] =
     CacheBuilder.newBuilder().build(new CloudAccountsCacheLoader())
 
   // subscribe for events
@@ -42,8 +43,8 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
   }
 
   private class CloudAccountsCacheLoader extends
-    CacheLoader[String,Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredential]]]] {
-    override def load(key: String): Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredential]]] = {
+    CacheLoader[String,Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredentials]]]] {
+    override def load(key: String): Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredentials]]] = {
       getCloudAccountsFromKeyStore(key)
     }
   }
@@ -51,21 +52,21 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
   /**
     * List all cloud account names
     */
-  def getAllCloudAccountNames : Future[Either[CredentialNotFoundInKeystoreError,CloudAccounts]] = {
+  def getAllCloudAccountNames : Future[Either[CredentialNotFoundInKeystoreError, CloudAccountsBody]] = {
     cloudAccountsCache.get(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
-        Right(CloudAccounts(cloudAccounts.map(x => CloudAccount(x.cloudAccount.accountId, x.cloudAccount.userName))))
-      case Left(error) => Right(CloudAccounts(List()))
+        Right(CloudAccountsBody(cloudAccounts.map(x => CloudAccountsItem(x.id.get, x.accountDetails))))
+      case Left(error) => Right(CloudAccountsBody(List()))
     }
   }
 
   /**
     * Get cloud account
     */
-  def getCloudAccount(cloudAccount: CloudAccount) : Future[Either[CredentialNotFoundInKeystoreError,CloudAccountWithCredential]] = {
+  def getCloudAccount(accountId: String) : Future[Either[CredentialNotFoundInKeystoreError, CloudAccountWithCredentials]] = {
     cloudAccountsCache.get(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
-        cloudAccounts.find(x => x.cloudAccount == cloudAccount) match {
+        cloudAccounts.find(_.id.get.equals(accountId)) match {
           case Some(result) => Right(result)
           case None => Left(CredentialNotFoundInKeystoreError(DpKeyStore.credentialDoesNotExistsErrMsg))
         }
@@ -77,7 +78,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
   /**
     * List all cloud accounts
     */
-  def getAllCloudAccounts : Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredential]]] = {
+  def getAllCloudAccounts : Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredentials]]] = {
     cloudAccountsCache.get(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) => Right(cloudAccounts)
       case Left(error) => Right(List())
@@ -86,14 +87,14 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
 
   /**
     * Update a cloud account
-    * @param cloudAccountWithCredential
+    * @param cloudAccount
     */
-  def updateCloudAccount(cloudAccountWithCredential: CloudAccountWithCredential) : Future[Either[GenericError,Unit]] = {
+  def updateCloudAccount(cloudAccount: CloudAccountWithCredentials) : Future[Either[GenericError,Unit]] = {
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccountsWithCredentials) =>
-        val otherAccounts = cloudAccountsWithCredentials.filterNot(elm => elm.cloudAccount == cloudAccountWithCredential.cloudAccount)
+        val otherAccounts = cloudAccountsWithCredentials.filterNot(_.id.get.equals(cloudAccount.id.get))
         if (otherAccounts.lengthCompare(cloudAccountsWithCredentials.length) != 0) {
-          saveCloudAccountsToKeyStore(otherAccounts :+ cloudAccountWithCredential) match {
+          saveCloudAccountsToKeyStore(otherAccounts :+ cloudAccount) match {
             case Success(v) => Right(Unit)
             case Failure(ex) => Left(GenericError(ex.getMessage))
           }
@@ -108,10 +109,11 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     * Add cloud account
     * @param cloudAccount
     */
-  def addCloudAccount(cloudAccount: CloudAccountWithCredential) : Future[Either[KeyStoreWriteError,Unit]] = {
+  def addCloudAccount(cloudAccount: CloudAccountWithCredentials) : Future[Either[KeyStoreWriteError,Unit]] = {
+    cloudAccount.presetId
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
-        if (cloudAccounts.contains(cloudAccount)) {
+        if (cloudAccounts.exists(_.id.get.equals(cloudAccount.id.get))) {
           Left(KeyStoreWriteError(DpKeyStore.credentialNameExistsErrMsg))
         } else {
           saveCloudAccountsToKeyStore(cloudAccounts :+ cloudAccount) match {
@@ -123,18 +125,18 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
         saveCloudAccountsToKeyStore(List(cloudAccount)) match {
           case Success(v) => Right(Unit)
           case Failure(ex) => Left(KeyStoreWriteError(ex.getMessage))
-      }
+        }
     }
   }
 
   /**
     * Deletes a cloud account
-    * @param cloudAccount
+    * @param accountId
     */
-  def deleteCloudAccount(cloudAccount: CloudAccount) : Future[Either[GenericError,Unit]] = {
+  def deleteCloudAccount(accountId: String) : Future[Either[GenericError,Unit]] = {
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
-        val cloudAccountsToBeSaved = cloudAccounts.filterNot(x => x.cloudAccount == cloudAccount)
+        val cloudAccountsToBeSaved = cloudAccounts.filterNot(_.id.get.equals(accountId))
         if (cloudAccounts.lengthCompare(cloudAccountsToBeSaved.length) != 0) {
           saveCloudAccountsToKeyStore(cloudAccountsToBeSaved) match {
             case Success(v) => Right(Unit)
@@ -147,10 +149,10 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     }
   }
 
-  def saveCloudAccountsToKeyStore(cloudAccountsInfo: List[CloudAccountWithCredential]): Try[Unit] = {
+  def saveCloudAccountsToKeyStore(cloudAccountsInfo: List[CloudAccountWithCredentials]): Try[Unit] = {
     val serializedCloudAccount = SerializationUtils.serialize(cloudAccountsInfo)
     credentialManager.write(DpKeyStore.ALIAS, Map(DpKeyStore.KEY -> serializedCloudAccount)) map {
-     _ => cloudAccountsCache.invalidate(DpKeyStore.ALIAS)
+      _ => cloudAccountsCache.invalidate(DpKeyStore.ALIAS)
     }
   }
 
@@ -159,7 +161,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     * @param alias
     * @return
     */
-  def getCloudAccountsFromKeyStore (alias: String): Future[Either[CredentialNotFoundInKeystoreError,List[CloudAccountWithCredential]]] =  {
+  def getCloudAccountsFromKeyStore (alias: String): Future[Either[CredentialNotFoundInKeystoreError, List[CloudAccountWithCredentials]]] =  {
     credentialManager.read(alias, Set(DpKeyStore.KEY)) match {
       case Success(keyValueMap) =>
         keyValueMap.get(DpKeyStore.KEY) match {
@@ -174,7 +176,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
                 }
               }
             }
-            val value = ois.readObject.asInstanceOf[List[CloudAccountWithCredential]]
+            val value = ois.readObject.asInstanceOf[List[CloudAccountWithCredentials]]
             ois.close()
             Future.successful(Right(value))
 

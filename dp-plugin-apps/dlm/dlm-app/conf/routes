@@ -11,15 +11,15 @@ GET      /api/store/credentials                                       controller
 GET      /api/store/credentialAccounts                                controllers.CredentialStore.listAllCredentialAccounts
 POST     /api/store/credential                                        controllers.CredentialStore.addCredentialAccount
 PUT      /api/store/credential                                        controllers.CredentialStore.updateCredentialAccount
-DELETE   /api/store/credential/accountId/:accountId/userName/:name    controllers.CredentialStore.deleteCredentialAccount(accountId : Long, name : String)
+DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
 
 #Cloud
-GET      /api/cloud/list/buckets/:accountId/username/:userName                controllers.Cloud.listAllBuckets(accountId: Long, userName: String)
-GET      /api/cloud/list/objects/:accountId/username/:userName/bucket/:bucketName/files        controllers.Cloud.listAllObjects(accountId: Long, userName: String, bucketName: String)
+GET      /api/cloud/list/buckets/:cloudAccountId                      controllers.Cloud.listAllBuckets(cloudAccountId: String)
+GET      /api/cloud/list/objects/:cloudAccountId/bucket/:bucketName/files  controllers.Cloud.listAllObjects(cloudAccountId: String, bucketName: String)
 POST     /api/cloud/userIdentity                                      controllers.Cloud.getUserIdentity
-GET      /api/cloud/account/:accountId/username/:userName             controllers.Cloud.checkUserIdentity(accountId: Long, userName: String)
-GET      /api/cloud/list/containers/:accountName                             controllers.Cloud.listAllContainers(accountName: String)
-GET      /api/cloud/list/blobs/:accountName/container/:containerName/files   controllers.Cloud.listAllBlobs(accountName: String, containerName: String)
+GET      /api/cloud/account/:cloudAccountId                           controllers.Cloud.checkUserIdentity(cloudAccountId: String)
+GET      /api/cloud/list/containers/:cloudAccountId                   controllers.Cloud.listAllContainers(cloudAccountId: String)
+GET      /api/cloud/list/blobs/:cloudAccountId/container/:containerName/files   controllers.Cloud.listAllBlobs(cloudAccountId: String, containerName: String)
 
 #Clusters
 GET     /api/clusters                                         controllers.Clusters.list

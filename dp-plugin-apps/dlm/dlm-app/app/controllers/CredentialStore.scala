@@ -10,6 +10,7 @@ package controllers
 
 import com.google.inject.Inject
 import models.AmazonS3Entities._
+import models.CloudAccountEntities._
 import services.DlmKeyStore
 import play.api.mvc.{Action, Controller}
 import models.JsonResponses
@@ -43,7 +44,7 @@ class CredentialStore @Inject()(
 
   def addCredentialAccount = Action.async (parse.json) { request =>
     Logger.info("Received add cloud credential request")
-    request.body.validate[CloudAccountWithCredential].map { credentialAccount =>
+    request.body.validate[CloudAccountWithCredentials].map { credentialAccount =>
       dlmKeyStoreService.addCloudAccount(credentialAccount).map {
         case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
         case Right(response) => Ok(JsonResponses.statusOk)
@@ -53,7 +54,7 @@ class CredentialStore @Inject()(
 
   def updateCredentialAccount = Action.async (parse.json) { request =>
     Logger.info("Received update cloud credential request")
-    request.body.validate[CloudAccountWithCredential].map { credentialAccount =>
+    request.body.validate[CloudAccountWithCredentials].map { credentialAccount =>
       dlmKeyStoreService.updateCloudAccount(credentialAccount).map {
         case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
         case Right(response) => Ok(JsonResponses.statusOk)
@@ -61,12 +62,11 @@ class CredentialStore @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def deleteCredentialAccount(accountId: Long, userName: String) = Action.async {
+  def deleteCredentialAccount(cloudAccountId: String) = Action.async {
     Logger.info("Received delete cloud credential request")
-    dlmKeyStoreService.deleteCloudAccount(CloudAccount(accountId, userName)).map {
+    dlmKeyStoreService.deleteCloudAccount(cloudAccountId).map {
       case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
       case Right(response) => Ok(JsonResponses.statusOk)
     }
   }
-
 }

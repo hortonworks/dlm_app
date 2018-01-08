@@ -9,15 +9,27 @@
 
 package models
 
+import java.io.Serializable
+import models.WASBEntities.Error._
+import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
 import play.api.libs.json.Json
 
 object WASBEntities {
-  case class ClientCredentials(accountName: String, accessKey: String, protocol: String = "http")
-  case class WASBClientError(error: String)
+  sealed trait Error
+  object Error {
+    final case class WASBClientError(message: String) extends Error
+  }
   case class BlobListItem(pathSuffix: String, `type`: String, modificationTime: Option[Long], length: Option[Long])
   case class BlobListResponse(fileList: Seq[BlobListItem])
   case class MountPointDefinition(name: String)
   case class MountPointsResponse(items: Seq[MountPointDefinition])
+
+  @SerialVersionUID(131)
+  case class WASBAccountDetails(provider: String, accountName: String) extends Serializable with CloudAccountDetails {
+    override def getAccountId(): String = accountName
+  }
+  @SerialVersionUID(132)
+  case class WASBAccountCredential(credentialType: String, accessKey: String, protocol: String = "http") extends Serializable with CloudAccountCredentials
 
   implicit val wasbClientErrorWrites = Json.writes[WASBClientError]
   implicit val wasbClientErrorReads = Json.reads[WASBClientError]

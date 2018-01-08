@@ -14,43 +14,25 @@ package models
 import java.io.Serializable
 
 import models.AmazonS3Entities.Error._
+import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
 import play.api.libs.json.{JsValue, Json}
 
 object AmazonS3Entities {
   sealed trait Error
   object Error {
-    final case class GenericError(message: String) extends Error
-    final case class DeserializationError(message: String) extends Error
-    final case class CredentialNotFoundInKeystoreError(message: String) extends Error
-    final case class CloudCredentialNameExists(message: String) extends Error
-    final case class KeyStoreWriteError(message: String) extends Error
     final case class AmazonS3Error(message: String) extends Error
   }
-  @SerialVersionUID(123)
-  case class Credential (accessKeyId: String, secretAccessKey: String) extends Serializable
-  @SerialVersionUID(125)
-  case class CloudAccountWithCredential (cloudAccount: CloudAccount, credential: Credential) extends Serializable
   @SerialVersionUID(124)
-  case class CloudAccount (accountId: Long, userName: String) extends Serializable
-  case class CloudAccounts (accounts: List[CloudAccount])
+  case class S3AccountDetails(provider: String, accountId: Long, userName: String) extends Serializable with CloudAccountDetails {
+    override def getAccountId(): String = s"${accountId.toString}_${userName}"
+  }
+  @SerialVersionUID(123)
+  case class S3AccountCredential (credentialType: String, accessKeyId: String, secretAccessKey: String) extends Serializable with CloudAccountCredentials
 
   case class CloudUserDetails(accountId: String, accountOwnerName: String, userName: String)
   case class Bucket (name: String, owner: String, creationDate: String)
   case class BucketObject(pathSuffix: String, `type`: String, length: Option[Long] = None, modificationTime: Option[Long] = None)
   case class BucketObjectsResponse(fileList: Seq[BucketObject])
-
-
-  implicit val credentialReads = Json.reads[Credential]
-  implicit val credentialWrites = Json.writes[Credential]
-
-  implicit val cloudAccountReads = Json.reads[CloudAccount]
-  implicit val cloudAccountWrites = Json.writes[CloudAccount]
-
-  implicit val cloudAccountWithCredentialReads = Json.reads[CloudAccountWithCredential]
-  implicit val cloudAccountWithCredentialWrites = Json.writes[CloudAccountWithCredential]
-
-  implicit val cloudAccountsReads = Json.reads[CloudAccounts]
-  implicit val cloudAccountsWrites = Json.writes[CloudAccounts]
 
   implicit val cloudUserDetailsReads = Json.reads[CloudUserDetails]
   implicit val cloudUserDetailsWrites = Json.writes[CloudUserDetails]
@@ -64,20 +46,6 @@ object AmazonS3Entities {
   implicit val bucketObjectsResponseReads = Json.reads[BucketObjectsResponse]
   implicit val bucketObjectsResponseWrites = Json.writes[BucketObjectsResponse]
 
-  implicit val deserializationErrorReads = Json.reads[DeserializationError]
-  implicit val deserializationErrorWrites = Json.writes[DeserializationError]
-
-  implicit val credentialNotFoundInKeystoreErrorReads = Json.reads[CredentialNotFoundInKeystoreError]
-  implicit val credentialNotFoundInKeystoreErrorWrites = Json.writes[CredentialNotFoundInKeystoreError]
-
-  implicit val cloudCredentialNameExistsReads = Json.reads[CloudCredentialNameExists]
-  implicit val cloudCredentialNameExistsWrites = Json.writes[CloudCredentialNameExists]
-
-  implicit val genericErrorReads = Json.reads[GenericError]
-  implicit val genericErrorWrites = Json.writes[GenericError]
-
-  implicit val keyStoreWriteErrorReads = Json.reads[KeyStoreWriteError]
-  implicit val keyStoreWriteErrorWrites = Json.writes[KeyStoreWriteError]
 
   implicit val amazonS3ErrorReads = Json.reads[AmazonS3Error]
   implicit val amazonS3ErrorWrites = Json.writes[AmazonS3Error]

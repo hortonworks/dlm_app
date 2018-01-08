@@ -12,22 +12,19 @@ package services
 import com.google.inject.{Inject, Singleton}
 import com.microsoft.azure.storage.CloudStorageAccount
 import com.microsoft.azure.storage.blob._
-import models.WASBEntities.{BlobListResponse, ClientCredentials, MountPointsResponse, _}
+import models.CloudAccountEntities.CloudAccountWithCredentials
+import models.CloudAccountEntities.Error._
+import models.WASBEntities.{BlobListResponse, MountPointsResponse, _}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.Future
+import scala.concurrent.{Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton()
-class WASBService @Inject()() {
+class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
 
-  // TODO: this hardcode should be removed and replaced with credentials from credentials storage
-  private val accessKey: String = ""
-  private val accountName: String = ""
-  val credentials: ClientCredentials = ClientCredentials(accountName, accessKey)
-
-  private def mapError(err: WASBClientError): WASBClientError   = {
-    WASBClientError(error = err.error)
+  private def mapError(err: GenericError): GenericError   = {
+    GenericError(err.message)
   }
 
   private def getDirectoryName(path: String): String = {
@@ -38,34 +35,41 @@ class WASBService @Inject()() {
     path.split("/").last
   }
 
-  private def makeConnectionString(clientCredentials: ClientCredentials): String = {
-    return s"DefaultEndpointsProtocol=${clientCredentials.protocol};" +
-      s"AccountName=${clientCredentials.accountName};" +
-      s"AccountKey=${clientCredentials.accessKey}"
+  private def makeConnectionString(cloudAccount: CloudAccountWithCredentials): String = {
+    val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredential]
+    val accountDetails = cloudAccount.accountDetails.asInstanceOf[WASBAccountDetails]
+    return s"DefaultEndpointsProtocol=${credential.protocol};" +
+      s"AccountName=${accountDetails.accountName};" +
+      s"AccountKey=${credential.accessKey}"
   }
 
-  private def createBlobClient(accountName: String): Future[Either[WASBClientError, CloudBlobClient]] = {
-    val connectionString: String = makeConnectionString(credentials)
-    try {
-      Future.successful(Right(CloudStorageAccount.parse(connectionString).createCloudBlobClient()))
-    } catch {
-      case e: Exception => Future.successful(Left(WASBClientError(e.getMessage())))
+  private def createBlobClient(accountId: String): Future[Either[GenericError, CloudBlobClient]] = {
+    dlmKeyStore.getCloudAccount(accountId) map {
+      case Right(cloudAccount) => {
+        val connectionString: String = makeConnectionString(cloudAccount)
+        try {
+          Right(CloudStorageAccount.parse(connectionString).createCloudBlobClient())
+        } catch {
+          case e: Exception => Left(GenericError(e.getMessage()))
+        }
+      }
+      case Left(err) => Left(GenericError(err.message))
     }
   }
 
-  private def listContainers(accountName: String): Future[Either[WASBClientError, Seq[CloudBlobContainer]]] = {
-    createBlobClient(accountName) map {
+  private def listContainers(accountId: String): Future[Either[GenericError, Seq[CloudBlobContainer]]] = {
+    createBlobClient(accountId) map {
       case Right(client) => Right(client.listContainers().asScala.to[collection.immutable.Seq])
-      case Left(err) => Left(err)
+      case Left(err) => Left(GenericError(err.message))
     }
   }
 
-  private def listBlobs(accountName: String, containerName: String, path: String): Future[Either[WASBClientError, BlobListResponse]] = {
-    createBlobClient(accountName) map {
+  private def listBlobs(accountId: String, containerName: String, path: String): Future[Either[GenericError, BlobListResponse]] = {
+    createBlobClient(accountId) map {
       case Right(client) => {
         val container: CloudBlobContainer = client.getContainerReference(containerName)
         if (!container.exists()) {
-          Left(WASBClientError(error = s"Container ${containerName} is not exist"))
+          Left(GenericError(message = s"Container ${containerName} is not exist"))
         } else {
           var fileList: Seq[BlobListItem] = Seq()
           for (blobItem: ListBlobItem <- container.listBlobs(path.substring(1)).asScala) {
@@ -85,12 +89,12 @@ class WASBService @Inject()() {
           Right(BlobListResponse(fileList))
         }
       }
-      case Left(err) => Left(err)
+      case Left(err) => Left(mapError(err))
     }
   }
 
-  def getContainers(accountName: String): Future[Either[WASBClientError, MountPointsResponse]] = {
-    listContainers(accountName) map {
+  def getContainers(accountId: String): Future[Either[GenericError, MountPointsResponse]] = {
+    listContainers(accountId) map {
       case Right(containers) => {
         val items = containers.map { container =>
           MountPointDefinition(container.getName())
@@ -101,10 +105,19 @@ class WASBService @Inject()() {
     }
   }
 
-  def getFiles(accountName: String, containerName: String, path: String): Future[Either[WASBClientError, BlobListResponse]] = {
-    listBlobs(accountName, containerName, path) map {
+  def getFiles(accountId: String, containerName: String, path: String): Future[Either[GenericError, BlobListResponse]] = {
+    listBlobs(accountId, containerName, path) map {
       case Right(blobs) => Right(blobs)
       case Left(err) => Left(mapError(err))
+    }
+  }
+
+  // todo: need to check another way to check identity since if credential isn't valid azure-sdk
+  // will throw error only after timeout
+  def checkUserIdentityValid(accountId: String): Future[Either[GenericError, Unit]] = {
+    listContainers(accountId) map {
+      case Left(err) => Left(mapError(err))
+      case _ => Right(())
     }
   }
 }
