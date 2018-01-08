@@ -43,6 +43,11 @@ object Entities {
     }
   }
 
+  object SharingStatus extends Enumeration {
+    val PUBLIC = Value(1)
+    val PRIVATE = Value(2)
+  }
+
   case class HJwtToken(token: String)
 
   case class Error(code: String,
@@ -283,7 +288,7 @@ object Entities {
                      lastModified: LocalDateTime = LocalDateTime.now(),
                      active: Boolean = true,
                      version: Int = 1,
-                     sharedStatus: Int = 1,
+                     sharedStatus: Int = SharingStatus.PUBLIC.id,
                      customProps: Option[JsValue] = None)
 
   case class DatasetCategory(categoryId: Long, datasetId: Long)

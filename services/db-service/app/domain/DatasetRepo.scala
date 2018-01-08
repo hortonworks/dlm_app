@@ -201,18 +201,18 @@ class DatasetRepo @Inject()(
   }
 
   def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId:Long): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === 1)), paginatedQuery, searchText)
+    getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id)), paginatedQuery, searchText)
   }
 
   def getRichDatasetById(id: Long,userId:Long): Future[Option[RichDataset]] = {
-    getRichDataset(Datasets.filter(m => (m.id === id && m.createdBy === userId) || (m.id === id && m.sharedStatus === 1)), None, None).map(_.headOption)
+    getRichDataset(Datasets.filter(m => (m.id === id && m.createdBy === userId) || (m.id === id && m.sharedStatus === SharingStatus.PUBLIC.id)), None, None).map(_.headOption)
   }
 
   def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None,userId:Long): Future[Seq[RichDataset]] = {
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
-      .map(_._2).filter(m=>(m.createdBy === userId) || (m.sharedStatus === 1))
+      .map(_._2).filter(m=>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
     getRichDataset(query, paginatedQuery, searchText)
   }
 
@@ -238,12 +238,11 @@ class DatasetRepo @Inject()(
     db.run(query)
   }
 
-  def updateSharedStatus(datasetId: Long, shareStatus: Int) = {
+  def updateDatset(datasetId: Long, dataset: Dataset) = {
     val query = ( for {
-      _ <- Datasets.filter(_.id === datasetId).map(d => (d.sharedStatus)).update(shareStatus)
-      //_ <- Datasets.filter(_.id === dataset.id).update((dataset)
-      dataset <- Datasets.filter(_.id === datasetId).result.headOption
-    } yield(dataset)).transactionally
+      _ <- Datasets.filter(_.id === datasetId).update(dataset)
+      ds <- Datasets.filter(_.id === datasetId).result.headOption
+    } yield(ds)).transactionally
 
     db.run(query)
   }

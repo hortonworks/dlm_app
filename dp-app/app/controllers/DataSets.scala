@@ -248,16 +248,16 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def updateDSetSharedStatus(datasetId : String) = AuthenticatedAction.async(parse.json) { request =>
+  def updateDataset(datasetId : String) = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Received update dataSet shredStatus request")
     request.body
-      .validate[(Int, Long)]
-      .map { sharedStatusWithUser =>
+      .validate[Dataset]
+      .map { dataset =>
         val loggedinUser = request.user.id.get
-        if(loggedinUser != sharedStatusWithUser._2) Future.successful(Unauthorized("this user is not authorized to perform this action"))
+        if(loggedinUser != dataset.createdBy) Future.successful(Unauthorized("this user is not authorized to perform this action"))
         else{
           dataSetService
-            .updateDSetSharedStatus(sharedStatusWithUser._1, datasetId)
+            .updateDataset(datasetId, dataset)
             .map { dataset =>
               Ok(Json.toJson(dataset))
             }
@@ -266,11 +266,6 @@ class DataSets @Inject()(
       }
       .getOrElse(Future.successful(BadRequest))
   }
-
-  implicit val tupledSharedStatusWithUserReads = (
-    (__ \ 'sharedstatus).read[Int] and
-      (__ \ 'userId).read[Long]
-    ) tupled
 
   def delete(dataSetId: String) =  AuthenticatedAction.async { request =>
     implicit val token = request.token

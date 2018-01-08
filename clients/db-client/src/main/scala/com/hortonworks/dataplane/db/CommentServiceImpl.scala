@@ -67,7 +67,7 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def getByObjectRef(objectId: String, objectType: String): Future[Seq[OneLevelComment]] = {
-    ws.url(s"$url/comments?objectId=$objectId&objectType=$objectType")
+    ws.url(s"$url/${objectType}/${objectId}/comments")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToOneLevelComments)

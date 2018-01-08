@@ -21,7 +21,7 @@ export class CommentService {
   constructor(private http:Http) { }
 
   getByObjectRef(objectId: string, objectType: string): Observable<OneLevelComment[]>  {
-    const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}`;
+    const uri = `api/${objectType}/${objectId}/comments`;
 
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))

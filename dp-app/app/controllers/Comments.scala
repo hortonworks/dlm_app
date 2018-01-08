@@ -41,7 +41,7 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
           commentService
             .add(comment.copy(createdBy = request.user.id.get))
             .map { comment =>
-              Ok(Json.toJson(comment))
+              Created(Json.toJson(comment))
             }
             .recover(apiError)
         }
@@ -73,14 +73,12 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     (__ \ 'userId).read[String]
   ) tupled
 
-  def getByObjectRef = Action.async { req =>
-    val objectId = req.getQueryString("objectId")
-    val objectType  = req.getQueryString("objectType")
+  def getByObjectRef(objectType: String, objectId: String) = Action.async { req =>
     val objectTypes = config.getStringSeq("dp.comments.object.types").getOrElse(Nil)
-    if(objectId.isEmpty || objectType.isEmpty || !objectTypes.contains(objectType.get)) Future.successful(BadRequest)
+    if(!objectTypes.contains(objectType)) Future.successful(BadRequest)
     else{
       commentService
-        .getByObjectRef(objectId.get, objectType.get)
+        .getByObjectRef(objectId, objectType)
         .map { comments =>
           Ok(Json.toJson(comments))
         }

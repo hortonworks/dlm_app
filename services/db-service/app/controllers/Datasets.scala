@@ -101,13 +101,13 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     future.map(i => success(i)).recoverWith(apiError)
   }
 
-  def updateSharedStatus(datasetId: String) = Action.async(parse.json) { req =>
+  def updateDatset(datasetId: String) = Action.async(parse.json) { req =>
     req.body
-      .validate[(Int)]
-      .map { sstate =>
+      .validate[Dataset]
+      .map { dataset =>
         if(!isNumeric(datasetId)) Future.successful(BadRequest)
         else {
-          datasetRepo.updateSharedStatus(datasetId.toLong, sstate).map{ ds =>
+          datasetRepo.updateDatset(datasetId.toLong, dataset).map{ ds =>
             ds.map { d =>
               success(linkData(d, makeLink(d)))
             }
@@ -117,8 +117,6 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       }
       .getOrElse(Future.successful(BadRequest))
   }
-
-  implicit val tupledSharedInfoReads = ((__ \ 'sharedstatus).read[Int])
 
   def add = Action.async(parse.json) { req =>
     req.body

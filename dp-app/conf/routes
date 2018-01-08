@@ -84,7 +84,7 @@ POST          /api/datasets/categories                               controllers
 # Datasets ?
 # ===========================================
 GET           /api/dataset/:datasetId                                controllers.DataSets.getRichDatasetById(datasetId : String)
-PATCH         /api/datasetsharedinfo/:datasetId                      controllers.DataSets.updateDSetSharedStatus(datasetId : String)
+PATCH         /api/datasets/:datasetId                               controllers.DataSets.updateDataset(datasetId : String)
 GET           /api/dataset/list                                      controllers.DataSets.getRichDataset
 GET           /api/dataset/list/tag/:tagName                         controllers.DataSets.getRichDatasetByTag(tagName : String)
 
@@ -195,6 +195,6 @@ GET           /api/workspaces/:workspaceId/notebooks                 controllers
 # comments
 # ===========================================
 POST          /api/comments                                    controllers.Comments.addComments
-GET           /api/comments                                    controllers.Comments.getByObjectRef
+GET           /api/:objectType/:objectId/comments              controllers.Comments.getByObjectRef(objectType: String, objectId: String)
 DELETE        /api/comments/:id                                controllers.Comments.deleteCommentById(id: String)
 PATCH         /api/comments/:id                                controllers.Comments.updateComments(id: String)

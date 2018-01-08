@@ -26,6 +26,9 @@
     <div class="mdl-cell mdl-cell--12-col">Loading...</div>
   </div>
   <div *ngIf="!fetchInProgress">
+    <div class="mdl-grid" *ngIf="oneLevelComments.length === 0">
+      <div class="mdl-cell mdl-cell--12-col no-comments">No Comments yet.</div>
+    </div>
     <div class="comment-tree">
       <ul>
         <li *ngFor="let oneLevelComment of oneLevelComments">

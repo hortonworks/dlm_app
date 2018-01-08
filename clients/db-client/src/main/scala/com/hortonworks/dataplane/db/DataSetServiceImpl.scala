@@ -107,13 +107,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  override def updateDSetSharedStatus(sharedStatus: Int,datasetId : String): Future[Seq[Dataset]] = {
-    ws.url(s"$url/datasetsharedinfo/$datasetId")
+  override def updateDataset(datasetId : String, dataset: Dataset): Future[Seq[Dataset]] = {
+    ws.url(s"$url/datasets/$datasetId")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .patch(Json.toJson(sharedStatus))
+      .patch(Json.toJson(dataset))
       .map(mapDataSets)
   }
 

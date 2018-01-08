@@ -152,7 +152,7 @@ POST          /datasetswithassets                                            con
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
-PATCH         /datasetsharedinfo/:datasetId                                  controllers.Datasets.updateSharedStatus(datasetId:String)
+PATCH         /datasets/:datasetId                                           controllers.Datasets.updateDatset(datasetId:String)
 
 #RichDataset
 GET           /richdatasets                                                  controllers.Datasets.allRichDataset
@@ -213,6 +213,6 @@ POST         /blacklisted-tokens                                            cont
 
 #comments api
 POST        /comments                                                       controllers.Comments.addComment
-GET         /comments                                                       controllers.Comments.getCommentByObjectRef
+GET         /:objectType/:objectId/comments                                 controllers.Comments.getCommentByObjectRef(objectType: String, objectId: String)
 DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
 PATCH       /comments/:id                                                   controllers.Comments.update(id: String)
