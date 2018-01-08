@@ -33,7 +33,7 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def add(comment: Comment): Future[Either[Errors, CommentWithUser]] = {
+  override def add(comment: Comment): Future[CommentWithUser] = {
     ws.url(s"$url/comments")
       .withHeaders(
         "Content-Type" -> "application/json",
@@ -43,20 +43,20 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUser)
   }
 
-  override def deleteById(commentId: String, userId: Long): Future[Either[Errors, String]] = {
+  override def deleteById(commentId: String, userId: Long): Future[String] = {
     ws.url(s"$url/comments/$commentId")
       .withHeaders("Accept" -> "application/json")
       .delete()
       .map{ res =>
         res.status match {
-          case 200 => extractEntity[String](res, r => (r.json \ "results").validate[String].get)
+          case 200 => (res.json \ "results").validate[String].get
           case _ =>
-            mapErrors(res)
+            mapResponseToError(res)
         }
       }
   }
 
-  override def update(commentText: String, commentId: String) = {
+  override def update(commentText: String, commentId: String): Future[CommentWithUser] = {
     ws.url(s"$url/comments/$commentId")
       .withHeaders(
         "Content-Type" -> "application/json",
@@ -66,19 +66,21 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUser)
   }
 
-  override def getByObjectRef(objectId: String, objectType: String): Future[Either[Errors, Seq[OneLevelComment]]]  = {
+  override def getByObjectRef(objectId: String, objectType: String): Future[Seq[OneLevelComment]] = {
     ws.url(s"$url/comments?objectId=$objectId&objectType=$objectType")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToOneLevelComments)
   }
 
-  private def mapToOneLevelComments(res: WSResponse): Either[Errors, Seq[OneLevelComment]] = {
+  private def mapToOneLevelComments(res: WSResponse)= {
     res.status match {
       case 200 =>
         val commentswithuser = (res.json \ "results").validate[Seq[CommentWithUser]].getOrElse(Seq())
-        Right(getOneLevelComments(commentswithuser))
-      case _ => mapErrors(res)
+        getOneLevelComments(commentswithuser)
+      case _ => {
+        mapResponseToError(res)
+      }
     }
   }
 
@@ -104,17 +106,17 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToCommentWithUser(res: WSResponse) = {
     res.status match {
-      case 200 => extractEntity[CommentWithUser](res, r => (r.json \ "results").validate[CommentWithUser].get)
-      case _ => mapErrors(res)
+      case 200 => (res.json \ "results").validate[CommentWithUser].get
+      case _ => mapResponseToError(res)
     }
   }
 
-  private def mapToNestedComments(res: WSResponse): Either[Errors, Seq[NestedComment]] = {
+  private def mapToNestedComments(res: WSResponse): Seq[NestedComment] = {
     res.status match {
       case 200 =>
         val commentswithuser = (res.json \ "results").validate[Seq[CommentWithUser]].getOrElse(Seq())
-        Right(getNestedComments(commentswithuser))
-      case _ => mapErrors(res)
+        getNestedComments(commentswithuser)
+      case _ => mapResponseToError(res)
     }
   }
 
@@ -165,15 +167,15 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToComments(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Seq[Comment]](res, r => (r.json \ "results").validate[Seq[Comment]].get)
-      case _ => mapErrors(res)
+        (res.json \ "results").validate[Seq[Comment]].getOrElse(Seq())
+      case _ => mapResponseToError(res)
     }
   }
 
   private def mapToComment(res: WSResponse) = {
     res.status match {
-      case 200 => extractEntity[Comment](res, r => (r.json \ "results").validate[Comment].get)
-      case _ => mapErrors(res)
+      case 200 => (res.json \ "results").validate[Comment].get
+      case _ => mapResponseToError(res)
     }
   }
 

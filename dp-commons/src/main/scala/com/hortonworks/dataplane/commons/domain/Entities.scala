@@ -49,6 +49,9 @@ object Entities {
                    message: String,
                    errorType: String = ErrorType.General.toString)
 
+  case class RestApiException(respCode : Int,
+                              errorsObj: Errors) extends Exception(errorsObj.firstMessage)
+
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
     def firstMessage = errors.headOption.map(_.code).getOrElse("Unknown Error")
@@ -403,6 +406,9 @@ object JsonFormatters {
 
   implicit val errorsWrites = Json.writes[Errors]
   implicit val errorsReads = Json.reads[Errors]
+
+  implicit val restApiExceptionWrites = Json.writes[RestApiException]
+  implicit val restApiExceptionReads = Json.reads[RestApiException]
 
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]

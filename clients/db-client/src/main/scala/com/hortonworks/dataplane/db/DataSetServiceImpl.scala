@@ -107,14 +107,14 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  override def updateDSetSharedStatus(sharedStatus: Int,datasetId : String): Future[Either[Errors, Seq[Dataset]]] = {
+  override def updateDSetSharedStatus(sharedStatus: Int,datasetId : String): Future[Seq[Dataset]] = {
     ws.url(s"$url/datasetsharedinfo/$datasetId")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
       .patch(Json.toJson(sharedStatus))
-      .map(mapToDataSets)
+      .map(mapDataSets)
   }
 
   override def delete(datasetId: String): Future[Either[Errors, Long]] = {
@@ -128,6 +128,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => extractEntity[Seq[Dataset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[Dataset].get })
       case _ => mapErrors(res)
+    }
+  }
+
+  private def mapDataSets(res: WSResponse) = {
+    res.status match {
+      case 200 => (res.json \ "results" \\ "data").map { d => d.validate[Dataset].get }
+      case _ => mapResponseToError(res)
     }
   }
 

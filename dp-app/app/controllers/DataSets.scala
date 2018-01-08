@@ -43,7 +43,7 @@ class DataSets @Inject()(
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
     val utilityService: UtilityService)
-    extends Controller {
+    extends Controller with JsonAPI {
 
   def list(name: Option[String]) =  Action.async {
     Logger.info("Received list dataSet request")
@@ -258,12 +258,10 @@ class DataSets @Inject()(
         else{
           dataSetService
             .updateDSetSharedStatus(sharedStatusWithUser._1, datasetId)
-            .map {
-              case Left(errors) =>
-                InternalServerError(Json.toJson(errors))
-              case Right(dataset) =>
-                Ok(Json.toJson(dataset))
+            .map { dataset =>
+              Ok(Json.toJson(dataset))
             }
+            .recover(apiError)
         }
       }
       .getOrElse(Future.successful(BadRequest))

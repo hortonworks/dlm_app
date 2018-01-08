@@ -15,7 +15,6 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
-import com.hortonworks.dataplane.commons.domain.Entities
 import com.hortonworks.dataplane.commons.domain.Entities.Comment
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.CommentService
@@ -29,7 +28,7 @@ import scala.concurrent.Future
 
 class Comments @Inject()(@Named("commentService") val commentService: CommentService,
                          private val config: Configuration)
-  extends Controller {
+  extends Controller with JsonAPI {
 
   def addComments = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Comments Controller: Received add Comment request for assetCollection")
@@ -41,12 +40,10 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
         else{
           commentService
             .add(comment.copy(createdBy = request.user.id.get))
-            .map {
-              case Left(errors) =>
-                InternalServerError(Json.toJson(errors))
-              case Right(comment) =>
-                Ok(Json.toJson(comment))
+            .map { comment =>
+              Ok(Json.toJson(comment))
             }
+            .recover(apiError)
         }
       }
       .getOrElse(Future.successful(BadRequest))
@@ -62,12 +59,10 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
         else{
           commentService
             .update(commentTextWithUser._1,commentId)
-            .map {
-              case Left(errors) =>
-                InternalServerError(Json.toJson(errors))
-              case Right(comment) =>
-                Ok(Json.toJson(comment))
+            .map { comment =>
+              Ok(Json.toJson(comment))
             }
+            .recover(apiError)
         }
       }
       .getOrElse(Future.successful(BadRequest))
@@ -86,11 +81,10 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     else{
       commentService
         .getByObjectRef(objectId.get, objectType.get)
-        .map {
-          case Left(errors) =>
-            InternalServerError(Json.toJson(errors))
-          case Right(nestedComments: Seq[Entities.OneLevelComment]) => Ok(Json.toJson(nestedComments))
+        .map { comments =>
+          Ok(Json.toJson(comments))
         }
+        .recover(apiError)
     }
   }
 
@@ -103,12 +97,10 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     if(paramUserId.isEmpty || !isNumeric(paramUserId.get) || paramUserId.get.toLong != loggedinUser) Future.successful(Unauthorized("this user is not authorized to perform this action"))
     else{
       commentService.deleteById(commentId,paramUserId.get.toLong)
-        .map{
-          case Left(errors) =>
-            InternalServerError(Json.toJson(errors))
-          case Right(msg) =>
-            Ok(Json.toJson(msg))
+        .map{ msg =>
+          Ok(Json.toJson(msg))
         }
+        .recover(apiError)
     }
 
   }
