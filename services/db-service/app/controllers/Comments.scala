@@ -64,7 +64,7 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     else{
       val commentId = id.toLong
       val futureId = commentRepo.deleteById(commentId, userId.get.toLong)
-      futureId.map(i => success("Success")).recoverWith(apiError)
+      futureId.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
     }
   }
 
