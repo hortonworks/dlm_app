@@ -14,9 +14,11 @@ import { HttpClient } from '@angular/common/http';
 @Injectable()
 export class HdfsService {
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+  }
 
   getFilesList(clusterId, path): Observable<any> {
+    path = path || '/';
     return this.httpClient.get<any>(`clusters/${clusterId}/hdfs/file?path=${path}`);
   }
 
