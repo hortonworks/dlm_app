@@ -26,7 +26,7 @@
     <div class="mdl-cell mdl-cell--12-col">{{"common.loading" | translate}}...</div>
   </div>
   <div *ngIf="!fetchInProgress">
-    <div class="mdl-grid" *ngIf="oneLevelComments.length === 0">
+    <div class="mdl-grid" *ngIf="!fetchError && oneLevelComments.length === 0">
       <div class="mdl-cell mdl-cell--12-col no-comments">{{"pages.comments.noComments" | translate}}</div>
     </div>
     <div class="comment-tree">

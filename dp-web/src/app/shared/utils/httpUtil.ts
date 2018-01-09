@@ -76,10 +76,10 @@ export class HttpUtil {
   }
 
   private static isValidErrArray(errObject) {
-    return errObject.errors[0] && errObject.errors[0].code && errObject.errors[0].message && errObject.errors[0].errorType
+    return errObject.errors[0] && errObject.errors[0].code && errObject.errors[0].errorType
   }
   private static getMsgsFromErrArray(errorObj){
-    return errorObj.errors.filter(err => {return (err.code && err.message && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
+    return errorObj.errors.filter(err => {return (err.code && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
   }
   private static processErrorMessage(error:CustomError){
     if(error.code.length > 16){
