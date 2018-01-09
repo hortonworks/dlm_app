@@ -12,17 +12,17 @@ produces:
   - application/json
 
 paths:
-  /{objectType}/{objectId}/comments:
+  /comments:
     get:
       summary: Get a list of comments related to a particular object( e.g. a particular asset collection)
       parameters:
       - name: objectId
-        in: path
+        in: query
         description: the ID of the object for which comments are fetched
         required: true
         type: string
       - name: objectType
-        in: path
+        in: query
         description: the type of the object (e.g. assetCollection)
         required: true
         type: string
@@ -47,7 +47,6 @@ paths:
             items:
               $ref: '#/definitions/Error'
 
-  /comments:
     post:
       summary: Add a new comment
       parameters:
