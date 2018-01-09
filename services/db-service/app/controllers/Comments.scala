@@ -59,10 +59,11 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
 
   def deleteById(id: String) = Action.async { req =>
     Logger.info("db-service Comments controller:  Received delete comment request")
-    if(!isNumeric(id)) Future.successful(BadRequest)
+    val userId = req.getQueryString("userId")
+    if(userId.isEmpty || !isNumeric(userId.get) || !isNumeric(id)) Future.successful(BadRequest)
     else{
       val commentId = id.toLong
-      val futureId = commentRepo.deleteById(commentId)
+      val futureId = commentRepo.deleteById(commentId, userId.get.toLong)
       futureId.map(i => success("Success")).recoverWith(apiError)
     }
   }

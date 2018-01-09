@@ -31,7 +31,7 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
   extends Controller with JsonAPI {
 
   def addComments = AuthenticatedAction.async(parse.json) { request =>
-    Logger.info("Comments Controller: Received add Comment request for assetCollection")
+    Logger.info("Comments Controller: Received add Comment request")
     request.body
       .validate[Comment]
       .map { comment =>
@@ -50,7 +50,7 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
   }
 
   def updateComments(commentId: String) = AuthenticatedAction.async(parse.json) { request =>
-    Logger.info("Comments Controller: Received add Comment request for assetCollection")
+    Logger.info("Comments Controller: Received update Comment request")
     request.body
       .validate[(String, String)]
       .map { case (commentTextWithUser) =>
@@ -93,16 +93,11 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
 
   def deleteCommentById(commentId: String) = AuthenticatedAction.async { req =>
     Logger.info("dp-app Comments Controller: Received delete comment request")
-    val paramUserId = req.getQueryString("userId")
     val loggedinUser = req.user.id.get
-    if(paramUserId.isEmpty || !isNumeric(paramUserId.get) || paramUserId.get.toLong != loggedinUser) Future.successful(Unauthorized("this user is not authorized to perform this action"))
-    else{
-      commentService.deleteById(commentId,paramUserId.get.toLong)
-        .map{ msg =>
-          Ok(Json.toJson(msg))
-        }
-        .recover(apiError)
-    }
-
+    commentService.deleteById(commentId,loggedinUser)
+      .map{ msg =>
+        Ok(Json.toJson(msg))
+      }
+      .recover(apiError)
   }
 }

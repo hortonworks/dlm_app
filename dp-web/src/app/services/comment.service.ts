@@ -36,9 +36,9 @@ export class CommentService {
       .catch(HttpUtil.handleError);
   }
 
-  deleteComment(id: number, userId: number) : Observable<any> {
+  deleteComment(id: number) : Observable<any> {
     return this.http
-      .delete(`${this.uri}/${id}?userId=${userId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .delete(`${this.uri}/${id}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

@@ -44,7 +44,7 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def deleteById(commentId: String, userId: Long): Future[String] = {
-    ws.url(s"$url/comments/$commentId")
+    ws.url(s"$url/comments/$commentId?userId=${userId}")
       .withHeaders("Accept" -> "application/json")
       .delete()
       .map{ res =>

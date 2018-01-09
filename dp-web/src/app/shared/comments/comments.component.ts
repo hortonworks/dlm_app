@@ -74,7 +74,7 @@ export class CommentsComponent implements OnInit {
   }
 
   onDeleteComment(commentWU: CommentWithUser) {
-    this.commentService.deleteComment(commentWU.comment.id, commentWU.comment.createdBy).subscribe(_ => {
+    this.commentService.deleteComment(commentWU.comment.id).subscribe(_ => {
       this.getComments(false);
     });
   }

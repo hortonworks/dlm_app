@@ -189,7 +189,7 @@ class DataSets @Inject()(
   def getRichDatasetById(id: String) =  AuthenticatedAction.async { req =>
     Logger.info("Received retrieve dataSet request")
     if(Try(id.toLong).isFailure){
-      Future.successful(NotFound)
+      Future.successful(BadRequest)
     }else{
       dataSetService
         .getRichDatasetById(id.toLong,req.user.id.get)

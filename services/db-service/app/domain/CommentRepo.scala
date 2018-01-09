@@ -52,8 +52,8 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     }
   }
 
-  def deleteById(commentId:Long)={
-    db.run(Comments.filter(_.id === commentId).delete)
+  def deleteById(commentId:Long, userId: Long)={
+    db.run(Comments.filter(m =>(m.id === commentId && m.createdBy === userId)).delete)
   }
 
   def update(commentText: String, commentId: Long) = {
