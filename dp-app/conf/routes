@@ -195,6 +195,6 @@ GET           /api/workspaces/:workspaceId/notebooks                 controllers
 # comments
 # ===========================================
 POST          /api/comments                                    controllers.Comments.addComments
-GET           /api/:objectType/:objectId/comments              controllers.Comments.getByObjectRef(objectType: String, objectId: String)
+GET           /api/comments                                    controllers.Comments.getByObjectRef
 DELETE        /api/comments/:id                                controllers.Comments.deleteCommentById(id: String)
 PATCH         /api/comments/:id                                controllers.Comments.updateComments(id: String)

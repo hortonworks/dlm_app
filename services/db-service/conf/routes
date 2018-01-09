@@ -213,6 +213,6 @@ POST         /blacklisted-tokens                                            cont
 
 #comments api
 POST        /comments                                                       controllers.Comments.addComment
-GET         /:objectType/:objectId/comments                                 controllers.Comments.getCommentByObjectRef(objectType: String, objectId: String)
+GET         /comments                                                       controllers.Comments.getCommentByObjectRef
 DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
 PATCH       /comments/:id                                                   controllers.Comments.update(id: String)

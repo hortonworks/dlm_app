@@ -73,12 +73,15 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     (__ \ 'userId).read[String]
   ) tupled
 
-  def getByObjectRef(objectType: String, objectId: String) = Action.async { req =>
+  def getByObjectRef = Action.async { req =>
+    val objectId = req.getQueryString("objectId")
+    val objectType  = req.getQueryString("objectType")
     val objectTypes = config.getStringSeq("dp.comments.object.types").getOrElse(Nil)
-    if(!objectTypes.contains(objectType)) Future.successful(BadRequest)
+    Logger.info("dp-app Comments Controller: Received get comment request")
+    if(objectId.isEmpty || objectType.isEmpty || !objectTypes.contains(objectType.get)) Future.successful(BadRequest)
     else{
       commentService
-        .getByObjectRef(objectId, objectType)
+        .getByObjectRef(objectId.get, objectType.get)
         .map { comments =>
           Ok(Json.toJson(comments))
         }

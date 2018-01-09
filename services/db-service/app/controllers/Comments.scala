@@ -44,10 +44,13 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
 
   private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
 
-  def getCommentByObjectRef(objectType: String, objectId: String) = Action.async { req =>
-    if(!isNumeric(objectId)) Future.successful(BadRequest)
+  def getCommentByObjectRef = Action.async { req =>
+    val objectId = req.getQueryString("objectId")
+    val objectType  = req.getQueryString("objectType")
+    Logger.info("dp-service Comments Controller: Received get comment request")
+    if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
     else{
-      commentRepo.findByObejctRef(objectId.toLong,objectType)
+      commentRepo.findByObejctRef(objectId.get.toLong,objectType.get)
         .map{ commentswithuser =>
           success(commentswithuser)
         }.recoverWith(apiError)
