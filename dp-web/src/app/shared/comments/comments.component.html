@@ -14,20 +14,20 @@
     <div class="hwx-subtitle">
       <span class="primary-space comment-heading">
         <i class="fa fa-comments"></i>
-        <span>Collaborate</span>
+        <span>{{"pages.comments.collaborate" | translate}}</span>
     </span>
       <i id="back" class="fa fa-remove close-icon" [routerLink]="['../']"></i>
     </div>
   </div>
   <div class="mdl-grid" *ngIf="fetchError">
-    <div class="mdl-cell mdl-cell--12-col load-comment-error">Could not fetch related Comments</div>
+    <div class="mdl-cell mdl-cell--12-col load-comment-error">{{"pages.comments.fetchErrorMsg" | translate}}</div>
   </div>
   <div class="mdl-grid" *ngIf="fetchInProgress">
-    <div class="mdl-cell mdl-cell--12-col">Loading...</div>
+    <div class="mdl-cell mdl-cell--12-col">{{"common.loading" | translate}}...</div>
   </div>
   <div *ngIf="!fetchInProgress">
     <div class="mdl-grid" *ngIf="oneLevelComments.length === 0">
-      <div class="mdl-cell mdl-cell--12-col no-comments">No Comments yet.</div>
+      <div class="mdl-cell mdl-cell--12-col no-comments">{{"pages.comments.noComments" | translate}}</div>
     </div>
     <div class="comment-tree">
       <ul>
