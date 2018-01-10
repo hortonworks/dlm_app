@@ -1,0 +1,36 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<dlm-table
+  [rowDetailHeight]="550"
+  [rowDetailTemplate]="rowDetailRef"
+  [theme]="tableTheme"
+  [columns]="columns"
+  [columnMode]="columnMode"
+  [rows]="accounts">
+</dlm-table>
+
+<ng-template #nameCell let-account="row">
+  <p>
+    <span *ngIf="account.accountDetails.userName">{{account.accountDetails.userName}}</span>
+    <span *ngIf="account.accountDetails.accountName">{{account.accountDetails.accountName}}</span>
+  </p>
+  <p *ngIf="account.accountDetails.accountId">{{account.accountDetails.accountId}}</p>
+</ng-template>
+
+<ng-template #backetsCell let-backetsCount="value" let-account="row" let-expanded="expanded">
+  <div (click)="toggleBacketDetails(account)">
+    <span>{{backetsCount}}</span>
+    <i [ngClass]="{fa: true, 'fa-chevron-down': !expanded, 'fa-chevron-up': expanded}"></i>
+  </div>
+</ng-template>
+
+<ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
+  PLACEHOLDER
+</ng-template>

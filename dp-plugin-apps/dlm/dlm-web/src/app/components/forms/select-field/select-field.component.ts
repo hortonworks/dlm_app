@@ -9,12 +9,13 @@
 
 import {
   Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, ChangeDetectionStrategy,
-  EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef, HostBinding
+  EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef, HostBinding, OnDestroy
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormControl } from '@angular/forms';
 import { SelectOption } from './select-option.type';
 import { SelectFieldOptionDirective } from './select-field-option.directive';
 import { SelectFieldValueDirective } from './select-field-value.directive';
+import { SelectFieldDropdownDirective } from './select-field-dropdown.directive';
 
 export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -36,25 +37,32 @@ export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
           <div *ngIf="!valueView?.template">
             {{selectedOption.label || selectedOption.value || ('common.none' | translate)}}
           </div>
-          <ng-container *ngTemplateOutlet="valueView?.template; context: {value: selectedOption.value, label: selectedOption.label}">
+          <ng-container
+            *ngTemplateOutlet="valueView?.template; context: {value: selectedOption.value, label: selectedOption.label}">
           </ng-container>
           <span class="caret"></span>
         </div>
       </div>
-      <ul class="select-field-option-list list-unstyled" *ngIf="showMenu">
-        <li class="select-field-option-item" *ngFor="let option of options"
-          (click)="selectOption(option.value)">
-          <div *ngIf="!optionView?.template">
-            {{option.label || option.value}}
-          </div>
-          <ng-container *ngTemplateOutlet="optionView?.template; context: {value: option.value, label: option.label}">
-          </ng-container>
-        </li>
-      </ul>
+      <ng-container
+        *ngTemplateOutlet="dropdownView?.template;
+          context: {showMenu: showMenu, options: options, dropdownActionEmitter: dropdownActionEmitter}">
+      </ng-container>
+      <div *ngIf="!dropdownView?.template">
+        <ul class="select-field-option-list select-field-options-wrapper list-unstyled" *ngIf="showMenu">
+          <li class="select-field-option-item" *ngFor="let option of options"
+              (click)="selectOption(option.value)">
+            <div *ngIf="!optionView?.template">
+              {{option.label || option.value}}
+            </div>
+            <ng-container *ngTemplateOutlet="optionView?.template; context: {value: option.value, label: option.label}">
+            </ng-container>
+          </li>
+        </ul>
+      </div>
     </div>
   `
 })
-export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnChanges {
+export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnChanges, OnDestroy {
   private defaultValue: SelectOption = {
     label: 'None',
     value: null
@@ -62,12 +70,15 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
   focused = false;
   showMenu = false;
   selectedOption: SelectOption;
+  dropdownActionEmitter = new EventEmitter<string>();
   @Input() value: any;
   @Input() options: SelectOption[];
   @Output() onSelect = new EventEmitter<SelectOption>();
   @ContentChild(SelectFieldValueDirective) valueView: SelectFieldValueDirective;
   @ContentChild(SelectFieldOptionDirective) optionView: SelectFieldOptionDirective;
+  @ContentChild(SelectFieldDropdownDirective) dropdownView: SelectFieldDropdownDirective;
   @HostBinding() tabindex = 0;
+
   @HostListener('document:click', ['$event'])
   outsideClickHandler(e) {
     if (!this.elementRef.nativeElement.contains(e.target)) {
@@ -77,17 +88,20 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
 
   onChange = (_: any) => {};
 
-  constructor(private elementRef: ElementRef) { }
+  constructor(private elementRef: ElementRef) {
+  }
 
   @HostListener('focusin', ['$event.target'])
   focusIn(e) {
     this.focused = true;
   }
+
   @HostListener('focusout', ['$event.target'])
   focusOut(e) {
     this.focused = false;
     this.showMenu = false;
   }
+
   @HostListener('document:keydown', ['$event'])
   keyEvent(event: KeyboardEvent) {
     if (!this.focused) {
@@ -130,6 +144,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
   }
 
   ngOnInit() {
+    this.dropdownActionEmitter.subscribe(val => this.selectOption(val));
   }
 
   findOptionByValue(value) {
@@ -149,11 +164,16 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
     }
   }
 
+  ngOnDestroy() {
+    this.dropdownActionEmitter.unsubscribe();
+  }
+
   registerOnChange(onChange) {
     this.onChange = onChange;
   }
 
-  registerOnTouched() {}
+  registerOnTouched() {
+  }
 
   selectOption(value: any) {
     this.value = value;

@@ -31,7 +31,7 @@ import { getDatePickerDate } from 'utils/date-util';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
 import { simpleSearch } from 'utils/string-utils';
-import { loadFullDatabases, loadDatabases, loadTables } from 'actions/hivelist.action';
+import { loadDatabases, loadTables } from 'actions/hivelist.action';
 import { resetFormValue } from 'actions/form.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
@@ -47,9 +47,9 @@ import { HiveBrowserTablesLoadingMap, DatabaseTablesCollapsedEvent } from 'compo
 import { removeProgressState } from 'actions/progress.action';
 import { FILES_REQUEST } from 'components/hdfs-browser/hdfs-browser.component';
 import { loadYarnQueues } from 'actions/yarnqueues.action';
-import { YarnQueue } from 'models/yarnqueues.model';
 import { getYarnQueueEntities } from 'selectors/yarn.selector';
 import { isEqual } from 'utils/object-utils';
+import { CloudContainer } from 'models/cloud-container.model';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
@@ -109,6 +109,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   yarnQueueList: any[] = [];
 
   @Input() pairings: Pairing[] = [];
+  @Input() containers: any = {};
+  @Input() containersList: CloudContainer[] = [];
   @Input() sourceClusterId = 0;
   @Output() formSubmit = new EventEmitter<any>();
   @HostBinding('class') className = 'dlm-policy-form';
@@ -278,6 +280,17 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       label: this.t.instant('page.policies.form.fields.destinationCluster.default'),
       value: ''
     }];
+  }
+
+  get destinationContainers() {
+    return this.containersList.map(c => ({value: c.id, label: c.name}));
+  }
+
+  get destinationOptions() {
+    if (this.destinationClusters.length === 1 && !this.destinationClusters[0].value) {
+      return this.destinationClusters;
+    }
+    return [...this.destinationClusters, ...this.destinationContainers];
   }
 
   get selectedDay() {

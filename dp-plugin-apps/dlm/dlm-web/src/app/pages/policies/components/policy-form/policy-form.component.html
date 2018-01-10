@@ -60,7 +60,47 @@
                     </dlm-select-field>
                   </dlm-form-field>
                   <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate" [required]="true">
-                    <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
+                    <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationOptions" [value]="destinationCluster">
+                      <ng-template selectFieldDropdown let-showMenu="showMenu" let-options="options" let-dropdownActionEmitter="dropdownActionEmitter">
+                        <div *ngIf="showMenu" class="select-field-options-wrapper">
+                          <ul class="select-field-option-list list-unstyled" *ngIf="options.length === 1 && !options[0].value">
+                            <li class="select-field-option-item">
+                              {{options[0].label}}
+                            </li>
+                          </ul>
+                          <div *ngIf="!(options.length === 1 && !options[0].value)" class="row">
+                            <div class="col-md-6">
+                              <ul class="select-field-option-list list-unstyled">
+                                <li class="select-field-option-item no-hover">
+                                  <p class="group-title"><i class="fa fa-cubes" aria-hidden="true"></i> {{ "data_stores.clusters" | translate}}</p>
+                                  <ul>
+                                    <li class="select-field-option-item" *ngFor="let cluster of destinationClusters" (click)="dropdownActionEmitter.next(cluster.value)">
+                                      {{cluster.label || cluster.value}}
+                                    </li>
+                                  </ul>
+                                </li>
+                              </ul>
+                              <dlm-select-cloud-destination
+                                [containers]="containers.S3"
+                                [title]="'data_stores.cloud.aws'"
+                                [dropdownActionEmitter]="dropdownActionEmitter"
+                              ></dlm-select-cloud-destination>
+                            </div>
+                            <div class="col-md-6">
+                              <dlm-select-cloud-destination
+                                [containers]="containers.ADSL"
+                                [title]="'data_stores.cloud.adsl'"
+                                [dropdownActionEmitter]="dropdownActionEmitter"
+                              ></dlm-select-cloud-destination>
+                              <dlm-select-cloud-destination
+                                [containers]="containers.WASB"
+                                [title]="'data_stores.cloud.wasb'"
+                                [dropdownActionEmitter]="dropdownActionEmitter"
+                              ></dlm-select-cloud-destination>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-template>
                     </dlm-select-field>
                   </dlm-form-field>
                 </div>

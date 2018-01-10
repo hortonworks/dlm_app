@@ -196,11 +196,21 @@
     "menuItem": {
       "overview": "Overview",
       "clusters": "Clusters",
+      "data_stores": "Data Stores",
+      "cloud_stores": "Cloud Stores",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
       "help": "Help",
       "header": "DATA LIFECYCLE MANAGER"
+    }
+  },
+  "data_stores": {
+    "clusters": "Clusters",
+    "cloud": {
+      "aws": "S3",
+      "wasb": "WASB",
+      "adsl": "ADSL"
     }
   },
   "jobs": {
@@ -380,6 +390,24 @@
         "stats": "Once this cluster is paired, you will be able to browse HDFS from here"
       }
     },
+    "cloud_stores": {
+      "header": "Cloud Stores",
+      "content": {
+        "no_accounts": "No Accounts",
+        "table": {
+          "buckets_count": "Buckets",
+          "user_details": "Cloud User Details"
+        },
+        "accounts": {
+          "add": {
+            "title": "Add Cloud Store - {{provider}}",
+            "access_key": "{{provider}} Access Key",
+            "secret_key": "{{provider}} Secret Key",
+            "name": "Account Name"
+          }
+        }
+      }
+    },
     "policies": {
       "header": "Replication Policies",
       "header_note": "You must create a cluster pairing before you can create a replication policy.",
@@ -447,6 +475,7 @@
           "snapshot_text": "Enable snapshot based replication",
           "snapshot_url": "http://horton.works/dlm100_h0006a"
         },
+        "no_containers": "No containers",
         "fields": {
           "policy_name": "Policy Name",
           "policy_description": "Description",

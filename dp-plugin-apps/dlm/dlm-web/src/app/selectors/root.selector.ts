@@ -23,3 +23,5 @@ export const getDatabasesList = (state: State) => state.hiveDatabases;
 export const getBeaconAdminStatuses = (state: State) => state.beaconAdminStatus;
 export const getUnreachableBeacons = (state: State) => state.unreachableBeacon;
 export const getYarnQueues = (state: State) => state.yarnQueues;
+export const getCloudAccounts = (state: State) => state.cloudAccounts;
+export const getCloudContainers = (state: State) => state.cloudContainers;

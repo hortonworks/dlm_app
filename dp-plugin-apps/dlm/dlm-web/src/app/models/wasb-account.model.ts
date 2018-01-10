@@ -7,8 +7,12 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export * from './select-option.type';
-export * from './select-field.component';
-export * from './select-field-value.directive';
-export * from './select-field-option.directive';
-export * from './select-field-dropdown.directive';
+import { CloudAccount, CloudAccountDetails } from './cloud-account.model';
+
+export interface WasbAccountDetails extends CloudAccountDetails {
+  accountName: string;
+}
+
+export interface WasbAccount extends CloudAccount {
+  accountDetails: WasbAccountDetails;
+}

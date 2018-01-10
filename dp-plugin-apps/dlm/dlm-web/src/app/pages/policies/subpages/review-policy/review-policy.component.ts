@@ -19,7 +19,6 @@ import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';
 import { PolicyPayload, PolicyDefinition } from 'models/policy.model';
 import { resetProgressState } from 'actions/progress.action';
-import { resetFormValue } from 'actions/form.action';
 import { getFormValues } from 'selectors/form.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { loadPairings } from 'actions/pairing.action';
@@ -37,6 +36,11 @@ import { TimeZoneService } from 'services/time-zone.service';
 import { PolicyService } from 'services/policy.service';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 import { truncate } from 'pipes/truncate.pipe';
+import { getContainer } from 'selectors/cloud-container.selector';
+import { CloudContainer } from 'models/cloud-container.model';
+import { getAllAccounts } from 'selectors/cloud-account.selector';
+import { loadContainers } from 'actions/cloud-container.action';
+import { loadAccounts } from 'actions/cloud-account.action';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -60,9 +64,11 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   policyForm$: Observable<any>;
   sourceCluster: Cluster;
   targetCluster: Cluster;
+  targetContainer: CloudContainer;
   creationState: ProgressState;
   sourceCluster$: Observable<Cluster>;
   destinationCluster$: Observable<Cluster>;
+  destinationContainer$: Observable<CloudContainer>;
 
   private policyFormValue: any;
 
@@ -78,21 +84,29 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       .switchMap(policyForm => store.select(getCluster(policyForm.general.sourceCluster)));
     this.destinationCluster$ = this.policyForm$
       .switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
+    this.destinationContainer$ = this.policyForm$
+      .switchMap(policyForm => store.select(getContainer(policyForm.general.destinationCluster)));
     this.subscriptions.push(store
       .select(getProgressState(CREATE_POLICY_REQUEST))
       .subscribe((progressState: ProgressState) => this.creationState = progressState));
+    this.store.dispatch(loadAccounts());
     this.store.dispatch(resetProgressState(CREATE_POLICY_REQUEST));
+    this.store.select(getAllAccounts).subscribe(accounts => {
+      this.store.dispatch(loadContainers(accounts));
+    });
     this.store.dispatch(loadPairings());
     this.store.dispatch(loadClusters());
   }
 
   ngOnInit() {
     this.subscriptions.push(
-      Observable.combineLatest(this.policyForm$, this.sourceCluster$, this.destinationCluster$)
-        .filter(([policyForm, sourceCluster, destinationCluster]) => sourceCluster && destinationCluster && !isEmpty(policyForm))
-        .subscribe(([policyForm, sourceCluster, destinationCluster]) => {
+      Observable.combineLatest(this.policyForm$, this.sourceCluster$, this.destinationCluster$, this.destinationContainer$)
+        .filter(([policyForm, sourceCluster, destinationCluster, destinationContainer]) =>
+          sourceCluster && (destinationCluster || destinationContainer) && !isEmpty(policyForm))
+        .subscribe(([policyForm, sourceCluster, destinationCluster, destinationContainer]) => {
           this.sourceCluster = sourceCluster;
           this.targetCluster = destinationCluster;
+          this.targetContainer = destinationContainer;
           this.policyFormValue = policyForm;
 
           this.descriptionTranslateParam = {
@@ -100,7 +114,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
             policyName: policyForm.general.name,
             sourceCluster: sourceCluster.name
           };
-          this.setDetails(sourceCluster, destinationCluster, policyForm);
+          this.setDetails(sourceCluster, destinationCluster, destinationContainer, policyForm);
         })
     );
   }
@@ -122,7 +136,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       type: values.general.type,
       description: values.general.description,
       sourceCluster: PolicyService.makeClusterId(this.sourceCluster.dataCenter, this.sourceCluster.name),
-      targetCluster: PolicyService.makeClusterId(this.targetCluster.dataCenter, this.targetCluster.name),
+      targetCluster: this.getTargetId(),
       frequencyInSec: values.job.frequencyInSec,
       startTime: this.formatDateValue(values.job.startTime),
       endTime: this.formatDateValue(values.job.endTime),
@@ -133,6 +147,12 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     return {
       policyDefinition
     };
+  }
+
+  getTargetId() {
+    return this.targetCluster ?
+      PolicyService.makeClusterId(this.targetCluster.dataCenter, this.targetCluster.name) :
+      this.targetContainer.id; // todo use real id
   }
 
   formatDateValue(timeField, timezone = true) {
@@ -173,7 +193,8 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       requestId: CREATE_POLICY_REQUEST,
       notification
     };
-    this.store.dispatch(createPolicy(formValue, this.targetCluster.id, meta));
+    const targetId = this.targetCluster ? this.targetCluster.id : this.targetContainer.id;
+    this.store.dispatch(createPolicy(formValue, targetId, meta));
   }
 
   cancelReview() {
@@ -188,19 +209,40 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     this.errorDetailsDialog.show();
   }
 
-  setDetails(sourceCluster: Cluster, destinationCluster: Cluster, policyForm) {
+  setDetails(sourceCluster: Cluster, destinationCluster: Cluster, destinationContainer: CloudContainer, policyForm) {
     const type = policyForm.general.type;
     const repeatMode = policyForm.job.repeatMode;
     const timezone = policyForm.userTimezone;
     const formattedEndTime = this.formatDateDisplay(policyForm.job.endTime, timezone);
     const formattedStartTime = this.formatDateDisplay(policyForm.job.startTime, timezone);
     const details = [
-      {name: 'name', label: this.t.instant(`${this.tDetails}.policy_name`), value: policyForm.general.name},
-      {name: 'description', label: this.t.instant(`${this.tDetails}.policy_description`), value: policyForm.general.description},
-      {name: 'sourceCluster', label: this.t.instant('common.source'), value: `${sourceCluster.dataCenter} / ${sourceCluster.name}`},
-      {name: 'destinationCluster', label: this.t.instant('common.destination'),
-        value: `${destinationCluster.dataCenter} / ${destinationCluster.name}`},
-      {name: 'type', label: this.t.instant(`${this.tDetails}.service`), value: this.policyTypesLabels[type]}
+      {
+        name: 'name',
+        label: this.t.instant(`${this.tDetails}.policy_name`),
+        value: policyForm.general.name
+      },
+      {
+        name: 'description',
+        label: this.t.instant(`${this.tDetails}.policy_description`),
+        value: policyForm.general.description
+      },
+      {
+        name: 'sourceCluster',
+        label: this.t.instant('common.source'),
+        value: `${sourceCluster.dataCenter} / ${sourceCluster.name}`
+      },
+      {
+        name: 'destinationCluster',
+        label: this.t.instant('common.destination'),
+        value: destinationCluster ?
+          `${destinationCluster.dataCenter} / ${destinationCluster.name}` :
+          `${destinationContainer.provider} / ${destinationContainer.name}`
+      },
+      {
+        name: 'type',
+        label: this.t.instant(`${this.tDetails}.service`),
+        value: this.policyTypesLabels[type]
+      }
     ];
     if (type === this.policyTypes.HDFS) {
       details.push({name: 'directories', label: this.t.instant(`${this.tDetails}.directories`), value: policyForm.directories});
