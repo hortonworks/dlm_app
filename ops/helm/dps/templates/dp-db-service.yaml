@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dp-db-{{.Release.Name}}-service
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ template "projectName" . }}
+    version: {{ .Chart.Version }}
+    dpVersion: {{ .Values.global.dpVersion }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP # TODO: use headless service
+  selector:
+    app: {{ template "projectName" . }}
+    release: {{ .Release.Name }}
+  ports:
+    - name: pgport
+      protocol: TCP
+      port: {{ .Values.postgres.port }}
+      targetPort: {{ .Values.postgres.port }}

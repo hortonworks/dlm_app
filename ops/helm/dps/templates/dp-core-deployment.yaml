@@ -1,0 +1,52 @@
+#
+# A Deployment spec for all of dp-core components. Currently, we deploy everything under one pod
+# which is the reasons these are orgnized as a single Charts, rather than being sub-charts. We 
+# will need to break these apart, and do true multi-pod deployments with different subcharts.
+#
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name:  {{ template "projectName" . }}-{{.Release.Name}}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ template "projectName" . }}
+    version: {{ .Chart.Version }}
+    dpVersion: {{ .Values.global.dpVersion }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "projectName" . }}
+      release: {{ .Release.Name }}
+      type: deployment-pod
+  template:
+    metadata:
+      labels:
+        app: {{ template "projectName" . }}
+        release: {{ .Release.Name }}
+        type: deployment-pod
+    spec:
+      initContainers:
+{{ include "dp-init-generate-certs-container" . | indent 8}}
+{{ include "dp-init-keystore-container" . | indent 8}}
+      containers:
+{{ include "postgres-container" . | indent 8}}
+{{ include "knox-container" . | indent 8}}
+{{ include "dp-gateway-container" . | indent 8}}
+{{ include "dp-db-service-container" . | indent 8}}
+{{ include "dp-cluster-service-container" . | indent 8}}
+{{ include "dp-app-container" . | indent 8}}
+{{ include "dlm-container" . | indent 8}}
+      volumes:
+        - name: postgres-volume
+          emptyDir: {}
+        - name: dp-certs-volume # TODO: This should be a persisted volume
+          emptyDir: {}
+{{- if .Values.knox.certPem }}
+        - name: dp-certs-source-volume
+          secret:
+            secretName: dp-certs-secret-{{ .Release.Name }}
+{{- end }}

@@ -1,0 +1,11 @@
+apiVersion: v1
+name: dps
+description: DataPlane Services
+version: 0.2.0
+keywords:
+  - dataplane
+  - dp
+  - dps
+maintainers:
+  - name: Hortonworks
+deprecated: false

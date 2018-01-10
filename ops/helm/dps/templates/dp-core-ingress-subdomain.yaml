@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "projectName" . }}-{{.Release.Name}}-ingress-subdomain
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ template "projectName" . }}
+    version: {{ .Chart.Version }}
+    dpVersion: {{ .Values.global.dpVersion }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
+spec:
+  tls:
+  - hosts:
+    - {{.Release.Name}}.{{.Values.ingress.domain}}
+    secretName: {{.Values.ingress.domain}}-tls-cert-secret
+  rules:
+  - host: {{.Release.Name}}.{{.Values.ingress.domain}}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ template "projectName" . }}-{{.Release.Name}}-service
+          servicePort: 80 

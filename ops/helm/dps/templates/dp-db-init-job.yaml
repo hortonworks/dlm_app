@@ -1,0 +1,76 @@
+#
+# Provides a job to initialize the database for DP. This should be run before DP service can start
+# serving. However, since the Postgres is tied to a single Pod with an ephemeral volume, every time
+# the Pod restart, we should re-run this Job.
+#
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dp-db-init-{{.Release.Name}}-job
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ template "projectName" . }}
+    version: {{ .Chart.Version }}
+    dpVersion: {{ .Values.global.dpVersion }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: {{ template "projectName" . }}
+        release: {{ .Release.Name }}
+        type: job-pod
+    spec:
+      restartPolicy: OnFailure
+      # TODO: we can add an initContainer to wait for the database availability
+      initContainers: # we use initContainers because we have two containers that should be run in sequence
+        - name: dp-db-init
+          image: {{ .Values.global.registry }}/{{ .Values.global.hwxRepository }}/{{ .Values.dpMigrate.image.name }}:{{ .Values.global.dpVersion }}
+          command: ['/scripts/flyway.sh']
+          args: ["clean", "migrate"]
+          env:
+            - name: DATABASE_URI
+              value: "jdbc:postgresql://dp-db-{{ .Release.Name }}-service.{{ .Values.global.namespace }}.svc.cluster.local:{{ .Values.postgres.port }}/{{ .Values.postgres.database }}"
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dp-database-secret-{{ .Release.Name }}
+                  key: POSTGRES_USER
+            - name: DATABASE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: dp-database-secret-{{ .Release.Name }}
+                  key: POSTGRES_PASSWORD
+        - name: dp-user-admin-init
+          image: {{ .Values.global.registry }}/{{ .Values.global.hwxRepository }}/{{ .Values.dpMigrate.image.name }}:{{ .Values.global.dpVersion }}
+          command: ['/scripts/user-update.sh']
+          args: ["$(USER_ADMIN_PASSWORD)"]
+          env:
+            - name: PGHOST
+              value: dp-db-{{ .Release.Name }}-service.{{ .Values.global.namespace }}.svc.cluster.local
+            - name: PGPORT
+              value: {{ .Values.postgres.port | quote }}
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: dp-database-secret-{{ .Release.Name }}
+                  key: POSTGRES_USER
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dp-database-secret-{{ .Release.Name }}
+                  key: POSTGRES_PASSWORD
+            - name: PGDATABASE
+              value: {{ .Values.postgres.database }}
+            - name: USER_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dp-database-secret-{{ .Release.Name }}
+                  key: USER_ADMIN_PASSWORD
+      containers:
+        - name: busybox
+          image: busybox:1.27.2
+          command: ['echo']
+          args: ['success']

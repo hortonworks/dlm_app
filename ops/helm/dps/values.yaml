@@ -1,0 +1,93 @@
+# Default values for dp-umbrella.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+
+# Organized as, shared values first, then global values, then per-component values
+projectName: dp-core
+
+global:
+  namespace: dataplane # The namespace to submit the application to
+  # We version the dp-core chart separately than the underlying version of DP.
+  dpVersion: 1.1.0.0-12
+  registry: docker.io
+  hwxRepository: hortonworks
+  certsDir: /dp-shared
+  certsSourceDir: /dp-shared-source
+  dpKeystorePath: /dp-shared/dp-keystore.jceks
+  # Some values from config.env.sh in DP tarball
+  useTls: "false"
+  separateKnoxConfig: "false"
+  knoxConfigUsingCreds: "true"
+  useTestLdap: "no"
+  # adminPassword: admin
+
+postgres:
+  dataDir: /postgres/data
+  uri: jdbc:postgresql://localhost:5432/
+  port: 5432
+  database: dataplane
+  user: dp-admin
+  password: dp-admin
+
+consul:
+  app:
+    name: consul
+
+knox:
+  image:
+    name: dp-knox
+  # masterPassword: master-password
+  # certPassword: cert-password
+  # certPrivateKeyPem:
+  # certPem:
+
+dpGateway:
+  image:
+    name: dp-gateway
+
+dpDbService:
+  image:
+    name: dp-db-service
+
+dpClusterService:
+  image:
+    name: dp-cluster-service
+
+dpApp:
+  image:
+    name: dp-app
+  imagePullPolicy: IfNotPresent
+
+dpMigrate:
+  image:
+    name: dp-migrate
+
+dlm:
+  image:
+    name: dlm-app
+  imagePullPolicy: IfNotPresent
+  appHome: /usr/dlm-app
+
+service:
+  type: ClusterIP # TODO: This should be a LoadBalancer service instead
+  externalPort: 80
+  internalPort: 80
+  externalSSLPort: 443
+  internalSSLPort: 443
+
+ingress:
+  class: dps-nginx
+  domain: "dpstrialdev.io"
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
