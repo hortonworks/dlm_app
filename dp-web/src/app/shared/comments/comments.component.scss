@@ -272,6 +272,33 @@ ol, ul {
   font-style: oblique;
   font-size: 16px;
 }
+.rating-section {
+  background: #eff1f2;
+  border: 1px solid #fff;
+  padding: 4px 15px;
+  display: flow-root;
+}
+.rating-class{
+  float: right;
+  line-height: 25px;
+  margin-top: 25px;
+  font-size: 17px;
+}
+.rating-stars{
+  float: left;
+}
+
+:host /deep/ .rating{
+  align-items: left;
+}
+
+:host /deep/ .rating.medium .label-value{
+  font-size: 14px;
+}
+
+:host /deep/ .rating.label-top .label-value + .star-container{
+  margin-top: 0px;
+}
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   font-style: italic;
   color: #999;

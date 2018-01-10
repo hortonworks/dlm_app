@@ -77,7 +77,7 @@ export class DsFullView implements OnInit {
   }
 
   viewComments(){
-    this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection']}}], { relativeTo: this.activeRoute, skipLocationChange: true});
+    this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true});
   }
 
 }

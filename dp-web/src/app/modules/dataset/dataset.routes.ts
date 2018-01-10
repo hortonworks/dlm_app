@@ -47,7 +47,7 @@ export const routes: Routes = [{
         crumb: 'dss.collections.cCollection'
       },
       children: [{
-        path: 'comments/:objectType',
+        path: 'comments/:objectType/:isRatingEnabled',
         component: CommentsComponent,
         outlet: 'sidebar'
       }]

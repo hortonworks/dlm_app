@@ -19,6 +19,11 @@
       <i id="back" class="fa fa-remove close-icon" [routerLink]="['../']"></i>
     </div>
   </div>
+  <div class="rating-section" *ngIf="isRatingEnabled">
+    <div class="rating-stars"><star-rating-comp [starType]="'svg'" [labelText]="'RATE THIS COLLECTION'" [labelPosition]="'top'" [size]="'medium'" [speed]="'noticeable'" [step]="0.5"
+                                 [showHalfStars]="true" [id]="'rating-id'" [hoverEnabled]="true"></star-rating-comp></div>
+    <div class="rating-class">4.1</div>
+  </div>
   <div class="mdl-grid" *ngIf="fetchError">
     <div class="mdl-cell mdl-cell--12-col load-comment-error">{{"pages.comments.fetchErrorMsg" | translate}}</div>
   </div>

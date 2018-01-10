@@ -18,6 +18,7 @@ import { LdapConfigCommonComponent } from './ldap-config-common/ldap-config-comm
 import {TranslateModule} from "@ngx-translate/core";
 import {RouterModule} from "@angular/router";
 import { CommentsComponent } from './comments/comments.component';
+import {StarRatingModule} from "angular-star-rating";
 
 @NgModule({
   imports:  [
@@ -25,6 +26,7 @@ import { CommentsComponent } from './comments/comments.component';
     TranslateModule,
     FormsModule,
     RouterModule,
+    StarRatingModule.forRoot()
   ],
   declarations: [DpTableDirective, RedirectUrlComponent, LdapConfigCommonComponent, CommentsComponent],
   exports:  [

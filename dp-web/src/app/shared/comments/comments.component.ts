@@ -28,6 +28,7 @@ export class CommentsComponent implements OnInit {
               private translateService: TranslateService,
               private commentService: CommentService) { }
 
+  isRatingEnabled: boolean = false;
   objectType: string;
   objectId: string;
   oneLevelComments: OneLevelComment[]= [];
@@ -40,6 +41,7 @@ export class CommentsComponent implements OnInit {
   ngOnInit() {
     this.objectType = this.route.snapshot.params['objectType'];
     this.objectId = this.route.parent.snapshot.params['id'];
+    this.isRatingEnabled = this.route.snapshot.params['isRatingEnabled'];
     this.getComments(true);
   }
 
