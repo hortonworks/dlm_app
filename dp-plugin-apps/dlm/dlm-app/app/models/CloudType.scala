@@ -18,6 +18,28 @@ sealed trait CloudType {
 
 case object S3 extends CloudType { val name = "S3" }
 
-case object ADSL extends CloudType { val name = "ADSL" }
+case object ADLS extends CloudType { val name = "ADLS" }
 
-case object AZURE extends CloudType { val name = "AZURE" }
+case object WASB extends CloudType { val name = "WASB" }
+
+/**
+  * Cloud credential types that are supported for cloud replication
+  */
+object CloudCredentialType extends Enumeration {
+  type CloudCredentialType = Value
+
+  val WASB_TOKEN = Value("WASB_TOKEN")
+  val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
+  val S3_TOKEN = Value("S3_TOKEN")
+}
+
+/**
+  * List of supported cloud providers
+  */
+object CloudAccountProvider extends Enumeration {
+  type CloudAccountProvider = Value
+
+  val WASB = Value("WASB")
+  val S3 = Value("S3")
+  val ADLS = Value("ADLS")
+}

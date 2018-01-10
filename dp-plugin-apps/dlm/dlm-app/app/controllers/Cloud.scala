@@ -10,33 +10,48 @@ package controllers
 
 import com.google.inject.Inject
 import models.AmazonS3Entities._
-import services.AmazonS3Service
+import models.CloudAccountEntities.Error._
+import models.CloudAccountEntities.CloudAccountCredentials
+import models.WASBEntities._
+import services.{AmazonS3Service, DlmKeyStore, WASBService}
 import play.api.mvc.{Action, Controller}
-import models.JsonResponses
+import models.{CloudAccountProvider, JsonResponses, S3}
 import play.api.Logger
 import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 
 class Cloud @Inject()(
-  val amazonS3Service: AmazonS3Service
+  val amazonS3Service: AmazonS3Service,
+  val wasbService: WASBService,
+  val dlmKeyStore: DlmKeyStore
 ) extends Controller {
 
-  def listAllBuckets(accountId: Long, userName: String) = Action.async {
+  def listAllBuckets(cloudAccountId: String) = Action.async {
     Logger.info("Received list all bucket request")
-    amazonS3Service.listAllBuckets(accountId, userName).map {
+    amazonS3Service.listAllBuckets(cloudAccountId).map {
       case Right(buckets) => Ok(Json.toJson(buckets))
       case Left(error) => {
         InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
       }
+    }
+  }
 
+  def listAllObjects(cloudAccountId: String, bucketName: String) = Action.async { request =>
+    Logger.info("Received list all objects request")
+    val path: String = request.getQueryString("path").getOrElse("/")
+    amazonS3Service.listAllObjects(cloudAccountId, bucketName, path).map {
+      case Right(bucketObjects) => Ok(Json.toJson(bucketObjects))
+      case Left(error) => {
+        InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
+      }
     }
   }
 
   def getUserIdentity = Action.async (parse.json) { request =>
     Logger.debug("Received get user identity request")
-    request.body.validate[Credential].map { credential =>
+    request.body.validate[CloudAccountCredentials].map { credential =>
       amazonS3Service.getUserIdentity(credential).map {
         case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
         case Right(cloudUserDetails) => Ok(Json.toJson(cloudUserDetails))
@@ -44,13 +59,44 @@ class Cloud @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def checkUserIdentity(accountId: Long, userName: String) = Action.async { request =>
+  def checkUserIdentity(cloudAccountId: String) = Action.async {
     Logger.debug("Received check user identity request")
-    amazonS3Service.checkUserIdentityValid(accountId, userName).map {
+    val p: Promise[Either[GenericError, Unit]] = Promise()
+    dlmKeyStore.getCloudAccount(cloudAccountId) map {
+      case Right(cloudAccount) => {
+        val check = CloudAccountProvider.withName(cloudAccount.accountDetails.provider) match {
+          case CloudAccountProvider.S3 => amazonS3Service.checkUserIdentityValid(cloudAccountId)
+          case CloudAccountProvider.WASB => wasbService.checkUserIdentityValid(cloudAccountId)
+          case _ => Future.successful(Left(GenericError(s"No validation for provider ${cloudAccount.accountDetails.provider}")))
+        }
+        check.map {
+          case Left(error) => p.success(Left(error))
+          case Right(res) => p.success(Right(res))
+        }
+      }
+      case Left(error) => p.success(Left(GenericError(error.message)))
+    }
+    p.future.map {
       case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
       case Right(result) => Ok(JsonResponses.statusOk)
     }
+  }
 
+  def listAllContainers(cloudAccountId: String) = Action.async {
+    Logger.info("Received list all containers request")
+    wasbService.getContainers(cloudAccountId) map {
+      case Right(containers) => Ok(Json.toJson(containers))
+      case Left(err) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(err)}"))
+    }
+  }
+
+  def listAllBlobs(accountName: String, containerName: String) = Action.async { request =>
+    Logger.info("Received list all blobs request")
+    val path: String = request.getQueryString("path").getOrElse("/")
+    wasbService.getFiles(accountName, containerName, path) map {
+      case Right(filesResponse) => Ok(Json.toJson(filesResponse))
+      case Left(err) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(err)}"))
+    }
   }
 
 }

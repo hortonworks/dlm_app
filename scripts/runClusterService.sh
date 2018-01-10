@@ -10,4 +10,4 @@
 #  */
 #
 
-cd ..; sbt ";project clusterService;run"; cd -
+sbt ";project clusterService;run"

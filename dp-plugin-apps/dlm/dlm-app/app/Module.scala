@@ -147,7 +147,6 @@ class Module extends AbstractModule {
     implicit val clusterWsClient:ClusterWsClient = ClusterWsClient(ws)
     new AmbariWebServiceImpl(configuration.underlying)
   }
-
 }
 
 @Singleton

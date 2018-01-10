@@ -25,6 +25,7 @@ libraryDependencies ++= Seq(
   "io.dropwizard.metrics" % "metrics-jvm" % "3.2.5",
   "com.amazonaws" % "aws-java-sdk" % "1.11.46",
   "commons-lang" % "commons-lang" % "2.6",
+  "com.microsoft.azure" % "azure-storage" % "6.1.0",
   "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.1",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
   "org.mockito" % "mockito-all" % "1.10.19" % Test
