@@ -30,6 +30,8 @@ object WASBEntities {
   }
   @SerialVersionUID(132)
   case class WASBAccountCredential(credentialType: String, accessKey: String, protocol: String = "http") extends Serializable with CloudAccountCredentials
+  @SerialVersionUID(133)
+  case class WASBAccountCredentialSAS(credentialType: String, token: String) extends Serializable with CloudAccountCredentials
 
   implicit val wasbClientErrorWrites = Json.writes[WASBClientError]
   implicit val wasbClientErrorReads = Json.reads[WASBClientError]

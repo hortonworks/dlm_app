@@ -15,7 +15,7 @@ import models.CloudAccountEntities.Error._
 import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
 import models.CloudCredentialType._
 import models.CloudAccountProvider._
-import models.WASBEntities.{WASBAccountCredential, WASBAccountDetails}
+import models.WASBEntities.{WASBAccountCredential, WASBAccountCredentialSAS, WASBAccountDetails}
 import play.api.libs.json._
 
 object CloudAccountEntities {
@@ -57,12 +57,14 @@ object CloudAccountEntities {
 
   implicit val s3CloudAccountCredentialFmt = Json.format[S3AccountCredential]
   implicit val wasbAccountCredentialFmt = Json.format[WASBAccountCredential]
+  implicit val wasbAccountCredentialSasFmt = Json.format[WASBAccountCredentialSAS]
 
   implicit val cloudAccountCredentialsFmt: Format[CloudAccountCredentials] = new Format[CloudAccountCredentials] {
     def reads(json: JsValue): JsResult[CloudAccountCredentials] = {
       def from(name: CloudCredentialType, data: JsObject): JsResult[CloudAccountCredentials] = name match {
         case S3_TOKEN  => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
         case WASB_TOKEN  => Json.fromJson[WASBAccountCredential](data)(Json.format[WASBAccountCredential])
+        case WASB_SAS_TOKEN => Json.fromJson[WASBAccountCredentialSAS](data)(Json.format[WASBAccountCredentialSAS])
         case _      => JsError(s"Unknown credentialType '$name'")
       }
 
@@ -77,6 +79,7 @@ object CloudAccountEntities {
       cloudAccountCredentials match {
         case data: S3AccountCredential => Json.toJson(data)(s3CloudAccountCredentialFmt)
         case data: WASBAccountCredential => Json.toJson(data)(wasbAccountCredentialFmt)
+        case data: WASBAccountCredentialSAS => Json.toJson(data)(wasbAccountCredentialSasFmt)
       }
     }
   }

@@ -10,14 +10,15 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-import com.microsoft.azure.storage.CloudStorageAccount
+import com.microsoft.azure.storage.{CloudStorageAccount, StorageCredentials, StorageCredentialsSharedAccessSignature}
 import com.microsoft.azure.storage.blob._
 import models.CloudAccountEntities.CloudAccountWithCredentials
 import models.CloudAccountEntities.Error._
+import models.{CloudAccountProvider, CloudCredentialType}
 import models.WASBEntities.{BlobListResponse, MountPointsResponse, _}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{Future}
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton()
@@ -35,22 +36,27 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
     path.split("/").last
   }
 
-  private def makeConnectionString(cloudAccount: CloudAccountWithCredentials): String = {
-    val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredential]
+  private def getAccount(cloudAccount: CloudAccountWithCredentials): CloudStorageAccount = {
     val accountDetails = cloudAccount.accountDetails.asInstanceOf[WASBAccountDetails]
-    return s"DefaultEndpointsProtocol=${credential.protocol};" +
-      s"AccountName=${accountDetails.accountName};" +
-      s"AccountKey=${credential.accessKey}"
+    CloudCredentialType.withName(cloudAccount.accountCredentials.credentialType) match {
+      case CloudCredentialType.WASB_TOKEN =>
+        val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredential]
+        CloudStorageAccount.parse(s"DefaultEndpointsProtocol=${credential.protocol};" +
+          s"AccountName=${accountDetails.accountName};" +
+          s"AccountKey=${credential.accessKey}")
+      case CloudCredentialType.WASB_SAS_TOKEN =>
+        val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredentialSAS]
+        new CloudStorageAccount(new StorageCredentialsSharedAccessSignature(credential.token), true, null, accountDetails.accountName)
+    }
   }
 
   private def createBlobClient(accountId: String): Future[Either[GenericError, CloudBlobClient]] = {
     dlmKeyStore.getCloudAccount(accountId) map {
       case Right(cloudAccount) => {
-        val connectionString: String = makeConnectionString(cloudAccount)
         try {
-          Right(CloudStorageAccount.parse(connectionString).createCloudBlobClient())
+          Right(getAccount(cloudAccount).createCloudBlobClient())
         } catch {
-          case e: Exception => Left(GenericError(e.getMessage()))
+          case e: Exception => Left(GenericError(e.getMessage))
         }
       }
       case Left(err) => Left(GenericError(err.message))
@@ -59,7 +65,13 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
 
   private def listContainers(accountId: String): Future[Either[GenericError, Seq[CloudBlobContainer]]] = {
     createBlobClient(accountId) map {
-      case Right(client) => Right(client.listContainers().asScala.to[collection.immutable.Seq])
+      case Right(client) => {
+        try {
+          Right(client.listContainers().asScala.to[collection.immutable.Seq])
+        } catch {
+          case e: Exception => Left(GenericError(e.getMessage))
+        }
+      }
       case Left(err) => Left(GenericError(err.message))
     }
   }
@@ -67,26 +79,30 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
   private def listBlobs(accountId: String, containerName: String, path: String): Future[Either[GenericError, BlobListResponse]] = {
     createBlobClient(accountId) map {
       case Right(client) => {
-        val container: CloudBlobContainer = client.getContainerReference(containerName)
-        if (!container.exists()) {
-          Left(GenericError(message = s"Container ${containerName} is not exist"))
-        } else {
-          var fileList: Seq[BlobListItem] = Seq()
-          for (blobItem: ListBlobItem <- container.listBlobs(path.substring(1)).asScala) {
-            val file = blobItem match {
-              case dir: CloudBlobDirectory => BlobListItem(
-                getDirectoryName(dir.getPrefix()),
-                "DIRECTORY",
-                None, None)
-              case blob: CloudBlob => BlobListItem(
-                getFileName(blob.getName()),
-                "FILE",
-                Option(blob.getProperties().getLastModified().getTime()),
-                Option(blob.getProperties().getLength()))
+        try {
+          val container: CloudBlobContainer = client.getContainerReference(containerName)
+          if (!container.exists()) {
+            Left(GenericError(message = s"Container ${containerName} is not exist"))
+          } else {
+            var fileList: Seq[BlobListItem] = Seq()
+            for (blobItem: ListBlobItem <- container.listBlobs(path.substring(1)).asScala) {
+              val file = blobItem match {
+                case dir: CloudBlobDirectory => BlobListItem(
+                  getDirectoryName(dir.getPrefix()),
+                  "DIRECTORY",
+                  None, None)
+                case blob: CloudBlob => BlobListItem(
+                  getFileName(blob.getName()),
+                  "FILE",
+                  Option(blob.getProperties().getLastModified().getTime()),
+                  Option(blob.getProperties().getLength()))
+              }
+              fileList = fileList :+ file
             }
-            fileList = fileList :+ file
+            Right(BlobListResponse(fileList))
           }
-          Right(BlobListResponse(fileList))
+        } catch {
+          case e: Exception => Left(GenericError(e.getMessage))
         }
       }
       case Left(err) => Left(mapError(err))
