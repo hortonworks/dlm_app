@@ -9,4 +9,4 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-cd ../dp-web; yarn dev; cd -
+cd dp-web; yarn dev
