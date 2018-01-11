@@ -8,8 +8,8 @@
   -->
 
 <dlm-progress-container [progressState]="overallProgress$ | async">
-  <div class="row page-section" *ngIf="(activeTabValue$ |async)">
-    <div class="col-md-8">
+  <div class="row">
+    <div class="col-md-8" *ngIf="(activeTabValue$ |async)">
       <div class="clearfix">
         <tabs [items]="tabs" [activeTabValue]="activeTabValue$ |async" (clickOnItem)="selectTab($event)"></tabs>
         <button (click)="addAccount()" class="btn btn-secondary pull-right">Add</button>

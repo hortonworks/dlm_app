@@ -113,6 +113,9 @@ import { CloudStoresComponent } from './pages/cloud-stores/cloud-stores.componen
 import { CloudAccountsListComponent } from './pages/cloud-stores/cloud-accounts-list/cloud-accounts-list.component';
 import { AddAccountModalComponent } from './pages/cloud-stores/add-account-modal/add-account-modal.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
+import { CloudContainerBrowserComponent } from 'components/cloud-container-browser/cloud-container-browser.component';
+// tslint:disable-next-line
+import { CloudContainerBrowserBreadcrumbComponent } from 'components/cloud-container-browser/breadcrumb/cloud-container-browser-breadcrumb.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
 import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
@@ -225,6 +228,8 @@ import { AsyncActionsService } from 'services/async-actions.service';
     ClusterListComponent,
     CloudStoresComponent,
     CloudAccountsListComponent,
+    CloudContainerBrowserComponent,
+    CloudContainerBrowserBreadcrumbComponent,
     AddAccountModalComponent,
     PairingsComponent,
     CreatePairingComponent,

@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,15 +7,21 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export const AWS = 'S3';
-export const WASB = 'WASB';
-export const ADLS = 'ADLS';
+.nameLink {
+  &:hover {
+    cursor: pointer;
+  }
+}
 
-export const PROVIDERS = [AWS, ADLS, WASB];
-
-export const FILE_TYPES = {
-  FILE: 'FILE',
-  DIRECTORY: 'DIRECTORY'
-};
-
-export const ROOT_PATH = '/';
+.breadcrumbs {
+  margin-bottom: 10px;
+  background-color: white;
+  padding: 15px;
+  .breadcrumb-item:not(:first-child) {
+    &:before {
+      content: ">\00a0";
+      padding: 0 5px;
+      color: #ccc;
+    }
+  }
+}

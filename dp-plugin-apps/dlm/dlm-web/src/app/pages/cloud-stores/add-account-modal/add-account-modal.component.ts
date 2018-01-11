@@ -21,8 +21,8 @@ import { TranslateService } from '@ngx-translate/core';
     <dlm-modal-dialog #addAccountModalDialog [title]="title" (onClose)="initForm()">
       <dlm-modal-dialog-body>
         <form class="basic-form " [formGroup]="accountForm" (ngSubmit)="handleSubmit(accountForm)">
-          <dlm-form-field 
-            [required]="true" 
+          <dlm-form-field
+            [required]="true"
             [maxLengthValue]="64"
             [label]="'page.cloud_stores.content.accounts.add.access_key' | translate:providerTranslate">
             <input type="password" class="form-control" qe-attr="access-key" formField formControlName="accessKey"/>
@@ -82,5 +82,10 @@ export class AddAccountModalComponent implements OnInit, OnDestroy {
       accessKey: ['', Validators.compose([Validators.required, Validators.maxLength(64)])],
       secretKey: ['', Validators.compose([Validators.required, Validators.maxLength(64)])]
     });
+  }
+
+  handleSubmit(account) {
+    // todo real handler
+    return true;
   }
 }

@@ -18,19 +18,19 @@ export const getEntitiesGroupedByAccount =
   (type) => createSelector(getEntities(type), containers => groupByKey(mapToList(containers), 'accountId'));
 
 export const getAllContainers =
-  createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADSL'), (wasb, s3, adsl) =>
-    [...mapToList(wasb), ...mapToList(s3), ...mapToList(adsl)]);
+  createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADLS'), (wasb, s3, adls) =>
+    [...mapToList(wasb), ...mapToList(s3), ...mapToList(adls)]);
 
 export const getAllContainersGrouped =
-  createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADSL'), (wasb, s3, adsl) => ({
-    WASB: mapToList(wasb || {}), S3: mapToList(s3 || {}), ADSL: mapToList(adsl || {})
+  createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADLS'), (wasb, s3, adls) => ({
+    WASB: mapToList(wasb || {}), S3: mapToList(s3 || {}), ADLS: mapToList(adls || {})
   }));
 
-export const getContainer = (id) => createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADSL'), (wasb, s3, adsl) =>
-wasb[id] || s3[id] || adsl[id]);
+export const getContainer = (id) => createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADLS'), (wasb, s3, adls) =>
+wasb[id] || s3[id] || adls[id]);
 
 export const getContainersGroupedByAccounts = createSelector(
   getEntitiesGroupedByAccount('WASB'),
   getEntitiesGroupedByAccount('S3'),
-  getEntitiesGroupedByAccount('ADSL'),
-  (wasb, s3, adsl) => Object.assign({}, wasb, s3, adsl));
+  getEntitiesGroupedByAccount('ADLS'),
+  (wasb, s3, adls) => Object.assign({}, wasb, s3, adls));

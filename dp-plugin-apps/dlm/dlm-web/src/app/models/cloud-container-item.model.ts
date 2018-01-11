@@ -7,12 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { CloudAccount, CloudAccountDetails } from './cloud-account.model';
-
-export interface AdslAccountDetails extends CloudAccountDetails {
-  accountName: string;
-}
-
-export interface AdslAccount extends CloudAccount {
-  accountDetails: AdslAccountDetails;
+export interface CloudContainerItem {
+  type: string;
+  pathSuffix: string;
+  length?: number;
 }

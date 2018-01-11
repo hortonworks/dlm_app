@@ -13,12 +13,12 @@ import { WasbAccount } from 'models/wasb-account.model';
 import { BaseState } from 'models/base-resource-state';
 import { AwsAccount } from 'models/aws-account.model';
 import { groupByKey } from 'utils/array-util';
-import { AdslAccount } from 'models/adsl-account.model';
+import { AdlsAccount } from 'models/adls-account.model';
 
 export interface State {
   WASB: BaseState<WasbAccount>;
   S3: BaseState<AwsAccount>;
-  ADSL: BaseState<AdslAccount>;
+  ADLS: BaseState<AdlsAccount>;
 }
 
 export const initialState: State = {
@@ -28,7 +28,7 @@ export const initialState: State = {
   S3: {
     entities: {}
   },
-  ADSL: {
+  ADLS: {
     entities: {}
   }
 };
@@ -45,8 +45,8 @@ export function reducer(state = initialState, action): State {
         S3: {
           entities: Object.assign({}, state.S3.entities, toEntities<AwsAccount>(accountsMap.S3 || []))
         },
-        ADSL: {
-          entities: Object.assign({}, state.ADSL.entities, toEntities<AdslAccount>(accountsMap.ADSL || []))
+        ADLS: {
+          entities: Object.assign({}, state.ADLS.entities, toEntities<AdlsAccount>(accountsMap.ADLS || []))
         }
       };
     }

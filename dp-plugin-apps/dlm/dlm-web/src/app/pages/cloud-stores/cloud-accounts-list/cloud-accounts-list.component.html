@@ -8,7 +8,7 @@
   -->
 
 <dlm-table
-  [rowDetailHeight]="550"
+  [rowDetailHeight]="660"
   [rowDetailTemplate]="rowDetailRef"
   [theme]="tableTheme"
   [columns]="columns"
@@ -31,6 +31,17 @@
   </div>
 </ng-template>
 
-<ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
-  PLACEHOLDER
+<ng-template let-account="row" ngx-datatable-row-detail-template #rowDetailRef>
+  <div *ngIf="account.containers.length; else noContainers">
+    <div class="btn-group">
+      <button *ngFor="let container of account.containers" (click)="selectContainer(container)" class="btn btn-secondary">{{container.name | truncate:15}}</button>
+    </div>
+    <p></p>
+    <dlm-cloud-container-browser
+      [rootPath]="'/'"
+      [container]="selectedContainer"></dlm-cloud-container-browser>
+  </div>
+  <ng-template #noContainers>
+    {{'page.cloud_stores.content.no_containers' | translate}}
+  </ng-template>
 </ng-template>

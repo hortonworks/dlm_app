@@ -14,8 +14,8 @@ import { getContainersGroupedByAccounts } from './cloud-container.selector';
 
 export const getEntities = (type) => createSelector(getCloudAccounts, state => state[type].entities);
 export const getAllAccounts =
-  createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADSL'), (wasb, s3, adsl) =>
-    [...mapToList(wasb), ...mapToList(s3), ...mapToList(adsl)]);
+  createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADLS'), (wasb, s3, adls) =>
+    [...mapToList(wasb), ...mapToList(s3), ...mapToList(adls)]);
 
 export const getAllAccountsWithContainers =
   createSelector(getAllAccounts, getContainersGroupedByAccounts, (accounts, groupedContainers) =>

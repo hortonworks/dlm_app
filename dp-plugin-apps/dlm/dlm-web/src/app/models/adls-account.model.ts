@@ -7,15 +7,12 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export const AWS = 'S3';
-export const WASB = 'WASB';
-export const ADLS = 'ADLS';
+import { CloudAccount, CloudAccountDetails } from './cloud-account.model';
 
-export const PROVIDERS = [AWS, ADLS, WASB];
+export interface AdlsAccountDetails extends CloudAccountDetails {
+  accountName: string;
+}
 
-export const FILE_TYPES = {
-  FILE: 'FILE',
-  DIRECTORY: 'DIRECTORY'
-};
-
-export const ROOT_PATH = '/';
+export interface AdlsAccount extends CloudAccount {
+  accountDetails: AdlsAccountDetails;
+}

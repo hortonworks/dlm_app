@@ -9,6 +9,6 @@
 
 import { CloudContainer } from './cloud-container.model';
 
-export interface AdslContainer extends CloudContainer {
+export interface AdlsContainer extends CloudContainer {
   some: string;
 }

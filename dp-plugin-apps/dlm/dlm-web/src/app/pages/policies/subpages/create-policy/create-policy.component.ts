@@ -44,6 +44,7 @@ const CONTAINERS_REQUEST = '[CREATE POLICY] CONTAINERS_REQUEST';
       <div>
         <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
           <dlm-policy-form
+            [accounts]="accounts$ | async"
             [containers]="containersGrouped$ | async"
             [containersList]="containers$ | async"
             [pairings]="pairings$ | async"

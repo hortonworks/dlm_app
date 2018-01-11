@@ -16,6 +16,7 @@ import { ColumnMode } from '@swimlane/ngx-datatable/release';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
+import { CloudContainer } from '../../../models/cloud-container.model';
 
 @Component({
   selector: 'dlm-cloud-accounts-list',
@@ -36,6 +37,8 @@ export class CloudAccountsListComponent implements OnInit {
   tableTheme = TableTheme.Cards;
   columns = [];
   columnMode = ColumnMode.flex;
+
+  selectedContainer: CloudContainer;
 
   constructor(private t: TranslateService, private cdRef: ChangeDetectorRef) {
 
@@ -61,7 +64,12 @@ export class CloudAccountsListComponent implements OnInit {
 
   toggleBacketDetails(clusterRow) {
     this.tableComponent.toggleRowDetail(clusterRow);
+    this.selectedContainer = clusterRow.containers[0];
     this.cdRef.detectChanges();
+  }
+
+  selectContainer(container) {
+    this.selectedContainer = container;
   }
 
 }

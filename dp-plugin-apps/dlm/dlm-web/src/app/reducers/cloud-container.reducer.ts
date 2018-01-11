@@ -13,12 +13,12 @@ import { BaseState } from 'models/base-resource-state';
 import { groupByKey } from 'utils/array-util';
 import { WasbContainer } from 'models/wasb-container.model';
 import { AwsBucket } from 'models/aws-bucket.model';
-import { AdslContainer } from 'models/adsl-container.model';
+import { AdlsContainer } from 'models/adls-container.model';
 
 export interface State {
   WASB: BaseState<WasbContainer>;
   S3: BaseState<AwsBucket>;
-  ADSL: BaseState<AdslContainer>;
+  ADLS: BaseState<AdlsContainer>;
 }
 
 export const initialState: State = {
@@ -28,7 +28,7 @@ export const initialState: State = {
   S3: {
     entities: {}
   },
-  ADSL: {
+  ADLS: {
     entities: {}
   }
 };
@@ -45,8 +45,8 @@ export function reducer(state = initialState, action): State {
         S3: {
           entities: Object.assign({}, state.S3.entities, toEntities<AwsBucket>(containersMap.S3 || []))
         },
-        ADSL: {
-          entities: Object.assign({}, state.ADSL.entities, toEntities<AdslContainer>(containersMap.ADSL || []))
+        ADLS: {
+          entities: Object.assign({}, state.ADLS.entities, toEntities<AdlsContainer>(containersMap.ADLS || []))
         }
       };
     }

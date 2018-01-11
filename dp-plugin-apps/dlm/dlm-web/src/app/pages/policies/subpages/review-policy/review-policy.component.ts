@@ -85,7 +85,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     this.destinationCluster$ = this.policyForm$
       .switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
     this.destinationContainer$ = this.policyForm$
-      .switchMap(policyForm => store.select(getContainer(policyForm.general.destinationCluster)));
+      .switchMap(policyForm => store.select(getContainer(policyForm.general.destinationContainer)));
     this.subscriptions.push(store
       .select(getProgressState(CREATE_POLICY_REQUEST))
       .subscribe((progressState: ProgressState) => this.creationState = progressState));

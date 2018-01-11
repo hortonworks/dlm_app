@@ -210,7 +210,7 @@
     "cloud": {
       "aws": "S3",
       "wasb": "WASB",
-      "adsl": "ADSL"
+      "adls": "ADLS"
     }
   },
   "jobs": {
@@ -394,6 +394,7 @@
       "header": "Cloud Stores",
       "content": {
         "no_accounts": "No Accounts",
+        "no_containers": "No Containers",
         "table": {
           "buckets_count": "Buckets",
           "user_details": "Cloud User Details"
@@ -487,6 +488,9 @@
             "default": "Select a Source Cluster first",
             "noPair": "No paired cluster available for the selected source cluster"
           },
+          "destination_type": "Destination Type",
+          "cloud_account": "Account",
+          "container": "Container",
           "sourceDataCenter": "Source Data Center",
           "destinationDataCenter": "Destination Data Center",
           "service": "Service",

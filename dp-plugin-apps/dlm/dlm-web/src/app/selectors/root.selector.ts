@@ -25,3 +25,4 @@ export const getUnreachableBeacons = (state: State) => state.unreachableBeacon;
 export const getYarnQueues = (state: State) => state.yarnQueues;
 export const getCloudAccounts = (state: State) => state.cloudAccounts;
 export const getCloudContainers = (state: State) => state.cloudContainers;
+export const getCloudContainerItems = (state: State) => state.cloudContainerItems;

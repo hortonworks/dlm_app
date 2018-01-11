@@ -14,6 +14,8 @@ import { CloudContainerService } from 'services/cloud-container.service';
 import {
   loadContainersSuccess,
   loadContainersFail,
+  loadContainerDirSuccess,
+  loadContainerDirFail,
   ActionTypes as containerActions
 } from 'actions/cloud-container.action';
 
@@ -28,6 +30,16 @@ export class CloudContainersEffects {
       return this.containerService.fetchContainersForAccounts(payload.accounts)
         .map(accounts => loadContainersSuccess(accounts, payload.meta))
         .catch(err => Observable.of(loadContainersFail(err, payload.meta)));
+    });
+
+  @Effect()
+  loadDir$: Observable<any> = this.actions$
+    .ofType(containerActions.LOAD_DIR.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.containerService.fetchContainerDir(payload.container, payload.path)
+        .map(dirContent => loadContainerDirSuccess(dirContent, payload.meta))
+        .catch(err => Observable.of(loadContainerDirFail(err, payload.meta)));
     });
 
   constructor(private actions$: Actions, private containerService: CloudContainerService) {
