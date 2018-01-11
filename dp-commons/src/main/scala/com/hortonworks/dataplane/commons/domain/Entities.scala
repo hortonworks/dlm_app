@@ -391,12 +391,14 @@ object Entities {
   case class CommentWithUser(comment:Comment,
                              userName: String)
 
-  case class NestedComment(comment:Comment,
-                           children: Seq[NestedComment],
-                           userName: String)
-
   case class OneLevelComment(commentWithUser: CommentWithUser,
                              children: Seq[CommentWithUser])
+
+  case class Rating(id: Option[Long] = None,
+                    rating: Float,
+                    objectType: String,
+                    objectId: Long,
+                    createdBy: Long)
 
 }
 
@@ -579,11 +581,11 @@ object JsonFormatters {
   implicit val commentWithUserWrites = Json.writes[CommentWithUser]
   implicit val commentWithUserReads = Json.reads[CommentWithUser]
 
-  implicit val nestedCommentWrites = Json.writes[NestedComment]
-  implicit val nestedCommentReads = Json.reads[NestedComment]
-
   implicit val oneLevelCommentWrites = Json.writes[OneLevelComment]
   implicit val oneLevelCommentReads = Json.reads[OneLevelComment]
+
+  implicit val ratingWrites = Json.writes[Rating]
+  implicit val ratingReads = Json.reads[Rating]
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 
