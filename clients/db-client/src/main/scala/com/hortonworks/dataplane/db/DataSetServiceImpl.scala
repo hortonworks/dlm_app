@@ -43,13 +43,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSets)
   }
 
-  override def create(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]] = {
+  override def create(dataSetAndTags: DatasetAndTags): Future[Either[Errors, DatasetAndCategories]] = {
     ws.url(s"$url/datasets")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .post(Json.toJson(dataSetAndCatIds))
+      .post(Json.toJson(dataSetAndTags))
       .map(mapToDataSetAndCategories)
   }
 
@@ -58,6 +58,20 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(datasetReq))
       .map(mapToDataSetAndCategories)
+  }
+
+  def addAssets(datasetId: Long, dataAssets: Seq[DataAsset]) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$datasetId/addassets")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(dataAssets))
+      .map(mapToRichDataset1)
+  }
+
+  def removeAllAssets(datasetId: Long) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$datasetId/removeallassets")
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map(mapToRichDataset1)
   }
 
   def listRichDataset(queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
@@ -97,13 +111,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  override def update(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]] = {
+  override def update(dataSetAndTags: DatasetAndTags): Future[Either[Errors, DatasetAndCategories]] = {
     ws.url(s"$url/datasets")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .put(Json.toJson(dataSetAndCatIds))
+      .put(Json.toJson(dataSetAndTags))
       .map(mapToDataSetAndCategories)
   }
 
@@ -151,6 +165,14 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       case _ => mapErrors(res)
     }
   }
+
+  private def mapToRichDataset1(res: WSResponse): RichDataset = {
+    res.status match {
+      case 200 => (res.json \ "results" \\ "data").head.validate[RichDataset].get
+      case _ => throw new Exception(res.status.toString)
+    }
+  }
+
 
   private def mapToRichDatasets(res: WSResponse): Either[Errors, Seq[RichDataset]] = {
     res.status match {
