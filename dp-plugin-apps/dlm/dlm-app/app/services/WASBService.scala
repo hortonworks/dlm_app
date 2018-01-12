@@ -14,7 +14,7 @@ import com.microsoft.azure.storage.{CloudStorageAccount, StorageCredentials, Sto
 import com.microsoft.azure.storage.blob._
 import models.CloudAccountEntities.CloudAccountWithCredentials
 import models.CloudAccountEntities.Error._
-import models.{CloudAccountProvider, CloudCredentialType}
+import models.CloudCredentialType
 import models.WASBEntities.{BlobListResponse, MountPointsResponse, _}
 
 import scala.collection.JavaConverters._

@@ -20,6 +20,7 @@ POST     /api/cloud/userIdentity                                      controller
 GET      /api/cloud/account/:cloudAccountId                           controllers.Cloud.checkUserIdentity(cloudAccountId: String)
 GET      /api/cloud/list/containers/:cloudAccountId                   controllers.Cloud.listAllContainers(cloudAccountId: String)
 GET      /api/cloud/list/blobs/:cloudAccountId/container/:containerName/files   controllers.Cloud.listAllBlobs(cloudAccountId: String, containerName: String)
+GET      /api/cloud/list/adls/:cloudAccountId/files                   controllers.Cloud.listADLSFiles(cloudAccountId: String)
 
 #Clusters
 GET     /api/clusters                                         controllers.Clusters.list

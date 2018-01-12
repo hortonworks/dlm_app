@@ -13,9 +13,9 @@ import models.AmazonS3Entities._
 import models.CloudAccountEntities.Error._
 import models.CloudAccountEntities.CloudAccountCredentials
 import models.WASBEntities._
-import services.{AmazonS3Service, DlmKeyStore, WASBService}
+import services.{ADLSService, AmazonS3Service, DlmKeyStore, WASBService}
 import play.api.mvc.{Action, Controller}
-import models.{CloudAccountProvider, JsonResponses, S3}
+import models.{CloudAccountProvider, JsonResponses}
 import play.api.Logger
 import play.api.libs.json.Json
 
@@ -25,6 +25,7 @@ import scala.concurrent.{Future, Promise}
 class Cloud @Inject()(
   val amazonS3Service: AmazonS3Service,
   val wasbService: WASBService,
+  val adlsService: ADLSService,
   val dlmKeyStore: DlmKeyStore
 ) extends Controller {
 
@@ -95,6 +96,14 @@ class Cloud @Inject()(
     val path: String = request.getQueryString("path").getOrElse("/")
     wasbService.getFiles(accountName, containerName, path) map {
       case Right(filesResponse) => Ok(Json.toJson(filesResponse))
+      case Left(err) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(err)}"))
+    }
+  }
+
+  def listADLSFiles(cloudAccountId: String) = Action.async { request =>
+    val path: String = request.getQueryString("path").getOrElse("/")
+    adlsService.getFiles(cloudAccountId, path) map {
+      case Right(files) => Ok(Json.toJson(files))
       case Left(err) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(err)}"))
     }
   }
