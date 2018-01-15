@@ -11,7 +11,7 @@
 
 import {Component, ViewChild, ElementRef, Input, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges,} from '@angular/core';
 import {Router, NavigationStart} from '@angular/router';
-import {DpAppNavigation} from 'dp-apps';
+import {DpAppNavigation} from 'dps-apps';
 
 import {PersonaTabs, HeaderData, Persona} from '../../models/header-data';
 import {CollapsibleNavService} from '../../services/collapsible-nav.service';

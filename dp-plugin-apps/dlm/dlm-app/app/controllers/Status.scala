@@ -39,5 +39,4 @@ class Status @Inject()(metricsRegistry: MetricsRegistry) extends Controller {
     } else
       Future.successful(Ok(MetricsReporter.asJson))
   }
-
 }

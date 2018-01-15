@@ -119,6 +119,5 @@ object JsonFormatters {
 
   implicit val yarnQueuesResponseReads = Json.reads[YarnQueuesResponse]
   implicit val yarnQueuesResponseWrites = Json.writes[YarnQueuesResponse]
-
 }
 

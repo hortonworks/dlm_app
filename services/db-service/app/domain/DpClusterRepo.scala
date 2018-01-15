@@ -47,31 +47,14 @@ class DpClusterRepo @Inject()(
         if (dpc.isDefined) {
           // Found an entity, only update applicable fields and return
           db.run(
-              DataplaneClusters
-                .filter(_.id === dl.id)
-                .map(
-                  r =>
-                    (r.dcName,
-                     r.description,
-                     r.ambariUrl,
-                     r.locationId,
-                     r.name,
-                     r.properties,
-                     r.userId,
-                     r.updated))
-                .update(dl.dcName,
-                        dl.description,
-                        dl.ambariUrl,
-                        dl.location,
-                        dl.name,
-                        dl.properties,
-                        dl.createdBy,
-                        Some(LocalDateTime.now()))
-            )
-            .flatMap { v =>
-              if (v > 0) findById(dl.id.get).map(r => (r.get, false))
-              else Future.failed(UpdateError())
-            }
+            DataplaneClusters.filter(_.id === dl.id)
+              .map(r => (r.dcName, r.description, r.ambariUrl, r.locationId, r.name,r.properties,r.userId,r.updated, r.isDataLake))
+              .update(dl.dcName, dl.description, dl.ambariUrl, dl.location, dl.name,dl.properties,dl.createdBy,Some(LocalDateTime.now()),dl.isDatalake)
+
+          ).flatMap { v =>
+            if (v > 0) findById(dl.id.get).map(r => (r.get,false))
+            else Future.failed(UpdateError())
+          }
         } else {
           insert(dl).map((_, true))
         }

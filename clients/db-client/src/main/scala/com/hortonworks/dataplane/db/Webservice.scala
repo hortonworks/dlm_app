@@ -114,10 +114,16 @@ object Webservice {
 
     def list(name: Option[String]): Future[Either[Errors, Seq[Dataset]]]
 
-    def create(dataSetAndCatIds: DatasetAndCategoryIds)
+    def create(dataSetAndTags: DatasetAndTags)
     : Future[Either[Errors, DatasetAndCategories]]
 
     def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]]
+
+    def update(dataSetAndTags: DatasetAndTags): Future[Either[Errors, DatasetAndCategories]]
+
+    def addAssets(id: Long, dataAssets: Seq[DataAsset]) : Future[RichDataset]
+
+    def removeAllAssets(id: Long) : Future[RichDataset]
 
     def listRichDataset(queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 

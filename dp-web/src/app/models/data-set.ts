@@ -15,11 +15,14 @@ export class DataSet {
   id?:number;
   name: string;
   description: string;
-  datalakeId: number;
-  permissions: string;
+  datalakeId?: number;
+  dpClusterId?: number
   createdBy?: number;
-  createdOn? : number;
-  lastModified?: number;
+  createdOn? : any;
+  lastModified?: any;
+  active?: Boolean;
+  version?: number;
+
 }
 
 export class DataSetAndCategories {
@@ -27,7 +30,7 @@ export class DataSetAndCategories {
   categories : Category[]
 }
 
-export class DataSetAndCategoryIds {
+export class DataSetAndTags {
   dataset : DataSet;
-  categories : number[]
+  tags : string[]
 }

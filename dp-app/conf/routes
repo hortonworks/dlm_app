@@ -64,15 +64,13 @@ GET           /api/actions/clusters                                  controllers
 # ===========================================
 GET           /api/datasets                                          controllers.DataSets.list(name: Option[String])
 POST          /api/datasets                                          controllers.DataSets.create
+PUT           /api/datasets                                          controllers.DataSets.update
 
 GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId: String)
 DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId: String)
 
 GET           /api/clusters/:clusterId/hosts                        controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
 
-
-
-# PUT           /api/datasets/:datasetId                             controllers.DataSets.update(datasetId: String)
 
 # DatasetCategories
 # ===========================================
@@ -91,10 +89,12 @@ GET           /api/dataset/list/tag/:tagName                         controllers
 # Datasets ?
 # ===========================================
 POST          /api/atlas-dataset                                     controllers.DataSets.createDatasetWithAtlasSearch
+POST          /api/add-atlas-assets                                  controllers.DataSets.addAssetsToDataset
 
 # DatasetAssets
 # ===========================================
 GET           /api/dataset/:datasetId/assets                         controllers.DataSets.getDataAssetsByDatasetId(datasetId: String, queryName: String, offset: Long, limit: Long)
+DELETE        /api/dataset/:datasetId/allassets                      controllers.DataSets.removeAllAssetsFromDataset(datasetId: Long)
 
 # Atlas API Search
 # ===========================================

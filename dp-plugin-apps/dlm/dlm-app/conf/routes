@@ -6,7 +6,23 @@
 GET     /health                                               controllers.Status.health
 GET     /metrics                                              controllers.Status.metrics
 
-# clusters
+#CredentialStore
+GET      /api/store/credentials                                       controllers.CredentialStore.listAllCredentialNames
+GET      /api/store/credentialAccounts                                controllers.CredentialStore.listAllCredentialAccounts
+POST     /api/store/credential                                        controllers.CredentialStore.addCredentialAccount
+PUT      /api/store/credential                                        controllers.CredentialStore.updateCredentialAccount
+DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
+
+#Cloud
+GET      /api/cloud/list/buckets/:cloudAccountId                      controllers.Cloud.listAllBuckets(cloudAccountId: String)
+GET      /api/cloud/list/objects/:cloudAccountId/bucket/:bucketName/files  controllers.Cloud.listAllObjects(cloudAccountId: String, bucketName: String)
+POST     /api/cloud/userIdentity                                      controllers.Cloud.getUserIdentity
+GET      /api/cloud/account/:cloudAccountId                           controllers.Cloud.checkUserIdentity(cloudAccountId: String)
+GET      /api/cloud/list/containers/:cloudAccountId                   controllers.Cloud.listAllContainers(cloudAccountId: String)
+GET      /api/cloud/list/blobs/:cloudAccountId/container/:containerName/files   controllers.Cloud.listAllBlobs(cloudAccountId: String, containerName: String)
+GET      /api/cloud/list/adls/:cloudAccountId/files                   controllers.Cloud.listADLSFiles(cloudAccountId: String)
+
+#Clusters
 GET     /api/clusters                                         controllers.Clusters.list
 GET     /api/clusters/status                                  controllers.Clusters.listStatus
 GET     /api/clusters/:clusterId/status                       controllers.Clusters.retrieveStatus(clusterId : Long)
@@ -53,6 +69,7 @@ GET     /api/clusters/:clusterId/hive/database/:dbName/tables     controllers.Hi
 
 GET     /api/clusters/:clusterId/yarn/queues                      controllers.YarnQueues.retrieve(clusterId: Long)
 
+#Cloud
 
 # Due to the regex involved, Following should be always placed at the end of the file
 # static resources

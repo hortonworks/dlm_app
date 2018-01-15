@@ -13,7 +13,7 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetCreateRequest}
+import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DataAsset, DatasetAndTags, DatasetCreateRequest}
 import domain.API.{dpClusters, users}
 import domain.{DatasetRepo, PaginatedQuery, SortQuery}
 import play.api.libs.json.{Json, __}
@@ -120,13 +120,32 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   def add = Action.async(parse.json) { req =>
     req.body
-      .validate[DatasetAndCategoryIds]
+      .validate[DatasetAndTags]
       .map { cl =>
         val created = datasetRepo.insertWithCategories(cl)
         created.map(c => success(linkData(c, makeLink(c.dataset))))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+
+  def addAssets (datasetId: Long) = Action.async(parse.json) { req =>
+    req.body
+      .validate[Seq[DataAsset]]
+      .map { assets =>
+        datasetRepo
+          .addAssets(datasetId, assets)
+          .map(c => success(linkData(c)))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def removeAllAssets (datasetId: Long) = Action.async { req =>
+    datasetRepo
+      .removeAllAssets(datasetId)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
   }
 
   def addWithAsset = Action.async(parse.json) { req =>
@@ -142,7 +161,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   def update = Action.async(parse.json) { req =>
     req.body
-      .validate[DatasetAndCategoryIds]
+      .validate[DatasetAndTags]
       .map { cl =>
         val created = datasetRepo.updateWithCategories(cl)
         created.map(c => success(linkData(c, makeLink(c.dataset))))

@@ -339,7 +339,7 @@ object Entities {
 
   case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
 
-  case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
+  case class DatasetAndTags(dataset: Dataset, tags: Seq[String])
 
   case class CategoryCount(name: String, count: Int)
 
@@ -350,6 +350,12 @@ object Entities {
                                   tags: Seq[String],
                                   assetQueryModels: Seq[AtlasSearchQuery],
                                   dataAssets: Seq[DataAsset] = Nil)
+
+  case class AddToBoxPrams( datasetId:Long,
+                            clusterId: Long,
+                            assetQueryModel: AtlasSearchQuery,
+                            exceptions : Seq[String])
+
   case class LdapConfiguration(
       id: Option[Long],
       ldapUrl: Option[String]=None,
@@ -506,8 +512,8 @@ object JsonFormatters {
   implicit val datasetResponseReads = Json.reads[DatasetAndCategories]
   implicit val datasetResponseWrites = Json.writes[DatasetAndCategories]
 
-  implicit val datasetRequestReads = Json.reads[DatasetAndCategoryIds]
-  implicit val datasetRequestWrites = Json.writes[DatasetAndCategoryIds]
+  implicit val datasetRequestReads = Json.reads[DatasetAndTags]
+  implicit val datasetRequestWrites = Json.writes[DatasetAndTags]
 
   implicit val configReads = Json.reads[DpConfig]
   implicit val configWrites = Json.writes[DpConfig]
@@ -517,9 +523,11 @@ object JsonFormatters {
   implicit val categoriesCountAndTotalWrites =
     Json.writes[CategoriesCountAndTotal]
 
-  implicit val datasetCreateRequestReads =
-    defaultJson.reads[DatasetCreateRequest]
+  implicit val datasetCreateRequestReads = defaultJson.reads[DatasetCreateRequest]
   implicit val datasetCreateRequestWrites = Json.writes[DatasetCreateRequest]
+
+  implicit val addToBoxPramsReads = defaultJson.reads[AddToBoxPrams]
+  implicit val addToBoxPramsWrites = Json.writes[AddToBoxPrams]
 
   implicit val richDatasetReads = defaultJson.reads[RichDataset]
   implicit val richDatasetWrites = Json.writes[RichDataset]
