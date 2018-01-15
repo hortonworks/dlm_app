@@ -46,15 +46,14 @@ export class CommentsComponent implements OnInit {
   }
 
   getComments(refreshScreen: boolean) {
-    let that = this;
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
     this.commentService.getByObjectRef(this.objectId,this.objectType).subscribe(comments =>{
-        that.oneLevelComments = comments;
-        that.fetchInProgress = false;
+        this.oneLevelComments = comments;
+        this.fetchInProgress = false;
       }, () => {
-        that.fetchInProgress = false;
-        that.fetchError = true;
+        this.fetchInProgress = false;
+        this.fetchError = true;
       }
     );
   }
