@@ -31,12 +31,12 @@
     <div class="mdl-cell mdl-cell--12-col">{{"common.loading" | translate}}...</div>
   </div>
   <div *ngIf="!fetchInProgress">
-    <div class="mdl-grid" *ngIf="!fetchError && oneLevelComments.length === 0">
+    <div class="mdl-grid" *ngIf="!fetchError && commentsWithUserAndChildren.length === 0">
       <div class="mdl-cell mdl-cell--12-col no-comments">{{"pages.comments.noComments" | translate}}</div>
     </div>
     <div class="comment-tree">
       <ul>
-        <li *ngFor="let oneLevelComment of oneLevelComments">
+        <li *ngFor="let oneLevelComment of commentsWithUserAndChildren">
           <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(oneLevelComment.commentWithUser)}">
             <div class="flex-grid">
               <div class="primary-space">

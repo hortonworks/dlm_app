@@ -12,7 +12,7 @@ import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {CommentService} from "../../services/comment.service";
-import {OneLevelComment, Comment, CommentWithUser, ReplyParent} from "../../models/comment";
+import {CommentWithUserAndChildren, Comment, CommentWithUser, ReplyParent} from "../../models/comment";
 import {AuthUtils} from "../utils/auth-utils";
 import * as moment from 'moment';
 
@@ -31,7 +31,7 @@ export class CommentsComponent implements OnInit {
   isRatingEnabled: boolean = false;
   objectType: string;
   objectId: string;
-  oneLevelComments: OneLevelComment[]= [];
+  commentsWithUserAndChildren: CommentWithUserAndChildren[]= [];
   fetchInProgress: boolean =true;
   newCommentText: string;
   isReply: boolean = false;
@@ -49,7 +49,7 @@ export class CommentsComponent implements OnInit {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
     this.commentService.getByObjectRef(this.objectId,this.objectType).subscribe(comments =>{
-        this.oneLevelComments = comments;
+        this.commentsWithUserAndChildren = comments;
         this.fetchInProgress = false;
       }, () => {
         this.fetchInProgress = false;

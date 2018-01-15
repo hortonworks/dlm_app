@@ -26,7 +26,7 @@ export class CommentWithUser {
   userName: string;
 }
 
-export class OneLevelComment {
+export class CommentWithUserAndChildren {
   commentWithUser: CommentWithUser;
   children: CommentWithUser[] = [];
 }
