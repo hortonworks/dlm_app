@@ -11,6 +11,7 @@
 
 import {Component, EventEmitter, Input, OnInit, Output, SimpleChange} from "@angular/core";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
+import {RichDatasetService} from "../../../services/RichDatasetService";
 import {
   AssetListActionsEnum, AssetSetQueryFilterModel,
   AssetSetQueryModel
@@ -28,12 +29,14 @@ export class DsAssetsHolder implements OnInit {
   @Input() assetSetQueryModelsForAddition: AssetSetQueryModel[] = null;
   @Input() assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = null;
   @Input() dsModel: RichDatasetModel = null;
-  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.REMOVE];
+  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.REMOVE, AssetListActionsEnum.ADD];
   showPopup: boolean = false;
   showList: boolean = false;
 
   @Output('onNext') nextEE: EventEmitter<void> = new EventEmitter<void>();
   @Output('onCancel') cancelEE: EventEmitter<void> = new EventEmitter<void>();
+
+  constructor(private richDatasetService: RichDatasetService){}
 
   ngOnInit() {
     this.setShowListFlag();
@@ -44,9 +47,14 @@ export class DsAssetsHolder implements OnInit {
   }
 
   actionDone(asqm: AssetSetQueryModel) {
-    this.assetSetQueryModelsForAddition.push(asqm);
-    this.showPopup = false;
-    this.setShowListFlag();
+    this.richDatasetService
+      .addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm])
+      .subscribe(rData => {
+        this.dsModel = rData;
+        // this.assetSetQueryModelsForAddition.push(asqm);
+        this.showPopup = false;
+        this.setShowListFlag();
+      })
   }
 
   onListAction(action: AssetListActionsEnum) {
@@ -59,9 +67,15 @@ export class DsAssetsHolder implements OnInit {
   }
 
   actionRemoveAll() {
-    this.assetSetQueryModelsForAddition.splice(0);
-    this.dsModel.counts=null;
-    this.setShowListFlag();
+    console.log("Remove all called!!!")
+    this.richDatasetService
+      .deleteAllAssets(this.dsModel.id)
+      .subscribe(rData => {
+        this.dsModel = rData;
+        // this.assetSetQueryModelsForAddition.splice(0);
+        // this.dsModel.counts=null;
+        this.setShowListFlag();
+      })
   }
 
   actionCancel() {

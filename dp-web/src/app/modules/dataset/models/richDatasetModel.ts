@@ -20,11 +20,13 @@ export class RichDatasetModel {
   creatorId: number;
   creatorName: string;
   description: string;
-  datalakeId: number;
+  datalakeId: number; // datalakeId and dpClusterId are same thing
   datalakeName: string;
   favourite: boolean;
   id: number;
   name: string;
-  clusterId?: number;
+  clusterId?: number;  // cluster id as discovered_cluster id
   tags?: string[];
+  createdOn?: string;
+  lastModified?: string;
 }
