@@ -13,13 +13,11 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import domain.CommentRepo
 import com.hortonworks.dataplane.commons.domain.Entities.Comment
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
-import play.mvc.BodyParser.Json
 
 import scala.concurrent.{ExecutionContext, Future}
 
