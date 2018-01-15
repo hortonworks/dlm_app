@@ -132,7 +132,7 @@ object Webservice {
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
 
-    def updateDataset(datasetId : String, dataset: Dataset): Future[Seq[Dataset]]
+    def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset]
 
     def delete(dataSetId: String): Future[Either[Errors, Long]]
   }

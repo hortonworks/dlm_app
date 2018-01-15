@@ -109,7 +109,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
         else {
           datasetRepo.updateDatset(datasetId.toLong, dataset).map{ ds =>
             ds.map { d =>
-              success(linkData(d, makeLink(d)))
+              success(Json.toJson(d))
             }
               .getOrElse(NotFound)
           }.recoverWith(apiError)
