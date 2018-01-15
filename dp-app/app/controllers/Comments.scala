@@ -52,7 +52,7 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
   def updateComments(commentId: String) = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Comments Controller: Received update Comment request")
     request.body
-      .validate[(String, String)]
+      .validate[(String, Long)]
       .map { case (commentTextWithUser) =>
         val loggedinUser = request.user.id.get
         if(loggedinUser != commentTextWithUser._2) Future.successful(Unauthorized("this user is not authorized to perform this action"))
@@ -70,7 +70,7 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
 
   implicit val tupledCommentTextWithUserReads = (
     (__ \ 'commentText).read[String] and
-    (__ \ 'userId).read[String]
+    (__ \ 'userId).read[Long]
   ) tupled
 
   def getByObjectRef = Action.async { req =>

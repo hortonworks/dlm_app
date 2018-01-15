@@ -207,7 +207,7 @@ object Webservice {
 
     def add(comment: Comment): Future[CommentWithUser]
 
-    def getByObjectRef(objectId: String, objectType:String): Future[Seq[OneLevelComment]]
+    def getByObjectRef(objectId: String, objectType:String): Future[Seq[commentWithUserAndChildren]]
 
     def deleteById(commentId: String,userId: Long): Future[String]
 

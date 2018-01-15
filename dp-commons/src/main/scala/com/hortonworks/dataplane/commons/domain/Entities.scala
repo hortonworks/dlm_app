@@ -391,8 +391,8 @@ object Entities {
   case class CommentWithUser(comment:Comment,
                              userName: String)
 
-  case class OneLevelComment(commentWithUser: CommentWithUser,
-                             children: Seq[CommentWithUser])
+  case class commentWithUserAndChildren(commentWithUser: CommentWithUser,
+                                        children: Seq[CommentWithUser])
 
   case class Rating(id: Option[Long] = None,
                     rating: Float,
@@ -581,8 +581,8 @@ object JsonFormatters {
   implicit val commentWithUserWrites = Json.writes[CommentWithUser]
   implicit val commentWithUserReads = Json.reads[CommentWithUser]
 
-  implicit val oneLevelCommentWrites = Json.writes[OneLevelComment]
-  implicit val oneLevelCommentReads = Json.reads[OneLevelComment]
+  implicit val oneLevelCommentWrites = Json.writes[commentWithUserAndChildren]
+  implicit val oneLevelCommentReads = Json.reads[commentWithUserAndChildren]
 
   implicit val ratingWrites = Json.writes[Rating]
   implicit val ratingReads = Json.reads[Rating]

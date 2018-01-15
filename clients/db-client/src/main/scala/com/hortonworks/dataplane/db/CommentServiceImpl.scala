@@ -20,6 +20,7 @@ import com.typesafe.config.Config
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
+import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -66,7 +67,7 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUser)
   }
 
-  override def getByObjectRef(objectId: String, objectType: String): Future[Seq[OneLevelComment]] = {
+  override def getByObjectRef(objectId: String, objectType: String): Future[Seq[commentWithUserAndChildren]] = {
     ws.url(s"$url/comments?objectId=$objectId&objectType=$objectType")
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -84,21 +85,23 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def getOneLevelComments(commentswithuser: Seq[CommentWithUser]): Seq[OneLevelComment] = {
+  private def getOneLevelComments(commentswithuser: Seq[CommentWithUser]): Seq[commentWithUserAndChildren] = {
     val map = commentswithuser.filter(cmnt => cmnt.comment.parentCommentId.isEmpty).map(cmnt => {
-      cmnt.comment.id.get -> OneLevelComment(commentWithUser = cmnt, children = Seq())
+      cmnt.comment.id.get -> commentWithUserAndChildren(commentWithUser = cmnt, children = Seq())
     }).toMap
     val oneLevelCommentMap = processOneLevelComments(0,commentswithuser, map)
     oneLevelCommentMap.values.toSeq.sortBy(_.commentWithUser.comment.createdOn.getOrElse(LocalDateTime.MIN).atZone(ZoneId.systemDefault()).toInstant.toEpochMilli)
   }
 
-  private def processOneLevelComments(idx: Int,commentswithuser: Seq[CommentWithUser], oneLevelCommentMap: Map[Long, OneLevelComment]):Map[Long, OneLevelComment] = {
+
+  @tailrec
+  private def processOneLevelComments(idx: Int,commentswithuser: Seq[CommentWithUser], oneLevelCommentMap: Map[Long, commentWithUserAndChildren]):Map[Long, commentWithUserAndChildren] = {
     if(idx >= commentswithuser.length) oneLevelCommentMap
     else{
       if(commentswithuser(idx).comment.parentCommentId.isEmpty) processOneLevelComments(idx+1,commentswithuser,oneLevelCommentMap)
       else{
         val parentOneLevelComment = oneLevelCommentMap.get(commentswithuser(idx).comment.parentCommentId.get).get
-        val comment: OneLevelComment = OneLevelComment(commentWithUser = parentOneLevelComment.commentWithUser, children = parentOneLevelComment.children :+ commentswithuser(idx))
+        val comment: commentWithUserAndChildren = commentWithUserAndChildren(commentWithUser = parentOneLevelComment.commentWithUser, children = parentOneLevelComment.children :+ commentswithuser(idx))
         processOneLevelComments(idx+1,commentswithuser, oneLevelCommentMap.updated(commentswithuser(idx).comment.parentCommentId.get, comment))
       }
     }
