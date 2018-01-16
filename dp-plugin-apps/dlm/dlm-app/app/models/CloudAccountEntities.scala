@@ -32,7 +32,9 @@ object CloudAccountEntities {
   /**
     * Base trait for account credentials
     */
-  trait CloudAccountCredentials { def credentialType: String }
+  trait CloudAccountCredentials {
+    def credentialType: String
+  }
 
   /**
     * Base trait for account details which contains user's info such as user name, account id etc.

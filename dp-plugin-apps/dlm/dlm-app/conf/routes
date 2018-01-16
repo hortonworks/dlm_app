@@ -14,13 +14,11 @@ PUT      /api/store/credential                                        controller
 DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
 
 #Cloud
-GET      /api/cloud/list/buckets/:cloudAccountId                      controllers.Cloud.listAllBuckets(cloudAccountId: String)
-GET      /api/cloud/list/objects/:cloudAccountId/bucket/:bucketName/files  controllers.Cloud.listAllObjects(cloudAccountId: String, bucketName: String)
-POST     /api/cloud/userIdentity                                      controllers.Cloud.getUserIdentity
-GET      /api/cloud/account/:cloudAccountId                           controllers.Cloud.checkUserIdentity(cloudAccountId: String)
-GET      /api/cloud/list/containers/:cloudAccountId                   controllers.Cloud.listAllContainers(cloudAccountId: String)
-GET      /api/cloud/list/blobs/:cloudAccountId/container/:containerName/files   controllers.Cloud.listAllBlobs(cloudAccountId: String, containerName: String)
-GET      /api/cloud/list/adls/:cloudAccountId/files                   controllers.Cloud.listADLSFiles(cloudAccountId: String)
+GET      /api/cloud/account/:accountId/mountPoints/                       controllers.Cloud.listAllMountPoints(accountId: String)
+GET      /api/cloud/account/:accountId/mountPoint/:mountPoint/files       controllers.Cloud.listFiles(accountId: String, mountPoint: String)
+POST     /api/cloud/userIdentity                                          controllers.Cloud.getUserIdentity
+GET      /api/cloud/account/:cloudAccountId                               controllers.Cloud.checkUserIdentity(cloudAccountId: String)
+GET      /api/cloud/list/adls/:cloudAccountId/files                       controllers.Cloud.listADLSFiles(cloudAccountId: String)
 
 #Clusters
 GET     /api/clusters                                         controllers.Clusters.list

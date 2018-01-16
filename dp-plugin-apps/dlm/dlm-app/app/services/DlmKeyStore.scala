@@ -17,6 +17,8 @@ import com.google.inject.{Inject, Singleton}
 import com.typesafe.scalalogging.Logger
 import models.CloudAccountEntities.Error._
 import models.CloudAccountEntities.{CloudAccountWithCredentials, CloudAccountsBody, CloudAccountsItem}
+import models.CloudAccountProvider
+import models.CloudAccountProvider.CloudAccountProvider
 import play.api.cache._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -191,7 +193,6 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
         Future.successful(Left(CredentialNotFoundInKeystoreError(ex.getMessage)))
     }
   }
-
 }
 
 object DpKeyStore {
