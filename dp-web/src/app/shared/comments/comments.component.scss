@@ -73,9 +73,6 @@
   position: fixed;
   height: 40px;
   width: 400px;
-  -webkit-transition: bottom .8s ease;
-  -moz-transition: bottom .8s ease;
-  -o-transition: bottom .8s ease;
   transition: bottom .8s ease;
   -webkit-font-smoothing: antialiased;
   padding: 3px 2px 2px;
@@ -101,8 +98,6 @@ ol, ul {
   color: #666;
   border-color: transparent;
   border-radius: 2px;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
   border: 1px solid transparent;
   padding: 9px 5px;
   font-size: 14px;
@@ -281,11 +276,19 @@ ol, ul {
 .rating-class{
   float: right;
   line-height: 25px;
-  margin-top: 25px;
-  font-size: 17px;
+ // margin-top: 25px;
+  font-size: 14px;
 }
 .rating-stars{
   float: left;
+}
+
+.fixed-star{
+  float: right;
+}
+
+:host /deep/ .rating:focus{
+  outline: none;
 }
 
 :host /deep/ .rating{
@@ -299,19 +302,7 @@ ol, ul {
 :host /deep/ .rating.label-top .label-value + .star-container{
   margin-top: 0px;
 }
-::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-  font-style: italic;
-  color: #999;
-}
-::-moz-placeholder { /* Firefox 19+ */
-  font-style: italic;
-  color: #999;
-}
-:-ms-input-placeholder { /* IE 10+ */
-  font-style: italic;
-  color: #999;
-}
-:-moz-placeholder { /* Firefox 18- */
+::placeholder {
   font-style: italic;
   color: #999;
 }

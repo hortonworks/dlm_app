@@ -22,7 +22,12 @@
   <div class="rating-section" *ngIf="isRatingEnabled">
     <div class="rating-stars"><star-rating-comp [starType]="'svg'" [labelText]="'RATE THIS COLLECTION'" [labelPosition]="'top'" [size]="'medium'" [speed]="'noticeable'" [step]="0.5"
                                  [showHalfStars]="true" [id]="'rating-id'" [hoverEnabled]="true"></star-rating-comp></div>
-    <div class="rating-class">4.1</div>
+    <div class="rating-class">
+      <div>2000 votes</div>
+      <div class="fixed-star">
+        <star-rating-comp [starType]="'svg'" [labelText]="'4.1'" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
+      </div>
+    </div>
   </div>
   <div class="mdl-grid" *ngIf="fetchError">
     <div class="mdl-cell mdl-cell--12-col load-comment-error">{{"pages.comments.fetchErrorMsg" | translate}}</div>
