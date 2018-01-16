@@ -9,7 +9,7 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        { "glob": "**/*", "input": "../node_modules/dp-apps/dist/images", "output": "./assets/images/" },
+        { "glob": "**/*", "input": "../node_modules/dps-apps/dist/images", "output": "./assets/images/" },
         "favicon.png"
       ],
       "index": "index.html",
@@ -25,7 +25,7 @@
         "../node_modules/nvd3/build/nv.d3.css",
         "../node_modules/dialog-polyfill/dialog-polyfill.css",
         "../node_modules/leaflet/dist/leaflet.css",
-        "../node_modules/dp-apps/dist/dp-app-navigation.css",
+        "../node_modules/dps-apps/dist/dp-app-navigation.css",
         "vendor.scss",
         "styles.scss"
       ],

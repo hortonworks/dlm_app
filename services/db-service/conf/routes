@@ -148,6 +148,8 @@ DELETE        /clusters/:clusterId/properties/:propertiesId                  con
 #Dataset API
 GET           /datasets                                                      controllers.Datasets.all(name: Option[String])
 POST          /datasets                                                      controllers.Datasets.add
+POST          /datasets/:datasetId/addassets                                 controllers.Datasets.addAssets(datasetId:Long)
+DELETE        /datasets/:datasetId/removeallassets                           controllers.Datasets.removeAllAssets(datasetId:Long)
 POST          /datasetswithassets                                            controllers.Datasets.addWithAsset
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)

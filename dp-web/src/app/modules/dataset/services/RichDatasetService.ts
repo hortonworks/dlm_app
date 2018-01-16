@@ -15,7 +15,7 @@ import {Observable} from "rxjs";
 import {RichDatasetModel} from "../models/richDatasetModel";
 import {AssetSetQueryModel} from "../views/ds-assets-list/ds-assets-list.component";
 import {DsAssetsService} from "./dsAssetsService";
-import {DataSetAndCategories} from "../../../models/data-set";
+import {DataSetAndCategories, DataSetAndTags} from "../../../models/data-set";
 import {HttpUtil} from "../../../shared/utils/httpUtil";
 @Injectable()
 export class RichDatasetService {
@@ -44,7 +44,7 @@ export class RichDatasetService {
       .catch(HttpUtil.handleError);
   }
 
-  saveDataset(dataSet: RichDatasetModel, asqms: AssetSetQueryModel[], tags: string[]): Observable<DataSetAndCategories> {
+  saveDatasetWithAssets(dataSet: RichDatasetModel, asqms: AssetSetQueryModel[], tags: string[]): Observable<DataSetAndCategories> {
     const postObj = {
       "dataset": {
         "name": dataSet.name, "description": dataSet.description, "dpClusterId": +dataSet.datalakeId, "createdBy": 1
@@ -60,7 +60,35 @@ export class RichDatasetService {
       .catch(HttpUtil.handleError);
   }
 
-  extractRichDataModel(data: any): RichDatasetModel {
+  saveDataset(dSetAndTags: DataSetAndTags) : Observable<DataSetAndCategories> {
+    return this.http[(dSetAndTags.dataset.id)?'put':'post']
+      ("/api/datasets", dSetAndTags, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+  addAssets(dSetId: number, clusterId: number, asqms: AssetSetQueryModel[], exceptions: string[] = []) : Observable<RichDatasetModel> {
+    const postObj = {
+      datasetId: dSetId,
+      clusterId: clusterId,
+      assetQueryModel: {"atlasFilters": DsAssetsService.prototype.getAtlasFilters(asqms)},
+      exceptions : exceptions
+    }
+    return this.http
+      .post("/api/add-atlas-assets", postObj, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(this.extractRichDataModel)
+      .catch(HttpUtil.handleError);
+  }
+
+  deleteAllAssets(dSetId: number) : Observable<RichDatasetModel> {
+    return this.http
+      .delete(`/api/dataset/${dSetId}/allassets`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(this.extractRichDataModel)
+      .catch(HttpUtil.handleError);
+  }
+
+  extractRichDataModel(data: any): RichDatasetModel { // converts RichDataset(backend case class) to RichDatasetModel
     const ASSET_TYPES = [{label: 'hiveCount', key: 'hive_table'}, {label: 'filesCount', key: 'hdfs_files'}];
 
     return {
@@ -71,6 +99,8 @@ export class RichDatasetService {
       datalakeName: data.cluster,
       clusterId : data.clusterId,
       creatorId: data.dataset.createdBy,
+      createdOn: data.dataset.createdOn,
+      lastModified: data.dataset.lastModified,
       creatorName: data.user,
       favourite: (data.tags.indexOf("favourite") != -1),
       counts: ASSET_TYPES.reduce((accumulator, cAssetType) => {

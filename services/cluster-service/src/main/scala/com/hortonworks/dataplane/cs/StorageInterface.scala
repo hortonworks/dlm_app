@@ -15,7 +15,6 @@ import javax.inject.{Inject, Singleton}
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterHost, ClusterServiceHost, DataplaneCluster, Errors, ClusterService => ClusterData}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
-import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -29,6 +28,8 @@ trait StorageInterface {
 
   def updateServiceByName(toPersist: ClusterData,
                           hosts: Seq[ClusterServiceHost]): Future[Boolean]
+
+  def markAsDatalake(dpClusterId: Long, isDatalake: Boolean): Future[DataplaneCluster]
 
   def getDpClusters: Future[Seq[DataplaneCluster]]
 
@@ -75,6 +76,33 @@ class StorageInterfaceImpl @Inject()(
           logger.error(s"Exception: No data lakes found - Reason: ${e}", e)
           Future.successful(Seq())
       }
+
+
+  private def retrieveClusterById(dpClusterId: Long): Future[DataplaneCluster] = {
+    dpClusterService.retrieve(dpClusterId.toString())
+      .map {
+        case Left(errors) => throw new Exception(s"Could not retrieve cluster - Reason $errors")
+        case Right(cluster) => cluster
+      }
+  }
+
+  private def updateClusterById(dpCluster: DataplaneCluster): Future[DataplaneCluster] = {
+    dpClusterService.update(dpCluster).map {
+      case Left(errors) => throw new Exception(s"Could not update cluster - Reason $errors")
+      case Right(cluster) => cluster
+    }
+  }
+
+  override def markAsDatalake(dpClusterId: Long, isDatalake: Boolean): Future[DataplaneCluster] = {
+    for {
+      dpCluster <- retrieveClusterById(dpClusterId)
+      newCluster <- Future.successful(dpCluster.copy(
+        isDatalake = Some(isDatalake)))
+        updated <- updateClusterById(newCluster)
+    } yield {
+      updated
+    }
+  }
 
   override def getLinkedClusters(dpCluster: DataplaneCluster): Future[Seq[Cluster]] = {
     clusterService

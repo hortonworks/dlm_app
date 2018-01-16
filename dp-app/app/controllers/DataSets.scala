@@ -11,10 +11,11 @@
 
 package controllers
 
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasEntities, Entity}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasEntities, AtlasSearchQuery, Entity}
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
@@ -57,13 +58,13 @@ class DataSets @Inject()(
   }
 
   def create = AuthenticatedAction.async(parse.json) { request =>
-    Logger.info("Received create dataSet request")
+    Logger.info("Received create dataSet with categoryIds request")
     request.body
-      .validate[DatasetAndCategoryIds]
-      .map { dSetNCtgryIds =>
+      .validate[DatasetAndTags]
+      .map { dSetNTags =>
         dataSetService
-          .create(dSetNCtgryIds.copy(
-            dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id)))
+          .create(dSetNTags.copy(
+            dataset = dSetNTags.dataset.copy(createdBy = request.user.id)))
           .map {
             case Left(errors) =>
               InternalServerError(Json.toJson(errors))
@@ -74,37 +75,93 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  private def getAssetFromSearch(req: DatasetCreateRequest)(
-      implicit token: Option[HJwtToken])
-    : Future[Either[Errors, (Seq[DataAsset], Long, Long)]] = {
-    val future = for {
-      results <- atlasService.searchQueryAssets(req.clusterId.toString,
-                                                req.assetQueryModels.head)
-      enhancedResults <- doEnhanceAssetsWithOwningDataset(
-        req.clusterId.toString,
-        results)
-    } yield enhancedResults
+  def update() = AuthenticatedAction.async(parse.json) { request =>
+    Logger.info("Received update dataSet with categoryIds request")
+    request.body
+      .validate[DatasetAndTags]
+      .map { dSetNTags =>
+        dataSetService
+          .update(dSetNTags.copy(
+            dataset = dSetNTags.dataset.copy(lastModified = LocalDateTime.now())))
+          .map {
+            case Left(errors) =>
+              InternalServerError(Json.toJson(errors))
+            case Right(dataSetNCategories) =>
+              Ok(Json.toJson(dataSetNCategories))
+          }
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
 
-    future
-      .map {
-        case Left(errors) => Left(errors)
-        case Right(enhanced) =>
-          val entitiesToSave =
-            enhanced.filter(cEntity => cEntity.datasetId.isEmpty)
-          Right(entitiesToSave.map(cEntity =>
-                  getAssetFromEntity(cEntity, req.clusterId.toString)),
-                entitiesToSave.size,
-                enhanced.size - entitiesToSave.size)
+  private def getAssetFromSearch(clusterId: Long, searchQuery: AtlasSearchQuery, filterDatasetId:Long = 0)(
+    implicit token: Option[HJwtToken])
+  : Future[Either[Errors, (Seq[DataAsset], Long, Long)]] = {
+    atlasService
+      .searchQueryAssets(clusterId.toString, searchQuery)
+      .flatMap {
+        case Left(errors) => Future.successful(Left(errors))
+        case Right(atlasEntities) => {
+          extractAndMarkEntities(clusterId, atlasEntities, filterDatasetId)
+            .map {
+              case Left(errors) => Left(errors)
+              case Right(marked) =>
+                val entitiesToSave =  if(filterDatasetId == 0) marked.filter(_.datasetId.isEmpty)
+                                      else  marked.filter(_.datasetId.getOrElse(0) != filterDatasetId)
+                Right(entitiesToSave.map(getAssetFromEntity(_, clusterId)),
+                  entitiesToSave.size, marked.size - entitiesToSave.size)
+            }
+        }
       }
   }
 
-  private def getAssetFromEntity(entity: Entity, clusterId: String): DataAsset = {
+  private def getAssetFromEntity(entity: Entity, clusterId: Long): DataAsset = {
     DataAsset(None,
               entity.typeName.get,
               entity.attributes.get.get("name").get,
               entity.guid.get,
               Json.toJson(entity.attributes.get),
-              clusterId.toLong)
+              clusterId)
+  }
+
+  def addAssetsToDataset = AuthenticatedAction.async(parse.json) { req =>
+    implicit val token = req.token
+    req.body.validate[AddToBoxPrams].map{ params =>
+      getAssetFromSearch(params.clusterId, params.assetQueryModel, params.datasetId).flatMap {
+        case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
+        case Right((assets, _, _)) =>  assets.size match {
+          case 0 =>
+            Logger.info("Effectively no asset to add.")
+            dataSetService
+              .getRichDatasetById(params.datasetId)
+              .map {
+                case Left(errors) => InternalServerError(Json.toJson(errors))
+                case Right(richDataset) => Ok(Json.toJson(richDataset))
+              }
+          case _ => dataSetService
+            .addAssets(params.datasetId, assets)
+            .map(rDataset =>
+             // TODO Modify Profiler data
+             Ok(Json.toJson(rDataset))
+            )
+            .recoverWith({
+             case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+            })
+        }
+      }
+    }.getOrElse(Future.successful(BadRequest))
+  }
+
+  def removeAllAssetsFromDataset(datasetId: Long) = AuthenticatedAction.async { req =>
+    implicit val token = req.token
+    dataSetService
+      .removeAllAssets(datasetId)
+      .map(rDataset =>
+        // TODO Modify Profiler data
+        Ok(Json.toJson(rDataset))
+      )
+      .recoverWith({
+        case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+      })
   }
 
   def createDatasetWithAtlasSearch = AuthenticatedAction.async(parse.json) {
@@ -113,7 +170,7 @@ class DataSets @Inject()(
       request.body
         .validate[DatasetCreateRequest]
         .map { req =>
-          getAssetFromSearch(req).flatMap {
+          getAssetFromSearch(req.clusterId, req.assetQueryModels.head).flatMap {
             case Right((assets, countOfSaved, countOfIgnored)) =>
               countOfSaved match {
                 case 0 => Future.successful(InternalServerError(JsonResponses.statusError("Unable to create an asset collection with 0 assets.")))
@@ -343,37 +400,31 @@ class DataSets @Inject()(
       }
   }
 
-  private def doEnhanceAssetsWithOwningDataset(
-      clusterIdAsString: String,
-      atlasEntities: Either[Errors, AtlasEntities])
-    : Future[Either[Errors, Seq[Entity]]] = {
-    atlasEntities match {
-      case Left(errors) => Future.successful(Left(errors))
-      case Right(atlasEntities) =>
-        val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
-        val assetIds
-          : Seq[String] = entities.filter(_.guid.nonEmpty) map (_.guid.get)
-        val clusterId = clusterIdAsString.toLong
-        assetService
-          .findManagedAssets(clusterId, assetIds)
-          .map {
-            case Left(errors) => Left(errors)
-            case Right(relationships) =>
-              val enhanced = entities.map { cEntity =>
-                val cRelationship =
-                  relationships.find(_.guid == cEntity.guid.get)
-                cRelationship match {
-                  case None => cEntity
-                  case Some(relationship) =>
-                    cEntity.copy(
-                      datasetId = Option(relationship.datasetId),
-                      datasetName = Option(relationship.datasetName))
-                }
-
-              }
-              Right(enhanced)
+  // Extracts entities and mark them with dataset name and Id
+  private def extractAndMarkEntities(clstrId: Long, atlasEntities: AtlasEntities, prefDatasetId:Long = 0)
+  : Future[Either[Errors, Seq[Entity]]] = {
+    val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
+    val assetIds: Seq[String] = entities.filter(_.guid.nonEmpty) map (_.guid.get)
+    assetService
+      .findManagedAssets(clstrId, assetIds)
+      .map {
+        case Left(errors) => Left(errors)
+        case Right(relations) => Right(
+          entities.map { ent =>
+            (relations.find(rel => rel.guid == ent.guid.get && rel.datasetId == prefDatasetId) match {
+              case Some(relation) => Some(relation)
+              case None => relations.find(_.guid == ent.guid.get)
+            })
+            match {
+              case None => ent
+              case Some(ds) => ent.copy(
+                datasetId = Option(ds.datasetId),
+                datasetName = Option(ds.datasetName)
+              )
+            }
           }
-    }
+        )
+      }
   }
 
   private def doDeleteDataset(datasetId: String): Future[Long] = {

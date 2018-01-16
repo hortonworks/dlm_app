@@ -15,6 +15,7 @@ import {RichDatasetModel} from "../../models/richDatasetModel";
 import {DsTagsService} from "../../services/dsTagsService";
 import {RichDatasetService} from "../../services/RichDatasetService";
 import {AssetSetQueryFilterModel, AssetSetQueryModel} from "../ds-assets-list/ds-assets-list.component";
+import {DataSetAndCategories, DataSetAndTags} from "../../../../models/data-set";
 
 @Component({
   providers: [RichDatasetModel],
@@ -76,28 +77,53 @@ export class DsEditor implements OnInit {
   }
 
   actionSave() {
-    if (this.saveInProgress) return;
-    this.saveInProgress = true;
-    this.richDatasetService
-      .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
-      .subscribe(
-        () => this.actionCancel(),
-        error => {
-          this.saveInProgress = false;
-          this.errorMessage = error.json().message
-        }
-      );
+    // if (this.saveInProgress) return;
+    // this.saveInProgress = true;
+    // this.richDatasetService
+    //   .saveDatasetWithAssets(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
+    //   .subscribe(
+    //     () => this.actionCancel(),
+    //     error => {
+    //       this.saveInProgress = false;
+    //       this.errorMessage = error.json().message
+    //     }
+    //   );
+    this.router.navigate(["datasteward/collections"]);
   }
 
   actionCancel() {
     this.router.navigate(["datasteward/collections"]);
   }
 
+  getDataSetAndTags() : DataSetAndTags {
+    const rData:RichDatasetModel = this.dsModel, tags=this.tags;
+    return {
+      dataset : {
+        "id": rData.id || 0,
+        "name": rData.name,
+        "description": rData.description,
+//        "datalakeId": rData.datalakeId,
+        "dpClusterId": parseInt(rData.datalakeId as any),
+        "createdBy": rData.creatorId || 0,
+        "createdOn": rData.createdOn,
+        "lastModified": rData.lastModified,
+        "active": true,
+        "version": 1
+      },
+      tags : tags
+    } as DataSetAndTags;
+  }
+
   validateStage1() {
-    return this.dsModel.name && this.dsModel.description && this.dsModel.datalakeId;
+    if(!(this.dsModel.name && this.dsModel.description && this.dsModel.datalakeId)) return false;
+    this.richDatasetService
+      .saveDataset(this.getDataSetAndTags())
+      .subscribe()
+    return true;
   }
 
   validateStage2() {
+    if(this.assetSetQueryModelsForAddition.length == 0) return false;
     return true;
   }
 

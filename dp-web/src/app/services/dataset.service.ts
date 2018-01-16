@@ -13,7 +13,7 @@ import {Injectable} from '@angular/core';
 import {Http, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {DataSetAndCategories, DataSetAndCategoryIds, DataSet} from '../models/data-set';
+import {DataSetAndCategories, DataSetAndTags, DataSet} from '../models/data-set';
 
 
 @Injectable()
@@ -41,7 +41,7 @@ export class DataSetService {
       .catch(HttpUtil.handleError);
   }
 
-  post(data: DataSetAndCategoryIds): Observable<DataSetAndCategories> {
+  post(data: DataSetAndTags): Observable<DataSetAndCategories> {
     data.dataset.createdBy=0;
     return this.http
       .post(`${this.url}`, data, new RequestOptions(HttpUtil.getHeaders()))
