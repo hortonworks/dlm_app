@@ -134,9 +134,6 @@ object Webservice {
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
-    def update(dataSetAndCatIds: DatasetAndCategoryIds)
-    : Future[Either[Errors, DatasetAndCategories]]
-
     def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset]
 
     def delete(dataSetId: String): Future[Either[Errors, Long]]

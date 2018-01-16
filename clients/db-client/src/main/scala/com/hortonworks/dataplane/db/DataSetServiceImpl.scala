@@ -121,16 +121,6 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  override def update(dataSetAndTags: DatasetAndTags): Future[Either[Errors, DatasetAndCategories]] = {
-    ws.url(s"$url/datasets")
-      .withHeaders(
-        "Content-Type" -> "application/json",
-        "Accept" -> "application/json"
-      )
-      .put(Json.toJson(dataSetAndTags))
-      .map(mapToDataSetAndCategories)
-  }
-
   override def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset] = {
     ws.url(s"$url/datasets/$datasetId")
       .withHeaders(

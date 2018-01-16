@@ -128,7 +128,7 @@ class DataSets @Inject()(
           case 0 =>
             Logger.info("Effectively no asset to add.")
             dataSetService
-              .getRichDatasetById(params.datasetId)
+              .getRichDatasetById(params.datasetId,req.user.id.get)
               .map {
                 case Left(errors) => InternalServerError(Json.toJson(errors))
                 case Right(richDataset) => Ok(Json.toJson(richDataset))
@@ -282,23 +282,6 @@ class DataSets @Inject()(
           InternalServerError(Json.toJson(errors))
         case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
       }
-  }
-
-  def update() = Action.async(parse.json) { request =>
-    Logger.info("Received update dataSet request")
-    request.body
-      .validate[DatasetAndCategoryIds]
-      .map { dSetNCtgryIds =>
-        dataSetService
-          .update(dSetNCtgryIds)
-          .map {
-            case Left(errors) =>
-              InternalServerError(Json.toJson(errors))
-            case Right(dataSetNCategories) =>
-              Ok(Json.toJson(dataSetNCategories))
-          }
-      }
-      .getOrElse(Future.successful(BadRequest))
   }
 
   def updateDataset(datasetId : String) = AuthenticatedAction.async(parse.json) { request =>
