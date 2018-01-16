@@ -31,6 +31,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import {PipesModule} from 'pipes/pipes.module';
 import {TooltipModule} from 'ngx-bootstrap';
 import { configureComponentTest } from 'testing/configure';
+import { SelectCloudDestinationComponent } from '../../components/select-cloud-destination/select-cloud-destination.component';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -64,7 +65,8 @@ describe('CreatePolicyComponent', () => {
         TableFooterComponent,
         TableFilterComponent,
         ActionColumnComponent,
-        CheckboxColumnComponent
+        CheckboxColumnComponent,
+        SelectCloudDestinationComponent
       ],
       providers: [
         NavbarService

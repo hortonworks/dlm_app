@@ -37,7 +37,7 @@ export const filterCollection = (collection, filters) => {
 export const groupByKey = (collection, keyName) => {
   const group = {};
   collection.forEach(item => {
-    const value = item[keyName];
+    const value = multiLevelResolve(item, keyName);
     if (group[value] == null) {
       group[value] = [item];
     } else {

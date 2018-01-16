@@ -7,7 +7,10 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, Input, OnInit, ContentChild, ViewEncapsulation, HostBinding } from '@angular/core';
+import {
+  Component, Input, OnInit, ContentChild, ViewEncapsulation, HostBinding, SimpleChanges,
+  OnChanges
+} from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { FormFieldDirective } from './form-field.directive';
 
@@ -17,7 +20,7 @@ import { FormFieldDirective } from './form-field.directive';
   styleUrls: ['./form-field.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class FormFieldComponent implements OnInit {
+export class FormFieldComponent implements OnInit, OnChanges {
   @Input() label: string;
   @Input() maxLengthValue: string|number;
   @ContentChild(FormFieldDirective) formField: FormFieldDirective;
@@ -32,5 +35,12 @@ export class FormFieldComponent implements OnInit {
   ngOnInit() {
     this.fieldControl = this.formField.formFieldControl;
     this.labelTranslate = { fieldLabel: this.label, maxLengthValue: this.maxLengthValue };
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['label'] && this.labelTranslate) {
+      this.labelTranslate['fieldLabel'] = changes['label'].currentValue;
+    }
+
   }
 }

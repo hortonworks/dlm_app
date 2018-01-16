@@ -51,6 +51,8 @@ import { ConfirmationEffects } from './effects/confirmation.effect';
 import { NotificationEffects } from './effects/notification.effect';
 import { BeaconEffects } from './effects/beacon.effect';
 import { YarnEffects } from './effects/yarn.effect';
+import { CloudAccountsEffects } from './effects/cloud-accounts.effect';
+import { CloudContainersEffects } from './effects/cloud-containers.effect';
 
 import { FormEffects } from './effects/form.effect';
 import { RouterEffects } from './effects/router.effect';
@@ -73,6 +75,8 @@ import { UserService } from 'services/user.service';
 import { ConfirmationService } from 'services/confirmation.service';
 import { BeaconService } from 'services/beacon.service';
 import { YarnService } from 'services/yarn.service';
+import { CloudAccountService } from 'services/cloud-account.service';
+import { CloudContainerService } from 'services/cloud-container.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -105,7 +109,13 @@ import { IssuesListItemComponent } from './pages/overview/issues-list-item/issue
 import { JobsOverviewTableComponent } from './pages/overview/jobs-overview-table/jobs-overview-table.component';
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
+import { CloudStoresComponent } from './pages/cloud-stores/cloud-stores.component';
+import { CloudAccountsListComponent } from './pages/cloud-stores/cloud-accounts-list/cloud-accounts-list.component';
+import { AddAccountModalComponent } from './pages/cloud-stores/add-account-modal/add-account-modal.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
+import { CloudContainerBrowserComponent } from 'components/cloud-container-browser/cloud-container-browser.component';
+// tslint:disable-next-line
+import { CloudContainerBrowserBreadcrumbComponent } from 'components/cloud-container-browser/breadcrumb/cloud-container-browser-breadcrumb.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
 import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
@@ -122,6 +132,7 @@ import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
 import { PolicyDetailsComponent } from './pages/policies/policy-details/policy-details.component';
 import { PrevJobsComponent } from './pages/policies/components/prev-jobs/prev-jobs.component';
+import { SelectCloudDestinationComponent } from './pages/policies/components/select-cloud-destination/select-cloud-destination.component';
 
 import { PairingCardComponent } from './pages/pairings/components/pairing-card/pairing-card.component';
 import { PairingCardListComponent } from './pages/pairings/components/pairing-card-list/pairing-card-list.component';
@@ -140,6 +151,8 @@ import { TableFooterComponent } from './common/table/table-footer/table-footer.c
 import { TableFilterComponent } from './common/table/table-filter/table-filter.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
+
+import { TabsComponent } from './common/tabs/tabs.component';
 
 import { PipesModule } from './pipes/pipes.module';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
@@ -177,7 +190,9 @@ import { AsyncActionsService } from 'services/async-actions.service';
       NotificationEffects,
       BeaconEffects,
       RouterEffects,
-      YarnEffects
+      YarnEffects,
+      CloudAccountsEffects,
+      CloudContainersEffects
     ]),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
@@ -211,6 +226,11 @@ import { AsyncActionsService } from 'services/async-actions.service';
     NotificationsTableComponent,
     ClustersComponent,
     ClusterListComponent,
+    CloudStoresComponent,
+    CloudAccountsListComponent,
+    CloudContainerBrowserComponent,
+    CloudContainerBrowserBreadcrumbComponent,
+    AddAccountModalComponent,
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,
@@ -226,6 +246,7 @@ import { AsyncActionsService } from 'services/async-actions.service';
     PolicyDetailsComponent,
     PolicyServiceFilterComponent,
     PrevJobsComponent,
+    SelectCloudDestinationComponent,
 
     ResourceChartsComponent,
     OverviewFilterComponent,
@@ -259,7 +280,8 @@ import { AsyncActionsService } from 'services/async-actions.service';
     NotificationsComponent,
     EventMessageComponent,
     LogModalDialogComponent,
-    PersonaPopupComponent
+    PersonaPopupComponent,
+    TabsComponent
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -284,6 +306,8 @@ import { AsyncActionsService } from 'services/async-actions.service';
     BeaconService,
     YarnService,
     AsyncActionsService,
+    CloudAccountService,
+    CloudContainerService,
     AppConfig,
     {
       provide: APP_INITIALIZER,

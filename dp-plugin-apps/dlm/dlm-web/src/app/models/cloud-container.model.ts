@@ -7,8 +7,9 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export * from './select-option.type';
-export * from './select-field.component';
-export * from './select-field-value.directive';
-export * from './select-field-option.directive';
-export * from './select-field-dropdown.directive';
+export interface CloudContainer {
+  id: string;
+  accountId: string;
+  name: string;
+  provider: string;
+}

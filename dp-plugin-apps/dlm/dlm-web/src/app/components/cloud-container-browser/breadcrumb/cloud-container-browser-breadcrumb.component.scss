@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,8 +7,21 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export * from './select-option.type';
-export * from './select-field.component';
-export * from './select-field-value.directive';
-export * from './select-field-option.directive';
-export * from './select-field-dropdown.directive';
+.nameLink {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.breadcrumbs {
+  margin-bottom: 10px;
+  background-color: white;
+  padding: 15px;
+  .breadcrumb-item:not(:first-child) {
+    &:before {
+      content: ">\00a0";
+      padding: 0 5px;
+      color: #ccc;
+    }
+  }
+}

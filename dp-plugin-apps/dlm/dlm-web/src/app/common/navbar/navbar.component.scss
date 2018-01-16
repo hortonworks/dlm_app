@@ -151,3 +151,11 @@ $collapsed-menu-item-height: 50px;
 .navigation-bar-fit-height {
   left: 0;
 }
+
+.sub-menu {
+  li {
+    a {
+      padding-left: 40px !important;
+    }
+  }
+}

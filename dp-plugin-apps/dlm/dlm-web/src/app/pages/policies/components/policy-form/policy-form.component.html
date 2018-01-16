@@ -59,8 +59,24 @@
                     <dlm-select-field qe-attr="policy-source-cluster" formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
                     </dlm-select-field>
                   </dlm-form-field>
-                  <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate" [required]="true">
+
+                  <dlm-form-field [label]="'page.policies.form.fields.destination_type' | translate" [required]="true">
+                    <dlm-select-field qe-attr="policy-destination-type" formField formControlName="destinationType" [options]="destinationTypes" [value]="destinationType" (onSelect)="handleDestinationTypeChange($event)">
+                    </dlm-select-field>
+                  </dlm-form-field>
+
+                  <dlm-form-field *ngIf="policyForm.get('general.destinationType').value === CLUSTER" [label]="'page.policies.form.fields.destinationCluster.self' | translate" [required]="true">
                     <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
+                    </dlm-select-field>
+                  </dlm-form-field>
+
+                  <dlm-form-field *ngIf="PROVIDERS.indexOf(policyForm.get('general.destinationType').value) !== -1" [label]="'page.policies.form.fields.cloud_account' | translate" [required]="true">
+                    <dlm-select-field qe-attr="policy-cloud-account" formField formControlName="cloudAccount" [options]="cloudAccounts" [value]="cloudAccount">
+                    </dlm-select-field>
+                  </dlm-form-field>
+
+                  <dlm-form-field *ngIf="policyForm.get('general.cloudAccount').value" [label]="'page.policies.form.fields.container' | translate" [required]="true">
+                    <dlm-select-field qe-attr="policy-destination-container" formField formControlName="destinationContainer" [options]="destinationContainers" [value]="destinationContainer">
                     </dlm-select-field>
                   </dlm-form-field>
                 </div>

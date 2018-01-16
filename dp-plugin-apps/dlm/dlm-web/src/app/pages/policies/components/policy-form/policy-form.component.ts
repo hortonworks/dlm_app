@@ -11,7 +11,7 @@ import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
   HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import {
-  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn, ValidationErrors
+  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, ValidationErrors
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { IMyOptions, IMyDateModel, IMyInputFieldChanged } from 'mydatepicker';
@@ -31,7 +31,7 @@ import { getDatePickerDate } from 'utils/date-util';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
 import { simpleSearch } from 'utils/string-utils';
-import { loadFullDatabases, loadDatabases, loadTables } from 'actions/hivelist.action';
+import { loadDatabases, loadTables } from 'actions/hivelist.action';
 import { resetFormValue } from 'actions/form.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
@@ -47,9 +47,11 @@ import { HiveBrowserTablesLoadingMap, DatabaseTablesCollapsedEvent } from 'compo
 import { removeProgressState } from 'actions/progress.action';
 import { FILES_REQUEST } from 'components/hdfs-browser/hdfs-browser.component';
 import { loadYarnQueues } from 'actions/yarnqueues.action';
-import { YarnQueue } from 'models/yarnqueues.model';
 import { getYarnQueueEntities } from 'selectors/yarn.selector';
 import { isEqual } from 'utils/object-utils';
+import { CloudContainer } from 'models/cloud-container.model';
+import { PROVIDERS } from 'constants/cloud.constant';
+import { CloudAccount } from 'models/cloud-account.model';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
@@ -95,6 +97,8 @@ export function nameValidator(): ValidatorFn {
   };
 }
 
+const CLUSTER = 'CLUSTER';
+
 @Component({
   selector: 'dlm-policy-form',
   templateUrl: './policy-form.component.html',
@@ -107,8 +111,14 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   private formRestored = false;
   databaseTablesLoadingMap: HiveBrowserTablesLoadingMap = {};
   yarnQueueList: any[] = [];
+  CLUSTER = CLUSTER;
+  PROVIDERS = PROVIDERS;
+  DESTINATION_TYPES = [CLUSTER, ...PROVIDERS];
 
   @Input() pairings: Pairing[] = [];
+  @Input() containers: any = {};
+  @Input() accounts: CloudAccount[] = [];
+  @Input() containersList: CloudContainer[] = [];
   @Input() sourceClusterId = 0;
   @Output() formSubmit = new EventEmitter<any>();
   @HostBinding('class') className = 'dlm-policy-form';
@@ -280,6 +290,25 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     }];
   }
 
+  get cloudAccounts() {
+    return this.accounts
+      .filter(a => a.accountDetails.provider === this.policyForm.value.general.destinationType)
+      .map(a => ({label: a.accountDetails['userName'] || a.accountDetails['accountName'], value: a.id}));
+  }
+
+  get destinationTypes() {
+    return this.DESTINATION_TYPES.map(dt => ({label: dt, value: dt}));
+  }
+
+  get destinationContainers() {
+    const accountId = this.policyForm.value.general.cloudAccount;
+    const provider = this.policyForm.value.general.destinationType;
+    return this.containers[provider] ?
+      this.containers[provider]
+        .filter(c => c.accountId === accountId)
+        .map(c => ({label: c.name, value: c.id})) : [];
+  }
+
   get selectedDay() {
     return this.policyForm.value.job.day;
   }
@@ -304,6 +333,18 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return this.policyForm.value.general.destinationCluster;
   }
 
+  get destinationType() {
+    return this.policyForm.value.general.destinationType;
+  }
+
+  get destinationContainer() {
+    return this.policyForm.value.general.destinationContainer;
+  }
+
+  get cloudAccount() {
+    return this.policyForm.value.general.cloudAccount;
+  }
+
   getEndTime(endDate) {
     const date = moment(endDate).toDate();
     date.setHours(23, 59, 59);
@@ -317,7 +358,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         description: ['', Validators.maxLength(512)],
         type: [this.selectedPolicyType],
         sourceCluster: ['', Validators.required],
-        destinationCluster: ['', Validators.required]
+        destinationCluster: ['', Validators.required],
+        destinationContainer: ['', Validators.required],
+        destinationType: ['', Validators.required],
+        cloudAccount: ['', Validators.required]
       }),
       databases: ['', Validators.required],
       directories: ['', Validators.compose([Validators.required])],
@@ -545,6 +589,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.setupDatabaseChanges(this.policyForm);
     this.setupDestinationChanges(this.policyForm);
     this.setupTimeZoneChanges();
+    const destinationType = this.policyForm.value.general.destinationType;
+    if (destinationType) {
+      this.updateDestinationFields(destinationType);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -691,7 +739,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.selectedHdfsPath = this.root;
     this.policyForm.patchValue({
       general: {
-        destinationCluster: ''
+        destinationCluster: '',
+        destinationContainer: '',
+        destinationType: '',
+        cloudAccount: ''
       }
     });
     this.selectedSource$.next(sourceCluster.value);
@@ -700,6 +751,42 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   handleHdfsPathChange(path) {
     this.selectedHdfsPath = path;
+  }
+
+  handleDestinationTypeChange(type) {
+    this.policyForm.patchValue({
+      general: {
+        destinationCluster: '',
+        destinationContainer: '',
+        cloudAccount: '',
+      }
+    });
+    this.updateDestinationFields(type.value);
+  }
+
+  updateDestinationFields(value) {
+    const cloudProps = ['general.destinationContainer', 'general.cloudAccount'];
+    const clusterProps = ['general.destinationCluster'];
+    let toEnable, toDisable;
+    if (value === this.CLUSTER) {
+      toDisable = cloudProps;
+      toEnable = clusterProps;
+    } else {
+      toDisable = clusterProps;
+      toEnable = cloudProps;
+    }
+    toDisable.map(p => {
+      const control = this.policyForm.get(p);
+      if (control.enabled) {
+        control.disable();
+      }
+    });
+    toEnable.map(p => {
+      const control = this.policyForm.get(p);
+      if (control.disabled) {
+        control.enable();
+      }
+    });
   }
 
   cancel() {
