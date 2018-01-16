@@ -118,7 +118,12 @@ export class DsEditor implements OnInit {
     if(!(this.dsModel.name && this.dsModel.description && this.dsModel.datalakeId)) return false;
     this.richDatasetService
       .saveDataset(this.getDataSetAndTags())
-      .subscribe()
+      .subscribe(rDataSet => {
+        this.dsModel = rDataSet
+        this.assetSetQueryModelsForAddition.push(
+          new AssetSetQueryModel([new AssetSetQueryFilterModel("dataset.id", "=", rDataSet.id, "-")])
+        );
+      })
     return true;
   }
 
