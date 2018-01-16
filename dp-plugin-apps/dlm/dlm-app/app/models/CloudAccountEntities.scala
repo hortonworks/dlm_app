@@ -11,6 +11,7 @@ package models
 
 import java.io.Serializable
 
+import models.ADLSEntities.{ADLSAccountCredentials, ADLSAccountDetails}
 import models.CloudAccountEntities.Error._
 import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
 import models.CloudCredentialType._
@@ -58,6 +59,7 @@ object CloudAccountEntities {
   implicit val s3CloudAccountCredentialFmt = Json.format[S3AccountCredential]
   implicit val wasbAccountCredentialFmt = Json.format[WASBAccountCredential]
   implicit val wasbAccountCredentialSasFmt = Json.format[WASBAccountCredentialSAS]
+  implicit val adlsAccountCredentialsFmt = Json.format[ADLSAccountCredentials]
 
   implicit val cloudAccountCredentialsFmt: Format[CloudAccountCredentials] = new Format[CloudAccountCredentials] {
     def reads(json: JsValue): JsResult[CloudAccountCredentials] = {
@@ -65,6 +67,7 @@ object CloudAccountEntities {
         case S3_TOKEN  => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
         case WASB_TOKEN  => Json.fromJson[WASBAccountCredential](data)(Json.format[WASBAccountCredential])
         case WASB_SAS_TOKEN => Json.fromJson[WASBAccountCredentialSAS](data)(Json.format[WASBAccountCredentialSAS])
+        case ADLS_STS => Json.fromJson[ADLSAccountCredentials](data)(Json.format[ADLSAccountCredentials])
         case _      => JsError(s"Unknown credentialType '$name'")
       }
 
@@ -80,18 +83,21 @@ object CloudAccountEntities {
         case data: S3AccountCredential => Json.toJson(data)(s3CloudAccountCredentialFmt)
         case data: WASBAccountCredential => Json.toJson(data)(wasbAccountCredentialFmt)
         case data: WASBAccountCredentialSAS => Json.toJson(data)(wasbAccountCredentialSasFmt)
+        case data: ADLSAccountCredentials => Json.toJson(data)(adlsAccountCredentialsFmt)
       }
     }
   }
 
   implicit val s3AccountDetailsFmt = Json.format[S3AccountDetails]
   implicit val wasbAccountDetailsFmt = Json.format[WASBAccountDetails]
+  implicit val adlsAccountDetailsFmt = Json.format[ADLSAccountDetails]
 
   implicit val cloudAccountDetailsFmt: Format[CloudAccountDetails] = new Format[CloudAccountDetails] {
     def reads(json: JsValue): JsResult[CloudAccountDetails] = {
       def from(name: CloudAccountProvider, data: JsObject): JsResult[CloudAccountDetails] = name match {
         case CloudAccountProvider.S3  => Json.fromJson[S3AccountDetails](data)(s3AccountDetailsFmt)
         case CloudAccountProvider.WASB => Json.fromJson[WASBAccountDetails](data)(wasbAccountDetailsFmt)
+        case CloudAccountProvider.ADLS => Json.fromJson[ADLSAccountDetails](data)(adlsAccountDetailsFmt)
         case _      => JsError(s"Unknown provider '$name'")
       }
 
@@ -106,6 +112,7 @@ object CloudAccountEntities {
       cloudAccountDetails match {
         case data: S3AccountDetails => Json.toJson(data)(s3AccountDetailsFmt)
         case data: WASBAccountDetails => Json.toJson(data)(wasbAccountDetailsFmt)
+        case data: ADLSAccountDetails => Json.toJson(data)(adlsAccountDetailsFmt)
       }
     }
   }

@@ -31,6 +31,7 @@ object CloudCredentialType extends Enumeration {
   val WASB_TOKEN = Value("WASB_TOKEN")
   val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
   val S3_TOKEN = Value("S3_TOKEN")
+  val ADLS_STS = Value("ADLS_STS")
 }
 
 /**
