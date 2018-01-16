@@ -237,7 +237,7 @@ class DatasetRepo @Inject()(
     getRichDataset(query, paginatedQuery, searchText)
   }
 
-  def insertWithCategories(dsNtags: DatasetAndTags): Future[DatasetAndCategories] = {
+  def insertWithCategories(dsNtags: DatasetAndTags): Future[RichDataset] = {
     val tags = dsNtags.tags
     val query = (for {
       existingCategories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
@@ -248,11 +248,13 @@ class DatasetRepo @Inject()(
       savedDataset <- doSafeInsert(dsNtags.dataset)
       categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
-    } yield (DatasetAndCategories(savedDataset, categories))).transactionally
-    db.run(query)
+    } yield (savedDataset)).transactionally
+    db.run(query).flatMap{
+      case sDset => getRichDataset(Datasets.filter(_.id === sDset.id.get), None, None).map(_.head)
+    }
   }
 
-  def updateWithCategories(dsNtags: DatasetAndTags): Future[DatasetAndCategories] = {
+  def updateWithCategories(dsNtags: DatasetAndTags): Future[RichDataset] = {
     val tags = dsNtags.tags
     val query = (for {
       _ <- Datasets.filter(_.id === dsNtags.dataset.id).update(dsNtags.dataset)
@@ -265,8 +267,10 @@ class DatasetRepo @Inject()(
       savedDataset <- Datasets.filter(_.id === dsNtags.dataset.id).result.head
       categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
-    } yield (DatasetAndCategories(savedDataset, categories))).transactionally
-    db.run(query)
+    } yield (savedDataset)).transactionally
+    db.run(query).flatMap{
+      case sDset => getRichDataset(Datasets.filter(_.id === sDset.id.get), None, None).map(_.head)
+    }
   }
 
   def updateDatset(datasetId: Long, dataset: Dataset) = {

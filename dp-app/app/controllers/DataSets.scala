@@ -65,12 +65,10 @@ class DataSets @Inject()(
         dataSetService
           .create(dSetNTags.copy(
             dataset = dSetNTags.dataset.copy(createdBy = request.user.id)))
-          .map {
-            case Left(errors) =>
-              InternalServerError(Json.toJson(errors))
-            case Right(dataSetNCategories) =>
-              Ok(Json.toJson(dataSetNCategories))
-          }
+          .map(rDataset => Ok(Json.toJson(rDataset)))
+          .recoverWith({
+            case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+          })
       }
       .getOrElse(Future.successful(BadRequest))
   }
@@ -83,12 +81,10 @@ class DataSets @Inject()(
         dataSetService
           .update(dSetNTags.copy(
             dataset = dSetNTags.dataset.copy(lastModified = LocalDateTime.now())))
-          .map {
-            case Left(errors) =>
-              InternalServerError(Json.toJson(errors))
-            case Right(dataSetNCategories) =>
-              Ok(Json.toJson(dataSetNCategories))
-          }
+          .map(rDataset => Ok(Json.toJson(rDataset)))
+          .recoverWith({
+            case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+          })
       }
       .getOrElse(Future.successful(BadRequest))
   }

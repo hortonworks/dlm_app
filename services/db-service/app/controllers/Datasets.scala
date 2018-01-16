@@ -123,7 +123,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       .validate[DatasetAndTags]
       .map { cl =>
         val created = datasetRepo.insertWithCategories(cl)
-        created.map(c => success(linkData(c, makeLink(c.dataset))))
+        created.map(c => success(linkData(c)))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
@@ -163,8 +163,8 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     req.body
       .validate[DatasetAndTags]
       .map { cl =>
-        val created = datasetRepo.updateWithCategories(cl)
-        created.map(c => success(linkData(c, makeLink(c.dataset))))
+        val updated = datasetRepo.updateWithCategories(cl)
+        updated.map(c => success(linkData(c)))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))

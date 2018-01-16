@@ -24,26 +24,21 @@ import {
   templateUrl: "./ds-assets-holder.component.html"
 })
 
-export class DsAssetsHolder implements OnInit {
+export class DsAssetsHolder {
 
   @Input() assetSetQueryModelsForAddition: AssetSetQueryModel[] = null;
   @Input() assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = null;
   @Input() dsModel: RichDatasetModel = null;
   applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.REMOVE, AssetListActionsEnum.ADD];
   showPopup: boolean = false;
-  showList: boolean = false;
-
+  
   @Output('onNext') nextEE: EventEmitter<void> = new EventEmitter<void>();
   @Output('onCancel') cancelEE: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private richDatasetService: RichDatasetService){}
 
-  ngOnInit() {
-    this.setShowListFlag();
-  }
-
-  setShowListFlag() {
-    this.showList = (this.assetSetQueryModelsForAddition.length > 0);
+  get showList() {
+    return (this.assetSetQueryModelsForAddition.length > 0);
   }
 
   actionDone(asqm: AssetSetQueryModel) {
@@ -53,7 +48,6 @@ export class DsAssetsHolder implements OnInit {
         this.dsModel = rData;
         // this.assetSetQueryModelsForAddition.push(asqm);
         this.showPopup = false;
-        this.setShowListFlag();
       })
   }
 
@@ -74,7 +68,6 @@ export class DsAssetsHolder implements OnInit {
         this.dsModel = rData;
         // this.assetSetQueryModelsForAddition.splice(0);
         // this.dsModel.counts=null;
-        this.setShowListFlag();
       })
   }
 
