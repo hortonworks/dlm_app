@@ -60,10 +60,11 @@ export class RichDatasetService {
       .catch(HttpUtil.handleError);
   }
 
-  saveDataset(dSetAndTags: DataSetAndTags) : Observable<DataSetAndCategories> {
+  saveDataset(dSetAndTags: DataSetAndTags) : Observable<RichDatasetModel> {
     return this.http[(dSetAndTags.dataset.id)?'put':'post']
       ("/api/datasets", dSetAndTags, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
+      .map(this.extractRichDataModel)
       .catch(HttpUtil.handleError);
   }
   addAssets(dSetId: number, clusterId: number, asqms: AssetSetQueryModel[], exceptions: string[] = []) : Observable<RichDatasetModel> {

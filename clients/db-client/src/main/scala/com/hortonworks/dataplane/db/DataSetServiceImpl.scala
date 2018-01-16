@@ -43,14 +43,24 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSets)
   }
 
-  override def create(dataSetAndTags: DatasetAndTags): Future[Either[Errors, DatasetAndCategories]] = {
+  override def create(dataSetAndTags: DatasetAndTags): Future[RichDataset] = {
     ws.url(s"$url/datasets")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
       .post(Json.toJson(dataSetAndTags))
-      .map(mapToDataSetAndCategories)
+      .map(mapToRichDataset1)
+  }
+
+  override def update(dataSetAndTags: DatasetAndTags): Future[RichDataset] = {
+    ws.url(s"$url/datasets")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .put(Json.toJson(dataSetAndTags))
+      .map(mapToRichDataset1)
   }
 
   def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]] = {
@@ -108,16 +118,6 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/datasets/$datasetId")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToDataSetAndCategories)
-  }
-
-  override def update(dataSetAndTags: DatasetAndTags): Future[Either[Errors, DatasetAndCategories]] = {
-    ws.url(s"$url/datasets")
-      .withHeaders(
-        "Content-Type" -> "application/json",
-        "Accept" -> "application/json"
-      )
-      .put(Json.toJson(dataSetAndTags))
       .map(mapToDataSetAndCategories)
   }
 
