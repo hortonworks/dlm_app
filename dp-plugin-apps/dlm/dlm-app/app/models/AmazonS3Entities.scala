@@ -16,6 +16,7 @@ import java.io.Serializable
 import models.AmazonS3Entities.Error._
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
 import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudCredentialType.CloudCredentialType
 import models.CloudResponseEntities.{FileListItem, FileListResponse}
 import play.api.libs.json.{JsValue, Json}
 
@@ -25,7 +26,7 @@ object AmazonS3Entities {
     final case class AmazonS3Error(message: String) extends Error
   }
   @SerialVersionUID(124)
-  case class S3AccountDetails(provider: String, accountName: String, userName: String) extends Serializable with CloudAccountDetails {
+  case class S3AccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String, userName: String) extends Serializable with CloudAccountDetails {
     override def getAccountId: String = s"${accountName}_$userName"
   }
   @SerialVersionUID(123)

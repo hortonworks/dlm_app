@@ -20,6 +20,7 @@ import models.AmazonS3Entities.Error.AmazonS3Error
 import models.CloudAccountEntities.Error.GenericError
 import com.google.inject.{Inject, Singleton}
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
+import models.{CloudAccountProvider, CloudCredentialType}
 import models.CloudResponseEntities.{FileListItem, FileListResponse, MountPointDefinition, MountPointsResponse}
 
 import collection.JavaConverters._
@@ -61,7 +62,8 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
       val userNameIndex= arn.indexOf(AmazonS3Service.arnUserNameLabel) + AmazonS3Service.arnUserNameLabel.length
       val userName = arn.substring(userNameIndex)
       val accountId = callerIdentityResult.getAccount
-      Future.successful(Right(S3AccountDetails(callerIdentityResult.getAccount, accountId, userName)))
+      Future.successful(Right(S3AccountDetails(CloudAccountProvider.S3.toString, Some(CloudCredentialType.S3_TOKEN),
+        accountId, userName)))
     } catch {
       case ex : AmazonClientException =>
         logger.error(ex.getMessage)

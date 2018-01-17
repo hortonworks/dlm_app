@@ -10,6 +10,7 @@
 package models
 
 import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudCredentialType.CloudCredentialType
 import play.api.libs.json._
 
 /**
@@ -35,6 +36,11 @@ object CloudCredentialType extends Enumeration {
   val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
   val S3_TOKEN = Value("S3_TOKEN")
   val ADLS_STS = Value("ADLS_STS")
+
+  implicit val cloudCredentialTypeFormat = new Format[CloudCredentialType] {
+    def reads(json: JsValue) = JsSuccess(CloudCredentialType.withName(json.as[String]))
+    def writes(myEnum: CloudCredentialType) = JsString(myEnum.toString)
+  }
 }
 
 /**

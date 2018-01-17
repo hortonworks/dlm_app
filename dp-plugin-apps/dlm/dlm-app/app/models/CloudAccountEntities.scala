@@ -42,6 +42,7 @@ object CloudAccountEntities {
     */
   trait CloudAccountDetails {
     def provider: String
+    def credentialType: Option[CloudCredentialType]
     def accountName: String
     def getAccountId(): String
   }

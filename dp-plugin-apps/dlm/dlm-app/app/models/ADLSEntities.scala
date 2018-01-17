@@ -11,12 +11,13 @@ package models
 
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
 import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudCredentialType.CloudCredentialType
 import models.CloudResponseEntities.{FileListItem, FileListResponse}
 import play.api.libs.json.Json
 
 object ADLSEntities {
   @SerialVersionUID(141)
-  case class ADLSAccountDetails(provider: String, accountName: String) extends Serializable with CloudAccountDetails {
+  case class ADLSAccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String) extends Serializable with CloudAccountDetails {
     override def getAccountId(): String = accountName
   }
   @SerialVersionUID(142)

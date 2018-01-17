@@ -15,10 +15,13 @@ import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.hortonworks.dataplane.commons.service.api.{CredentialManager, KeystoreReloadEvent}
 import com.google.inject.{Inject, Singleton}
 import com.typesafe.scalalogging.Logger
+import models.ADLSEntities.ADLSAccountDetails
+import models.AmazonS3Entities.S3AccountDetails
 import models.CloudAccountEntities.Error._
 import models.CloudAccountEntities.{CloudAccountWithCredentials, CloudAccountsBody, CloudAccountsItem}
-import models.CloudAccountProvider
+import models.{CloudAccountProvider, CloudCredentialType}
 import models.CloudAccountProvider.CloudAccountProvider
+import models.WASBEntities.WASBAccountDetails
 import play.api.cache._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -57,7 +60,27 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
   def getAllCloudAccountNames : Future[Either[CredentialNotFoundInKeystoreError, CloudAccountsBody]] = {
     cloudAccountsCache.get(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
-        Right(CloudAccountsBody(cloudAccounts.map(x => CloudAccountsItem(x.id.get, x.accountDetails))))
+        Right(CloudAccountsBody(cloudAccounts.map(cloudAccount => {
+
+          val accountDetails = cloudAccount.accountDetails.credentialType match {
+            case Some(credentialType) => cloudAccount.accountDetails
+            case None =>
+              val credentials = cloudAccount.accountCredentials
+               CloudAccountProvider.withName(cloudAccount.accountDetails.provider) match {
+              case CloudAccountProvider.S3 =>
+                val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
+                S3AccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)), accountDetails.accountName, accountDetails.userName)
+              case CloudAccountProvider.WASB =>
+                val accountDetails = cloudAccount.accountDetails
+                WASBAccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)), accountDetails.accountName)
+              case CloudAccountProvider.ADLS =>
+                val accountDetails = cloudAccount.accountDetails
+                ADLSAccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)), accountDetails.accountName)
+            }
+          }
+          CloudAccountsItem(cloudAccount.id.get, accountDetails)
+        }
+        )))
       case Left(error) => Right(CloudAccountsBody(List()))
     }
   }

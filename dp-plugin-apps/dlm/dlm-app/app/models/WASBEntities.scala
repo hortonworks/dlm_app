@@ -14,6 +14,7 @@ import java.io.Serializable
 import models.WASBEntities.Error._
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
 import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudCredentialType.CloudCredentialType
 import models.CloudResponseEntities.{FileListItem, FileListResponse}
 import play.api.libs.json.Json
 
@@ -24,7 +25,7 @@ object WASBEntities {
   }
 
   @SerialVersionUID(131)
-  case class WASBAccountDetails(provider: String, accountName: String) extends Serializable with CloudAccountDetails {
+  case class WASBAccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String) extends Serializable with CloudAccountDetails {
     override def getAccountId(): String = accountName
   }
   @SerialVersionUID(132)
