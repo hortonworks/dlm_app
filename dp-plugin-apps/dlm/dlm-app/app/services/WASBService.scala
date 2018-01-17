@@ -10,12 +10,12 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-import com.microsoft.azure.storage.{CloudStorageAccount, StorageCredentials, StorageCredentialsSharedAccessSignature}
+import com.microsoft.azure.storage.{CloudStorageAccount, StorageCredentialsSharedAccessSignature}
 import com.microsoft.azure.storage.blob._
-import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails, CloudAccountWithCredentials}
+import models.CloudAccountEntities.CloudAccountWithCredentials
 import models.CloudAccountEntities.Error._
-import models.CloudResponseEntities.{FileListItem, FileListResponse, MountPointDefinition, MountPointsResponse}
-import models.{CloudAccountProvider, CloudCredentialType}
+import models.CloudResponseEntities.{FileListResponse, MountPointDefinition, MountPointsResponse}
+import models.CloudCredentialType
 import models.WASBEntities._
 
 import scala.collection.JavaConverters._
@@ -83,16 +83,16 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
         try {
           val container: CloudBlobContainer = client.getContainerReference(containerName)
           if (!container.exists()) {
-            Left(GenericError(message = s"Container ${containerName} is not exist"))
+            Left(GenericError(message = s"Container $containerName does not exist"))
           } else {
-            var fileList: Seq[FileListItem] = Seq()
+            var fileList: Seq[BlobListItem] = Seq()
             for (blobItem: ListBlobItem <- container.listBlobs(path.substring(1)).asScala) {
               val file = blobItem match {
-                case dir: CloudBlobDirectory => FileListItem(
+                case dir: CloudBlobDirectory => BlobListItem(
                   getDirectoryName(dir.getPrefix),
                   "DIRECTORY",
                   None, None)
-                case blob: CloudBlob => FileListItem(
+                case blob: CloudBlob => BlobListItem(
                   getFileName(blob.getName),
                   "FILE",
                   Option(blob.getProperties.getLastModified.getTime),
@@ -100,7 +100,7 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
               }
               fileList = fileList :+ file
             }
-            Right(FileListResponse(fileList))
+            Right(BlobListResponse(fileList))
           }
         } catch {
           case e: Exception => Left(GenericError(e.getMessage))

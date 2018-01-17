@@ -10,8 +10,11 @@
 package models
 
 import java.io.Serializable
+
 import models.WASBEntities.Error._
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
+import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudResponseEntities.{FileListItem, FileListResponse}
 import play.api.libs.json.Json
 
 object WASBEntities {
@@ -28,6 +31,10 @@ object WASBEntities {
   case class WASBAccountCredential(credentialType: String, accessKey: String, protocol: String = "http") extends Serializable with CloudAccountCredentials
   @SerialVersionUID(133)
   case class WASBAccountCredentialSAS(credentialType: String, token: String) extends Serializable with CloudAccountCredentials
+
+  case class BlobListItem(pathSuffix: String, `type`: String, modificationTime: Option[Long], length: Option[Long]) extends FileListItem
+  case class BlobListResponse(fileList: Seq[BlobListItem], provider: CloudAccountProvider = CloudAccountProvider.WASB) extends FileListResponse
+
 
   implicit val wasbClientErrorWrites = Json.writes[WASBClientError]
   implicit val wasbClientErrorReads = Json.reads[WASBClientError]

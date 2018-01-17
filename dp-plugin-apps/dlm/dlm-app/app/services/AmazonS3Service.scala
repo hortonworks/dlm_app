@@ -15,7 +15,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import com.typesafe.scalalogging.Logger
-import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
+import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails, S3FileItem, S3FileListResponse}
 import models.AmazonS3Entities.Error.AmazonS3Error
 import models.CloudAccountEntities.Error.GenericError
 import com.google.inject.{Inject, Singleton}
@@ -60,7 +60,7 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
       val arn = callerIdentityResult.getArn
       val userNameIndex= arn.indexOf(AmazonS3Service.arnUserNameLabel) + AmazonS3Service.arnUserNameLabel.length
       val userName = arn.substring(userNameIndex)
-      val accountId = callerIdentityResult.getAccount.toLong
+      val accountId = callerIdentityResult.getAccount
       Future.successful(Right(S3AccountDetails(callerIdentityResult.getAccount, accountId, userName)))
     } catch {
       case ex : AmazonClientException =>
@@ -112,15 +112,15 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
       case Right(result) =>
         val amazonS3Client = createS3Client(result.accountCredentials.asInstanceOf[S3AccountCredential])
         try {
-          val bucketObjects = amazonS3Client.listObjects(bucketName, path.substring(1)).getObjectSummaries().asScala.toList.flatMap{
+          val bucketObjects = amazonS3Client.listObjects(bucketName, path.substring(1)).getObjectSummaries.asScala.toList.flatMap{
             case x if x.getKey.substring(path.substring(1).length).split("/").length == 1 => {
               val rest = x.getKey.substring(path.substring(1).length)
               if (rest == "") None else
-              Some(FileListItem(extractFileName(rest), extractFileType(rest), Option(x.getSize), Option(x.getLastModified().getTime())))
+              Some(S3FileItem(extractFileName(rest), extractFileType(rest), Option(x.getSize), Option(x.getLastModified.getTime)))
             }
             case _ => None
           }
-          Right(FileListResponse(bucketObjects))
+          Right(S3FileListResponse(bucketObjects))
         } catch {
           case ex : AmazonClientException =>
             logger.error(ex.getMessage)

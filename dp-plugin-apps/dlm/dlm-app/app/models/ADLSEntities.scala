@@ -10,6 +10,8 @@
 package models
 
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
+import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudResponseEntities.{FileListItem, FileListResponse}
 import play.api.libs.json.Json
 
 object ADLSEntities {
@@ -19,11 +21,9 @@ object ADLSEntities {
   }
   @SerialVersionUID(142)
   case class ADLSAccountCredentials(credentialType: String, clientId: String, authTokenEndpoint: String, clientSecret: String) extends Serializable with CloudAccountCredentials
-  case class ADLSFile(pathSuffix: String, accessTime: Long, modificationTime: Long, blockSize: Long,
-                      permission: String, length: Long, replication: Int, owner: String, group: String, `type`: String)
-  case class ADLSFilesResponse(fileList: Seq[ADLSFile])
 
-  implicit val adlsFileFmt = Json.format[ADLSFile]
-  implicit val adlsFilesResponseFmt = Json.format[ADLSFilesResponse]
+  case class ADLSFileItem(pathSuffix: String, accessTime: Long, modificationTime: Option[Long], blockSize: Long,
+                          permission: String, length: Option[Long], replication: Int, owner: String, group: String, `type`: String) extends FileListItem
+  case class ADLSFileListResponse(fileList: Seq[ADLSFileItem], provider: CloudAccountProvider = CloudAccountProvider.ADLS) extends FileListResponse
 }
 

@@ -68,12 +68,4 @@ class Cloud @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def listADLSFiles(cloudAccountId: String) = Action.async { request =>
-    val path: String = request.getQueryString("path").getOrElse("/")
-    adlsService.getFiles(cloudAccountId, path) map {
-      case Right(files) => Ok(Json.toJson(files))
-      case Left(err) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(err)}"))
-    }
-  }
-
 }

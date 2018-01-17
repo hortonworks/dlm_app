@@ -14,11 +14,10 @@ PUT      /api/store/credential                                        controller
 DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
 
 #Cloud
-GET      /api/cloud/account/:accountId/mountPoints/                       controllers.Cloud.listAllMountPoints(accountId: String)
-GET      /api/cloud/account/:accountId/mountPoint/:mountPoint/files       controllers.Cloud.listFiles(accountId: String, mountPoint: String)
+GET      /api/cloud/account/:accountId/mountpoints                       controllers.Cloud.listAllMountPoints(accountId: String)
+GET      /api/cloud/account/:accountId/mountpoint/:mountPoint/files       controllers.Cloud.listFiles(accountId: String, mountPoint: String)
 POST     /api/cloud/userIdentity                                          controllers.Cloud.getUserIdentity
 GET      /api/cloud/account/:cloudAccountId                               controllers.Cloud.checkUserIdentity(cloudAccountId: String)
-GET      /api/cloud/list/adls/:cloudAccountId/files                       controllers.Cloud.listADLSFiles(cloudAccountId: String)
 
 #Clusters
 GET     /api/clusters                                         controllers.Clusters.list

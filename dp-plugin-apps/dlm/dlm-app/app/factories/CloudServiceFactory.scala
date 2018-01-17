@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import models.CloudAccountEntities.Error.GenericError
 import models.CloudAccountProvider
 import models.CloudAccountProvider.CloudAccountProvider
-import services.{AmazonS3Service, CloudService, DlmKeyStore, WASBService}
+import services._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class CloudServiceFactory @Inject()(
   val dlmKeyStore: DlmKeyStore,
   val amazonS3Service: AmazonS3Service,
-  val wasbService: WASBService){
+  val wasbService: WASBService,
+  val adlsService: ADLSService){
 
   def build(accountId: String) : Future[Either[GenericError,CloudService]] = {
     getCloudProvider(accountId) map {
@@ -21,6 +22,7 @@ class CloudServiceFactory @Inject()(
         cloudType match {
           case CloudAccountProvider.S3 => Right(amazonS3Service)
           case CloudAccountProvider.WASB => Right(wasbService)
+          case CloudAccountProvider.ADLS => Right(adlsService)
         }
       case Left(error) => Left(error)
     }

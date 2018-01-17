@@ -38,10 +38,12 @@ object CloudAccountEntities {
 
   /**
     * Base trait for account details which contains user's info such as user name, account id etc.
+    * This information is exposed via DLM REST GET API
     */
   trait CloudAccountDetails {
-    def provider: String;
-    def getAccountId(): String;
+    def provider: String
+    def accountName: String
+    def getAccountId(): String
   }
   @SerialVersionUID(1234)
   case class CloudAccountWithCredentials(var id: Option[String] = None, accountCredentials: CloudAccountCredentials, accountDetails: CloudAccountDetails) extends Serializable {
@@ -49,7 +51,7 @@ object CloudAccountEntities {
       * Generate and set `id`. It's used to generate id before serialization and storing to credential store
       */
     def presetId: Unit = {
-      id = Option(s"${id.getOrElse(accountDetails.getAccountId())}_${accountDetails.provider}_${accountCredentials.credentialType}")
+      id = Option(s"${id.getOrElse(accountDetails.getAccountId())}_${accountCredentials.credentialType}")
     }
   }
   case class CloudAccountsItem(id: String, accountDetails: CloudAccountDetails)

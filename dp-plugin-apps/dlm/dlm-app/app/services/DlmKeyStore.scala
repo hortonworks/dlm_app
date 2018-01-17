@@ -94,7 +94,8 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
   def updateCloudAccount(cloudAccount: CloudAccountWithCredentials) : Future[Either[GenericError,Unit]] = {
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccountsWithCredentials) =>
-        val otherAccounts = cloudAccountsWithCredentials.filterNot(_.id.get.equals(cloudAccount.id.get))
+        val cloudAccountId = cloudAccount.accountDetails.getAccountId()
+        val otherAccounts = cloudAccountsWithCredentials.filterNot(_.id.get.equals(cloudAccountId))
         if (otherAccounts.lengthCompare(cloudAccountsWithCredentials.length) != 0) {
           saveCloudAccountsToKeyStore(otherAccounts :+ cloudAccount) match {
             case Success(v) => Right(Unit)

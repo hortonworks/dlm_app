@@ -12,9 +12,10 @@ package services
 import com.google.inject.{Inject, Singleton}
 import com.microsoft.azure.datalake.store.{ADLStoreClient, DirectoryEntry, DirectoryEntryType}
 import com.microsoft.azure.datalake.store.oauth2.{AccessTokenProvider, ClientCredsTokenProvider}
-import models.ADLSEntities.{ADLSAccountCredentials, ADLSAccountDetails, ADLSFile, ADLSFilesResponse}
+import models.ADLSEntities.{ADLSAccountCredentials, ADLSAccountDetails, ADLSFileItem, ADLSFileListResponse}
 import models.CloudAccountEntities.Error.GenericError
-import models.CloudCredentialType
+import models.{CloudAccountProvider, CloudCredentialType}
+import models.CloudResponseEntities.{FileListResponse, MountPointDefinition, MountPointsResponse}
 
 import scala.concurrent.Future
 import scala.collection.JavaConverters._
@@ -25,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Note: There is no standard way to check user identity
   */
 @Singleton()
-class ADLSService @Inject()(val dlmKeyStore: DlmKeyStore) {
+class ADLSService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
   private def getAccountFqdn(accountName: String): String = {
     s"$accountName.azuredatalakestore.net"
   }
@@ -46,26 +47,26 @@ class ADLSService @Inject()(val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def getFiles(accountId: String, path: String): Future[Either[GenericError, ADLSFilesResponse]] = {
+  def listFiles(accountId: String, containerName: String, path: String): Future[Either[GenericError, FileListResponse]] = {
     getClient(accountId) map {
       case Right(client) => {
         try {
-          var files: Seq[ADLSFile] = Seq()
+          var files: Seq[ADLSFileItem] = Seq()
           for (file: DirectoryEntry <- client.enumerateDirectory(path).asScala) {
-            files = files :+ ADLSFile(
+            files = files :+ ADLSFileItem(
               file.name,
               file.lastAccessTime.getTime,
-              file.lastModifiedTime.getTime,
+              Some(file.lastModifiedTime.getTime),
               file.blocksize,
               file.permission,
-              file.length,
+              Some(file.length),
               file.replicationFactor,
               file.user,
               file.group,
               if (file.`type` == DirectoryEntryType.FILE) "FILE" else "DIRECTORY"
             )
           }
-          Right(ADLSFilesResponse(files))
+          Right(ADLSFileListResponse(files))
         } catch {
           case e: Exception => Left(GenericError(e.getMessage))
         }
@@ -73,4 +74,28 @@ class ADLSService @Inject()(val dlmKeyStore: DlmKeyStore) {
       case Left(err) => Left(err)
     }
   }
+
+
+  /**
+    * Lists "DEFAULT" as the single mountpoint for ADLS
+    * Note that ADLS does not have a native notion of Container/Bucket. This is to keep consistency with S3/WASB APIs
+    * @param accountId
+    * @return
+    */
+  override def listMountPoints(accountId: String): Future[Either[GenericError, MountPointsResponse]] = {
+    Future.successful(Right(MountPointsResponse(List(MountPointDefinition(ADLSService.deafultMountPoint)))))
+  }
+
+  // todo: need to check another way to check identity since if credential isn't valid azure-sdk
+  // will throw error only after timeout
+  override def checkUserIdentityValid(accountId: String): Future[Either[GenericError, Unit]] = {
+    listFiles(accountId, ADLSService.deafultMountPoint, "/") map {
+      case Left(err) =>  Left(err)
+      case _ => Right(())
+    }
+  }
+}
+
+object ADLSService {
+  val deafultMountPoint = "DEFAULT"
 }

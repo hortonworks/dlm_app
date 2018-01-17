@@ -9,6 +9,9 @@
 
 package models
 
+import models.CloudAccountProvider.CloudAccountProvider
+import play.api.libs.json._
+
 /**
   * Cloud types that are supported for cloud replication
   */
@@ -43,4 +46,9 @@ object CloudAccountProvider extends Enumeration {
   val WASB = Value("WASB")
   val S3 = Value("S3")
   val ADLS = Value("ADLS")
+
+  implicit val cloudAccountProviderFormat = new Format[CloudAccountProvider] {
+    def reads(json: JsValue) = JsSuccess(CloudAccountProvider.withName(json.as[String]))
+    def writes(myEnum: CloudAccountProvider) = JsString(myEnum.toString)
+  }
 }
