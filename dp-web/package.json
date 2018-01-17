@@ -34,6 +34,7 @@
     "@ngui/auto-complete": "^0.13.2",
     "@ngx-translate/core": "^6.0.1",
     "@ngx-translate/http-loader": "0.0.3",
+    "angular-star-rating": "^3.0.8",
     "core-js": "^2.4.1",
     "d3": "~3.5.3",
     "d3-tip": "^0.7.1",

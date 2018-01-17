@@ -84,22 +84,22 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDataset1)
   }
 
-  def listRichDataset(queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets?$queryString")
+  def listRichDataset(queryString: String, userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)
   }
 
-  def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]] = {
-    ws.url(s"$url/richdatasets/$id")
+  def getRichDatasetById(id: Long,userId:Long): Future[Either[Errors, RichDataset]] = {
+    ws.url(s"$url/richdatasets/$id?userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDataset)
   }
 
-  def listRichDatasetByTag(tagName: String, queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets/tags/$tagName?$queryString")
+  def listRichDatasetByTag(tagName: String, queryString: String,userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets/tags/$tagName?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)
@@ -121,6 +121,16 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
+  override def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset] = {
+    ws.url(s"$url/datasets/$datasetId")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .patch(Json.toJson(dataset))
+      .map(mapDataSet)
+  }
+
   override def delete(datasetId: String): Future[Either[Errors, Long]] = {
     ws.url(s"$url/datasets/$datasetId")
       .withHeaders("Accept" -> "application/json")
@@ -132,6 +142,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => extractEntity[Seq[Dataset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[Dataset].get })
       case _ => mapErrors(res)
+    }
+  }
+
+  private def mapDataSet(res: WSResponse) = {
+    res.status match {
+      case 200 => (res.json \ "results").validate[Dataset].get
+      case _ => mapResponseToError(res)
     }
   }
 

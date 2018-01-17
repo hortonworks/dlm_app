@@ -17,6 +17,8 @@ import {RedirectUrlComponent} from './redirect-url/redirect-url.component';
 import { LdapConfigCommonComponent } from './ldap-config-common/ldap-config-common.component';
 import {TranslateModule} from "@ngx-translate/core";
 import {RouterModule} from "@angular/router";
+import { CommentsComponent } from './comments/comments.component';
+import {StarRatingModule} from "angular-star-rating";
 
 @NgModule({
   imports:  [
@@ -24,8 +26,9 @@ import {RouterModule} from "@angular/router";
     TranslateModule,
     FormsModule,
     RouterModule,
+    StarRatingModule.forRoot()
   ],
-  declarations: [DpTableDirective, RedirectUrlComponent, LdapConfigCommonComponent],
+  declarations: [DpTableDirective, RedirectUrlComponent, LdapConfigCommonComponent, CommentsComponent],
   exports:  [
     CommonModule,
     FormsModule,

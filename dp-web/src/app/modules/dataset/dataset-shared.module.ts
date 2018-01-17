@@ -53,6 +53,8 @@ import {RangerService} from '../../services/ranger.service';
 import { AuditVisualizationComponent } from './views/asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
 import { AssetTagPolicyViewComponent } from './views/asset-view/asset-policy-view/asset-tag-policy-view/asset-tag-policy-view.component';
 import { AssetResourcePolicyViewComponent } from './views/asset-view/asset-policy-view/asset-resource-policy-view/asset-resource-policy-view.component';
+import {RouterModule} from "@angular/router";
+import {routes} from "./dataset.routes";
 
 @NgModule({
   declarations: [
@@ -95,6 +97,7 @@ import { AssetResourcePolicyViewComponent } from './views/asset-view/asset-polic
     DropdownModule,
     TabsModule,
     LineageModule,
+    RouterModule.forChild(routes),
     MyDateRangePickerModule,
   ],
   exports: [

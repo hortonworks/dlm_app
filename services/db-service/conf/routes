@@ -154,6 +154,7 @@ POST          /datasetswithassets                                            con
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
+PATCH         /datasets/:datasetId                                           controllers.Datasets.updateDatset(datasetId:String)
 
 #RichDataset
 GET           /richdatasets                                                  controllers.Datasets.allRichDataset
@@ -211,3 +212,9 @@ PUT          /ldapconfig                                                    cont
 # blacklisted tokens
 GET          /blacklisted-tokens                                            controllers.BlacklistedTokens.findByToken(token: String)
 POST         /blacklisted-tokens                                            controllers.BlacklistedTokens.insert
+
+#comments api
+POST        /comments                                                       controllers.Comments.addComment
+GET         /comments                                                       controllers.Comments.getCommentByObjectRef
+DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
+PATCH       /comments/:id                                                   controllers.Comments.update(id: String)

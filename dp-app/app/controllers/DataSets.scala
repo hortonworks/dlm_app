@@ -22,13 +22,14 @@ import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
 import com.hortonworks.dataplane.db.Webservice._
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, __}
 import services.UtilityService
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataAssetService, DataSetCategoryService, DataSetService}
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonResponses
 import play.api.mvc.{Action, Controller}
+import play.api.libs.functional.syntax._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -43,7 +44,7 @@ class DataSets @Inject()(
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
     val utilityService: UtilityService)
-    extends Controller {
+    extends Controller with JsonAPI {
 
   def list(name: Option[String]) =  Action.async {
     Logger.info("Received list dataSet request")
@@ -127,7 +128,7 @@ class DataSets @Inject()(
           case 0 =>
             Logger.info("Effectively no asset to add.")
             dataSetService
-              .getRichDatasetById(params.datasetId)
+              .getRichDatasetById(params.datasetId,req.user.id.get)
               .map {
                 case Left(errors) => InternalServerError(Json.toJson(errors))
                 case Right(richDataset) => Ok(Json.toJson(richDataset))
@@ -213,9 +214,10 @@ class DataSets @Inject()(
         .getOrElse(Future.successful(BadRequest))
   }
 
+
   def getRichDataset = AuthenticatedAction.async { req =>
     dataSetService
-      .listRichDataset(req.rawQueryString)
+      .listRichDataset(req.rawQueryString,req.user.id.get)
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
@@ -224,10 +226,11 @@ class DataSets @Inject()(
   }
 
   def getRichDatasetByTag(tagName: String) = AuthenticatedAction.async { req =>
+    val loggedinUserId = req.user.id.get
     val future =
       if (tagName.equalsIgnoreCase("all"))
-        dataSetService.listRichDataset(req.rawQueryString)
-      else dataSetService.listRichDatasetByTag(tagName, req.rawQueryString)
+        dataSetService.listRichDataset(req.rawQueryString,loggedinUserId)
+      else dataSetService.listRichDatasetByTag(tagName, req.rawQueryString, loggedinUserId)
 
     future.map {
       case Left(errors) =>
@@ -236,18 +239,22 @@ class DataSets @Inject()(
     }
   }
 
-  def getRichDatasetById(datasetId: String) =  Action.async {
+  def getRichDatasetById(id: String) =  AuthenticatedAction.async { req =>
     Logger.info("Received retrieve dataSet request")
-    dataSetService
-      .getRichDatasetById(datasetId.toLong)
-      .map {
-        case Left(errors)
+    if(Try(id.toLong).isFailure){
+      Future.successful(BadRequest)
+    }else{
+      dataSetService
+        .getRichDatasetById(id.toLong,req.user.id.get)
+        .map {
+          case Left(errors)
             if errors.errors.size > 0 && errors.errors.head.code == "404" =>
             NotFound
           case Left(errors) =>
             InternalServerError(Json.toJson(errors))
           case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
         }
+    }
   }
 
   def getDataAssetsByDatasetId(datasetId: String,
@@ -277,11 +284,30 @@ class DataSets @Inject()(
       }
   }
 
+  def updateDataset(datasetId : String) = AuthenticatedAction.async(parse.json) { request =>
+    Logger.info("Received update dataSet shredStatus request")
+    request.body
+      .validate[Dataset]
+      .map { dataset =>
+        val loggedinUser = request.user.id.get
+        if(loggedinUser != dataset.createdBy) Future.successful(Unauthorized("this user is not authorized to perform this action"))
+        else{
+          dataSetService
+            .updateDataset(datasetId, dataset)
+            .map { dataset =>
+              Ok(Json.toJson(dataset))
+            }
+            .recover(apiError)
+        }
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
   def delete(dataSetId: String) =  AuthenticatedAction.async { request =>
     implicit val token = request.token
     Logger.info("Received delete dataSet request")
     (for {
-      dataset <- doGetDataset(dataSetId)
+      dataset <- doGetDataset(dataSetId,request.user.id.get)
       clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toString)
       deleted <- doDeleteDataset(dataset.id.get.toString)
       jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
@@ -413,9 +439,9 @@ class DataSets @Inject()(
       }
   }
 
-  private def doGetDataset(datasetId: String): Future[Dataset] = {
+  private def doGetDataset(datasetId: String,userId: Long): Future[Dataset] = {
     dataSetService
-      .getRichDatasetById(datasetId.toLong)
+      .getRichDatasetById(datasetId.toLong,userId)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
         case Right(dataset) => Future.successful(dataset.dataset)
