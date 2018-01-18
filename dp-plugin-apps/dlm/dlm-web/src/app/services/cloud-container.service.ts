@@ -25,23 +25,25 @@ export class CloudContainerService {
     return Observable.forkJoin(requests).map(response => {
       return flatten(response.map((r, index) => {
         const provider = accounts[index].accountDetails.provider;
-        return (r.items || r).map(c => ({...c, provider, id: c.id || `${provider}_${c.name}`, accountId: accounts[index].id}));
+        return (r.items || r).map(c => ({
+          ...c,
+          provider,
+          id: c.id || `${provider}_${c.name}`,
+          accountId: accounts[index].id
+        }));
       }));
     });
   }
 
   fetchContainersForAccount(account: CloudAccount): Observable<any> {
-    const containers = account.accountDetails.provider === 'S3' ? 'buckets' : 'containers';
-    return this.httpClient.get<any>(`cloud/list/${containers}/${account.id}`);
+    return this.httpClient.get<any>(`cloud/account/${account.id}/mountpoints`);
   }
 
   fetchContainerDir(container: CloudContainer, path = '/'): Observable<any> {
-    const containers = container.provider === 'S3' ? 'bucket' : 'container';
-    const objects = container.provider === 'S3' ? 'objects' : 'blobs';
     if (!path.endsWith('/')) {
       path = `${path}/`;
     }
-    return this.httpClient.get<any>(`cloud/list/${objects}/${container.accountId}/${containers}/${container.name}/files?path=${path}`);
+    return this.httpClient.get<any>(`cloud/account/${container.accountId}/mountpoint/${container.name}/files/`, {params: {path}});
   }
 
 }

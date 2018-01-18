@@ -36,7 +36,10 @@ export const initialState: State = {
 export function reducer(state = initialState, action): State {
   switch (action.type) {
     case fromCloudContainer.ActionTypes.LOAD_CONTAINERS.SUCCESS: {
-      const containers = action.payload.response;
+      const containers = action.payload.response.map(c => {
+        c.id = `${c.name}_${c.accountId}`;
+        return c;
+      });
       const containersMap: any = groupByKey(containers, 'provider');
       return {
         WASB: {
