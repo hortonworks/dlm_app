@@ -23,9 +23,10 @@ export class AuthInterceptor implements HttpInterceptor {
     return (response: Response) => {
       if (response.status === 401) {
         const challengeAt = response.headers.get(UserService.HEADER_CHALLENGE_HREF);
-        const redirectTo = `${window.location.protocol}//${window.location.host}/${challengeAt}`;
+        const dpEndpoint = `${window.location.protocol}//${window.location.host}/`;
+        const redirectTo = `${dpEndpoint}${challengeAt}`;
         if (window.location.href.startsWith(redirectTo) === false) {
-          window.location.href = `${redirectTo}?originalUrl=${window.location.href}`;
+          window.location.href = `${redirectTo}?originalUrl=${dpEndpoint}`;
         }
       } else if (response.status === 403) {
         window.location.href = this.unauthorizedRedirect;
