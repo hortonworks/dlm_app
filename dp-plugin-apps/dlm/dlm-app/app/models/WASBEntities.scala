@@ -29,7 +29,7 @@ object WASBEntities {
     override def getAccountId(): String = accountName
   }
   @SerialVersionUID(132)
-  case class WASBAccountCredential(credentialType: String, accessKey: String, protocol: String = "http") extends Serializable with CloudAccountCredentials
+  case class WASBAccountCredential(credentialType: String, accessKey: String) extends Serializable with CloudAccountCredentials
   @SerialVersionUID(133)
   case class WASBAccountCredentialSAS(credentialType: String, token: String) extends Serializable with CloudAccountCredentials
 

@@ -42,7 +42,7 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
     CloudCredentialType.withName(cloudAccount.accountCredentials.credentialType) match {
       case CloudCredentialType.WASB_TOKEN =>
         val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredential]
-        CloudStorageAccount.parse(s"DefaultEndpointsProtocol=${credential.protocol};" +
+        CloudStorageAccount.parse(s"DefaultEndpointsProtocol=https;" +
           s"AccountName=${accountDetails.accountName};" +
           s"AccountKey=${credential.accessKey}")
       case CloudCredentialType.WASB_SAS_TOKEN =>
