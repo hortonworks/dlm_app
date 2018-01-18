@@ -141,7 +141,10 @@ export class DlmComponent implements OnDestroy, OnInit {
         reloadTimeOut = setTimeout(() => location.reload(), RELOAD_TIME);
       });
     const clustersRequestSubscription = this.asyncActions.dispatch(loadClusters())
-      .subscribe(_ => this.initPolling());
+      .subscribe(_ => {
+        this.store.dispatch(loadClustersStatuses());
+        this.initPolling();
+      });
     this.subscriptions.push(clustersRequestSubscription);
     this.subscriptions.push(pathChange$);
   }

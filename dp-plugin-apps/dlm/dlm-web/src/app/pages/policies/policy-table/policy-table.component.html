@@ -24,47 +24,47 @@
   (nameClick)="toggleRowDetail($event, policyContent.Files)">
 </dlm-policy-info>
 
-<ng-template #durationCell let-seconds="value" let-policy="row">
-  <dlm-duration-column [duration]="seconds" [attr.qe-attr]="'policy-duration-' + policy.$$index"></dlm-duration-column>
+<ng-template #durationCell let-seconds="value" let-policy="row" let-index="rowIndex">
+  <dlm-duration-column [duration]="seconds" [attr.qe-attr]="'policy-duration-' + index"></dlm-duration-column>
 </ng-template>
 
-<ng-template #verbStatusCellTemplate let-value="value" let-policy="row">
+<ng-template #verbStatusCellTemplate let-value="value" let-index="rowIndex" let-policy="row">
   <dlm-policy-status-column
     class="inline-block"
     [showText]="false"
     [status]="policy.uiStatus">
   </dlm-policy-status-column>
-  <span [attr.qe-attr]="'policy-status-' + policy.$$index" class="policy-status">{{value | translate}}</span>
+  <span [attr.qe-attr]="'policy-status-' + index" class="policy-status">{{value | translate}}</span>
 </ng-template>
 
 <ng-template #flowStatusCell let-mode="value">
   <dlm-flow-status [mode]="mode"></dlm-flow-status>
 </ng-template>
 
-<ng-template #clusterCellTemplate let-value="value" let-policy="row">
-  <div class="cluster-name" [attr.qe-attr]="'cluster-name-' + policy.$$index">{{value.name}}</div>
-  <div class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + policy.$$index">{{value.dataCenter}}</div>
+<ng-template #clusterCellTemplate let-value="value" let-policy="row" let-index="rowIndex">
+  <div class="cluster-name" [attr.qe-attr]="'cluster-name-' + index">{{value.name}}</div>
+  <div class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + index">{{value.dataCenter}}</div>
 </ng-template>
 
 <ng-template #iconCellTemplate>
   <span class="fa fa-arrow-right" aria-hidden="true"></span>
 </ng-template>
 
-<ng-template #prevJobs let-row="row">
-  <span class="actionable" [attr.qe-attr]="'policy-jobs-' + row.$$index" (click)="toggleRowDetail(row, policyContent.Jobs)">
+<ng-template #prevJobs let-row="row" let-index="rowIndex">
+  <span class="actionable" [attr.qe-attr]="'policy-jobs-' + index" (click)="toggleRowDetail(row, policyContent.Jobs)">
     <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
     <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isPrevJobsActive(row), 'fa-caret-down': !isPrevJobsActive(row.id)}">
     </span>
   </span>
 </ng-template>
 
-<ng-template #lastGoodCell let-time="value" let-policy="row">
-  <span *ngIf="time; else noData" [attr.qe-attr]="'policy-last-good-' + policy.$$index"
+<ng-template #lastGoodCell let-time="value" let-policy="row" let-index="rowIndex">
+  <span *ngIf="time; else noData" [attr.qe-attr]="'policy-last-good-' + index"
         [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
     {{time | fmtTz | amTimeAgo}}
   </span>
   <ng-template #noData>
-    <span [attr.qe-attr]="'policy-last-good-' + policy.$$index">n/a</span>
+    <span [attr.qe-attr]="'policy-last-good-' + index">n/a</span>
   </ng-template>
 </ng-template>
 
@@ -100,13 +100,13 @@
   ></dlm-policy-details>
 </ng-template>
 
-<ng-template #pathCell let-row="row" let-value="value">
-  <span [tooltip]="value" [attr.qe-attr]="'policy-path-' + row.$$index">{{value}}</span>
+<ng-template #pathCell let-row="row" let-value="value" let-index="rowIndex">
+  <span [tooltip]="value" [attr.qe-attr]="'policy-path-' + index">{{value}}</span>
 </ng-template>
 
-<ng-template #actionsCell let-row="row">
+<ng-template #actionsCell let-row="row" let-index="rowIndex">
   <dlm-policy-actions
-    [attr.qe-attr]="'policy-actions-' + row.$$index"
+    [attr.qe-attr]="'policy-actions-' + index"
     [rowId]="row.id"
     [policy]="row"
     [policyActions]="rowActions"
