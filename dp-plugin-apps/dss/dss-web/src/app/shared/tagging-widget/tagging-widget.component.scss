@@ -1,0 +1,101 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import "../../../styles/variables";
+
+.taggingWidget {
+  width: 100%;
+  overflow: hidden;
+  background: $white;
+  border: 1px solid $alto-1;
+  border-radius: 5px;
+}
+
+.taggingWidget > .tagSticker.focus,
+.taggingWidget.focus {
+  border-color: rgb(133, 191, 253);
+  //outline:auto 5px -webkit-focus-ring-color
+}
+
+.taggingWidget > .tagSticker:focus {
+  outline: none;
+}
+
+.taggingWidget input {
+  font-size: 1em;
+  height: 32px;
+  border-width: 0;
+  margin-top: -1px;
+  padding: 0 5px;
+}
+
+.taggingWidget input:focus {
+  outline: none;
+}
+
+.taggingWidget > .tagSticker {
+  display: inline-block;
+  background: $shuttle-gray;
+  color: $white;
+  padding: 5px 8px;
+  border-radius: 3px;
+  margin: 3px;
+  border: 1px solid $shuttle-gray;
+}
+
+.taggingWidget > .inputSpan {
+  overflow: hidden;
+  padding-right: 10px;
+}
+
+.inputSpan .dropDown {
+  position: absolute;
+  width: 180px;
+  font-size: 12px;
+  background-color: $white;
+  padding: 0 2px;
+  left: 0;
+  z-index: 5;
+  max-height: 100px;
+  overflow-y: auto;
+  border: 1px solid $alto;
+}
+
+.inputSpan .dropDown:empty {
+  border: none !important;
+}
+
+.taggingWidget.focus .dropDown {
+  display: block;
+}
+
+.dropDown .row {
+  padding: 5px 8px;
+  border-bottom: 1px solid $alto;
+}
+
+.dropDown .row:last-child {
+  border-bottom: 0;
+}
+
+.dropDown .row.focus,
+.dropDown .row:hover {
+  background-color: $gallery;
+}
+
+.remove {
+  cursor: pointer;
+}
+
+.no-match-error {
+  color: $roman-red;
+}
+
+

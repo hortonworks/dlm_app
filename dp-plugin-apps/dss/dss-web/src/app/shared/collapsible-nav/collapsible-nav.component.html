@@ -1,0 +1,29 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div id="persona_side_nav" #sideNav class="sidenav dss-sidebar"  [ngClass]="{'collpased': collapseSideNav}">
+
+  <div data-se="app__collapsibleNav-persona" #personaNavSrc class="dp-header-logo dp-header-logo--active borderBox">
+    <img  [attr.src]="dssLogoPath"/>
+    <span id="persona_drop_down" class="persona-drop-down-small"></span>
+    <span class="persona-name">Data Steward Studio</span>
+  </div>
+
+  <span class="sidenav-item" *ngFor="let nav of navItems; let i = index" [ngClass]="{'active': activeTabName === nav.tabName}" [attr.id]="'persona_side_nav_item_'+i" (click)="navigateToURL(nav)">
+    <i *ngIf="nav.iconClassName != ''" [ngClass]="'fa ' +  nav.iconClassName" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ nav.name }} </span>
+  </span>
+
+  <div id="persona_side_nav_expander" class="expander" (click)="toggleNav()">
+    <i *ngIf="!collapseSideNav" class="fa fa-angle-double-left"></i>
+    <i *ngIf="collapseSideNav" class="fa fa-angle-double-right"></i>
+  </div>
+
+</div>

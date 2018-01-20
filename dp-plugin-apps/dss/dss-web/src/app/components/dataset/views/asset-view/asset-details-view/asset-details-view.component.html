@@ -1,0 +1,88 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<dp-tabs [tabEnum]="detailsTabs" [tabType]="tabType.BUTTON" (selected)="selectedDetailsTabs=$event"> </dp-tabs>
+<div class="details-wrapper">
+  <section *ngIf="selectedDetailsTabs === detailsTabs.PROPERTIES">
+    <table style="width: 100%" dp-config-table class="mdl-data-table mdl-js-data-table">
+      <thead>
+        <tr>
+          <th class="mdl-data-table__cell--non-numeric">KEY</th>
+          <th class="mdl-data-table__cell--non-numeric">VALUE</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr *ngFor="let property of assetProperties">
+            <td class="mdl-data-table__cell--non-numeric">{{property.key}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{property.value}}</td>
+          </tr>
+      </tbody>
+    </table>
+  </section>
+  <section *ngIf="selectedDetailsTabs === detailsTabs.TAGS">
+    <table *ngIf="assetTags.length" style="width: 100%" class="mdl-data-table mdl-js-data-table">
+      <thead>
+        <tr>
+          <th class="mdl-data-table__cell--non-numeric">Name</th>
+          <th class="mdl-data-table__cell--non-numeric">Attributes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tag of assetTags">
+          <td class="mdl-data-table__cell--non-numeric">{{tag.name}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{tag.attributes}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="!assetTags.length">No tags available for asset</div>
+  </section>
+  <section *ngIf="selectedDetailsTabs === detailsTabs.SCHEMA">
+    <table style="width: 100%" class="mdl-data-table mdl-js-data-table" >
+      <thead>
+        <tr>
+          <th class="mdl-data-table__cell--non-numeric">&nbsp;</th>
+          <th class="mdl-data-table__cell--non-numeric">Name</th>
+          <th class="mdl-data-table__cell--non-numeric">Type</th>
+          <th class="mdl-data-table__cell--non-numeric" title="* Approximate values as being computed using HLL algorithm.">Unique Values *</th>
+          <th class="mdl-data-table__cell--non-numeric">Null Values</th>
+          <th class="mdl-data-table__cell--non-numeric">Max</th>
+          <th class="mdl-data-table__cell--non-numeric">Min</th>
+          <th class="mdl-data-table__cell--non-numeric">Mean</th>
+          <th class="mdl-data-table__cell--non-numeric">Comment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let schema of assetSchemas">
+          <tr>
+            <td class="mdl-data-table__cell--non-numeric" (click)="setColGuid(schema.guid)">
+              <i [class]="getIconClass(schema.guid)"></i>
+            </td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.name}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.type}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.noOfUniques}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.noOfNulls}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.max}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.min}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.mean}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.comment}}</td>
+          </tr>
+          <tr *ngIf="colGuid === schema.guid">
+            <td colspan="10" style="height:100px;padding: 15px 0;">
+              <asset-column-visual [data]="colVisualData"></asset-column-visual>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <br/><br/>
+    <div class="starText">* Approximate values as being computed using HLL algorithm.</div> 
+  </section>
+</div>

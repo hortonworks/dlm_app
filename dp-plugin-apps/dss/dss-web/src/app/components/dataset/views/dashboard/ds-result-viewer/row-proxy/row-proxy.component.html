@@ -1,0 +1,70 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<table #table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null">
+  <thead>
+    <tr>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.name" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.description" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("common.datalake" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.createdBy" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.hiveTables" | translate).toUpperCase()}}</th>
+<!--
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.hdfsFiles" | translate).toUpperCase()}}</th>
+-->
+      <th class="mdl-data-table__cell--non-numeric actions"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let dsModel of datasetModels; let index=index" on-mouseover="hoveredIndex=index">
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable key-column wrap" (click)="showFullView(dsModel)"><span data-se="dashboard_collection_list_itm_name">{{dsModel.name}}</span><span *ngIf="dsModel.favourite"><i class="fa__fa-star--favourite-icon fa fa-star"></i></span></td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.description || "--"}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.datalakeName}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.creatorName}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.counts.hiveCount}}</td>
+<!--
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.filesCount}}</td>
+-->
+      <td class="mdl-data-table__cell--non-numeric actions wrap">
+<!--
+        <div [ngClass]="{'visibility-visible': index === hoveredIndex, 'visibility-hidden': index !== hoveredIndex}">
+          <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon"><i class="fa fa-ellipsis-v fa__fa-ellipsis-v--icon"></i></button>
+          <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+                  for="dropDownIcon_{{ dsModel.id }}">
+              <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>{{"common.edit" | translate}}</li>
+              <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-close"></i>{{"common.delete" | translate}}</li>
+              <li class="mdl-menu__item">
+              <i class="fa__fa-star--icon fa fa-star"></i>
+              <span *ngIf="dsModel.favourite">{{"pages.dataset.dashboard.actions.remFromFav" | translate}}</span>
+              <span *ngIf="!dsModel.favourite">{{"pages.dataset.dashboard.actions.addToFav" | translate}}</span>
+              </li>
+          </label>
+          </div>
+ -->
+        <div class="dataset-item__action-wrapper">
+          <div class="dataset-item__action">
+            <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon" data-se="dashboard_collection_actions">
+              <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i>
+            </button>
+            <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_' + dsModel.id">
+              <li class="mdl-menu__item" (click)="deleteDataset(dsModel.id)" data-se="dashboard_collection_action_delete">
+                <span>
+                  <i class="fa__fa-close--icon fa fa-trash-o"></i>
+                  {{"common.delete" | translate}}
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

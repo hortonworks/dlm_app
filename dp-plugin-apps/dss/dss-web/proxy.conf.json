@@ -1,0 +1,15 @@
+{
+  "/api": {
+    "target": "https://localhost",
+    "secure": false
+  },
+  "/auth": {
+    "target": "https://localhost",
+    "secure": false
+  },
+  "/knox": {
+    "target": "https://localhost",
+    "secure": false,
+    "pathRewrite": {"^/knox" : ""}
+  }
+}

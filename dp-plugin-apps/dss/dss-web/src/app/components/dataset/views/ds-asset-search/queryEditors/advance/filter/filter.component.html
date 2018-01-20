@@ -1,0 +1,42 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div *ngIf="!avoidNewLine" style="clear: both"></div>
+<div class="queryFilter">
+  <select class="firstSelect" (change)="onFilterTypeChange($event)">
+    <option *ngFor="let obj of availableFilters; let i=index;" [value]="i" [attr.data-se]="'advanced_search_filter_option_'+i">{{obj.display}}</option>
+  </select>
+  <select *ngIf="filterObject" [(ngModel)]="filterObject.selectedOperator" (change)="validate($event)" data-se="advanced_search_filter_operator_select">
+    <option [value]="-1">Select Operator</option>
+    <option *ngFor="let opt of filterObject.operators" [value]="opt">{{filterObject.getOperatorDisplay(opt)}}</option>
+  </select>
+  <select *ngIf="filterObject && filterObject.valueOptions && filterObject.dataType !== 'tag'" [(ngModel)]="filterObject._value" (change)="validate($event)">
+    <option [value]="-1">{{filterObject.helpTextKey | translate}}</option>
+    <option *ngFor="let opt of filterObject.valueOptions;let i=index;" [value]="i" (change)="validate($event)" >{{opt.display||opt.name||opt}}</option>
+  </select>
+  <input *ngIf="filterObject && !filterObject.valueOptions"
+         [(ngModel)]="filterObject._value"
+         [placeholder]="filterObject.helpTextKey | translate"
+         (change)="validate($event)"
+         (keydown)="onKeyDown($event)"
+         data-se="advanced_search_filter_value_input"
+  />
+  <div style="display: inline-block;" *ngIf="filterObject && filterObject.valueOptions && filterObject.dataType === 'tag'">
+    <input
+      ngui-auto-complete
+      [(ngModel)]="filterObject._value"
+      [source]="filterObject.valueOptions"
+      [placeholder]="filterObject.helpTextKey | translate"
+      max-num-list="10"
+      (keydown)="onKeyDown($event)"/>
+  </div>
+  <button class="mdl-button btn-hwx-secondary" (click)="onCloseClick()"><i class="fa fa-close"></i></button>
+</div>

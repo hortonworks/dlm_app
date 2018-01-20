@@ -1,0 +1,99 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+@import "../../../../../styles/variables";
+
+.page-container {
+  padding-top: 30px;
+}
+.ds-editor-cont {
+  padding: 20px 0;
+  & .nav-panel {
+    width: $side-nav-width;
+    float: left;
+    border-right: 1px solid $iron;
+
+    & .nav-stage {
+      line-height: 20px;
+      color: $dusty-gray;
+      margin: 20px 0;
+
+      & span {
+        margin: 0 10px;
+      }
+      & .circle {
+        border : 1px solid $iron;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        float: left;
+        text-align: center;
+        -webkit-border-radius: 12px;
+        -moz-border-radius: 12px;
+        border-radius: 12px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      .fa-check-circle {
+        display: none;
+        float: left;
+        font-size: 20px;
+      }
+
+      & .fa-caret-left {
+        font-size: 20px;
+        margin-right: -1px;
+        color: transparent;
+      }
+      &.done {
+        color: $mountain_meadow;
+        cursor: pointer;
+        .circle {
+          display: none;
+        }
+        .fa-check-circle {
+          display: block;
+        }
+      }
+    }
+  }
+  & .nav-panel[stage="1"] .stage_1,
+  & .nav-panel[stage="2"] .stage_2,
+  & .nav-panel[stage="3"] .stage_3 {
+    color: $mountain_meadow;
+    & .circle {
+      border-color: $mountain_meadow;
+    }
+    & .fa-caret-left {
+      color: $mountain_meadow;
+    }
+  }
+  & .nav-result-panel {
+    margin: 0 0 0 $side-nav-width;
+    padding: 20px;
+  }
+}
+
+.fillMandatoryMsg {
+  margin-top: 15px;
+  color: $burnt-sienna;
+  display: none;
+}
+
+:host /deep/ .taggingWidget {
+  width: 350px !important;
+}
+
+.error-section {
+  color: $roman-red;
+  padding: 10px;
+}

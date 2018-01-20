@@ -1,0 +1,17 @@
+
+@import "../../../styles/variables";
+
+:host {
+  display: block;
+  height: 60px;
+}
+
+.header {
+  z-index: 10;
+  position: fixed;
+  background: $layout-header-bg-color;
+  height: $layout-header-desktop-row-height;
+  max-height: $layout-header-desktop-row-height;
+  line-height: $layout-header-desktop-row-height;
+  width: 100%;
+}
