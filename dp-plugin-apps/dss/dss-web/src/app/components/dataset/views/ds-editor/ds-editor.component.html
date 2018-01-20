@@ -1,0 +1,51 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="page-container">
+  <div class="hwx-title">{{dsModel.name || "Untitled"}}</div>
+  <div class="hwx-desc">{{"pages.dataset.ds-editor.ds-description" | translate}}</div>
+
+  <div class="ds-editor-cont">
+    <div class="nav-panel" [attr.stage]="currentStage">
+      <div class="nav-stage stage_1" [class.done]="1 < currentStage" (click)="moveToStage(1)" data-se="create_collection_nav_stage1"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>{{"pages.dataset.ds-editor.information" | translate}}</span><i class="fa fa-caret-left pull-right"></i></div>
+      <div class="nav-stage stage_2" [class.done]="2 < currentStage" (click)="moveToStage(2)"><div class="circle">2</div><i class="fa fa-check-circle"></i><span>{{"pages.dataset.ds-editor.assets" | translate}}</span><i class="fa fa-caret-left pull-right"></i></div>
+      <div class="nav-stage stage_3" [class.done]="3 < currentStage" (click)="moveToStage(3)"><div class="circle">3</div><i class="fa fa-check-circle"></i><span>{{"pages.dataset.ds-editor.summary" | translate}}</span><i class="fa fa-caret-left pull-right"></i></div>
+    </div>
+    <div class="nav-result-panel">
+      <ds-info-holder
+        *ngIf="currentStage == 1"
+        [dsModel]="dsModel"
+        [tags]="tags"
+        (onNext)="actionNext()"
+        (onCancel)="actionCancel()"></ds-info-holder>
+
+      <ds-assets-holder
+        *ngIf="currentStage == 2"
+        [dsModel]="dsModel"
+        [assetSetQueryModelsForAddition]="assetSetQueryModelsForAddition"
+        (onNext)="actionNext()"
+        (onCancel)="actionCancel()"></ds-assets-holder>
+
+      <ds-summary-holder
+        *ngIf="currentStage == 3"
+        [dsModel]="dsModel"
+        [tags]="tags"
+        (onSave)="actionSave()"
+        (onCancel)="actionCancel()"></ds-summary-holder>
+
+      <div class="error-section" *ngIf="errorMessage">
+        <strong>{{"pages.dataset.ds-editor.create-error" | translate}}</strong> {{errorMessage}}
+      </div>
+      <div class="fillMandatoryMsg" #fillMandatoryMsg>{{"pages.dataset.ds-editor.fillMandatoryMsg" | translate}}</div>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
