@@ -1,0 +1,71 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+@import "../../../styles/variables";
+
+.breadcrumb {
+  padding-left: 0 25px 0 0;
+
+  background-color: transparent;
+  font-size: 20px;
+  margin: 0 8px;
+  list-style: none;
+  display: flex;
+  // li {
+  //   line-height: 40px;
+  //   margin-right: 8px;
+  //   &.active span {
+  //     color: #373b44;
+  //   }
+  // }
+}
+
+a,
+a:hover,
+a:active,
+a:visited,
+a:focus,
+span {
+  // text-decoration: none;
+  // color: #646977;
+
+  cursor: pointer;
+  font-size: 20px;
+  color: $shuttle-gray-1;
+  line-height: 60px;
+  padding-right: 5px;
+}
+
+// li:first-child a {
+//   margin: 0 0 0 8px !important;
+// }
+
+li:not(.active)::after {
+  content: '/';
+  font-size: 20px;
+  color: $iron;
+  padding-right: 5px;
+}
+
+// li:last-child {
+//   content: '' !important;
+// }
+
+span {
+  // color: #646977;
+  cursor: default;
+  color: $tuna-1;
+}
+
+// .breadcrumb > li + li:before {
+//   color: #d1d2d4;
+//   padding: 0;
+// }

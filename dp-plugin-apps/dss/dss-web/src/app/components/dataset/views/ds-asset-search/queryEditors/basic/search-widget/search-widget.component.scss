@@ -1,0 +1,33 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+.taggingWidget {
+  border-width: 0px;
+}
+
+.taggingWidget > .tagSticker.focus,
+.taggingWidget > .tagSticker {
+  background-color: rgb(65,144,188);
+  color:white;
+  border-color: transparent;
+  border-radius: 8px;
+  height:24px;
+  margin:4px;
+  font-size: 12px;
+  padding-top: 0px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.taggingWidget input{
+  height:36px;
+}

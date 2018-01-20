@@ -1,0 +1,42 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+@import "../../../styles/variables";
+
+.paginationRow {
+  height: 45px;
+  line-height: 45px;
+  text-align: right;
+  float: right;
+}
+.paginationRow .pageSizeSpan {
+  color: rgb(64,144,189);
+}
+.paginationRow .fa-chevron-left,
+.paginationRow .fa-chevron-right {
+  padding:0 10px;
+  cursor:pointer;
+}
+
+.disabled {
+  cursor: auto !important;
+  color: $dusty-gray !important;
+}
+
+select {
+  color: inherit;
+  font-size: 1em;
+  height: 32px;
+  padding: 0 8px;
+  border-width: 0px;
+  outline: none;
+}
+select {background-color: inherit}

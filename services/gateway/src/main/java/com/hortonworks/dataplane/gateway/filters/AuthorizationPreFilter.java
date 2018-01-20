@@ -53,7 +53,7 @@ public class AuthorizationPreFilter  extends ZuulFilter {
       return false;
     }
 
-    return serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP) || serviceId.equals(Constants.CLOUDBREAK);
+    return serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP) || serviceId.equals(Constants.DSSAPP) || serviceId.equals(Constants.CLOUDBREAK);
   }
 
   @Override

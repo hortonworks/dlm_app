@@ -1,0 +1,53 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="queryEditor borderBox" #outerCont>
+  <div class="inputWidgetCont">
+    <div class="searchIconCont"><i class="fa fa-search"></i></div>
+    <div class="searchWidgetCont">
+      <!--<search-widget #searchWidget-->
+        <!--[allowTagDismissal]="true"-->
+        <!--[tags]="filterTags"-->
+        <!--[searchText]="queryObj.searchText"-->
+        <!--[placeHolderText]="'Search'"-->
+        <!--(onNewSearch)="onNewSearch($event)"-->
+        <!--(onTagDelete)="removeFilter($event)"-->
+      <!--&gt;-->
+      <!--</search-widget>-->
+      <input type="text" name="search" class="search-text" data-se="basic_query_editor_search_input" [(ngModel)]="queryObj.searchText" (keyup)="onKeyUp($event)"/>
+    </div>
+<!--     <div class="showFiltersButton" (click)="toggleFilterCont()"><i class="fa fa-filter"></i>&nbsp;&nbsp;Filter&nbsp;&nbsp;<i class="fa fa-angle-down"></i></div> -->
+    <div class="clearfix"></div>
+  </div>
+  <div *ngIf="filterStateFlag" class="filterCont">
+    <div class="singleFilterCont">
+      <div>Source</div>
+      <select (change)="onFilterOptionChange()" [(ngModel)]="typeValueIndx"><option *ngFor="let optn of typeFilOptns let i=index;" [value]="i">{{optn}}</option></select>
+    </div>
+    <div class="singleFilterCont">
+      <div>Owner</div>
+      <select (change)="onFilterOptionChange()" [(ngModel)]="ownerIndx"><option *ngFor="let optn of ownerFilOptn let i=index;" [value]="i">{{optn}}</option></select>
+    </div>
+    <div class="singleFilterCont">
+      <div>Created</div>
+      <select (change)="onFilterOptionChange()" [(ngModel)]="createdValueIndx"><option *ngFor="let optn of createdFilOptns; let i=index;" [value]="i">{{optn}}</option></select>
+    </div>
+    <div class="singleFilterCont">
+      <div>Size</div>
+      <select (change)="onFilterOptionChange()" [(ngModel)]="sizeValueIndx"><option *ngFor="let optn of sizeFilOptns let i=index;" [value]="i">{{optn}}</option></select>
+    </div>
+    <div class="singleFilterCont">
+      <div>Datalake</div>
+      <select (change)="onFilterOptionChange()" [(ngModel)]="dLakeIndx"><option *ngFor="let optn of dlFilOptns let i=index;" [value]="i">{{optn}}</option></select>
+    </div>
+    <div style="clear: both"></div>
+  </div>
+</div>

@@ -13,6 +13,7 @@ package com.hortonworks.dataplane.gateway.domain;
 public interface Constants {
   String DPAPP = "core";
   String DLMAPP = "dlm";
+  String DSSAPP = "dss";
   String CLOUDBREAK = "cloudbreak";
   String HDP_PROXY = "hdp_proxy";
 
