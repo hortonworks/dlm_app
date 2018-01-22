@@ -65,6 +65,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
   isUnhealthyClustersModalVisible = false;
   isWarningClustersModalVisible = false;
   isUnhealthyPoliciesModalVisible = false;
+  /**
+   * Stream holds visibilty state of the table with some delay. This is a workaround
+   * that helps to initialize table after complete rendering and fits table
+   */
+  shouldShowTable$: Observable<boolean>;
 
   jobsTableFooterOptions = {
     showFilterSummary: true
@@ -146,6 +151,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
           alerts: cluster.status.filter(service => service.state !== SERVICE_STATUS.STARTED)
         };
       });
+    this.shouldShowTable$ = this.overallProgress$
+      .filter(p => !p.isInProgress)
+      .delay(500)
+      .map(p => !p.isInProgress)
+      .first();
   }
 
   mapTableData(policy: Policy) {

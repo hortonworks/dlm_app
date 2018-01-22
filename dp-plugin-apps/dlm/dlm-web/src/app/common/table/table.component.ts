@@ -34,6 +34,7 @@ import { CheckboxColumnComponent } from 'components/table-columns/checkbox-colum
 import { ActionColumnType, ActionItemType, ActionColumnComponent } from 'components/';
 import { TableTheme, TableThemeSettings } from './table-theme.type';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import { genId } from 'utils/string-utils';
 
 export const SELECTED_KEY_NAME = '__selected';
 
@@ -295,6 +296,9 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   }
 
   recalculateTable() {
+    // this will call change detection checker inside of ngx-datatable component
+    // and trigger resize. Add random attribute here because it's cheaper than deep copy
+    this.rows = [...this.rows.map(i => ({...i, __tmpCache: genId()}))];
     this.table.recalculate();
   }
 
