@@ -20,6 +20,8 @@ import com.hortonworks.dataplane.gateway.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,16 +51,19 @@ public class AuthenticationController {
   private Utils utils;
 
   @RequestMapping(path="/in", method = RequestMethod.POST)
-  public UserContext signIn(@RequestBody Credential credential, HttpServletResponse response)
-    throws GatewayException {
+  public ResponseEntity<?> signIn(@RequestBody Credential credential, HttpServletResponse response) {
 
-    UserContext userContext = authenticationService.getUserContextFromCredential(credential);
+    try {
+      UserContext userContext = authenticationService.getUserContextFromCredential(credential);
 
-    String token = jwt.makeJWT(userContext);
-    Cookie cookie = cookieUtils.buildNewCookie(Constants.DP_JWT_COOKIE, token, jwt.getExpiration(token));
-    response.addCookie(cookie);
+      String token = jwt.makeJWT(userContext);
+      Cookie cookie = cookieUtils.buildNewCookie(Constants.DP_JWT_COOKIE, token, jwt.getExpiration(token));
+      response.addCookie(cookie);
 
-    return userContext;
+      return new ResponseEntity<Object>(userContext, HttpStatus.OK);
+    } catch (GatewayException ex) {
+      return new ResponseEntity<String>(ex.getStatus().getReasonPhrase(), ex.getStatus());
+    }
   }
 
   @RequestMapping(path="/out", method = RequestMethod.GET)
