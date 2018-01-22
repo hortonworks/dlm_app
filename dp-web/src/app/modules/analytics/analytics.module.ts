@@ -23,14 +23,14 @@ import { AddWorkspaceComponent } from './workspace/add-workspace/add-workspace.c
 import {ClusterService} from '../../services/cluster.service';
 import {SelectModule} from '../../shared/select/select.module';
 import { AssetsComponent } from './workspace/assets/assets.component';
-import {DatasetSharedModule} from '../dataset/dataset-shared.module';
+// import {DatasetSharedModule} from '../dataset/dataset-shared.module';
 import {WorkspaceAssetsService} from '../../services/workspace-assets.service';
-import {DsAssetsService} from '../dataset/services/dsAssetsService';
+// import {DsAssetsService} from '../dataset/services/dsAssetsService';
 
 @NgModule({
   imports: [
     RouterModule.forChild(analyticsRoutes),
-    DatasetSharedModule,
+    // DatasetSharedModule,
     CommonModule,
     SharedModule,
     SelectModule,
@@ -43,7 +43,7 @@ import {DsAssetsService} from '../dataset/services/dsAssetsService';
     WorkspaceComponent
   ],
   providers: [
-    DsAssetsService,
+    // DsAssetsService,
     ClusterService,
     WorkspaceService,
     WorkspaceAssetsService

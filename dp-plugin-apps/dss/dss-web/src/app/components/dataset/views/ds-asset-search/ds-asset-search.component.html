@@ -48,7 +48,7 @@
       *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
     <div *ngIf="!showQueryResults" class="noSearchMessage"><span>{{"pages.dataset.asset-search.noSearchMsg" | translate}}</span></div>
   </div>
-  <div class="actionButtonCont">
+  <div class="actionButtonCont" *ngIf="!hideActionButtonCont" >
     <button class="mdl-button btn-hwx-default"  data-se="asset_selection_popup_cancle" (click)="actionCancel()">{{"pages.dataset.asset-search.cancel" | translate}}</button>
     <button *ngIf="showDone && !saveButton" class="mdl-button btn-hwx-primary" data-se="asset_selection_popup_done" (click)="actionDone()">{{"pages.dataset.asset-search.done" | translate}}</button>
     <button *ngIf="showDone && saveButton" class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"common.save" | translate}}</button>

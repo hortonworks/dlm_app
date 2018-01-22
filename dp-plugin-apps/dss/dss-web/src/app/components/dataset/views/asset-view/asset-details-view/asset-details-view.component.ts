@@ -10,6 +10,7 @@
  */
 
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {TabStyleType} from '../../../../../shared/tabs/tabs.component';
 import {AssetService} from '../../../../../services/asset.service';
 import {AssetDetails, AssetProperty} from '../../../../../models/asset-property';
 import {AssetTag} from '../../../../../models/asset-tag';
@@ -17,7 +18,6 @@ import {AssetSchema} from '../../../../../models/asset-schema';
 import {DateUtils} from '../../../../../shared/utils/date-utils';
 import {StringUtils} from '../../../../../shared/utils/stringUtils';
 import {Observable} from 'rxjs/Observable';
-import {TabStyleType} from "app/shared/tabs/tabs.component";
 
 export enum DetailsTabs {
   PROPERTIES, TAGS, SCHEMA

@@ -30,6 +30,7 @@ export class DsAssetSearch {
   queryObj: SimpleQueryObjectModel = new SimpleQueryObjectModel("");
   queryModel: AssetSetQueryModel = new AssetSetQueryModel([]);
   showQueryResults: boolean = false;
+  hideActionButtonCont : boolean = false;
 
   @ViewChild("outerCont") outerCont: ElementRef;
   @ViewChild("tabCont") tabCont: ElementRef;
@@ -74,6 +75,7 @@ export class DsAssetSearch {
   }
 
   actionDone() {
+    this.hideActionButtonCont = true;
     this.doneNotificationEmitter.emit(this.queryModel);
   }
 

@@ -12,10 +12,10 @@
 @import "../../../../../styles/variables";
 
 .dsFullView {
-  min-height:100%;
-  width:100%;
+  //min-height:100%;
+  //width:100%;
   padding:20px;
-  position:absolute;
+  //position:absolute;
 
   & .div50Percent {
     width: 50%;
@@ -57,4 +57,10 @@
   top: 50%;
   transform: translateY(-50%);
   width: 500px;
+}
+
+.comment-icon {
+  margin-right: 25px;
+  font-size: x-large;
+  cursor: pointer;
 }

@@ -68,7 +68,7 @@ export class AuthenticationService {
 
   loadUser() {
     if (isDevMode()) {
-      return this.signIn(new Credential('admin', 'changeit')).toPromise();
+      return this.signIn(new Credential('admin', 'admin')).toPromise();
     }
 
     return this.http.get(`/api/identity`)

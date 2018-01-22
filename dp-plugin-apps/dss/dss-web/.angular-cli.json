@@ -20,7 +20,7 @@
       "prefix": "dss",
       "styles": [
         "../node_modules/roboto-npm-webfont/light/style.css",
-        "../node_modules/dp-apps/dist/dp-app-navigation.css",
+        "../node_modules/dps-apps/dist/dp-app-navigation.css",
         "../node_modules/font-awesome/css/font-awesome.css",
         "../node_modules/material-design-icons/iconfont/material-icons.css",
         "vendor.scss",

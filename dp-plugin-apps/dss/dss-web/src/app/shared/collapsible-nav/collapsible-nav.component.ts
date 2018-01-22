@@ -10,7 +10,8 @@
  */
 
 import {Component, ViewChild, ElementRef, OnInit, HostBinding, isDevMode} from '@angular/core';
-import {DpAppNavigation} from 'dp-apps';
+import {Router} from '@angular/router';
+import {DpAppNavigation} from 'dps-apps';
 import {navigation} from '../../_nav';
 
 @Component({
@@ -27,7 +28,7 @@ export class CollapsibleNavComponent implements OnInit {
   @ViewChild('personaNavSrc') personaNavSrc: ElementRef;
   @HostBinding('class.dss-sidebar-collapsed') collapseSideNav = false;
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit() {
     DpAppNavigation.init({
@@ -38,5 +39,9 @@ export class CollapsibleNavComponent implements OnInit {
 
   toggleNav() {
     this.collapseSideNav = !this.collapseSideNav;
+  }
+
+  navigateToURL(nav) {
+    this.router.navigateByUrl(nav.url);
   }
 }

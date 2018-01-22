@@ -13,7 +13,7 @@
 <div class="form-group">
   <label for="name" class="required">{{"common.name" | translate}}</label>
   <div class="dp-input-and-message-wrapper">
-    <input type="text" placeholder="Name" #datasetName="ngModel" name="name" id="name" [(ngModel)]="dsModel.name" required dpUniqueDatasetName [ngClass]="{'validation-error': datasetName.invalid && datasetName.errors.unique}" data-se="ds_editor_info_name"/>
+    <input type="text" placeholder="Name" #datasetName name="name" id="name" [(ngModel)]="dsModel.name" required dpUniqueDatasetName [ngClass]="{'validation-error': datasetName.invalid && datasetName.errors.unique}" data-se="ds_editor_info_name"/>
     <div *ngIf="datasetName.invalid && datasetName.errors.unique" class="error-message">
       {{"pages.dataset.ds-editor.errors.unique" | translate}}
     </div>

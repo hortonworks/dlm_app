@@ -12,6 +12,7 @@ import {routes} from './dss.routes';
 import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.modue';
 import {HeaderModule} from './shared/header/header.module';
 import {AuthenticationService} from './services/authentication.service';
+import {CommentsModule} from './shared/comments/comments.module';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -32,6 +33,7 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
     RouterModule.forRoot(routes),
     CollapsibleNavModule,
     HeaderModule,
+    CommentsModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
