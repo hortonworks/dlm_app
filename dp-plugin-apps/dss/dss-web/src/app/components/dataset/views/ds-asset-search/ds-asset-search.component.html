@@ -20,13 +20,13 @@
                           [queryObj]="queryObj"
                           (onQueryObjUpdate)="onSimpleQueryObjUpdate($event)"
                           (onHeightChange)="onQueryEditorResize($event)"
-    #basicQueryEditor ></normlal-query-editor>
+                          #basicQueryEditor ></normlal-query-editor>
     <advance-query-editor *ngIf="activeTab == tabEnum.ADVANCE"
                           [queryModel]="queryModel"
                           [clusterId]="clusterId"
                           (onHeightChange)="onQueryEditorResize($event)"
                           (onActionDone)="actionSearch($event)"
-    #advanceQueryEditor ></advance-query-editor>
+                          #advanceQueryEditor ></advance-query-editor>
     <div style="clear: both"></div>
   </div>
   <div class="filterActionCont">
@@ -40,15 +40,14 @@
                     [hideSearch]="true"
                     [queryModels]="queryModel"
                     [innerListScrollable]="true"
-                    [selectionAllowed]="false"
                     [avoidLoadingOnInit]="true"
                     [clusterId]="clusterId"
                     [allowAssetNavigation]="false"
                     [showBelongsToColumn]="showBelongsToColumn"
-      *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
+                    *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
     <div *ngIf="!showQueryResults" class="noSearchMessage"><span>{{"pages.dataset.asset-search.noSearchMsg" | translate}}</span></div>
   </div>
-  <div class="actionButtonCont">
+  <div class="actionButtonCont" *ngIf="!hideActionButtonCont" >
     <button class="mdl-button btn-hwx-default"  data-se="asset_selection_popup_cancle" (click)="actionCancel()">{{"pages.dataset.asset-search.cancel" | translate}}</button>
     <button *ngIf="showDone && !saveButton" class="mdl-button btn-hwx-primary" data-se="asset_selection_popup_done" (click)="actionDone()">{{"pages.dataset.asset-search.done" | translate}}</button>
     <button *ngIf="showDone && saveButton" class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"common.save" | translate}}</button>

@@ -13,6 +13,7 @@ import {CommonModule} from "@angular/common";
 import {NgModule} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NguiAutoCompleteModule} from '@ngui/auto-complete';
+import {PaginationModule} from "../../shared/pagination/pagination.module";
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
 import {AssetOwnerService} from "./services/assetOwnerService";
 import {DsAssetsService} from "./services/dsAssetsService";
@@ -40,22 +41,25 @@ import { MyDateRangePickerModule } from 'mydaterangepicker';
 
 import {AssetViewComponent} from './views/asset-view/asset-view.component';
 import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
+import {DropdownModule} from '../../shared/dropdown/dropdown.module';
+import {TabsModule} from '../../shared/tabs/tabs.module';
 import { AssetDetailsViewComponent } from './views/asset-view/asset-details-view/asset-details-view.component';
 import { AssetColumnVisualComponent } from './views/asset-view/asset-column-visual/asset-column-visual.component';
 import { AssetAuditView } from './views/asset-view/asset-audit-view/asset-audit-view.component';
 import { AssetPolicyView } from './views/asset-view/asset-policy-view/asset-policy-view.component';
+import {LineageModule} from '../../shared/lineage/lineage.module';
 import {AssetService} from '../../services/asset.service';
 import {RangerService} from '../../services/ranger.service';
 import { AuditVisualizationComponent } from './views/asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
 import { AssetTagPolicyViewComponent } from './views/asset-view/asset-policy-view/asset-tag-policy-view/asset-tag-policy-view.component';
 import { AssetResourcePolicyViewComponent } from './views/asset-view/asset-policy-view/asset-resource-policy-view/asset-resource-policy-view.component';
-import {PaginationModule} from '../../shared/pagination/pagination.module';
-import {DropdownModule} from '../../shared/dropdown/dropdown.module';
-import {LineageModule} from '../../shared/lineage/lineage.module';
-import {TabsModule} from "app/shared/tabs/tabs.module";
-import {DataSetService} from "app/services/dataset.service";
+import {RouterModule} from "@angular/router";
+import {routes} from "./dataset.routes";
+import {CommentsModule} from '../../shared/comments/comments.module';
 import {DatasetTagService} from "app/services/tag.service";
+import {DataSetService} from '../../services/dataset.service';
 import {LakeService} from '../../services/lake.service';
+import {CommentService} from '../../services/comment.service';
 
 @NgModule({
   declarations: [
@@ -98,7 +102,9 @@ import {LakeService} from '../../services/lake.service';
     DropdownModule,
     TabsModule,
     LineageModule,
+    RouterModule.forChild(routes),
     MyDateRangePickerModule,
+    CommentsModule
   ],
   exports: [
     NavTagPanel,
@@ -119,15 +125,16 @@ import {LakeService} from '../../services/lake.service';
     SearchWidget
   ],
   providers: [
-    LakeService,
     RichDatasetService,
     DsAssetsService,
     DsTagsService,
-    DataSetService,
-    DatasetTagService,
     AssetOwnerService,
     AssetService,
     RangerService,
+    DatasetTagService,
+    DataSetService,
+    LakeService,
+    CommentService
   ]
 })
 export class DatasetSharedModule {

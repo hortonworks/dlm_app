@@ -17,6 +17,8 @@ import {Router} from "@angular/router";
 
 export enum AssetTypeEnum { ALL, HIVE, HDFS}
 
+export enum AssetSelectionStateEnum { CHECKALL, CHECKALLWITHEXCEPTION, CHECKSOME}
+
 export let AssetTypeEnumString = ["all", "hive", "file"];
 export enum AssetListActionsEnum {EDIT, REMOVE, ADD}
 export class AssetSetQueryFilterModel {
@@ -26,7 +28,7 @@ export class AssetSetQueryFilterModel {
 class ASQFM extends AssetSetQueryFilterModel {}
 
 export class AssetSetQueryModel {
-  constructor(public filters: AssetSetQueryFilterModel[]) {
+  constructor(public filters: AssetSetQueryFilterModel[], public selectionList: string[] = [], public exceptionList:string[] = []) {
   }
 }
 class ASQM extends AssetSetQueryModel {}
@@ -65,7 +67,10 @@ export class DsAssetList implements OnInit {
   pageStartIndex: number = 1;
   assetsCount: number = 0;
   dsAssets: DsAssetModel[] = [];
+  selExcepList: string[] = [];
   tab = AssetTypeEnum;
+  selStates = AssetSelectionStateEnum;
+  selectState = AssetSelectionStateEnum.CHECKSOME;
   actionEnum = AssetListActionsEnum;
   resultState:ResultState = ResultState.LOADED;
   resultStates = ResultState;
@@ -100,6 +105,13 @@ export class DsAssetList implements OnInit {
   clearResults() {
     this.dsAssets = [];
     this.totalPages = this.assetsCount = 0;
+  }
+
+  freshFetch () {
+    this.setFirstPage();
+    this.selExcepList = [];
+    this.selectState = this.selStates.CHECKSOME
+    return this.fetchAssets();
   }
 
   fetchAssets() {
@@ -157,6 +169,27 @@ export class DsAssetList implements OnInit {
     this.pageStartIndex = index;
     this.fetchAssets();
   }
+  onCheckAllChange(e) {
+    this.selExcepList = [];
+    if(e.target.checked) this.selectState = this.selStates.CHECKALLWITHEXCEPTION
+    else this.selectState = this.selStates.CHECKSOME
+    console.log(this.selectState);  
+  }
+  checkedAllState() {
+    if (this.selectState == this.selStates.CHECKSOME) return false;
+    return true;  
+  }
+  showChecked(asset) {
+    // if (this.selectState == this.selStates.CHECKALL) return true
+    if (this.selectState == this.selStates.CHECKALLWITHEXCEPTION) {
+      return (this.selExcepList.indexOf(asset.id) == -1)
+    }
+    return (this.selExcepList.indexOf(asset.id) != -1)
+  }
+  onAssetSelectionChange(asset) {
+    if (this.selExcepList.indexOf(asset.id) == -1) this.selExcepList.push(asset.id);
+    else this.selExcepList = this.selExcepList.filter(id => id !== asset.id);
+  }
 
   actionAddMore() {
     this.actionEmitter.emit(this.actionEnum.ADD);
@@ -168,6 +201,12 @@ export class DsAssetList implements OnInit {
 
   actionEdit() {
     this.actionEmitter.emit(this.actionEnum.EDIT);
+  }
+
+  updateQueryModels() {
+    const asqms: ASQM[] = [], qmdls = this.queryModels;
+    asqms.push.apply(asqms, (qmdls.constructor.name == "Array") ? qmdls : [qmdls]);
+    asqms.forEach(asqm => asqm[(this.selectState == this.selStates.CHECKSOME)?"selectionList":"exceptionList"] = this.selExcepList);
   }
 
   getQueryModelsForAssetService(countQuery: boolean) {
@@ -194,7 +233,7 @@ export class DsAssetList implements OnInit {
   onAssetClick(id:any, clusterId:number) {
     // console.log(id, clusterId);
     if(this.allowAssetNavigation && clusterId) {
-      this.router.navigate([`dss/clusters/${clusterId}/assets/${id}`]);
+      this.router.navigate([`datasteward/clusters/${clusterId}/assets/${id}`]);
     }
   }
 

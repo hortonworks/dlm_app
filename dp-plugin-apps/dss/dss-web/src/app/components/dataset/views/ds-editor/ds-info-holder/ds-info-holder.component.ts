@@ -11,9 +11,9 @@
 
 import {Component, Input, Output, OnInit, SimpleChange, EventEmitter} from "@angular/core";
 import {Lake} from "../../../../../models/lake";
+import {LakeService} from "../../../../../services/lake.service";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
 import {DsTagsService} from "../../../services/dsTagsService";
-import {LakeService} from '../../../../../services/lake.service';
 
 @Component({
   providers: [RichDatasetModel],
@@ -23,7 +23,7 @@ import {LakeService} from '../../../../../services/lake.service';
 })
 export class DsInfoHolder implements OnInit {
 
-  @Input() dsModel: RichDatasetModel;
+  @Input() dsModel = new RichDatasetModel();
   @Input() tags: string[] = [];
   availableTags = [];
   lakes: Lake[];

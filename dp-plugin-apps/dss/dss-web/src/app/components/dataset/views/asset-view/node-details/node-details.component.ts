@@ -31,6 +31,7 @@ export class NodeDetailsComponent implements OnInit {
   name: string;
   iconSrc: string;
   fetchInProgress = true;
+  returnURl: string = '';
 
   readonly entityState = {
     'ACTIVE': false,
@@ -58,6 +59,10 @@ export class NodeDetailsComponent implements OnInit {
         this.fetchInProgress = false;
       }));
     });
+
+    this.route.queryParams.subscribe((params) => {
+      this.returnURl = params.returnURl;
+    });
   }
 
   private extractAssetProperties(properties) {
@@ -83,7 +88,7 @@ export class NodeDetailsComponent implements OnInit {
   }
 
   backToLineage() {
-    this.router.navigate(['../'], {relativeTo: this.route, skipLocationChange: true});
+    this.router.navigate([this.returnURl], {relativeTo: this.route, skipLocationChange: true});
   }
 
 

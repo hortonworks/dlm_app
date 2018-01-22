@@ -235,7 +235,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     svgGroup.selectAll("g.nodes g.node")
       .on('click', function (d) {
         that.tooltip.hide(d);
-        that.router.navigate([{outlets: {'sidebar': ['nodes', d]}}], { relativeTo: that.route, skipLocationChange: true});
+        that.router.navigate([{outlets: {'sidebar': ['nodes', d]}}], { relativeTo: that.route, skipLocationChange: true, queryParams: { returnURl: that.router.url } });
       }).on('mouseleave', function (d) {
       that.activeNode = false;
       let nodeEL = this;

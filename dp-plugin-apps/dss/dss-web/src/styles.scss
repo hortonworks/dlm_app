@@ -20,6 +20,8 @@
 @import "styles/slider";
 @import "styles/dialog";
 @import "styles/dss";
+@import "~angular-star-rating/assets/scss/star-rating";
+
 
 body {
   font-size: 13px;
@@ -33,7 +35,7 @@ body {
 .dp-view-pane {
   padding: 20px 20px;
   border: 1px solid $concrete;
-  min-height: calc(100vh - 85px);
+  //min-height: calc(100vh - 85px);
 }
 
 div.spacer-34 {

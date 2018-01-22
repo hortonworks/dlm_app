@@ -30,6 +30,7 @@ export class DsAssetSearch {
   queryObj: SimpleQueryObjectModel = new SimpleQueryObjectModel("");
   queryModel: AssetSetQueryModel = new AssetSetQueryModel([]);
   showQueryResults: boolean = false;
+  hideActionButtonCont : boolean = false;
 
   @ViewChild("outerCont") outerCont: ElementRef;
   @ViewChild("tabCont") tabCont: ElementRef;
@@ -74,6 +75,8 @@ export class DsAssetSearch {
   }
 
   actionDone() {
+    this.hideActionButtonCont = true;
+    this.dsAssetList.updateQueryModels();
     this.doneNotificationEmitter.emit(this.queryModel);
   }
 
@@ -90,7 +93,7 @@ export class DsAssetSearch {
       case this.tabEnum.ADVANCE:
         this.advanceQueryEditor.updateQueryModel();
         if(!this.queryModel.filters.length) return this.onEmptySearch();
-        this.dsAssetList.fetchAssets();
+        this.dsAssetList.freshFetch();
         break;
     }
   }

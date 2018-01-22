@@ -1,7 +1,7 @@
 export const navigation = [
   {
     name: 'Asset Collection',
-    url: '/datasteward/collections',
+    url: '/dss/collections',
     iconClassName: 'fa-cubes'
   }
 ];
