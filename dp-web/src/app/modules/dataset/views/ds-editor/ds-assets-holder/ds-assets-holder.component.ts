@@ -43,7 +43,7 @@ export class DsAssetsHolder {
 
   actionDone(asqm: AssetSetQueryModel) {
     let futureRdataSet;
-    console.log(asqm.selectionList.length);
+
     if(asqm.selectionList.length) 
       futureRdataSet = this.richDatasetService.addSelectedAssets(this.dsModel.id, this.dsModel.clusterId, asqm.selectionList);
     else
