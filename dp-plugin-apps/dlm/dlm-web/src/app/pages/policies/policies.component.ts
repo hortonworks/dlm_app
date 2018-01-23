@@ -88,12 +88,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   private initPolling() {
 
     const pollingLoop = Observable.timer(POLL_INTERVAL)
-      .concatMap(_ => {
-        if (!this.lastPolicyToggles || (this.lastPolicyToggles.expanded && this.lastPolicyToggles.contentType === PolicyContent.Jobs)) {
-          return this.asyncActions.dispatch(loadPolicies({ numResults: ALL_POLICIES_COUNT }));
-        }
-        return Observable.of(null);
-      })
+      .concatMap(_ => this.asyncActions.dispatch(loadPolicies({ numResults: ALL_POLICIES_COUNT })))
       .repeat()
       .subscribe();
     this.subscriptions.push(pollingLoop);
