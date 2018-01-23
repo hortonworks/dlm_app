@@ -12,7 +12,7 @@
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, AmbariEndpoint, ServiceInfo}
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
 import com.typesafe.config.Config
 import play.api.libs.json.{JsObject, JsResult, JsValue}
@@ -56,6 +56,8 @@ object Webservice {
     def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]]
 
     def getAssetDetails(clusterId: String, atlasGuid: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]]
+
+    def getAssetsDetails(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]]
 
     def getTypeDefs(clusterId: String, defType: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 

@@ -81,6 +81,19 @@ export class RichDatasetService {
       .catch(HttpUtil.handleError);
   }
 
+  addSelectedAssets(dSetId: number, clusterId: number, selection: string[]) : Observable<RichDatasetModel> {
+    const postObj = {
+      datasetId: dSetId,
+      clusterId: clusterId,
+      guids : selection
+    }
+    return this.http
+      .post("/api/add-selected-atlas-assets", postObj, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(this.extractRichDataModel)
+      .catch(HttpUtil.handleError);
+  }
+
   deleteAllAssets(dSetId: number) : Observable<RichDatasetModel> {
     return this.http
       .delete(`/api/dataset/${dSetId}/allassets`, new RequestOptions(HttpUtil.getHeaders()))

@@ -71,6 +71,19 @@ class QueryAttributes @Inject()(
         }
     }
 
+  def getAssetsDetails(clusterId: String, guids: Seq[String]) =
+    AuthenticatedAction.async { req =>
+      Logger.info("Received get properties for entity")
+      implicit val token = req.token
+      atlasService
+        .getAssetsDetails(clusterId, guids)
+        .map {
+          case Left(errors) =>
+            InternalServerError(Json.toJson(errors))
+          case Right(atlasEntities) => Ok(Json.toJson(atlasEntities))
+        }
+    }
+
   def getLineage(clusterId: String, atlasGuid: String) = AuthenticatedAction.async {
     request =>
       Logger.info("Received get lineage")

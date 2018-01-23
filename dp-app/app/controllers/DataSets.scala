@@ -89,7 +89,27 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  private def getAssetFromSearch(clusterId: Long, searchQuery: AtlasSearchQuery, filterDatasetId:Long = 0)(
+  private def getAssetsFromGuids(clusterId: Long, guids:Seq[String], filterDatasetId:Long = 0)
+                                (implicit token: Option[HJwtToken])
+  : Future[Either[Errors, Seq[DataAsset]]]= {
+    atlasService
+      .getAssetsDetails(clusterId.toString, guids)
+      .flatMap {
+        case Left(errors) => Future.successful(Left(errors))
+        case Right(atlasEntities) => {
+          extractAndMarkEntities(clusterId, atlasEntities, filterDatasetId)
+            .map {
+              case Left(errors) => Left(errors)
+              case Right(marked) =>
+                val entitiesToSave =  if(filterDatasetId == 0) marked.filter(_.datasetId.isEmpty)
+                                      else  marked.filter(_.datasetId.getOrElse(0) != filterDatasetId)
+                Right(entitiesToSave.map(getAssetFromEntity(_, clusterId)))
+            }
+        }
+      }
+  }
+
+  private def getAssetFromSearch(clusterId: Long, searchQuery: AtlasSearchQuery, filterDatasetId:Long = 0, exceptions: Seq[String] = Seq())(
     implicit token: Option[HJwtToken])
   : Future[Either[Errors, (Seq[DataAsset], Long, Long)]] = {
     atlasService
@@ -97,7 +117,7 @@ class DataSets @Inject()(
       .flatMap {
         case Left(errors) => Future.successful(Left(errors))
         case Right(atlasEntities) => {
-          extractAndMarkEntities(clusterId, atlasEntities, filterDatasetId)
+          extractAndMarkEntities(clusterId, atlasEntities, filterDatasetId, exceptions)
             .map {
               case Left(errors) => Left(errors)
               case Right(marked) =>
@@ -119,10 +139,33 @@ class DataSets @Inject()(
               clusterId)
   }
 
+  def addSelectedAssetsToDataset = AuthenticatedAction.async(parse.json) { req =>
+    implicit val token = req.token
+    req.body.validate[BoxSelectionPrams].map{ params =>
+      getAssetsFromGuids(params.clusterId, params.guids, params.datasetId).flatMap {
+        case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
+        case Right(assets) =>  assets.size match {
+          case 0 =>
+            Logger.info("Effectively no asset to add.")
+            Future.successful(Conflict)
+          case _ => dataSetService
+            .addAssets(params.datasetId, assets)
+            .map(rDataset =>
+              // TODO Modify Profiler data
+              Ok(Json.toJson(rDataset))
+            )
+            .recoverWith({
+              case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+            })
+        }
+      }
+    }.getOrElse(Future.successful(BadRequest))
+  }
+
   def addAssetsToDataset = AuthenticatedAction.async(parse.json) { req =>
     implicit val token = req.token
     req.body.validate[AddToBoxPrams].map{ params =>
-      getAssetFromSearch(params.clusterId, params.assetQueryModel, params.datasetId).flatMap {
+      getAssetFromSearch(params.clusterId, params.assetQueryModel, params.datasetId, params.exceptions).flatMap {
         case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right((assets, _, _)) =>  assets.size match {
           case 0 =>
@@ -146,6 +189,20 @@ class DataSets @Inject()(
       }
     }.getOrElse(Future.successful(BadRequest))
   }
+
+  def removeAssetsFromDataset(datasetId: Long) = AuthenticatedAction.async { req =>
+    implicit val token = req.token
+    dataSetService
+      .removeAssets(datasetId, req.rawQueryString)
+      .map(rDataset =>
+        // TODO Modify Profiler data
+        Ok(Json.toJson(rDataset))
+      )
+      .recoverWith({
+        case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+      })
+  }
+
 
   def removeAllAssetsFromDataset(datasetId: Long) = AuthenticatedAction.async { req =>
     implicit val token = req.token
@@ -380,7 +437,7 @@ class DataSets @Inject()(
   }
 
   // Extracts entities and mark them with dataset name and Id
-  private def extractAndMarkEntities(clstrId: Long, atlasEntities: AtlasEntities, prefDatasetId:Long = 0)
+  private def extractAndMarkEntities(clstrId: Long, atlasEntities: AtlasEntities, prefDatasetId:Long = 0, exceptions: Seq[String] = Seq())
   : Future[Either[Errors, Seq[Entity]]] = {
     val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
     val assetIds: Seq[String] = entities.filter(_.guid.nonEmpty) map (_.guid.get)
@@ -389,19 +446,21 @@ class DataSets @Inject()(
       .map {
         case Left(errors) => Left(errors)
         case Right(relations) => Right(
-          entities.map { ent =>
-            (relations.find(rel => rel.guid == ent.guid.get && rel.datasetId == prefDatasetId) match {
-              case Some(relation) => Some(relation)
-              case None => relations.find(_.guid == ent.guid.get)
-            })
-            match {
-              case None => ent
-              case Some(ds) => ent.copy(
-                datasetId = Option(ds.datasetId),
-                datasetName = Option(ds.datasetName)
-              )
+          entities
+            .filter(ent => exceptions.find(_ == ent.guid.getOrElse(None)).isEmpty)
+            .map { ent =>
+              (relations.find(rel => rel.guid == ent.guid.get && rel.datasetId == prefDatasetId) match {
+                case Some(relation) => Some(relation)
+                case None => relations.find(_.guid == ent.guid.get)
+              })
+              match {
+                case None => ent
+                case Some(ds) => ent.copy(
+                  datasetId = Option(ds.datasetId),
+                  datasetName = Option(ds.datasetName)
+                )
+              }
             }
-          }
         )
       }
   }
