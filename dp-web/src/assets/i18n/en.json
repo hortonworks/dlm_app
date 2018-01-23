@@ -357,6 +357,11 @@
         }
       }
     },
+    "comments": {
+      "collaborate": "Collaborate",
+      "fetchErrorMsg": "Could not fetch related Comments",
+      "noComments": "No Comments yet"
+    },
     "analytics": {
       "workspace": {
         "title": "Workspaces",

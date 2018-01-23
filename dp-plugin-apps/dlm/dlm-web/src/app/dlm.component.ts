@@ -92,10 +92,24 @@ export class DlmComponent implements OnDestroy, OnInit {
         'go-to-overview'
       ),
       new MenuItem(
-        t.instant('sidenav.menuItem.clusters'),
+        t.instant('sidenav.menuItem.data_stores'),
         './clusters',
-        'navigation-icon fa fa-fw fa-cubes',
-        'go-to-clusters'
+        'navigation-icon fa fa-fw fa-database',
+        'go-to-clusters',
+        [
+          new MenuItem(
+            t.instant('sidenav.menuItem.clusters'),
+            './clusters',
+            'navigation-icon fa fa-fw fa-cubes',
+            'go-to-clusters'
+          ),
+          new MenuItem(
+            t.instant('sidenav.menuItem.cloud_stores'),
+            './cloud-stores',
+            'navigation-icon fa fa-fw fa-cloud',
+            'go-to-cloud-stores'
+          )
+        ]
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
@@ -127,7 +141,10 @@ export class DlmComponent implements OnDestroy, OnInit {
         reloadTimeOut = setTimeout(() => location.reload(), RELOAD_TIME);
       });
     const clustersRequestSubscription = this.asyncActions.dispatch(loadClusters())
-      .subscribe(_ => this.initPolling());
+      .subscribe(_ => {
+        this.store.dispatch(loadClustersStatuses());
+        this.initPolling();
+      });
     this.subscriptions.push(clustersRequestSubscription);
     this.subscriptions.push(pathChange$);
   }

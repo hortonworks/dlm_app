@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<dlm-progress-container [progressState]="overallProgress$ | async">
+  <div class="row">
+    <div class="col-md-8" *ngIf="(activeTabValue$ |async)">
+      <div class="clearfix">
+        <tabs [items]="tabs" [activeTabValue]="activeTabValue$ |async" (clickOnItem)="selectTab($event)"></tabs>
+        <button (click)="addAccount()" class="btn btn-secondary pull-right">Add</button>
+      </div>
+      <div *ngIf="(tableData$ | async)?.length > 0; else noAccounts">
+        <dlm-cloud-accounts-list [accounts]="tableData$ | async"></dlm-cloud-accounts-list>
+      </div>
+      <ng-template #noAccounts>
+        <div qe-attr="no-accounts-alert">
+          <div class="alert alert-warning" role="alert">
+            {{"page.cloud_stores.content.no_accounts" | translate}}
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</dlm-progress-container>

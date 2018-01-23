@@ -43,11 +43,19 @@ object Entities {
     }
   }
 
+  object SharingStatus extends Enumeration {
+    val PUBLIC = Value(1)
+    val PRIVATE = Value(2)
+  }
+
   case class HJwtToken(token: String)
 
   case class Error(code: String,
                    message: String,
                    errorType: String = ErrorType.General.toString)
+
+  case class RestApiException(respCode : Int,
+                              errorsObj: Errors) extends Exception(errorsObj.firstMessage)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
@@ -280,6 +288,7 @@ object Entities {
                      lastModified: LocalDateTime = LocalDateTime.now(),
                      active: Boolean = true,
                      version: Int = 1,
+                     sharedStatus: Int = SharingStatus.PUBLIC.id,
                      customProps: Option[JsValue] = None)
 
   case class DatasetCategory(categoryId: Long, datasetId: Long)
@@ -374,6 +383,29 @@ object Entities {
                                    dataAssets: Seq[DataAsset] = Nil)
 
   case class BlacklistedToken(id: Option[Long], token: String, expiry: LocalDateTime)
+
+  case class Comment(id: Option[Long] = None,
+                      comment: Option[String],
+                      objectType: String,
+                      objectId: Long,
+                      createdBy: Long,
+                      createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      parentCommentId: Option[Long],
+                      editVersion: Option[Int] = Some(0))
+
+  case class CommentWithUser(comment:Comment,
+                             userName: String)
+
+  case class commentWithUserAndChildren(commentWithUser: CommentWithUser,
+                                        children: Seq[CommentWithUser])
+
+  case class Rating(id: Option[Long] = None,
+                    rating: Float,
+                    objectType: String,
+                    objectId: Long,
+                    createdBy: Long)
+
 }
 
 object JsonFormatters {
@@ -387,6 +419,9 @@ object JsonFormatters {
 
   implicit val errorsWrites = Json.writes[Errors]
   implicit val errorsReads = Json.reads[Errors]
+
+  implicit val restApiExceptionWrites = Json.writes[RestApiException]
+  implicit val restApiExceptionReads = Json.reads[RestApiException]
 
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]
@@ -547,6 +582,18 @@ object JsonFormatters {
 
   implicit val serviceDependencyWrites = Json.writes[ServiceDependency]
   implicit val serviceDependencyReads = Json.reads[ServiceDependency]
+
+  implicit val commentWrites = Json.writes[Comment]
+  implicit val commentReads = Json.reads[Comment]
+
+  implicit val commentWithUserWrites = Json.writes[CommentWithUser]
+  implicit val commentWithUserReads = Json.reads[CommentWithUser]
+
+  implicit val oneLevelCommentWrites = Json.writes[commentWithUserAndChildren]
+  implicit val oneLevelCommentReads = Json.reads[commentWithUserAndChildren]
+
+  implicit val ratingWrites = Json.writes[Rating]
+  implicit val ratingReads = Json.reads[Rating]
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 

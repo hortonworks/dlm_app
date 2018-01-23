@@ -10,7 +10,7 @@
 #
 FROM openjdk:8-jre
 
-ENV HDP_VERSION=2.6.3.0-187
+ENV HDP_VERSION=2.6.4.0-91
 ENV CONSUL_VERSION=0.8.5
 ENV KNOX_SSO_CONFIG_PATH=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
 

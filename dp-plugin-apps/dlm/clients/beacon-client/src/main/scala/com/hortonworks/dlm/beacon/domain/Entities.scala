@@ -61,12 +61,14 @@ object ResponseEntities {
   case class BeaconLogResponse(status: String, message: String, requestId: String)
 
   case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String,
-                                       wireEncryption: Boolean, rangerCreateDenyPolicy: String)
+                                       wireEncryption: Boolean, rangerCreateDenyPolicy: String, replication_TDE: Option[Boolean],
+                                       replication_cloud_fs: Option[Boolean], replication_cloud_hive_withCluster: Option[Boolean])
 
   case class BeaconAdminStatusDetails(clusterId: Long, beaconAdminStatus: BeaconAdminStatusResponse)
 
   case class HdfsFile(accessTime: Long, blockSize: Long, group: String, length: Long, modificationTime: Long,
-                      owner: String, pathSuffix: String, permission: String, replication: Int, `type`: String)
+                      owner: String, pathSuffix: String, permission: String, replication: Int, `type`: String,
+                      isEncrypted: Option[Boolean], encryptionKeyName: Option[String])
 
   case class BeaconHdfsFileResponse(status: String, message: String, requestId: String, totalResults: Long, fileList: Seq[HdfsFile])
 
@@ -89,7 +91,8 @@ object RequestEntities {
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
                                       startTime: Option[String], endTime: Option[String], distcpMaxMaps: Option[Long],
-                                      distcpMapBandwidth: Option[Long], queueName: Option[String], description: Option[String])
+                                      distcpMapBandwidth: Option[Long], queueName: Option[String],
+                                      `tde.sameKey`: Option[Boolean], description: Option[String])
 }
 
 object JsonFormatters {

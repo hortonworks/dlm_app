@@ -9,7 +9,14 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule, AlertModule } from 'ngx-bootstrap';
+import {
+  BsDropdownModule,
+  ButtonsModule,
+  TooltipModule,
+  CollapseModule,
+  ProgressbarModule,
+  AlertModule
+} from 'ngx-bootstrap';
 import { ModalModule } from 'ngx-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
@@ -29,7 +36,12 @@ import { FormFieldComponent } from './forms/form-field/form-field.component';
 import { FormFieldDirective } from './forms/form-field/form-field.directive';
 import { FieldErrorComponent } from './forms/field-error/field-error.component';
 import { ProgressContainerComponent } from './progress-container/progress-container.component';
-import { SelectFieldComponent, SelectFieldOptionDirective, SelectFieldValueDirective } from './forms/select-field/';
+import {
+  SelectFieldComponent,
+  SelectFieldOptionDirective,
+  SelectFieldValueDirective,
+  SelectFieldDropdownDirective
+} from './forms/select-field/';
 import { MapComponent } from './map/map.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
 import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.component';
@@ -87,6 +99,7 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     SelectFieldComponent,
     SelectFieldOptionDirective,
     SelectFieldValueDirective,
+    SelectFieldDropdownDirective,
     MapComponent,
     PageHeaderComponent,
     AddEntityButtonComponent,
@@ -126,6 +139,7 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     SelectFieldComponent,
     SelectFieldOptionDirective,
     SelectFieldValueDirective,
+    SelectFieldDropdownDirective,
     MapComponent,
     PageHeaderComponent,
     AddEntityButtonComponent,
@@ -151,4 +165,5 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     FieldLabelComponent
   ]
 })
-export class CommonComponentsModule {}
+export class CommonComponentsModule {
+}

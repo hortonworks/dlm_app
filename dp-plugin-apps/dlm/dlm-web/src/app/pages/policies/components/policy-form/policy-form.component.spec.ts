@@ -31,6 +31,7 @@ import {HdfsService} from 'services/hdfs.service';
 import {Observable} from 'rxjs/Observable';
 import {TooltipModule} from 'ngx-bootstrap';
 import { configureComponentTest } from 'testing/configure';
+import { SelectCloudDestinationComponent } from '../select-cloud-destination/select-cloud-destination.component';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
@@ -61,7 +62,8 @@ describe('PolicyFormComponent', () => {
         TableComponent,
         TableFooterComponent,
         TableFilterComponent,
-        ActionColumnComponent
+        ActionColumnComponent,
+        SelectCloudDestinationComponent
       ],
       providers: [
         {provide: HdfsService, useValue: mockHdfsService},

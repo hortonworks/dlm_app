@@ -10,19 +10,20 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-import com.microsoft.azure.storage.{CloudStorageAccount, StorageCredentials, StorageCredentialsSharedAccessSignature}
+import com.microsoft.azure.storage.{CloudStorageAccount, StorageCredentialsSharedAccessSignature}
 import com.microsoft.azure.storage.blob._
 import models.CloudAccountEntities.CloudAccountWithCredentials
 import models.CloudAccountEntities.Error._
+import models.CloudResponseEntities.{FileListResponse, MountPointDefinition, MountPointsResponse}
 import models.CloudCredentialType
-import models.WASBEntities.{BlobListResponse, MountPointsResponse, _}
+import models.WASBEntities._
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton()
-class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
+class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
 
   private def mapError(err: GenericError): GenericError   = {
     GenericError(err.message)
@@ -41,7 +42,7 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
     CloudCredentialType.withName(cloudAccount.accountCredentials.credentialType) match {
       case CloudCredentialType.WASB_TOKEN =>
         val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredential]
-        CloudStorageAccount.parse(s"DefaultEndpointsProtocol=${credential.protocol};" +
+        CloudStorageAccount.parse(s"DefaultEndpointsProtocol=https;" +
           s"AccountName=${accountDetails.accountName};" +
           s"AccountKey=${credential.accessKey}")
       case CloudCredentialType.WASB_SAS_TOKEN =>
@@ -76,26 +77,26 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  private def listBlobs(accountId: String, containerName: String, path: String): Future[Either[GenericError, BlobListResponse]] = {
+  private def listBlobs(accountId: String, containerName: String, path: String): Future[Either[GenericError, FileListResponse]] = {
     createBlobClient(accountId) map {
       case Right(client) => {
         try {
           val container: CloudBlobContainer = client.getContainerReference(containerName)
           if (!container.exists()) {
-            Left(GenericError(message = s"Container ${containerName} is not exist"))
+            Left(GenericError(message = s"Container $containerName does not exist"))
           } else {
             var fileList: Seq[BlobListItem] = Seq()
             for (blobItem: ListBlobItem <- container.listBlobs(path.substring(1)).asScala) {
               val file = blobItem match {
                 case dir: CloudBlobDirectory => BlobListItem(
-                  getDirectoryName(dir.getPrefix()),
+                  getDirectoryName(dir.getPrefix),
                   "DIRECTORY",
                   None, None)
                 case blob: CloudBlob => BlobListItem(
-                  getFileName(blob.getName()),
+                  getFileName(blob.getName),
                   "FILE",
-                  Option(blob.getProperties().getLastModified().getTime()),
-                  Option(blob.getProperties().getLength()))
+                  Option(blob.getProperties.getLastModified.getTime),
+                  Option(blob.getProperties.getLength))
               }
               fileList = fileList :+ file
             }
@@ -109,11 +110,16 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def getContainers(accountId: String): Future[Either[GenericError, MountPointsResponse]] = {
+  /**
+    * Lists all containers
+    * @param accountId
+    * @return
+    */
+  override def listMountPoints(accountId: String): Future[Either[GenericError, MountPointsResponse]] = {
     listContainers(accountId) map {
       case Right(containers) => {
         val items = containers.map { container =>
-          MountPointDefinition(container.getName())
+          MountPointDefinition(container.getName)
         }
         Right(MountPointsResponse(items))
       }
@@ -121,7 +127,7 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def getFiles(accountId: String, containerName: String, path: String): Future[Either[GenericError, BlobListResponse]] = {
+  override def listFiles(accountId: String, containerName: String, path: String): Future[Either[GenericError, FileListResponse]] = {
     listBlobs(accountId, containerName, path) map {
       case Right(blobs) => Right(blobs)
       case Left(err) => Left(mapError(err))
@@ -130,7 +136,7 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) {
 
   // todo: need to check another way to check identity since if credential isn't valid azure-sdk
   // will throw error only after timeout
-  def checkUserIdentityValid(accountId: String): Future[Either[GenericError, Unit]] = {
+  override def checkUserIdentityValid(accountId: String): Future[Either[GenericError, Unit]] = {
     listContainers(accountId) map {
       case Left(err) => Left(mapError(err))
       case _ => Right(())

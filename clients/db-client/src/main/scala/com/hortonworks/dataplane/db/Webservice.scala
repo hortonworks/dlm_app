@@ -11,13 +11,15 @@
 
 package com.hortonworks.dataplane.db
 
+import com.google.common.base.Strings
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, EntityDatasetRelationship}
-import play.api.libs.json.{JsObject, JsResult, Json}
+import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}
 import play.api.libs.ws.WSResponse
 
 import scala.concurrent.Future
+import scala.util.{Success, Try}
 
 object Webservice {
 
@@ -38,11 +40,23 @@ object Webservice {
                                f: WSResponse => JsResult[Errors]): Errors = {
       if (res.body.isEmpty)
         Errors()
-      f(res).map(r => r).getOrElse(Errors())
+      else f(res).map(r => r).getOrElse(Errors())
     }
 
     protected def mapErrors(res: WSResponse) = {
       Left(extractError(res, r => r.json.validate[Errors]))
+    }
+
+    protected def mapResponseToError(res: WSResponse) = {
+      val errorsObj = Try(res.json.validate[Errors])
+
+      errorsObj match {
+        case Success(e :JsSuccess[Errors]) =>
+          throw new RestApiException(res.status, e.get)
+        case _ =>
+          val msg = if(Strings.isNullOrEmpty(res.body)) res.statusText else  res.body
+          throw new RestApiException(res.status, Errors(Seq(Error(res.status.toString, msg, ErrorType.General.toString))))
+      }
     }
 
   }
@@ -110,15 +124,17 @@ object Webservice {
 
     def removeAllAssets(id: Long) : Future[RichDataset]
 
-    def listRichDataset(queryString : String): Future[Either[Errors, Seq[RichDataset]]]
+    def listRichDataset(queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 
-    def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]]
+    def getRichDatasetById(id: Long,userId:Long): Future[Either[Errors, RichDataset]]
 
-    def listRichDatasetByTag(tagName: String, queryString : String): Future[Either[Errors, Seq[RichDataset]]]
+    def listRichDatasetByTag(tagName: String, queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 
     def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long): Future[Either[Errors, Seq[DataAsset]]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
+
+    def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset]
 
     def delete(dataSetId: String): Future[Either[Errors, Long]]
   }
@@ -184,6 +200,21 @@ object Webservice {
     def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
 
     def retrieve(locationId: Long): Future[Either[Errors, Location]]
+
+  }
+
+  trait CommentService extends DbClientService {
+
+    //def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
+
+    def add(comment: Comment): Future[CommentWithUser]
+
+    def getByObjectRef(objectId: String, objectType:String): Future[Seq[commentWithUserAndChildren]]
+
+    def deleteById(commentId: String,userId: Long): Future[String]
+
+    def update(commentText: String, commentId: String): Future[CommentWithUser]
+
 
   }
 

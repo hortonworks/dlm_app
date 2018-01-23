@@ -9,24 +9,26 @@
 
 package services
 
-import com.amazonaws.{AmazonClientException}
+import com.amazonaws.AmazonClientException
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient
-import com.amazonaws.services.securitytoken.model.{GetCallerIdentityRequest}
+import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import com.typesafe.scalalogging.Logger
-import models.AmazonS3Entities.{BucketObject, BucketObjectsResponse, CloudUserDetails, S3AccountCredential, Bucket => DlmBucket}
-import models.AmazonS3Entities.Error.{AmazonS3Error}
-import models.CloudAccountEntities.Error.{GenericError}
+import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails, S3FileItem, S3FileListResponse}
+import models.AmazonS3Entities.Error.AmazonS3Error
+import models.CloudAccountEntities.Error.GenericError
 import com.google.inject.{Inject, Singleton}
-import models.CloudAccountEntities.{CloudAccountCredentials}
+import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
+import models.{CloudAccountProvider, CloudCredentialType}
+import models.CloudResponseEntities.{FileListItem, FileListResponse, MountPointDefinition, MountPointsResponse}
 
 import collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
+class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudService {
 
   private val logger = Logger(classOf[AmazonS3Service])
 
@@ -51,17 +53,17 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     new AWSSecurityTokenServiceClient(createBasicClient(credential))
   }
 
-  def getUserIdentity(credential: CloudAccountCredentials) : Future[Either[AmazonS3Error, CloudUserDetails]] = {
+  def getUserIdentity(credential: CloudAccountCredentials) : Future[Either[AmazonS3Error, CloudAccountDetails]] = {
     val awsCredential: S3AccountCredential = credential.asInstanceOf[S3AccountCredential]
     val awsStsClient = createSTSClient(awsCredential)
-    val amazonS3Client = createS3Client(awsCredential)
     try {
       val callerIdentityResult = awsStsClient.getCallerIdentity(new GetCallerIdentityRequest)
       val arn = callerIdentityResult.getArn
       val userNameIndex= arn.indexOf(AmazonS3Service.arnUserNameLabel) + AmazonS3Service.arnUserNameLabel.length
       val userName = arn.substring(userNameIndex)
-      val accountOwner = amazonS3Client.getS3AccountOwner.getDisplayName
-      Future.successful(Right(CloudUserDetails(callerIdentityResult.getAccount, accountOwner, userName)))
+      val accountId = callerIdentityResult.getAccount
+      Future.successful(Right(S3AccountDetails(CloudAccountProvider.S3.toString, Some(CloudCredentialType.S3_TOKEN),
+        accountId, userName)))
     } catch {
       case ex : AmazonClientException =>
         logger.error(ex.getMessage)
@@ -69,7 +71,7 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def checkUserIdentityValid(accountId: String) : Future[Either[GenericError, Unit]] = {
+  override def checkUserIdentityValid(accountId: String) : Future[Either[GenericError, Unit]] = {
     dlmKeyStore.getCloudAccount(accountId) map {
       case Right(result) =>
         val credential = result.accountCredentials.asInstanceOf[S3AccountCredential]
@@ -85,13 +87,19 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def listAllBuckets(accountId: String) : Future[Either[GenericError, List[DlmBucket]]] = {
+  /**
+    * Lists all buckets
+    * @param accountId
+    * @return
+    */
+  override def listMountPoints(accountId: String) : Future[Either[GenericError, MountPointsResponse]] = {
     dlmKeyStore.getCloudAccount(accountId) map {
       case Right(result) =>
         val amazonS3Client = createS3Client(result.accountCredentials.asInstanceOf[S3AccountCredential])
         try {
-          Right(amazonS3Client.listBuckets.asScala.toList.map(x =>
-            DlmBucket(x.getName, x.getOwner.getDisplayName, x.getCreationDate.toString)))
+          val allBuckets = amazonS3Client.listBuckets.asScala.toList.map(x =>
+            MountPointDefinition(x.getName))
+          Right(MountPointsResponse(allBuckets))
         } catch {
           case ex : AmazonClientException =>
             logger.error(ex.getMessage)
@@ -101,20 +109,20 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) {
     }
   }
 
-  def listAllObjects(accountId: String, bucketName: String, path: String) : Future[Either[GenericError, BucketObjectsResponse]] = {
+  override def listFiles(accountId: String, bucketName: String, path: String) : Future[Either[GenericError, FileListResponse]] = {
     dlmKeyStore.getCloudAccount(accountId) map {
       case Right(result) =>
         val amazonS3Client = createS3Client(result.accountCredentials.asInstanceOf[S3AccountCredential])
         try {
-          val bucketObjects = amazonS3Client.listObjects(bucketName, path.substring(1)).getObjectSummaries().asScala.toList.flatMap{
+          val bucketObjects = amazonS3Client.listObjects(bucketName, path.substring(1)).getObjectSummaries.asScala.toList.flatMap{
             case x if x.getKey.substring(path.substring(1).length).split("/").length == 1 => {
               val rest = x.getKey.substring(path.substring(1).length)
               if (rest == "") None else
-              Some(BucketObject(extractFileName(rest), extractFileType(rest), Option(x.getSize), Option(x.getLastModified().getTime())))
+              Some(S3FileItem(extractFileName(rest), extractFileType(rest), Option(x.getSize), Option(x.getLastModified.getTime)))
             }
             case _ => None
           }
-          Right(BucketObjectsResponse(bucketObjects))
+          Right(S3FileListResponse(bucketObjects))
         } catch {
           case ex : AmazonClientException =>
             logger.error(ex.getMessage)

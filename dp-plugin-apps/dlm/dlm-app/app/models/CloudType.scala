@@ -9,6 +9,10 @@
 
 package models
 
+import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudCredentialType.CloudCredentialType
+import play.api.libs.json._
+
 /**
   * Cloud types that are supported for cloud replication
   */
@@ -32,6 +36,11 @@ object CloudCredentialType extends Enumeration {
   val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
   val S3_TOKEN = Value("S3_TOKEN")
   val ADLS_STS = Value("ADLS_STS")
+
+  implicit val cloudCredentialTypeFormat = new Format[CloudCredentialType] {
+    def reads(json: JsValue) = JsSuccess(CloudCredentialType.withName(json.as[String]))
+    def writes(myEnum: CloudCredentialType) = JsString(myEnum.toString)
+  }
 }
 
 /**
@@ -43,4 +52,9 @@ object CloudAccountProvider extends Enumeration {
   val WASB = Value("WASB")
   val S3 = Value("S3")
   val ADLS = Value("ADLS")
+
+  implicit val cloudAccountProviderFormat = new Format[CloudAccountProvider] {
+    def reads(json: JsValue) = JsSuccess(CloudAccountProvider.withName(json.as[String]))
+    def writes(myEnum: CloudAccountProvider) = JsString(myEnum.toString)
+  }
 }

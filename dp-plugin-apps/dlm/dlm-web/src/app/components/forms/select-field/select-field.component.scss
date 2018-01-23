@@ -7,6 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+@import '../../../styles/variables';
+
 .select-field-container {
   position: relative;
   width: 100%;
@@ -26,9 +28,8 @@
   }
 }
 
-.select-field-option-list {
+.select-field-options-wrapper {
   position: absolute;
-  list-style: none;
   border: 1px solid #ccc;
   width: 100%;
   z-index: 3;
@@ -37,12 +38,36 @@
   border-radius: 0 0 4px 4px;
   max-height: 35px * 6;
   overflow: auto;
+  >.row {
+    margin: 0;
+    >.col-md-6 {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}
+
+.group-title {
+  color: $link-color;
+}
+
+.select-field-option-list {
+  list-style: none;
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
 
   .select-field-option-item {
     padding: 10px;
     width: inherit;
     border-bottom: 1px solid #ccc;
-
+    &.no-hover {
+      &:hover {
+        background: white;
+      }
+    }
     &:hover {
       background-color: #f5f5f5;
     }

@@ -58,8 +58,9 @@ export class HttpUtil {
     let message;
     if (error._body) {
       let errorJSON = JSON.parse(error._body);
-      if(Array.isArray(errorJSON.errors) && errorJSON.errors[0] && errorJSON.errors[0].code && errorJSON.errors[0].message && errorJSON.errors[0].errorType){
-        message = errorJSON.errors.filter(err => {return (err.code && err.message && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
+      if((Array.isArray(errorJSON.errors) && HttpUtil.isValidErrArray(errorJSON)) || (Array.isArray(errorJSON.errorsObj.errors) && HttpUtil.isValidErrArray(errorJSON.errorsObj))){
+        let errObject = (Array.isArray(errorJSON.errors) ? errorJSON : errorJSON.errorsObj)
+        message = HttpUtil.getMsgsFromErrArray(errObject);
       }else if(Array.isArray(errorJSON)){
         message = errorJSON.map(err => {return HttpUtil.truncateErrorMessage(err.message)}).join(', ')
       }else if(errorJSON.message){
@@ -74,6 +75,12 @@ export class HttpUtil {
     return Observable.throw(error);
   }
 
+  private static isValidErrArray(errObject) {
+    return errObject.errors[0] && errObject.errors[0].code && errObject.errors[0].errorType
+  }
+  private static getMsgsFromErrArray(errorObj){
+    return errorObj.errors.filter(err => {return (err.code && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
+  }
   private static processErrorMessage(error:CustomError){
     if(error.code.length > 16){
       return error.code;

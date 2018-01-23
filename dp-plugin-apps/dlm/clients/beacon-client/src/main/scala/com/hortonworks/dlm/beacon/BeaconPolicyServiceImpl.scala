@@ -99,6 +99,10 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
         case Some(queueName) => "\nqueueName = " + queueName
         case None => ""
       }) +
+      (policyDefinitionRequest.`tde.sameKey` match {
+        case Some(tdeSameKey) => "\ntde.sameKey = " + tdeSameKey
+        case None => ""
+      }) +
       (policyDefinitionRequest.description match {
         case Some(description) => "\ndescription = " + description
         case None => ""
