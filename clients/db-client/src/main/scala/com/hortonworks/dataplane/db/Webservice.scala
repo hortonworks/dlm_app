@@ -122,6 +122,8 @@ object Webservice {
 
     def addAssets(id: Long, dataAssets: Seq[DataAsset]) : Future[RichDataset]
 
+    def removeAssets(datasetId: Long, queryString: String) : Future[RichDataset]
+
     def removeAllAssets(id: Long) : Future[RichDataset]
 
     def listRichDataset(queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]

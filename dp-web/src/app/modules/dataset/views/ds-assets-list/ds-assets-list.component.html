@@ -42,7 +42,8 @@
     <div class="list" [class.unLoaded]="!dsAssets.length" [class.withDsNameCom]="showBelongsToColumn">
       <div class="listRow listHead">
         <div *ngIf="dsAssets.length">
-          <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>
+          <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox" (change)="onCheckAllChange($event)" 
+            [checked]="checkedAllState()"/></div>
           <div class="col starCol" *ngIf="showBelongsToColumn">&nbsp;</div>
           <div class="col sourceCol">{{"pages.dataset.labels.source" | translate}}</div>
           <div class="col nameCol">{{"pages.dataset.labels.name" | translate}}</div>
@@ -59,7 +60,8 @@
         <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>{{"common.loading" | translate}} ...</span></div>
         <div *ngIf="dsAssets.length">
           <div class="listRow"  *ngFor="let asset of dsAssets;" [class.disabledRow]="asset.dsName">
-            <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>
+            <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox" [checked]="showChecked(asset)"
+              (change)="onAssetSelectionChange(asset)"/></div>
             <div class="col starCol" *ngIf="showBelongsToColumn">{{asset.dsName?"*":"&nbsp;"}}</div>
             <div class="col sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
               <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>

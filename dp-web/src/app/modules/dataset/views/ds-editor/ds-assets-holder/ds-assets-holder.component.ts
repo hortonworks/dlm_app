@@ -42,9 +42,14 @@ export class DsAssetsHolder {
   }
 
   actionDone(asqm: AssetSetQueryModel) {
-    this.richDatasetService
-      .addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm])
-      .subscribe(rData => {
+    let futureRdataSet;
+
+    if(asqm.selectionList.length) 
+      futureRdataSet = this.richDatasetService.addSelectedAssets(this.dsModel.id, this.dsModel.clusterId, asqm.selectionList);
+    else
+      futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
+    
+    futureRdataSet.subscribe(rData => {
         this.dsModel = rData;
         // this.assetSetQueryModelsForAddition.push(asqm);
         this.showPopup = false;

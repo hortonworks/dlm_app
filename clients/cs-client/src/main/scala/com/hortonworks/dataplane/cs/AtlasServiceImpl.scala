@@ -42,10 +42,20 @@ class AtlasServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
     }
   }
 
+  private def mapToAtlasEntities(res: WSResponse) = {
+    res.status match {
+      case 200 => extractEntity[AtlasEntities](res, r => {
+        val entities = (r.json \ "results" \ "data" \ "entities").validate[Seq[AssetProperties]].get.map(_.getEntity())
+        AtlasEntities(Some(entities.toList))
+      })
+      case _ => mapErrors(res)
+    }
+  }
+
   private def mapToProperties(res: WSResponse) = {
     res.status match {
-      case 200 => extractEntity[AssetProperties](res, r =>
-        (r.json \ "results" \ "data" \ "entity").validate[AssetProperties].get
+      case 200 => extractEntity[Seq[AssetProperties]](res, r =>
+        (r.json \ "results" \ "data" \ "entities").validate[Seq[AssetProperties]].get
       )
       case _ => mapErrors(res)
     }
@@ -83,6 +93,15 @@ class AtlasServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapResultsGeneric)
+  }
+
+  def getAssetsDetails(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]] = {
+    ws.url(s"$url/cluster/$clusterId/atlas/guid")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .withQueryString(guids.map(guid => ("query", guid)): _*)
+      .get()
+      .map(mapToAtlasEntities)
   }
 
   override def getTypeDefs(clusterId: String, defType:String) (implicit token:Option[HJwtToken]): Future[Either[Errors,JsObject]] = {

@@ -141,6 +141,13 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       .getOrElse(Future.successful(BadRequest))
   }
 
+  def removeAssets (datasetId: Long, ids: Seq[Long]) = Action.async { req =>
+    datasetRepo
+      .removeAssets(datasetId, ids)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
+  }
+
   def removeAllAssets (datasetId: Long) = Action.async { req =>
     datasetRepo
       .removeAllAssets(datasetId)

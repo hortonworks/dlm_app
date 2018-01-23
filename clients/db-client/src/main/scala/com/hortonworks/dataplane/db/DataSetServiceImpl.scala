@@ -77,6 +77,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDataset1)
   }
 
+  def removeAssets(datasetId: Long, queryString: String) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$datasetId/assets?$queryString")
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map(mapToRichDataset1)
+  }
+
   def removeAllAssets(datasetId: Long) : Future[RichDataset] = {
     ws.url(s"$url/datasets/$datasetId/removeallassets")
       .withHeaders("Accept" -> "application/json")

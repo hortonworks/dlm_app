@@ -356,6 +356,11 @@ object Entities {
                             assetQueryModel: AtlasSearchQuery,
                             exceptions : Seq[String])
 
+  case class BoxSelectionPrams( datasetId:Long,
+                            clusterId: Long,
+                            guids : Seq[String])
+
+
   case class LdapConfiguration(
       id: Option[Long],
       ldapUrl: Option[String]=None,
@@ -528,6 +533,9 @@ object JsonFormatters {
 
   implicit val addToBoxPramsReads = defaultJson.reads[AddToBoxPrams]
   implicit val addToBoxPramsWrites = Json.writes[AddToBoxPrams]
+
+  implicit val BoxSelectionPramsReads = defaultJson.reads[BoxSelectionPrams]
+  implicit val BoxSelectionPramsWrites = Json.writes[BoxSelectionPrams]
 
   implicit val richDatasetReads = defaultJson.reads[RichDataset]
   implicit val richDatasetWrites = Json.writes[RichDataset]
