@@ -1,0 +1,25 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<span class="paginationRow" *ngIf="showPagination">
+  <span>{{"common.pagination.rowsPerPage" | translate}}</span>
+  <span class="pageSizeSpan">
+    <select id="page-size-dropdown" [(ngModel)]="pageSize" (change)="pageSizeChange()">
+      <option *ngFor="let opt of pageSizeOptions;" [value]="opt" id="size-{{opt}}">{{opt}}</option>
+    </select>
+  </span>&nbsp;&nbsp;&nbsp;&nbsp;
+  <span *ngIf="count!=infinity">
+    <span>{{start + "-" + end +" of " + count}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+  </span>
+  <i id="previous-btn" class="fa fa-chevron-left" [ngClass]="{'disabled': start === 1}" (click)="previous()"></i>&nbsp;&nbsp;
+  <i id="next-btn" class="fa fa-chevron-right" [ngClass]="{'disabled': end === count}" (click)="next()"></i>
+</span>
+<div style="clear: both"></div>

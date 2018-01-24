@@ -25,7 +25,7 @@ public class ServicesConfigUtil {
   private ArrayList<ServiceConfig> serviceConfigs=new ArrayList<>();
   public ServicesConfigUtil() {
     serviceConfigs.add(new ServiceConfig("dlm",new String[]{"dlmapp"}));
-    serviceConfigs.add(new ServiceConfig("dss",new String[]{"dpapp"},new String[]{"/api/dataset", "/api/dataset-tag"}));
+    serviceConfigs.add(new ServiceConfig("dss",new String[]{"dssapp"},new String[]{"/api/dataset", "/api/dataset-tag"}));
   }
 
 

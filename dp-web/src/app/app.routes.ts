@@ -22,14 +22,6 @@ import {LoaderSpinComponent} from './shared/loader-spin/loader-spin.component';
 import {ServiceErrorComponent} from './shared/service-error/service-error.component';
 
 export const routes: Routes = [{
-  path: 'datasteward',
-  loadChildren: './modules/dataset/dataset.module#DatasetModule',
-  canActivate:[ NavigationGuard ],
-  data: {
-    crumb: 'dss',
-    title: 'dss',
-  }
-}, {
   path: 'onboard',
   loadChildren: './modules/onboard/onboard.module#OnboardModule',
   canActivate:[ NavigationGuard ],

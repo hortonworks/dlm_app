@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 @RequestMapping("/service")
 public class ServiceMetricsController {
 
-  private static final Map<String,String> METERED_SERVICES = ImmutableMap.of("db","db-service", "clusters","cluster-service", "core", "core","dlm","dlm");
+  private static final Map<String,String> METERED_SERVICES = ImmutableMap.of("db","db-service", "clusters","cluster-service", "core", "core","dlm","dlm", "dss", "dss");
   private static Logger log = LoggerFactory.getLogger(ServiceMetricsController.class);
 
 

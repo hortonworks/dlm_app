@@ -1,0 +1,27 @@
+.dss-body {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow-x: hidden;
+
+  .dss-main {
+    flex: 1;
+    min-width: 0;
+    margin: 0px 0px 0px $side-nav-width;
+    transition: all $layout-transition-time ease;
+  }
+
+  .dss-sidebar {
+    flex: 0 0 $side-nav-width;
+    order: -1;
+    transition: width $layout-transition-time ease;
+
+    &.dss-sidebar-collapsed {
+      transition: width $layout-transition-time ease;
+    }
+  }
+
+  .dss-sidebar-collapsed + .dss-main {
+    margin: 0px 0px 0px $side-nav-minimised-width;
+  }
+}
