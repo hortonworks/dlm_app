@@ -45,6 +45,16 @@ class CredentialManager(private val storePath: String, private val storePassword
     }
   }
 
+  def read(alias: String): Try[Array[Byte]] = {
+    keystore.map { keystore =>
+      if (!keystore.containsAlias(s"$alias")) {
+        throw CredentialNotFoundInKeystoreException(s"Credential not found for key of $alias")
+      } else {
+        keystore.getKey(s"$alias", storePassword.toCharArray).getEncoded
+      }
+    }
+  }
+
   def read(alias: String, keys: Set[String]): Try[Map[String, Array[Byte]]] = {
     keystore.map { keystore =>
       (for {

@@ -15,13 +15,19 @@ import java.util.Optional
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import com.hortonworks.datapalane.consul._
+import com.hortonworks.dataplane.commons.domain.Entities.{VaultAppTokenResponse, VaultInitResponse, VaultUnsealResponse}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
+import com.hortonworks.dataplane.commons.service.api.{CredentialManager, CredentialNotFoundInKeystoreException, SecretManager}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.cs._
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
+
+import scala.collection.mutable
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class Module extends AbstractModule {
   def configure() = {
@@ -194,13 +200,74 @@ class Module extends AbstractModule {
     new SkuServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("secretManager")
+  def provideSecretManager(implicit ws: WSClient,configuration: Configuration): SecretManager = {
+    new SecretManager(configuration.underlying)
+  }
+
 }
 
 @Singleton
-class ConsulInitializer @Inject()(config:Configuration){
+class ConsulInitializer @Inject()(config:Configuration)(implicit ws: WSClient){
+  import scala.concurrent.ExecutionContext.Implicits.global
 
   private val registrar = new ApplicationRegistrar(config.underlying,Optional.of(new AppConsulHook))
   registrar.initialize()
+
+  private val secretManager = new SecretManager(config.underlying)
+  val credentialManager = new CredentialManager(config.underlying.getString("dp.keystore.path"), config.underlying.getString("dp.keystore.password"))
+
+  credentialManager.read("vault_secret", Set("keys", "token")).map{secret =>
+    secret.values.toList.map(x => new String(x, "UTF-8")) match {
+      case List(keys, token) => {
+        val keysArr = keys.split("-")
+        val futures = secretManager.unsealVault(keysArr)
+          futures onComplete  {
+            case Failure(ex) => throw new Exception("Unseal could not be completed", ex)
+            case Success(res) => {
+ //            secretManager.createAppRole(config.underlying.getString("vault.roleName"), config.underlying.getString("vault.appPath"), token).map{ createResponse =>
+               secretManager.getToken(config.underlying.getString("vault.roleName"), config.underlying.getString("vault.appPath"), token).map{ appToken =>
+//                 val appTokenResponse = token.asInstanceOf[VaultAppTokenResponse]
+//                 secretManager.readFromVault("secret/my-secret", appTokenResponse.auth.client_token)
+ //               secretManager.readFromVault("my-secret", appToken.auth.client_token)
+                 secretManager.writeToVault(Map("padma" -> "priya"),"dp-core/padma", appToken.auth.client_token)
+               }
+//              }
+            }
+          }
+      }
+    }
+  }.recover {
+    case ex: CredentialNotFoundInKeystoreException =>
+      secretManager.initializeVault().map { res =>
+//        var map = Map[String, Array[Byte]]()
+//        var i = 1
+//        for(key <- res.keys){
+//          map += (key+i -> key.getBytes("UTF-8"))
+//          i += 1
+//        }
+//        map += ("token" -> res.root_token.getBytes("UTF-8"))
+        credentialManager.write("vault_secret", Map("keys" -> res.keys.mkString("-").getBytes("UTF-8"), "token" -> res.root_token.getBytes("UTF-8")))
+        val futures = secretManager.unsealVault(res.keys)
+        futures onComplete  {
+          case Failure(e) => throw new Exception("Unseal could not be completed", e)
+          case Success(successResponse) => {
+            secretManager.enableAppRole(res.root_token,"dp-core", "DP Core").map { enableResponse =>
+            //  secretManager.createAppRole("dp-core","dp-core", res.root_token).map{ createResponse =>
+              secretManager.getToken(config.underlying.getString("vault.roleName"), config.underlying.getString("vault.appPath"), res.root_token).map{ appToken =>
+                 // val appTokenResponse = token.asInstanceOf[VaultAppTokenResponse]
+                 // secretManager.readFromVault("secret/my-secret", appTokenResponse.auth.client_token)
+                    secretManager.readFromVault("my-secret", appToken.auth.client_token)
+                  }
+                }
+              //}
+            }
+          }
+        }
+      }
+
 
   private class AppConsulHook extends ConsulHook{
     override def onServiceRegistration(dpService: DpService) = {

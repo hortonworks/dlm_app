@@ -410,6 +410,38 @@ object Entities {
                     objectType: String,
                     objectId: Long,
                     createdBy: Long)
+  case class VaultInitRequest (secret_shares:Long = 10,
+                        secret_threshold:Long =  5)
+
+  case class VaultInitResponse (keys:Seq[String],
+                                keys_base64: Seq[String],
+                                root_token:String)
+
+  case class VaultUnsealRequest (key: String)
+
+  case class VaultAuthEnableRequest(`type`: String, description: String)
+
+  case class VaultUnsealResponse(version: String)
+
+  case class VaultAppRoleRequest(policies: Seq[String]= Seq())
+
+  case class VaultAppTokenRequest(role_id: String, secret_id: String)
+
+  case class VaultRoleIdResponse(data: VaultRoleIdData)
+
+  case class VaultSecretIdResponse(data: VaultSecretIdData)
+
+  case class VaultSecretIdRequest(cidr_list: String)
+
+  case class VaultAppTokenResponse(auth: VaultAuthData)
+
+  case class VaultAuthData(accessor: String, client_token: String)
+
+  case class VaultRoleIdData(role_id: String)
+
+  case class VaultSecretIdData(secret_id:String, secret_id_accessor:String)
+
+  case class VaultMountRequest(`type`: String)
 
 }
 
@@ -604,5 +636,50 @@ object JsonFormatters {
   implicit val ratingReads = Json.reads[Rating]
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
+
+  implicit val vaultInitRequestWrites = Json.writes[VaultInitRequest]
+  implicit val vaultInitRequestReads = Json.reads[VaultInitRequest]
+
+  implicit val vaultInitResponseWrites = Json.writes[VaultInitResponse]
+  implicit val vaultInitResponseReads = Json.reads[VaultInitResponse]
+
+  implicit val vaultUnsealRequestWrites = Json.writes[VaultUnsealRequest]
+  implicit val vaultUnsealRequestReads = Json.reads[VaultUnsealRequest]
+
+  implicit val vaultUnsealResponseWrites = Json.writes[VaultUnsealResponse]
+  implicit val vaultUnsealResponseReads = Json.reads[VaultUnsealResponse]
+
+  implicit val VaultAuthEnableRequestWrites = Json.writes[VaultAuthEnableRequest]
+  implicit val VaultAuthEnableRequestReads = Json.reads[VaultAuthEnableRequest]
+
+  implicit val vaultAuthDataWrites = Json.writes[VaultAuthData]
+  implicit val vaultAuthDataReads = Json.reads[VaultAuthData]
+
+  implicit val vaultSecretIdDataWrites = Json.writes[VaultSecretIdData]
+  implicit val vaultSecretDataReads = Json.reads[VaultSecretIdData]
+
+  implicit val vaultRoleIdDataWrites = Json.writes[VaultRoleIdData]
+  implicit val vaultRoleDataReads = Json.reads[VaultRoleIdData]
+
+  implicit val vaultRoleIdResponseWrites = Json.writes[VaultRoleIdResponse]
+  implicit val vaultRoleIdResponseReads = Json.reads[VaultRoleIdResponse]
+
+  implicit val vaultAppTokenRequestWrites = Json.writes[VaultAppTokenRequest]
+  implicit val vaultAppTokenRequestReads = Json.reads[VaultAppTokenRequest]
+
+  implicit val vaultAppTokenResponseWrites = Json.writes[VaultAppTokenResponse]
+  implicit val vaultAppTokenResponseReads = Json.reads[VaultAppTokenResponse]
+
+  implicit val vaultSecretIdResponseWrites = Json.writes[VaultSecretIdResponse]
+  implicit val vaultSecretIdResponseReads = Json.reads[VaultSecretIdResponse]
+
+  implicit val vaultSecretIdRequestWrites = Json.writes[VaultSecretIdRequest]
+  implicit val vaultSecretIdRequestReads = Json.reads[VaultSecretIdRequest]
+
+  implicit val vaultAppRoleRequestWrites = Json.writes[VaultAppRoleRequest]
+  implicit val vaultAppRoleRequestReads = Json.reads[VaultAppRoleRequest]
+
+  implicit val vaultMountRequestWrites = Json.writes[VaultMountRequest]
+  implicit val vaultMountRequestReads = Json.reads[VaultMountRequest]
 
 }

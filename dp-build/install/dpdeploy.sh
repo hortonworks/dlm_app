@@ -47,6 +47,11 @@ init_consul(){
     source $(pwd)/docker-consul.sh
 }
 
+init_vault(){
+    echo "Initializing Vault"
+    source $(pwd)/docker-vault.sh
+}
+
 generate_certs() {
     CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
 
@@ -313,6 +318,8 @@ read_certs_config() {
 
 init_knox_and_consul() {
     init_consul
+
+    init_vault
 
     init_certs
 
