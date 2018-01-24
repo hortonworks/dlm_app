@@ -351,15 +351,6 @@ alphanum-sort@^1.0.1, alphanum-sort@^1.0.2:
 amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
-
-angular-star-rating@^3.0.8:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/angular-star-rating/-/angular-star-rating-3.0.8.tgz#c33ea9bb5b61d7a2f8cf4cc60faa0048716c96b0"
-  dependencies:
-    css-star-rating "^1.1.3"
-=======
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
 
 angular-star-rating@^3.0.8:
   version "3.0.8"
@@ -1564,19 +1555,11 @@ d3-force@1.1.0:
 d3-format@1:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-1.2.2.tgz#1a39c479c8a57fe5051b2e67a3bee27061a74e7a"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
 
 d3-format@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-1.2.1.tgz#4e19ecdb081a341dafaf5f555ee956bcfdbf167f"
 
-=======
-
-d3-format@1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/d3-format/-/d3-format-1.2.1.tgz#4e19ecdb081a341dafaf5f555ee956bcfdbf167f"
-
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
 d3-geo@1.9.1:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/d3-geo/-/d3-geo-1.9.1.tgz#157e3b0f917379d0f73bebfff3be537f49fa7356"
@@ -1981,13 +1964,9 @@ dot-prop@^4.1.0:
   dependencies:
     is-obj "^1.0.0"
 
-"dps-apps@git+ssh://git@github.com/hortonworks/dps-apps.git#0.1.2-alpha":
+"dps-apps@git+ssh://git@github.com/hortonworks/dps-apps.git#0.1.0-alpha":
   version "0.1.0-alpha"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
-  resolved "git+ssh://git@github.com/hortonworks/dps-apps.git#a34deea1eb08bbf71719754410a6489a7d8e1ae5"
-=======
   resolved "git+ssh://git@github.com/hortonworks/dps-apps.git#1093f9ed31464ae4057923de20d16af4ff443e6c"
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -2248,7 +2227,6 @@ eventsource@0.1.6:
 evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/evp_bytestokey/-/evp_bytestokey-1.0.3.tgz#7fcbdb198dc71959432efe13842684e0525acb02"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
   dependencies:
     md5.js "^1.3.4"
     safe-buffer "^5.1.1"
@@ -2257,16 +2235,6 @@ execa@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/execa/-/execa-0.7.0.tgz#944becd34cc41ee32a63a9faf27ad5a65fc59777"
   dependencies:
-=======
-  dependencies:
-    md5.js "^1.3.4"
-    safe-buffer "^5.1.1"
-
-execa@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/execa/-/execa-0.7.0.tgz#944becd34cc41ee32a63a9faf27ad5a65fc59777"
-  dependencies:
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
     cross-spawn "^5.0.1"
     get-stream "^3.0.0"
     is-stream "^1.1.0"
@@ -2527,16 +2495,6 @@ forwarded@~0.1.2:
 fresh@0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
-
-from2@^2.1.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/from2/-/from2-2.3.0.tgz#8bfb5502bde4a4d36cfdeea007fcca21d7e382af"
-  dependencies:
-    inherits "^2.0.1"
-    readable-stream "^2.0.0"
-=======
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
 
 from2@^2.1.0:
   version "2.3.0"
@@ -2866,28 +2824,9 @@ has@^1.0.1:
 hash-base@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/hash-base/-/hash-base-2.0.2.tgz#66ea1d856db4e8a5470cadf6fce23ae5244ef2e1"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
   dependencies:
     inherits "^2.0.1"
 
-hash-base@^3.0.0:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/hash-base/-/hash-base-3.0.4.tgz#5fc8686847ecd73499403319a6b0a3f3f6ae4918"
-=======
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
-  dependencies:
-    inherits "^2.0.1"
-    safe-buffer "^5.0.1"
-
-hash.js@^1.0.0, hash.js@^1.0.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/hash.js/-/hash.js-1.1.3.tgz#340dedbe6290187151c1ea1d777a3448935df846"
-  dependencies:
-    inherits "^2.0.3"
-    minimalistic-assert "^1.0.0"
-
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
-=======
 hash-base@^3.0.0:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/hash-base/-/hash-base-3.0.4.tgz#5fc8686847ecd73499403319a6b0a3f3f6ae4918"
@@ -2902,7 +2841,6 @@ hash.js@^1.0.0, hash.js@^1.0.3:
     inherits "^2.0.3"
     minimalistic-assert "^1.0.0"
 
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
 hawk@3.1.3, hawk@~3.1.3:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/hawk/-/hawk-3.1.3.tgz#078444bd7c1640b0fe540d2c9b73d59678e8e1c4"
@@ -3051,19 +2989,11 @@ https-proxy-agent@^1.0.0:
 iconv-lite@0.4, iconv-lite@0.4.19:
   version "0.4.19"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.19.tgz#f7468f60135f5e5dad3399c0a81be9a1603a082b"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
 
 icss-replace-symbols@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/icss-replace-symbols/-/icss-replace-symbols-1.1.0.tgz#06ea6f83679a7749e386cfe1fe812ae5db223ded"
 
-=======
-
-icss-replace-symbols@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/icss-replace-symbols/-/icss-replace-symbols-1.1.0.tgz#06ea6f83679a7749e386cfe1fe812ae5db223ded"
-
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
 icss-utils@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/icss-utils/-/icss-utils-2.1.0.tgz#83f0a0ec378bf3246178b6c2ad9136f135b1c962"
@@ -3663,7 +3593,6 @@ kind-of@^2.0.1:
 kind-of@^3.0.2, kind-of@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
   dependencies:
     is-buffer "^1.1.5"
 
@@ -3677,21 +3606,6 @@ latest-version@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/latest-version/-/latest-version-3.1.0.tgz#a205383fea322b33b5ae3b18abee0dc2f356ee15"
   dependencies:
-=======
-  dependencies:
-    is-buffer "^1.1.5"
-
-kind-of@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-4.0.0.tgz#20813df3d712928b207378691a45066fae72dd57"
-  dependencies:
-    is-buffer "^1.1.5"
-
-latest-version@^3.0.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/latest-version/-/latest-version-3.1.0.tgz#a205383fea322b33b5ae3b18abee0dc2f356ee15"
-  dependencies:
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
     package-json "^4.0.0"
 
 lazy-cache@^0.2.3:
@@ -4432,7 +4346,6 @@ p-limit@^1.0.0, p-limit@^1.1.0:
 p-locate@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/p-locate/-/p-locate-2.0.0.tgz#20a0103b222a70c8fd39cc2e580680f3dde5ec43"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
   dependencies:
     p-limit "^1.1.0"
 
@@ -4444,19 +4357,6 @@ package-json@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/package-json/-/package-json-4.0.1.tgz#8869a0401253661c4c4ca3da6c2121ed555f5eed"
   dependencies:
-=======
-  dependencies:
-    p-limit "^1.1.0"
-
-p-map@^1.1.1:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.2.0.tgz#e4e94f311eabbc8633a1e79908165fca26241b6b"
-
-package-json@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/package-json/-/package-json-4.0.1.tgz#8869a0401253661c4c4ca3da6c2121ed555f5eed"
-  dependencies:
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
     got "^6.7.1"
     registry-auth-token "^3.0.1"
     registry-url "^3.0.3"
@@ -5766,19 +5666,11 @@ spdy@^3.4.1:
     safe-buffer "^5.0.1"
     select-hose "^2.0.0"
     spdy-transport "^2.0.18"
-<<<<<<< HEAD:dp-plugin-apps/dss/dss-web/yarn.lock
 
 sprintf-js@^1.0.3:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.1.1.tgz#36be78320afe5801f6cea3ee78b6e5aab940ea0c"
 
-=======
-
-sprintf-js@^1.0.3:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.1.1.tgz#36be78320afe5801f6cea3ee78b6e5aab940ea0c"
-
->>>>>>> initial commit for dss:dp-plugin-apps/dss/dss-web/yarn.lock
 sprintf-js@~1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
