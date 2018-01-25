@@ -135,7 +135,11 @@ a:focus {
 }
 
 ng-select {
-  &:focus {
-    outline: none;
+  &, .ui-select-container, .ui-select-match {
+    line-height: normal;
+
+    &:focus {
+      outline: none;
+    }
   }
 }

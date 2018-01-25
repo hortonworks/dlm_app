@@ -27,7 +27,8 @@
 .dlm-hdfs-browser {
   .datatable-body {
     height: 340px !important;
-    overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   datatable-progress {

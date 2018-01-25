@@ -484,7 +484,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   private setupDirectoryChanges(policyForm: FormGroup) {
     const directoryFieldChange$: Observable<string> = policyForm.valueChanges
-      .map(values => values.directories)
+      .pluck<any, string>('directories')
       .distinctUntilChanged()
       .debounceTime(500)
       .do(path => {
@@ -494,19 +494,23 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       });
 
     const directoryRequestStatus$ = this.store.select(getProgressState(FILES_REQUEST))
+      .map(p => !p ? { isInProgress: true } as ProgressState : p)
       .distinctUntilKeyChanged('isInProgress')
       .filter((progressState: ProgressState) => {
         return progressState.isInProgress === false;
       });
     // this is the easiest way to get validation works for this field
-    const validateDirectories = directoryFieldChange$
-      .switchMap(() => directoryRequestStatus$)
-      .subscribe((progressState: ProgressState) => {
+    const validateDirectories = Observable
+      .combineLatest(directoryFieldChange$, directoryRequestStatus$)
+      .subscribe(([_, progressState]: [string, ProgressState]) => {
         const directoriesField = policyForm.get('directories');
         this.setDirectoriesPending(policyForm, false);
         if (progressState.error) {
           directoriesField.setErrors({ notExist: true });
         } else {
+          if (!progressState.response || !this.hdfsRootPath) {
+            return;
+          }
           const files = progressState.response.fileList;
           const [tail] = this.hdfsRootPath.split('/').slice(-1);
           const isFile = files.length === 1 && files[0].type === FILE_TYPES.FILE &&
@@ -515,6 +519,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             directoriesField.setErrors({ isFile: true });
           }
         }
+        this.cdRef.detectChanges();
       });
     this.subscriptions.push(validateDirectories);
   }

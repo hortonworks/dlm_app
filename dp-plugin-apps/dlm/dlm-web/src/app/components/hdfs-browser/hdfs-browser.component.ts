@@ -50,7 +50,7 @@ export const FILES_REQUEST = '[HDFS Browser Component] FILES_REQUEST';
     <dlm-table
       #hdfsFilesTable
       [columns]="columns"
-      [rows]="rows$ | async"
+      [rows]="rows"
       [offset]="page"
       [selectionType]="selectionType"
       [scrollbarV]="scrollbarV"
@@ -176,9 +176,12 @@ export class HdfsBrowserComponent implements OnInit, OnDestroy {
       {prop: 'permission', name: 'Permission', cellClass: 'text-cell',
         headerClass: 'text-header', cellTemplate: this.permissionsTemplate, sortable: false, maxWidth: 120},
       {prop: 'modificationTime', name: 'Last Modified', cellClass: 'date-cell', headerClass: 'date-header',
-        cellTemplate: this.dateTemplate, maxWidth: 130}
+        cellTemplate: this.dateTemplate, maxWidth: 130},
+      // empty column that fits to browser scroll width
+      {prop: ' ', name: ' ', minWidth: 18, maxWidth: 18}
     ];
     this.subscriptions.push(loadData$);
+    this.subscriptions.push(this.rows$.subscribe(rows => this.rows = rows));
   }
 
   handleSelectedAction(selected) {
