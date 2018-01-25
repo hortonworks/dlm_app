@@ -14,6 +14,10 @@ import { CloudAccountService } from 'services/cloud-account.service';
 import {
   loadAccountsSuccess,
   loadAccountsFail,
+  addCloudStoreSuccess,
+  addCloudStoreFailure,
+  validateCredentialsSuccess,
+  validateCredentialsFailure,
   ActionTypes as accountActions
 } from 'actions/cloud-account.action';
 
@@ -30,6 +34,28 @@ export class CloudAccountsEffects {
         .catch(err => Observable.of(loadAccountsFail(err, payload.meta)));
     });
 
-  constructor(private actions$: Actions, private accountService: CloudAccountService) {
-  }
+  @Effect()
+  addCloudStore$: Observable<any> = this.actions$
+    .ofType(accountActions.ADD_CLOUD_STORE.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.accountService.addCloudStore(payload.cloud_store)
+        .map(response => {
+          return addCloudStoreSuccess({...response, payload: payload.cloud_store}, payload.meta);
+        })
+        .catch(err => Observable.of(addCloudStoreFailure(err, payload.meta)));
+    });
+
+  @Effect()
+  validateCredentials$: Observable<any> = this.actions$
+    .ofType(accountActions.VALIDATE_CREDENTIALS.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.accountService.validateCredentials(payload.credentials)
+        .map(response => {
+          return validateCredentialsSuccess({...response, payload: payload.credentials}, payload.meta);
+        })
+        .catch(err => Observable.of(validateCredentialsFailure(err, payload.meta)));
+    });
+  constructor(private actions$: Actions, private accountService: CloudAccountService) {}
 }

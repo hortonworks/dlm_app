@@ -11,6 +11,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody } from 'models/cloud-account.model';
 
 @Injectable()
 export class CloudAccountService {
@@ -23,8 +24,19 @@ export class CloudAccountService {
     return this.httpClient.get<any>('store/credentials');
   }
 
-  showAddAccountModal(provider) {
-    this.showAddAccountModal$.next(provider);
+  showAddAccountModal() {
+    this.showAddAccountModal$.next('show');
   }
 
+  closeAddAccountModal() {
+    this.showAddAccountModal$.next('close');
+  }
+
+  addCloudStore(cloudStore: AddCloudStoreRequestBody): Observable<any> {
+    return this.httpClient.post('store/credential', cloudStore);
+  }
+
+  validateCredentials(credentials: ValidateCredentialsRequestBody): Observable<any> {
+    return this.httpClient.post('cloud/userIdentity', credentials);
+  }
 }

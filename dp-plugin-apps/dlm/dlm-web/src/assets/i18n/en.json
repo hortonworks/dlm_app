@@ -11,6 +11,8 @@
     "review": "Review",
     "submit": "Submit",
     "show": "Show",
+    "save": "Save",
+    "saving": "Saving",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "duration": "Duration",
@@ -57,7 +59,10 @@
     "not_applicable": "Not Applicable",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
-      "unknown": "Something went wrong."
+      "unknown": "Something went wrong.",
+      "add_cloud": {
+        "unexpected": "Error: Unexpected response"
+      }
     },
     "time": {
       "hourly": "Hourly",
@@ -242,7 +247,8 @@
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
       "not_exist_directory": "Specified path does not exist",
       "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'.",
-      "invalid_date": "\"{{fieldLabel}}\" should be a valid date"
+      "invalid_date": "\"{{fieldLabel}}\" should be a valid date",
+      "invalid_credentials": "Wrong Credentials"
     }
   },
   "page": {
@@ -401,10 +407,19 @@
         },
         "accounts": {
           "add": {
-            "title": "Add Cloud Store - {{provider}}",
-            "access_key": "{{provider}} Access Key",
-            "secret_key": "{{provider}} Secret Key",
-            "name": "Account Name"
+            "title": "Add Cloud Store",
+            "provider": "Cloud Service Provider",
+            "access_key": "Access Key",
+            "secret_key": "Secret Key",
+            "username": "User Name",
+            "account_id": "Account Id",
+            "validate": "Validate",
+            "validating": "Validating",
+            "invalid_form": "Error: Cannot save cloud store since form is in invalid state",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud Store added successfully!"
+            }
           }
         }
       }

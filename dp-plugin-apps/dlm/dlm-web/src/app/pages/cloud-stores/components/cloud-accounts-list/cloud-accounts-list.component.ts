@@ -16,7 +16,7 @@ import { ColumnMode } from '@swimlane/ngx-datatable/release';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
-import { CloudContainer } from '../../../models/cloud-container.model';
+import { CloudContainer } from 'models/cloud-container.model';
 
 @Component({
   selector: 'dlm-cloud-accounts-list',

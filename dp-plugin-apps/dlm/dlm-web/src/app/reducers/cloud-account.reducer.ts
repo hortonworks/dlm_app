@@ -14,11 +14,14 @@ import { BaseState } from 'models/base-resource-state';
 import { AwsAccount } from 'models/aws-account.model';
 import { groupByKey } from 'utils/array-util';
 import { AdlsAccount } from 'models/adls-account.model';
+import { Progress, HttpProgress } from 'models/cloud-account.model';
+import { PROGRESS_STATUS } from 'constants/status.constant';
 
 export interface State {
   WASB: BaseState<WasbAccount>;
   S3: BaseState<AwsAccount>;
   ADLS: BaseState<AdlsAccount>;
+  progress?: Progress;
 }
 
 export const initialState: State = {
@@ -30,10 +33,20 @@ export const initialState: State = {
   },
   ADLS: {
     entities: {}
+  },
+  progress: <Progress>{
+    addCloudStore: <HttpProgress> {
+      state: PROGRESS_STATUS.INIT,
+      response: {}
+    },
+    validateCredentials: <HttpProgress> {
+      state: PROGRESS_STATUS.INIT,
+      response: {}
+    }
   }
 };
 
-export function reducer(state = initialState, action): State {
+export function reducer(state: State = initialState, action): State {
   switch (action.type) {
     case fromCloudAccount.ActionTypes.LOAD_ACCOUNTS.SUCCESS: {
       const accounts = action.payload.response.accounts;
@@ -47,6 +60,82 @@ export function reducer(state = initialState, action): State {
         },
         ADLS: {
           entities: Object.assign({}, state.ADLS.entities, toEntities<AdlsAccount>(accountsMap.ADLS || []))
+        }
+      };
+    }
+    case fromCloudAccount.ActionTypes.VALIDATE_CREDENTIALS.SUCCESS: {
+      return <State> {
+        ...state,
+        progress: {
+          addCloudStore: Object.assign({}, initialState.progress.addCloudStore),
+          validateCredentials: {
+            state: PROGRESS_STATUS.SUCCESS,
+            response: action.payload.response
+          }
+        }
+      };
+    }
+    case fromCloudAccount.ActionTypes.VALIDATE_CREDENTIALS.FAILURE: {
+      return <State> {
+        ...state,
+        progress: {
+          addCloudStore: Object.assign({}, initialState.progress.addCloudStore),
+          validateCredentials: {
+            state: PROGRESS_STATUS.FAILED,
+            response: action.payload
+          }
+        }
+      };
+    }
+    case fromCloudAccount.ActionTypes.RESET_ADD_CLOUD_PROGRESS_STATE: {
+      return <State> {
+        ...state,
+        progress: {
+          addCloudStore: Object.assign({}, initialState.progress.addCloudStore),
+          validateCredentials: Object.assign({}, initialState.progress.validateCredentials)
+        }
+      };
+    }
+    case fromCloudAccount.ActionTypes.ADD_CLOUD_STORE.SUCCESS: {
+      const response = action.payload.response;
+      if (response) {
+        return <State> {
+          ...state,
+          progress: {
+            ...state.progress,
+            addCloudStore: {
+              state: PROGRESS_STATUS.SUCCESS,
+              response
+            }
+          }
+        };
+      }
+      return <State> {
+        ...state,
+        progress: {
+          validateCredentials: Object.assign({}, initialState.progress.validateCredentials),
+          addCloudStore: {
+            state: PROGRESS_STATUS.FAILED,
+            response: {
+              error: {
+                error: {
+                  message: 'Unexpected response'
+                }
+              }
+            }
+          }
+        }
+      };
+    }
+    case fromCloudAccount.ActionTypes.ADD_CLOUD_STORE.FAILURE: {
+      return <State> {
+        ...state,
+        progress: {
+          validateCredentials: Object.assign({}, initialState.progress.validateCredentials),
+          addCloudStore: {
+            state: PROGRESS_STATUS.FAILED,
+            response: action.payload
+          }
         }
       };
     }

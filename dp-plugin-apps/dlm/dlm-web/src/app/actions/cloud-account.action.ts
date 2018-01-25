@@ -10,9 +10,14 @@
 import { requestType } from 'utils/type-action';
 import { ActionWithPayload } from 'actions/actions.type';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
+import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody } from 'models/cloud-account.model';
+import { type } from 'utils/type-action';
 
 export const ActionTypes = {
-  LOAD_ACCOUNTS: requestType('LOAD_ACCOUNTS')
+  LOAD_ACCOUNTS: requestType('LOAD_ACCOUNTS'),
+  ADD_CLOUD_STORE: requestType('ADD_CLOUD_STORE'),
+  VALIDATE_CREDENTIALS: requestType('VALIDATE_CREDENTIALS'),
+  RESET_ADD_CLOUD_PROGRESS_STATE: type('RESET_ADD_CLOUD_PROGRESS_STATE')
 };
 
 export const loadAccounts = (requestId?): ActionWithPayload<any> => ({
@@ -26,4 +31,39 @@ export const loadAccountsSuccess = (accounts, meta = {}): ActionSuccess => {
 export const loadAccountsFail = (error, meta = {}): ActionFailure => ({
   type: ActionTypes.LOAD_ACCOUNTS.FAILURE,
   payload: {error, meta}
+});
+
+export const addCloudStore = (cloud_store: AddCloudStoreRequestBody, meta = {}): ActionWithPayload<any> => ({
+  type: ActionTypes.ADD_CLOUD_STORE.START,
+  payload: {cloud_store, meta}
+});
+
+export const addCloudStoreSuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.ADD_CLOUD_STORE.SUCCESS,
+  payload: { response, meta }
+});
+
+export const addCloudStoreFailure = (error, meta): ActionFailure => ({
+  type: ActionTypes.ADD_CLOUD_STORE.FAILURE,
+  payload: { error, meta }
+});
+
+export const validateCredentials = (credentials: ValidateCredentialsRequestBody, meta = {}): ActionWithPayload<any> => ({
+  type: ActionTypes.VALIDATE_CREDENTIALS.START,
+  payload: {credentials, meta}
+});
+
+export const validateCredentialsSuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.VALIDATE_CREDENTIALS.SUCCESS,
+  payload: { response, meta }
+});
+
+export const validateCredentialsFailure = (error, meta): ActionFailure => ({
+  type: ActionTypes.VALIDATE_CREDENTIALS.FAILURE,
+  payload: { error, meta }
+});
+
+export const resetAddCloudProgressState = (requestId): ActionWithPayload<any> => ({
+  type: ActionTypes.RESET_ADD_CLOUD_PROGRESS_STATE,
+  payload: {requestId}
 });

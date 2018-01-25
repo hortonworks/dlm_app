@@ -8,6 +8,7 @@
  */
 
 import { CloudContainer } from './cloud-container.model';
+
 export interface CloudAccount {
   id: string;
   accountDetails: CloudAccountDetails;
@@ -16,4 +17,39 @@ export interface CloudAccount {
 
 export interface CloudAccountDetails {
   provider: string;
+}
+
+export interface AddCloudStoreRequestBody {
+  accountDetails: AddCloudAccountDetails;
+  accountCredentials: ValidateCredentialsRequestBody;
+}
+
+export interface AddCloudAccountDetails {
+  provider: string;
+  accountName: string;
+  userName: string;
+}
+
+export interface ValidateCredentialsResponse {
+  provider: string;
+  credentialType: string;
+  accountName: string;
+  userName: string;
+  payload: ValidateCredentialsRequestBody;
+}
+
+export interface HttpProgress {
+  state: string;
+  response: Object;
+}
+
+export interface ValidateCredentialsRequestBody {
+  credentialType: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+}
+
+export interface Progress {
+  addCloudStore: HttpProgress;
+  validateCredentials: HttpProgress;
 }

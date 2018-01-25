@@ -9,21 +9,30 @@
 
 <dlm-progress-container [progressState]="overallProgress$ | async">
   <div class="row">
-    <div class="col-md-8" *ngIf="(activeTabValue$ |async)">
-      <div class="clearfix">
-        <tabs [items]="tabs" [activeTabValue]="activeTabValue$ |async" (clickOnItem)="selectTab($event)"></tabs>
-        <button (click)="addAccount()" class="btn btn-secondary pull-right">Add</button>
-      </div>
-      <div *ngIf="(tableData$ | async)?.length > 0; else noAccounts">
-        <dlm-cloud-accounts-list [accounts]="tableData$ | async"></dlm-cloud-accounts-list>
-      </div>
-      <ng-template #noAccounts>
-        <div qe-attr="no-accounts-alert">
-          <div class="alert alert-warning" role="alert">
-            {{"page.cloud_stores.content.no_accounts" | translate}}
-          </div>
+    <div class="col-xs-8">
+      <div class="row flex-center">
+        <div class="col-xs-9">
+          <dlm-page-header
+            [title]="'page.cloud_stores.header'"
+            [isFlexCenter]="true">
+          </dlm-page-header>
         </div>
-      </ng-template>
+        <div class="col-xs-3">
+          <button (click)="addAccount()" class="btn btn-secondary pull-right">Add</button>
+        </div>
+      </div>
+      <div class="row">
+        <div *ngIf="(tableData$ | async)?.length > 0; else noAccounts">
+          <dlm-cloud-accounts-list [accounts]="tableData$ | async"></dlm-cloud-accounts-list>
+        </div>
+        <ng-template #noAccounts>
+          <div qe-attr="no-accounts-alert">
+            <div class="alert alert-warning" role="alert">
+              {{"page.cloud_stores.content.no_accounts" | translate}}
+            </div>
+          </div>
+        </ng-template>
+      </div>
     </div>
   </div>
 </dlm-progress-container>

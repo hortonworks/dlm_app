@@ -25,3 +25,5 @@ export const getAllAccountsWithContainers =
         containers: groupedContainers[a.id]
       };
     }));
+
+export const getCloudStoreProgress = createSelector(getCloudAccounts, state => state.progress);

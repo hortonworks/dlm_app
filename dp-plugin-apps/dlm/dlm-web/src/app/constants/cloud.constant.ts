@@ -7,11 +7,20 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export const AWS = 'S3';
+export const S3_TOKEN = 'S3_TOKEN';
+export const S3 = 'S3';
 export const WASB = 'WASB';
 export const ADLS = 'ADLS';
 
-export const PROVIDERS = [AWS, ADLS, WASB];
+export const CREDENTIAL_TYPE_VALUES = [S3_TOKEN];
+
+export const PROVIDERS = [S3, ADLS, WASB];
+
+export const CREDENTIAL_TYPE_LABELS = {
+  [S3_TOKEN]: 'S3',
+  [WASB]: 'WASB',
+  [ADLS]: 'ADLS'
+};
 
 export const FILE_TYPES = {
   FILE: 'FILE',

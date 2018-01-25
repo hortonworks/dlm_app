@@ -18,9 +18,6 @@ import { getContainersGroupedByAccounts } from 'selectors/cloud-container.select
 import { loadContainers } from 'actions/cloud-container.action';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
-import { PROVIDERS } from 'constants/cloud.constant';
-import { TabItem } from '../../common/tabs/tabs.component';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { CloudAccountService } from 'services/cloud-account.service';
 
 const ACCOUNTS_REQUEST = '[CLOUD STORES] ACCOUNTS_REQUEST';
@@ -38,34 +35,27 @@ export class CloudStoresComponent implements OnInit, OnDestroy {
   overallProgress$: Observable<ProgressState>;
   loadAccountsSubscription$;
 
-  tabs: TabItem[] = [];
-
   tableData$: Observable<CloudAccount[]>;
 
-  activeTabValue$: BehaviorSubject<any> = new BehaviorSubject('');
-
-  PROVIDERS = PROVIDERS;
-
-  constructor(private store: Store<State>, private cloudAccountService: CloudAccountService) {
-    this.tabs = this.PROVIDERS.map(p => {
-      return {
-        value: p,
-        title: p
-      } as TabItem;
-    });
-    this.activeTabValue$.next(this.PROVIDERS[0]);
-  }
+  constructor(private store: Store<State>, private cloudAccountService: CloudAccountService) {}
 
   ngOnInit() {
     this.store.dispatch(loadAccounts(ACCOUNTS_REQUEST));
+    const mergedProgress = [ACCOUNTS_REQUEST];
     this.accounts$ = this.store.select(getAllAccounts);
     this.containersGrouped$ = this.store.select(getContainersGroupedByAccounts);
     this.loadAccountsSubscription$ =
-      this.accounts$.subscribe(accounts => this.store.dispatch(loadContainers(accounts, CONTAINERS_REQUEST)));
-    this.overallProgress$ = this.store.select(getMergedProgress(ACCOUNTS_REQUEST, CONTAINERS_REQUEST));
-    const allResources$ = Observable.combineLatest(this.accounts$, this.containersGrouped$, this.activeTabValue$);
-    this.tableData$ = allResources$.map(([accounts, containersGrouped, activeTabValue]) => {
-      return accounts.filter(a => a.accountDetails.provider === activeTabValue).map(a => {
+      this.accounts$.subscribe(accounts => {
+        if (accounts.length) {
+          mergedProgress.push(CONTAINERS_REQUEST);
+          return this.store.dispatch(loadContainers(accounts, CONTAINERS_REQUEST));
+        }
+        return null;
+      });
+    this.overallProgress$ = this.store.select(getMergedProgress(...mergedProgress));
+    const allResources$ = Observable.combineLatest(this.accounts$, this.containersGrouped$);
+    this.tableData$ = allResources$.map(([accounts, containersGrouped]) => {
+      return accounts.map(a => {
         return {
           ...a,
           containers: containersGrouped[a.id]
@@ -78,12 +68,8 @@ export class CloudStoresComponent implements OnInit, OnDestroy {
     this.loadAccountsSubscription$.unsubscribe();
   }
 
-  selectTab(val) {
-    this.activeTabValue$.next(val);
-  }
-
   addAccount() {
-    this.cloudAccountService.showAddAccountModal(this.activeTabValue$.getValue());
+    this.cloudAccountService.showAddAccountModal();
   }
 
 }

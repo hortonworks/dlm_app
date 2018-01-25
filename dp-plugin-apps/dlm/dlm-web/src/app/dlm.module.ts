@@ -110,8 +110,8 @@ import { JobsOverviewTableComponent } from './pages/overview/jobs-overview-table
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
 import { CloudStoresComponent } from './pages/cloud-stores/cloud-stores.component';
-import { CloudAccountsListComponent } from './pages/cloud-stores/cloud-accounts-list/cloud-accounts-list.component';
-import { AddAccountModalComponent } from './pages/cloud-stores/add-account-modal/add-account-modal.component';
+import { CloudAccountsListComponent } from './pages/cloud-stores/components/cloud-accounts-list/cloud-accounts-list.component';
+import { AddAccountModalComponent } from 'pages/cloud-stores/components/add-account-modal/add-account-modal.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
 import { CloudContainerBrowserComponent } from 'components/cloud-container-browser/cloud-container-browser.component';
 // tslint:disable-next-line
@@ -163,6 +163,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 import { HortonStyleModule } from 'common/horton-style.module';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { AsyncActionsService } from 'services/async-actions.service';
+
+import { AddCloudFormComponent } from './pages/cloud-stores/components/add-cloud-form/add-cloud-form.component';
 
 @NgModule({
   imports: [
@@ -281,7 +283,8 @@ import { AsyncActionsService } from 'services/async-actions.service';
     EventMessageComponent,
     LogModalDialogComponent,
     PersonaPopupComponent,
-    TabsComponent
+    TabsComponent,
+    AddCloudFormComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

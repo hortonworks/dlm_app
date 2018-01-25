@@ -7,15 +7,25 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.inline-error-label {
-  padding: 5px 0;
-}
+@import '../../../../styles/variables';
 
-.inline-error-message {
-  padding-bottom: 5px;
-  .dlm-field-error {
-    .alert {
-      margin: 0;
-    }
+.add-cloud-form {
+  padding: 0;
+  label {
+    font-weight: normal;
+  }
+  .form-section {
+    padding: 5px;
+  }
+  .form-footer {
+    padding: 15px 5px;
+    border: none;
+  }
+  .status-icon.form-control-feedback {
+    right: 15px;
+  }
+  .form-control[disabled] {
+    color: $grey-color;
+    background-color: $lighter-grey;
   }
 }

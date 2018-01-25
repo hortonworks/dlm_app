@@ -27,6 +27,7 @@ export class FormFieldComponent implements OnInit, OnChanges {
   @Input() fieldClass = 'col-xs-6';
   @Input() errorClass = 'col-xs-6';
   @Input() required = false;
+  @Input() inlineError = false;
   @HostBinding('class') hostClass = 'dlm-form-field';
 
   labelTranslate: object;

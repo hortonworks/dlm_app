@@ -10,10 +10,12 @@
 export enum ModalSize {
   SMALL,
   MEDIUM,
-  LARGE
+  LARGE,
+  FIXED400
 }
 
 export const SIZE_CLASS_MAP = {
+  [ModalSize.FIXED400]: 'fixed-400',
   [ModalSize.SMALL]: 'small-modal',
   [ModalSize.MEDIUM]: 'medium-modal',
   [ModalSize.LARGE]: 'large-modal'
