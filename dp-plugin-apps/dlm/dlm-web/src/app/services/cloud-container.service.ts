@@ -21,6 +21,9 @@ export class CloudContainerService {
   }
 
   fetchContainersForAccounts(accounts: CloudAccount[]): Observable<any> {
+    if (!accounts.length) {
+      return Observable.of([]);
+    }
     const requests = accounts.map(account => this.fetchContainersForAccount(account));
     return Observable.forkJoin(requests).map(response => {
       return flatten(response.map((r, index) => {

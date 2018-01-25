@@ -28,7 +28,7 @@ export class CloudContainersEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.containerService.fetchContainersForAccounts(payload.accounts)
-        .map(accounts => loadContainersSuccess(accounts, payload.meta))
+        .map(containers => loadContainersSuccess(containers, payload.meta))
         .catch(err => Observable.of(loadContainersFail(err, payload.meta)));
     });
 
