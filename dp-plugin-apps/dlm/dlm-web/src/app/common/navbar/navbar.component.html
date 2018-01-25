@@ -45,7 +45,7 @@
           </a>
 
           <ng-template #has_sub_menu>
-            <a href="#" data-toggle="collapse-sub-menu">
+            <a href="#" data-toggle="collapse-sub-menu" [attr.qe-attr]="item.qeAttr">
               <span [ngClass]="item.iconClasses"></span>
               <span class="navigation-menu-item">{{item.label}}</span>
               <span class="toggle-icon fa fa-chevron-down pull-right"></span>
@@ -54,7 +54,7 @@
               <li *ngFor="let subItem of item.subMenu"
                   [ngClass]="{'submenu-li': true, 'active': false}"
                   routerLinkActive="active">
-                <a [routerLink]="subItem.linkURL">
+                <a [routerLink]="subItem.linkURL" [attr.qe-attr]="subItem.qeAttr">
                   <span [ngClass]="subItem.iconClasses"></span>
                   <span class="submenu-item">{{subItem.label}}</span>
                 </a>

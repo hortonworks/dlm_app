@@ -93,9 +93,9 @@ export class DlmComponent implements OnDestroy, OnInit {
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.data_stores'),
-        './clusters',
+        '',
         'navigation-icon fa fa-fw fa-database',
-        'go-to-clusters',
+        'toggle-data-sources',
         [
           new MenuItem(
             t.instant('sidenav.menuItem.clusters'),
