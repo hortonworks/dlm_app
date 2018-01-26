@@ -77,6 +77,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() showPageSizeMenu = true;
   @Input() multiExpand = false;
   @Input() rowDetailHeight = 200;
+  @Input() showFooter = true;
   /**
    * Table theme one of 'plain', 'cards'. 'plain' by default
    * @type {string}
@@ -150,6 +151,9 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   }
 
   get footerHeight(): string | number {
+    if (!this.showFooter) {
+      return 0;
+    }
     return this._footerHeight || TableThemeSettings[this.theme].footerHeight;
   }
 
