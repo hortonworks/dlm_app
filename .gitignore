@@ -33,6 +33,7 @@
 **/.gradle/**
 # Generated
 **/RUNNING_PID
+**/install.log
 
 # Mac OS Stuff
 **/.DS_Store
