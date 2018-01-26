@@ -50,10 +50,10 @@ package() {
     PACKAGE_ROOT=$BUILD_ROOT/pkg/$PACKAGE_NAME
 
     echo "Starting docker build"
-    dss-docker-build.sh build
+    ./dss-docker-build.sh build
 
     echo "Exporting docker images"
-    dss-docker-build.sh save
+    ./dss-docker-build.sh save
 
     rm -rf $PACKAGE_ROOT
     

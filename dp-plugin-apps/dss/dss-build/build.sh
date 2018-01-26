@@ -60,7 +60,7 @@ build_dss_web() {
 		yarn install
 		yarn run build
 	else
-		echo "Not running dp-web NPM again"
+		echo "Not running dss-web NPM again"
 	fi
 	cp -R ./dist/* ../dss-build/${DSS_DOCKER_ROOT_FOLDER}/dss-app/dss-web
 	popd
