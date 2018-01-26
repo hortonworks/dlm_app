@@ -40,7 +40,7 @@
     "d3-tip": "^0.7.1",
     "dagre-d3": "^0.4.17",
     "dialog-polyfill": "^0.4.9",
-    "dps-apps": "git+ssh://git@github.com/hortonworks/dps-apps.git#>0.1.0-alpha",
+    "dps-apps": "git+ssh://git@github.com/hortonworks/dps-apps.git#>0.1.2-alpha",
     "font-awesome": "^4.7.0",
     "leaflet": "^1.0.2",
     "leaflet-curve": "^1.0.0",
