@@ -1964,9 +1964,9 @@ dot-prop@^4.1.0:
   dependencies:
     is-obj "^1.0.0"
 
-"dps-apps@git+ssh://git@github.com/hortonworks/dps-apps.git#0.1.0-alpha":
+"dps-apps@git+ssh://git@github.com/hortonworks/dps-apps.git#>0.1.2-alpha":
   version "0.1.0-alpha"
-  resolved "git+ssh://git@github.com/hortonworks/dps-apps.git#1093f9ed31464ae4057923de20d16af4ff443e6c"
+  resolved "git+ssh://git@github.com/hortonworks/dps-apps.git#248b3261e8ed38e4bfb2f4b4abdf81d337d980c3"
 
 duplexer3@^0.1.4:
   version "0.1.4"
