@@ -6,6 +6,80 @@
 GET     /health                                               controllers.Status.health
 GET     /metrics                                              controllers.Status.metrics
 
+# Atlas API Search
+# ===========================================
+POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String)
+GET           /api/query-attributes                                  controllers.QueryAttributes.list(clusterId: String)
+
+# DatasetTags
+# ===========================================
+GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search: Option[String])
+GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName: String)
+
+GET           /api/assets/auditMockStatus                            controllers.QueryAttributes.checkAuditMockStatus
+GET           /api/assets/details/:clusterId/:atlasGuid              controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)
+GET           /api/assets/typeDefs/:clusterId/:defType               controllers.QueryAttributes.getTypeDefs(clusterId: String, defType: String)
+GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)
+
+# Assets
+# ===========================================
+GET           /api/assets/byguid/:guid                                controllers.Asset.getByGuid(guid: String)
+
+# Datasets
+# ===========================================
+GET           /api/datasets                                          controllers.DataSets.list(name: Option[String])
+POST          /api/datasets                                          controllers.DataSets.create
+PUT           /api/datasets                                          controllers.DataSets.update
+
+GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId: String)
+DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId: String)
+
+#GET           /api/clusters/:clusterId/hosts                        controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
+
+# DatasetCategories
+# ===========================================
+GET           /api/datasets/categories                               controllers.DataSets.listAllCategories
+GET           /api/datasets/categories/:search                       controllers.DataSets.searchCategories(search : String, size :Option[Long])
+POST          /api/datasets/categories                               controllers.DataSets.createCategory
+
+
+# Datasets ?
+# ===========================================
+GET           /api/dataset/:datasetId                                controllers.DataSets.getRichDatasetById(datasetId : String)
+PATCH         /api/datasets/:datasetId                               controllers.DataSets.updateDataset(datasetId : String)
+GET           /api/dataset/list                                      controllers.DataSets.getRichDataset
+GET           /api/dataset/list/tag/:tagName                         controllers.DataSets.getRichDatasetByTag(tagName : String)
+
+# Datasets ?
+# ===========================================
+POST          /api/atlas-dataset                                     controllers.DataSets.createDatasetWithAtlasSearch
+POST          /api/add-atlas-assets                                  controllers.DataSets.addAssetsToDataset
+
+# DatasetAssets
+# ===========================================
+GET           /api/dataset/:datasetId/assets                         controllers.DataSets.getDataAssetsByDatasetId(datasetId: String, queryName: String, offset: Long, limit: Long)
+DELETE        /api/dataset/:datasetId/allassets                      controllers.DataSets.removeAllAssetsFromDataset(datasetId: Long)
+
+# Ranger
+# ===========================================
+GET           /api/ranger/audit/:clusterId/:dbName/:tableName         controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
+GET           /api/ranger/:clusterId/policies                         controllers.RangerAttributes.getPolicyDetails(clusterId: String, offset: Long ?= 0, limit: Long ?= 20, serviceType: String, dbName: Option[String], tableName: Option[String], guid: Option[String])
+
+# comments
+# ===========================================
+POST          /api/comments                                         controllers.Comments.addComments
+GET           /api/comments                                         controllers.Comments.getByObjectRef
+DELETE        /api/comments/:id                                     controllers.Comments.deleteCommentById(id: String)
+PATCH         /api/comments/:id                                     controllers.Comments.updateComments(id: String)
+
+
+# others
+# ============================================
+GET           /api/identity                                          controllers.Authentication.userDetail
+GET           /api/roles                                             controllers.Authentication.getAllRoles
+GET           /api/lakes                                             controllers.DataplaneClusters.list
+GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
+
 # Due to the regex involved, Following should be always placed at the end of the file
 # static resources
 # @TODO: Replace `/usr/dlm-web` with env variable DLM_WEB_HOME
