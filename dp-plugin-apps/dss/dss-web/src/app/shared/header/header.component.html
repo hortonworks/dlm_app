@@ -1,3 +1,21 @@
 <nav class="header">
-  <dp-bread-crumb> </dp-bread-crumb>
+  <dp-bread-crumb></dp-bread-crumb>
+  <div class="actions">
+    <button id="header-menu" class="mdl-button mdl-js-button" data-se="identity__menu">
+      <i class="fa fa-user" aria-hidden="true"></i>
+      <i class="fa fa-caret-down" aria-hidden="true"></i>
+    </button>
+    <div class="mdl-menu mdl-menu--bottom-right mdl-js-menu" for="header-menu" #popup data-se="identity__detail">
+      <div class="popup-arrow-up"></div>
+      <div class="menu-header">
+        <div class="hwx-title" id="user-name" data-se="identity__display_name">{{user?.display}}
+        </div>
+      </div>
+      <div class="menu-footer">
+        <a id="change_password_btn" class="mdl-button btn-hwx-secondary" [routerLink]="['/profile/change-password']" *ngIf="user?.dbManaged" data-se="identity__password_change">Change password</a>
+        <span>&nbsp;</span>
+        <a id="logout-btn" class="mdl-button btn-hwx-secondary" (click)="logout()" data-se="identity__sign_out">Logout</a>
+      </div>
+    </div>
+  </div>
 </nav>
