@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import {Router} from '@angular/router';
+import {AuthenticationService} from '../../services/authentication.service';
+import {AuthUtils} from '../utils/auth-utils';
+import {User} from '../../models/user';
 
 @Component({
   selector: 'dss-header',
@@ -6,10 +10,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+  user = new User('', '', '', '', [], false, false, '');
 
-  constructor() { }
+  constructor(private authenticationService: AuthenticationService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.user = AuthUtils.getUser();
+  }
+
+  logout() {
+    this.authenticationService
+    .signOutAndRedirect();
   }
 
 }

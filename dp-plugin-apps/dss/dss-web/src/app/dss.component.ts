@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 declare var require;
@@ -8,9 +8,7 @@ declare var require;
   templateUrl: './dss.component.html',
   styleUrls: ['./dss.component.scss']
 })
-export class AppComponent implements OnInit {
-
-  title = 'app works!';
+export class AppComponent {
 
   constructor(
       private translateService: TranslateService) {
@@ -18,9 +16,5 @@ export class AppComponent implements OnInit {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
-  }
-
-  ngOnInit(): void {
-
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable, isDevMode } from '@angular/core';
 import { BaseRequestOptions, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import {dssCoreURLS} from './shared/utils/constants';
 
 @Injectable()
 export class BaseDssRequestOptions extends BaseRequestOptions {
@@ -15,7 +16,8 @@ export class DssRequestOptions extends RequestOptions {
 }
 
 export function extracted(options: RequestOptionsArgs) {
-  if (options && options.url && options.url.length > 0) {
+  if (options && options.url && options.url.length > 0 &&
+      dssCoreURLS.indexOf(options.url.replace(/^\//,'')) === -1) {
     options.url = (isDevMode() ? '' : 'dss/') + options.url;
   }
   return options;
