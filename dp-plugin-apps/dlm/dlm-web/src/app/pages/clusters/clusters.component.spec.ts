@@ -8,37 +8,63 @@
  */
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import { CommonComponentsModule } from 'components/common-components.module';
+import {CommonComponentsModule} from 'components/common-components.module';
 import {ClustersComponent} from './clusters.component';
 import {ClusterListComponent} from './cluster-list/cluster-list.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
-import {BytesSizePipe} from '../../pipes/bytes-size.pipe';
-import {Store} from '@ngrx/store';
-import {MockBackend} from '@angular/http/testing';
-import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
+import {MockTranslateLoader} from 'mocks/mock-translate-loader';
+import {HortonStyleModule} from 'common/horton-style.module';
+import {configureComponentTest} from 'testing/configure';
+import {RouterTestingModule} from '@angular/router/testing';
+import {TooltipModule} from 'ngx-bootstrap';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ClusterLegendComponent} from '../overview/cluster-legend/cluster-legend.component';
+import {TableComponent} from 'common/table/table.component';
+import {HdfsBrowserComponent} from 'components/hdfs-browser/hdfs-browser.component';
+import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
+import {CheckboxColumnComponent} from 'components/table-columns';
+import {CheckboxComponent} from 'common/checkbox/checkbox.component';
+import {ActionColumnComponent} from 'components/table-columns/action-column';
+import {PipesModule} from 'pipes/pipes.module';
+import {BytesSizePipe} from 'pipes/bytes-size.pipe';
+import {NavbarService} from 'services/navbar.service';
+import {MomentModule} from 'angular2-moment';
 
-xdescribe('ClustersComponent', () => {
+describe('ClustersComponent', () => {
   let component: ClustersComponent;
   let fixture: ComponentFixture<ClustersComponent>;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
+    configureComponentTest({
       imports: [
+        RouterTestingModule,
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),
-        CommonComponentsModule
+        CommonComponentsModule,
+        TooltipModule.forRoot(),
+        FormsModule,
+        ReactiveFormsModule,
+        NgxDatatableModule,
+        HortonStyleModule,
+        PipesModule,
+        MomentModule
       ],
       declarations: [
         ClustersComponent,
         ClusterListComponent,
-        BytesSizePipe
+        ClusterLegendComponent,
+        ActionColumnComponent,
+        TableComponent,
+        CheckboxColumnComponent,
+        CheckboxComponent,
+        TableFooterComponent,
+        HdfsBrowserComponent
       ],
       providers: [
-        {provide: ConnectionBackend, useClass: MockBackend},
-        {provide: RequestOptions, useClass: BaseRequestOptions},
-        Http,
+        BytesSizePipe,
+        NavbarService
       ]
     })
       .compileComponents();
