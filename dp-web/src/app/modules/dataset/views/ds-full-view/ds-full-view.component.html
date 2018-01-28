@@ -34,7 +34,11 @@
   </div>
   <div style="clear: both;"></div>
 
-  <div>
+  <div class="spacer-15"> </div>
+  <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
+  <div class="spacer-15"> </div>
+
+  <section *ngIf="selectedTopLevelTabs === topLevelTabs.Assets">
     <ds-assets-list [dsModel]="dsModel"
                     [applicableActions]="applicableListActions"
                     [queryModels]="dsAssetQueryModel"
@@ -42,7 +46,12 @@
                     [selectionAllowed]=false
                     (onAction)="onEdit($event)"
     ></ds-assets-list>
-  </div>
+  </section>
+
+  <section *ngIf="selectedTopLevelTabs === topLevelTabs.Profile">
+    <dp-profile-and-schedule
+    ></dp-profile-and-schedule>
+  </section>
 
   <dialog #dialogConfirm class="mdl-dialog dataset-delete-dialog">
       <h4 class="mdl-dialog__title hwx-subtitle">{{'pages.dataset.labels.confirmDelete' | translate}}</h4>

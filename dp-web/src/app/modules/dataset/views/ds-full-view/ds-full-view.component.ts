@@ -20,6 +20,11 @@ import {
   AssetSetQueryFilterModel,
   AssetSetQueryModel
 } from "../ds-assets-list/ds-assets-list.component";
+import {TabStyleType} from "../../../../shared/tabs/tabs.component";
+
+export enum TopLevelTabs {
+  Assets, Profile
+}
 
 @Component({
   selector: "ds-full-view",
@@ -33,6 +38,9 @@ export class DsFullView implements OnInit {
   applicableListActions: AssetListActionsEnum[] = [];//[AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
   clusterId: any;
+  topLevelTabs= TopLevelTabs;
+  tabType = TabStyleType;
+  selectedTopLevelTabs = TopLevelTabs.Assets;
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,

@@ -55,6 +55,7 @@ import { AssetTagPolicyViewComponent } from './views/asset-view/asset-policy-vie
 import { AssetResourcePolicyViewComponent } from './views/asset-view/asset-policy-view/asset-resource-policy-view/asset-resource-policy-view.component';
 import {RouterModule} from "@angular/router";
 import {routes} from "./dataset.routes";
+import { ProfileAndScheduleComponent } from './views/profile-and-schedule/profile-and-schedule.component';
 
 @NgModule({
   declarations: [
@@ -84,6 +85,7 @@ import {routes} from "./dataset.routes";
     AuditVisualizationComponent,
     AssetTagPolicyViewComponent,
     AssetResourcePolicyViewComponent,
+    ProfileAndScheduleComponent,
   ],
   entryComponents: [QueryFilter],
   imports: [

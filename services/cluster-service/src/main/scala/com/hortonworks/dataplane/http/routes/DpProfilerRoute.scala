@@ -174,6 +174,39 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val profilersInfo =
+    path ("cluster" / LongNumber / "dp-profiler" / "datatset" / Segment / "profilers") { (clusterId, datasetNameId) =>
+      get {
+        onComplete(getProfilerInfo(clusterId, datasetNameId)) {
+          case Success(res) => res.status match {
+            case 200 => complete(success(res.json))
+            case 404 => complete(StatusCodes.NotFound, notFound)
+            case 503 => complete(StatusCodes.ServiceUnavailable, serverError)
+            case _ => complete(StatusCodes.InternalServerError, serverError)
+          }
+          case Failure(th) => th match {
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+            case _ => complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
+
+  private def getProfilerInfo(clusterId: Long, datasetNameId: String): Future[WSResponse] = {
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      //urlToHit <- Future.successful(s"${baseUrls.head}/schedules?dataset=${datasetNameId}")
+      urlToHit <- Future.successful(s"${baseUrls.head}/jobs?skip=0&limit=1&submitter=localhost-hola-1")
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .get()
+    } yield {
+      response
+    }
+  }
+
   private def getAuditResults(clusterId: Long, dbName: String, tableName: String, userName: String, startDate: String, endDate: String): Future[WSResponse] = {
     val postData = Json.obj(
       "metric" -> "hiveagg",
@@ -248,9 +281,12 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$taskName")
-        response <- ws.url(urlToHit)
-          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-          .get()
+        response <- {
+          val abc = ws.url(urlToHit)
+            .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+            .get()
+          abc
+        }
       } yield {
         response
       }
