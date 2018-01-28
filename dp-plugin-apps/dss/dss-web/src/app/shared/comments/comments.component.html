@@ -69,8 +69,12 @@
                 </div>
               </div>
             </div>
-            <div class="comment-text">
+            <div class="comment-text" *ngIf="oneLevelComment.commentWithUser.comment.comment.length < 128">
               {{oneLevelComment.commentWithUser.comment.comment}}
+            </div>
+            <div class="comment-text" *ngIf="oneLevelComment.commentWithUser.comment.comment.length >= 128">
+              {{lengthAdjustedComment(oneLevelComment.commentWithUser.comment.comment,oneLevelComment.commentWithUser.isCommentExpanded)}}<a class="expandable-view" (click)=" oneLevelComment.commentWithUser.isCommentExpanded = !oneLevelComment.commentWithUser.isCommentExpanded">view
+              {{oneLevelComment.commentWithUser.isCommentExpanded? 'less':'more'}}</a>
             </div>
             <ul [ngClass]="{'response-group': oneLevelComment.children && oneLevelComment.children.length > 0  }">
               <li *ngFor="let child of oneLevelComment.children">

@@ -111,4 +111,11 @@ export class CommentsComponent implements OnInit {
     return date.format("hh:mm A MMM DD 'YY");
   }
 
+  lengthAdjustedComment(comment: string, isExpanded: boolean) {
+    if(!isExpanded){
+      return comment.substring(0,128)+"...  ";
+    }
+    return comment+"  ";
+  }
+
 }

@@ -24,6 +24,7 @@ export class Comment {
 export class CommentWithUser {
   comment: Comment;
   userName: string;
+  isCommentExpanded?: boolean = false;
 }
 
 export class CommentWithUserAndChildren {
