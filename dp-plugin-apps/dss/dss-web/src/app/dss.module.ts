@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import {APP_INITIALIZER, NgModule} from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {Http, HttpModule} from '@angular/http';
+import {Http, HttpModule, RequestOptions} from '@angular/http';
 import {RouterModule} from '@angular/router';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {TranslateLoader, TranslateModule, TranslateService} from '@ngx-translate/core';
@@ -13,6 +13,9 @@ import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.mod
 import {HeaderModule} from './shared/header/header.module';
 import {AuthenticationService} from './services/authentication.service';
 import {CommentsModule} from './shared/comments/comments.module';
+import {BaseDssRequestOptions} from './dss-request-options';
+import {MdlService} from './services/mdl.service';
+import {MdlDirective} from './shared/directives/mdl.directive';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -23,9 +26,6 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
 }
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
   imports: [
     BrowserModule,
     FormsModule,
@@ -42,7 +42,12 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
       }
     })
   ],
+  declarations: [
+    AppComponent,
+    MdlDirective
+  ],
   providers: [
+      MdlService,
       TranslateStore,
       TranslateService,
       AuthenticationService,
@@ -51,6 +56,9 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
         useFactory: startupServiceFactory,
         deps: [AuthenticationService],
         multi: true
+      },
+      { provide: RequestOptions,
+        useClass: BaseDssRequestOptions
       }
   ],
   bootstrap: [AppComponent]
