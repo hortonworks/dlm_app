@@ -54,6 +54,7 @@ GET           /api/dataset/list/tag/:tagName                         controllers
 # ===========================================
 POST          /api/atlas-dataset                                     controllers.DataSets.createDatasetWithAtlasSearch
 POST          /api/add-atlas-assets                                  controllers.DataSets.addAssetsToDataset
+POST          /api/add-selected-atlas-assets                         controllers.DataSets.addSelectedAssetsToDataset
 
 # DatasetAssets
 # ===========================================
