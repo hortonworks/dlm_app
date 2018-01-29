@@ -6,6 +6,8 @@
     "back": "Back",
     "ok": "Ok",
     "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
     "copy": "Copy",
     "copied": "Copied",
     "review": "Review",
@@ -201,8 +203,7 @@
     "menuItem": {
       "overview": "Overview",
       "clusters": "Clusters",
-      "data_stores": "Data Stores",
-      "cloud_stores": "Cloud Stores",
+      "cloud_stores": "Cloud Accounts",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
@@ -397,28 +398,28 @@
       }
     },
     "cloud_stores": {
-      "header": "Cloud Stores",
+      "header": "Cloud Accounts",
       "content": {
         "no_accounts": "No Accounts",
         "no_containers": "No Containers",
         "table": {
-          "buckets_count": "Buckets",
-          "user_details": "Cloud User Details"
+          "actions": "Actions",
+          "user_details": "Account"
         },
         "accounts": {
           "add": {
-            "title": "Add Cloud Store",
+            "title": "Add Cloud Account",
             "provider": "Cloud Service Provider",
             "access_key": "Access Key",
             "secret_key": "Secret Key",
-            "username": "User Name",
-            "account_id": "Account Id",
+            "username": "IAM USERNAME",
+            "account_id": "ACCOUNT ID",
             "validate": "Validate",
             "validating": "Validating",
-            "invalid_form": "Error: Cannot save cloud store since form is in invalid state",
+            "invalid_form": "Error: Cannot save cloud account since form is in invalid state",
             "success_notification": {
               "title": "Success",
-              "body": "Cloud Store added successfully!"
+              "body": "Cloud Account added successfully!"
             }
           }
         }

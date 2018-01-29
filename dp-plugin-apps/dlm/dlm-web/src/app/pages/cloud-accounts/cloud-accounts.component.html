@@ -9,11 +9,11 @@
 
 <dlm-progress-container [progressState]="overallProgress$ | async">
   <div class="row">
-    <div class="col-xs-8">
+    <div class="fixed-500">
       <div class="row flex-center">
         <div class="col-xs-9">
           <dlm-page-header
-            [title]="'page.cloud_stores.header'"
+            [title]="pageTitle"
             [isFlexCenter]="true">
           </dlm-page-header>
         </div>
@@ -22,16 +22,18 @@
         </div>
       </div>
       <div class="row">
-        <div *ngIf="(tableData$ | async)?.length > 0; else noAccounts">
-          <dlm-cloud-accounts-list [accounts]="tableData$ | async"></dlm-cloud-accounts-list>
-        </div>
-        <ng-template #noAccounts>
-          <div qe-attr="no-accounts-alert">
-            <div class="alert alert-warning" role="alert">
-              {{"page.cloud_stores.content.no_accounts" | translate}}
-            </div>
+        <div class="col-xs-12 cloud-accounts-list-container">
+          <div *ngIf="(tableData$ | async)?.length > 0; else noAccounts">
+            <dlm-cloud-accounts-list [accounts]="tableData$ | async"></dlm-cloud-accounts-list>
           </div>
-        </ng-template>
+          <ng-template #noAccounts>
+            <div qe-attr="no-accounts-alert">
+              <div class="alert alert-warning" role="alert">
+                {{"page.cloud_stores.content.no_accounts" | translate}}
+              </div>
+            </div>
+          </ng-template>
+        </div>
       </div>
     </div>
   </div>
