@@ -67,49 +67,25 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUser)
   }
 
-  override def getByObjectRef(queryString: String): Future[Seq[commentWithUserAndChildren]] = {
+  override def getByObjectRef(queryString: String): Future[Seq[CommentWithUser]] = {
     ws.url(s"$url/comments?$queryString")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToOneLevelComments)
+      .map(mapToCommentWithUsers)
   }
 
-  private def mapToOneLevelComments(res: WSResponse)= {
-    res.status match {
-      case 200 =>
-        val commentswithuser = (res.json \ "results").validate[Seq[CommentWithUser]].getOrElse(Seq())
-        getOneLevelComments(commentswithuser)
-      case _ => {
-        mapResponseToError(res)
-      }
-    }
-  }
-
-  private def getOneLevelComments(commentswithuser: Seq[CommentWithUser]): Seq[commentWithUserAndChildren] = {
-    val map = commentswithuser.filter(cmnt => cmnt.comment.parentCommentId.isEmpty).map(cmnt => {
-      cmnt.comment.id.get -> commentWithUserAndChildren(commentWithUser = cmnt, children = Seq())
-    }).toMap
-    val oneLevelCommentMap = processOneLevelComments(0,commentswithuser, map)
-    oneLevelCommentMap.values.toSeq.sortBy(-_.commentWithUser.comment.createdOn.getOrElse(LocalDateTime.MIN).atZone(ZoneId.systemDefault()).toInstant.toEpochMilli)
-  }
-
-
-  @tailrec
-  private def processOneLevelComments(idx: Int,commentswithuser: Seq[CommentWithUser], oneLevelCommentMap: Map[Long, commentWithUserAndChildren]):Map[Long, commentWithUserAndChildren] = {
-    if(idx >= commentswithuser.length) oneLevelCommentMap
-    else{
-      if(commentswithuser(idx).comment.parentCommentId.isEmpty) processOneLevelComments(idx+1,commentswithuser,oneLevelCommentMap)
-      else{
-        val parentOneLevelComment = oneLevelCommentMap.get(commentswithuser(idx).comment.parentCommentId.get).get
-        val comment: commentWithUserAndChildren = commentWithUserAndChildren(commentWithUser = parentOneLevelComment.commentWithUser, children = parentOneLevelComment.children :+ commentswithuser(idx))
-        processOneLevelComments(idx+1,commentswithuser, oneLevelCommentMap.updated(commentswithuser(idx).comment.parentCommentId.get, comment))
-      }
-    }
-  }
 
   private def mapToCommentWithUser(res: WSResponse) = {
     res.status match {
       case 200 => (res.json \ "results").validate[CommentWithUser].get
+      case _ => mapResponseToError(res)
+    }
+  }
+
+  private def mapToCommentWithUsers(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        (res.json \ "results").validate[Seq[CommentWithUser]].getOrElse(Seq())
       case _ => mapResponseToError(res)
     }
   }

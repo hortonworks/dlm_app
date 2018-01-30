@@ -84,11 +84,9 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
     def lastModified = column[Option[LocalDateTime]]("lastmodified")
 
-    def parentCommentId = column[Option[Long]]("parent_comment_id")
-
     def editVersion = column[Option[Int]]("edit_version")
 
-    def * = (id, comment, objectType, objectId, createdBy, createdOn, lastModified, parentCommentId, editVersion) <> ((Comment.apply _).tupled, Comment.unapply)
+    def * = (id, comment, objectType, objectId, createdBy, createdOn, lastModified, editVersion) <> ((Comment.apply _).tupled, Comment.unapply)
   }
 
 }

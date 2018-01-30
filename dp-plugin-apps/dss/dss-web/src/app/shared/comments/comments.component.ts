@@ -12,7 +12,7 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {CommentService} from "../../services/comment.service";
-import {CommentWithUserAndChildren, Comment, CommentWithUser, ReplyParent} from "../../models/comment";
+import {Comment, CommentWithUser} from "../../models/comment";
 import {AuthUtils} from "../utils/auth-utils";
 import * as moment from 'moment';
 
@@ -31,11 +31,9 @@ export class CommentsComponent implements OnInit {
   isRatingEnabled: boolean = false;
   objectType: string;
   objectId: string;
-  commentsWithUserAndChildren: CommentWithUserAndChildren[]= [];
+  commentWithUsers: CommentWithUser[]= [];
   fetchInProgress: boolean =true;
   newCommentText: string;
-  isReply: boolean = false;
-  reply: ReplyParent;
   fetchError: boolean= false;
   returnURl: string = '';
   offset:number = 0;
@@ -56,7 +54,7 @@ export class CommentsComponent implements OnInit {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
     this.commentService.getByObjectRef(this.objectId,this.objectType,this.offset,this.size).subscribe(comments =>{
-        this.commentsWithUserAndChildren = comments;
+        this.commentWithUsers = comments;
         this.fetchInProgress = false;
       }, () => {
         this.fetchInProgress = false;
@@ -72,11 +70,10 @@ export class CommentsComponent implements OnInit {
       newCommentObject.objectId = Number(this.objectId);
       newCommentObject.comment = this.newCommentText;
       newCommentObject.createdBy = Number(AuthUtils.getUser().id);
-      if(this.isReply) newCommentObject.parentCommentId = this.reply.parentId;
       this.commentService.add(newCommentObject).subscribe(_ => {
         this.getComments(false);
         this.newCommentText = "";
-        this.removeReply();
+        this.resizeTextArea();
       });
     }
   }
@@ -85,24 +82,6 @@ export class CommentsComponent implements OnInit {
     this.commentService.deleteComment(commentWU.comment.id).subscribe(_ => {
       this.getComments(false);
     });
-  }
-
-  onReplyToComment(parentCommentWU: CommentWithUser){
-     this.reply = new ReplyParent();
-     let parentComment = parentCommentWU.comment;
-     if(parentComment.parentCommentId){
-       this.reply.parentId = parentComment.parentCommentId;
-     }else{
-       this.reply.parentId = parentComment.id;
-     }
-     this.reply.commentText = parentComment.comment;
-     this.reply.username = parentCommentWU.userName;
-     this.isReply = true;
-  }
-
-  removeReply(){
-    this.reply = new ReplyParent();
-    this.isReply = false;
   }
 
   isLoggedInUser(commentWu: CommentWithUser){
@@ -127,9 +106,5 @@ export class CommentsComponent implements OnInit {
       textArea.style.cssText = 'height:auto';
       textArea.style.cssText = 'height:'+Math.min(textArea.scrollHeight, 100) + "px";
     },0);
-  }
-
-  onscroll(){
-    console.log("scrolled");
   }
 }
