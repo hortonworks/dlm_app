@@ -8,7 +8,7 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {CommentService} from "../../services/comment.service";
@@ -40,6 +40,7 @@ export class CommentsComponent implements OnInit {
   returnURl: string = '';
   offset:number = 0;
   size:number = 10;
+  @ViewChild('newComment') newCommentTextArea : ElementRef
 
   ngOnInit() {
     this.objectType = this.route.snapshot.params['objectType'];
@@ -120,4 +121,15 @@ export class CommentsComponent implements OnInit {
     return comment+"  ";
   }
 
+  resizeTextArea(){
+    let textArea = this.newCommentTextArea.nativeElement;
+    setTimeout(function() {
+      textArea.style.cssText = 'height:auto';
+      textArea.style.cssText = 'height:'+Math.min(textArea.scrollHeight, 100) + "px";
+    },0);
+  }
+
+  onscroll(){
+    console.log("scrolled");
+  }
 }

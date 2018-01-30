@@ -41,7 +41,6 @@
   line-height: 1;
   outline: none;
   margin: 0;
-  height: 36px;
 }
 .primary-space {
   flex-grow: 1;
@@ -71,11 +70,10 @@
 }
 .slider-footer {
   position: inherit;
-  height: 40px;
-  width: 400px;
+  width: 396px;
   transition: bottom .8s ease;
   -webkit-font-smoothing: antialiased;
-  padding: 3px 2px 2px;
+  padding: 2px 2px 2px;
   background-color: rgb(238, 238, 238);
   bottom: 0px;
 }
@@ -115,8 +113,6 @@ ol, ul {
   width:100%;
   border: none;
   resize: none;
-  min-height: 36px;
-  padding-bottom: 0px;
   font-size: 14px;
 }
 
@@ -171,7 +167,8 @@ ol, ul {
 .comment-tree {
   padding: 0 0 0px;
   overflow: auto;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 230px);
+  height: 100%;
 }
 .edge {
   height: 20px;
@@ -294,6 +291,10 @@ ol, ul {
 
 .expandable-view{
   cursor: pointer;
+}
+
+textarea{
+  display:block;
 }
 
 .slider-mask {

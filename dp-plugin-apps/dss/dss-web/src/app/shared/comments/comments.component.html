@@ -122,19 +122,13 @@
     </div>
   </div>
   <div class="slider-footer">
-    <div class="comment-reply-to-placeholder" *ngIf="isReply">
-      <div class="username-text"><span>{{reply.username}}</span>
-        <i class="fa fa-remove close-icon close-reply" (click)="removeReply()" id="close-reply"></i>
-      </div>
-      <div class="comment-reply">{{reply.commentText}}</div>
-    </div>
     <div class="flex-grid form-reply">
         <span class="primary-space">
-          <textarea type="text" placeholder="Add your comment here..." class="comment-input" [(ngModel)]="newCommentText" rows="2"></textarea>
+          <textarea #newComment type="text" placeholder="Add your comment here..." class="comment-input" [(ngModel)]="newCommentText" rows="2" (keydown)="resizeTextArea()" (cut)="resizeTextArea()" (paste)="resizeTextArea()"></textarea>
         </span>
       <span>
             <button class="paper-btn" (click)="onPostComment()" id="post">
-                <i class="fa fa-paper-plane"></i>
+                <i class="fa fa-chevron-up"></i>
             </button>
         </span>
     </div>
