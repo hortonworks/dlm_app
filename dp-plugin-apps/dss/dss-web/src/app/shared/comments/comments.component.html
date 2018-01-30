@@ -9,6 +9,7 @@
   ~  */
   -->
 
+<div class="slider-mask"></div>
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
@@ -73,8 +74,8 @@
               {{oneLevelComment.commentWithUser.comment.comment}}
             </div>
             <div class="comment-text" *ngIf="oneLevelComment.commentWithUser.comment.comment.length >= 128">
-              {{lengthAdjustedComment(oneLevelComment.commentWithUser.comment.comment,oneLevelComment.commentWithUser.isCommentExpanded)}}<a class="expandable-view" (click)=" oneLevelComment.commentWithUser.isCommentExpanded = !oneLevelComment.commentWithUser.isCommentExpanded">view
-              {{oneLevelComment.commentWithUser.isCommentExpanded? 'less':'more'}}</a>
+              {{lengthAdjustedComment(oneLevelComment.commentWithUser.comment.comment,oneLevelComment.commentWithUser.isCommentExpanded)}} <div><a class="expandable-view" (click)=" oneLevelComment.commentWithUser.isCommentExpanded = !oneLevelComment.commentWithUser.isCommentExpanded"><i>view
+              {{oneLevelComment.commentWithUser.isCommentExpanded? 'less':'more'}}</i></a></div>
             </div>
             <ul [ngClass]="{'response-group': oneLevelComment.children && oneLevelComment.children.length > 0  }">
               <li *ngFor="let child of oneLevelComment.children">
@@ -117,6 +118,7 @@
           </div>
         </li>
       </ul>
+      <div class="edge"></div>
     </div>
   </div>
   <div class="slider-footer">

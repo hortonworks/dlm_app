@@ -67,8 +67,8 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUser)
   }
 
-  override def getByObjectRef(objectId: String, objectType: String): Future[Seq[commentWithUserAndChildren]] = {
-    ws.url(s"$url/comments?objectId=$objectId&objectType=$objectType")
+  override def getByObjectRef(queryString: String): Future[Seq[commentWithUserAndChildren]] = {
+    ws.url(s"$url/comments?$queryString")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToOneLevelComments)
@@ -90,7 +90,7 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       cmnt.comment.id.get -> commentWithUserAndChildren(commentWithUser = cmnt, children = Seq())
     }).toMap
     val oneLevelCommentMap = processOneLevelComments(0,commentswithuser, map)
-    oneLevelCommentMap.values.toSeq.sortBy(_.commentWithUser.comment.createdOn.getOrElse(LocalDateTime.MIN).atZone(ZoneId.systemDefault()).toInstant.toEpochMilli)
+    oneLevelCommentMap.values.toSeq.sortBy(-_.commentWithUser.comment.createdOn.getOrElse(LocalDateTime.MIN).atZone(ZoneId.systemDefault()).toInstant.toEpochMilli)
   }
 
 

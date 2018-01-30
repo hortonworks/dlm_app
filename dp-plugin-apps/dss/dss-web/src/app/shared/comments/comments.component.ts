@@ -38,6 +38,8 @@ export class CommentsComponent implements OnInit {
   reply: ReplyParent;
   fetchError: boolean= false;
   returnURl: string = '';
+  offset:number = 0;
+  size:number = 10;
 
   ngOnInit() {
     this.objectType = this.route.snapshot.params['objectType'];
@@ -52,7 +54,7 @@ export class CommentsComponent implements OnInit {
   getComments(refreshScreen: boolean) {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
-    this.commentService.getByObjectRef(this.objectId,this.objectType).subscribe(comments =>{
+    this.commentService.getByObjectRef(this.objectId,this.objectType,this.offset,this.size).subscribe(comments =>{
         this.commentsWithUserAndChildren = comments;
         this.fetchInProgress = false;
       }, () => {

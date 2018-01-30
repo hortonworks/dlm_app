@@ -20,7 +20,7 @@ export class CommentService {
   uri = 'api/comments';
   constructor(private http:Http) { }
 
-  getByObjectRef(objectId: string, objectType: string): Observable<CommentWithUserAndChildren[]>  {
+  getByObjectRef(objectId: string, objectType: string, offset:number, size:number): Observable<CommentWithUserAndChildren[]>  {
     const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}`;
 
     return this.http

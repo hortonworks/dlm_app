@@ -39,13 +39,16 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     db.run(query)
   }
 
-  def findByObejctRef(objectId:Long,objectType:String): Future[Seq[CommentWithUser]] = {
+  def findByObejctRef(objectId:Long, objectType:String, paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[CommentWithUser]] = {
     implicit val localDateColumnType = MappedColumnType.base[LocalDate, Date](
       d => Date.valueOf(d),
       d => d.toLocalDate)
     val query = Comments.filter(m => (m.objectId === objectId && m.objectType === objectType))
-      .join(userRepo.Users).on(_.createdBy === _.id).map(t => (t._1,t._2.username)).sortBy(_._1.createdOn).result
-    db.run(query).map{res =>
+      .join(userRepo.Users).on(_.createdBy === _.id).map(t => (t._1,t._2.username)).sortBy(_._1.createdOn.desc)
+    val q = paginatedQuery.map { pq =>
+      query.drop(pq.offset).take(pq.size)
+    }.getOrElse(query)
+    db.run(q.result).map{res =>
       res.map{ r =>
         CommentWithUser(r._1,r._2)
       }

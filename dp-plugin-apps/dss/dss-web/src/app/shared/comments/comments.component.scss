@@ -70,7 +70,7 @@
   display: block;
 }
 .slider-footer {
-  position: fixed;
+  position: inherit;
   height: 40px;
   width: 400px;
   transition: bottom .8s ease;
@@ -80,8 +80,10 @@
   bottom: 0px;
 }
 .dialog1x {
+  top: 60px;
   width: 400px;
   border-top: 1px solid $silver;
+  position: fixed;
 }
 ol, ul {
   list-style: none;
@@ -167,9 +169,12 @@ ol, ul {
   margin-left: 10px;
 }
 .comment-tree {
-  padding: 0 0 50px;
-  max-height: calc(100vh - 190px);
+  padding: 0 0 0px;
   overflow: auto;
+  max-height: calc(100vh - 200px);
+}
+.edge {
+  height: 20px;
 }
 .comment-user {
   display: inline-block;
@@ -271,7 +276,7 @@ ol, ul {
   background: #eff1f2;
   border: 1px solid #fff;
   padding: 4px 15px;
-  display: flow-root;
+  overflow: auto;
 }
 .rating-class{
   float: right;
@@ -289,6 +294,19 @@ ol, ul {
 
 .expandable-view{
   cursor: pointer;
+}
+
+.slider-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, .1);
+  z-index: 10;
+  opacity: 1;
+  -webkit-transition: opacity .8s ease;  /* Safari */
+  transition: opacity .8s ease;
 }
 
 :host /deep/ .rating:focus{

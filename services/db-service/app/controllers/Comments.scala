@@ -13,7 +13,7 @@ package controllers
 
 import javax.inject._
 
-import domain.CommentRepo
+import domain.{CommentRepo, PaginatedQuery, SortQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.Comment
 import play.api.Logger
 import play.api.libs.json._
@@ -42,13 +42,23 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
 
   private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
 
+  private def getPaginatedQuery(req: Request[AnyContent]): Option[PaginatedQuery] = {
+    val offset = req.getQueryString("offset")
+    val size = req.getQueryString("size")
+
+    if (size.isDefined && offset.isDefined) {
+      Some(PaginatedQuery(offset.get.toInt, size.get.toInt, None))
+    } else None
+
+  }
+
   def getCommentByObjectRef = Action.async { req =>
     val objectId = req.getQueryString("objectId")
     val objectType  = req.getQueryString("objectType")
     Logger.info("dp-service Comments Controller: Received get comment request")
     if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
     else{
-      commentRepo.findByObejctRef(objectId.get.toLong,objectType.get)
+      commentRepo.findByObejctRef(objectId.get.toLong,objectType.get,getPaginatedQuery(req))
         .map{ commentswithuser =>
           success(commentswithuser)
         }.recoverWith(apiError)
