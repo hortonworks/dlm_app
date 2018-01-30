@@ -68,4 +68,12 @@ class Cloud @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
+  def getBucketPolicy(accountId: String, bucketName: String) = Action.async { request =>
+    Logger.debug("Received get bucket policy request")
+    amazonS3Service.getBucketPolicy(accountId, bucketName).map {
+      case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
+      case Right(bucketPolciyText) => Ok(Json.toJson(bucketPolciyText))
+    }
+  }
+
 }

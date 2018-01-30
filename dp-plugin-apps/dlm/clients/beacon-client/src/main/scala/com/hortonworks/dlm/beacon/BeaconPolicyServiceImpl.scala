@@ -73,12 +73,22 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
   }
 
   private def mapToPolicyDefinitionRequest(policyDefinitionRequest : PolicyDefinitionRequest) = {
-    "name = " + policyDefinitionRequest.name +
-    "\ntype = " + policyDefinitionRequest.`type` +
-    "\nsourceDataset = " +  policyDefinitionRequest.sourceDataset +
-    "\nsourceCluster = " + policyDefinitionRequest.sourceCluster +
-    "\ntargetCluster = " + policyDefinitionRequest.targetCluster +
-    "\nfrequencyInSec = " + policyDefinitionRequest.frequencyInSec +
+      "name = " + policyDefinitionRequest.name +
+      "\ntype = " + policyDefinitionRequest.`type` +
+      "\nsourceDataset = " +  policyDefinitionRequest.sourceDataset +
+      "\nfrequencyInSec = " + policyDefinitionRequest.frequencyInSec +
+      (policyDefinitionRequest.cloudCred match {
+        case Some(cloudCred) => "\ncloudCred = " + cloudCred
+        case None => ""
+      }) +
+      (policyDefinitionRequest.sourceCluster match {
+        case Some(sourceCluster) => "\nsourceCluster = " + sourceCluster
+        case None => ""
+      }) +
+      (policyDefinitionRequest.targetCluster match {
+        case Some(targetCluster) => "\ntargetCluster = " + targetCluster
+        case None => ""
+      }) +
       (policyDefinitionRequest.endTime match {
       case Some(endTime) => "\nendTime = " + endTime
       case None => ""
@@ -105,6 +115,30 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
       }) +
       (policyDefinitionRequest.description match {
         case Some(description) => "\ndescription = " + description
+        case None => ""
+      }) +
+      (policyDefinitionRequest.sourceSnapshotRetentionAgeLimit match {
+        case Some(sourceSnapshotRetentionAgeLimit) => "\nsourceSnapshotRetentionAgeLimit = " + sourceSnapshotRetentionAgeLimit
+        case None => ""
+      }) +
+      (policyDefinitionRequest.sourceSnapshotRetentionNumber match {
+        case Some(sourceSnapshotRetentionNumber) => "\nsourceSnapshotRetentionNumber = " + sourceSnapshotRetentionNumber
+        case None => ""
+      }) +
+      (policyDefinitionRequest.targetSnapshotRetentionAgeLimit match {
+        case Some(targetSnapshotRetentionAgeLimit) => "\ntargetSnapshotRetentionAgeLimit = " + targetSnapshotRetentionAgeLimit
+        case None => ""
+      }) +
+      (policyDefinitionRequest.targetSnapshotRetentionNumber match {
+        case Some(targetSnapshotRetentionNumber) => "\ntargetSnapshotRetentionNumber = " + targetSnapshotRetentionNumber
+        case None => ""
+      }) +
+      (policyDefinitionRequest.retryAttempts match {
+        case Some(retryAttempts) => "\nretryAttempts = " + retryAttempts
+        case None => ""
+      }) +
+      (policyDefinitionRequest.retryDelay match {
+        case Some(retryDelay) => "\nretryDelay = " + retryDelay
         case None => ""
       })
   }

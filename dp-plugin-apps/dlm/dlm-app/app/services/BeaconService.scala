@@ -48,6 +48,7 @@ class BeaconService @Inject()(
    @Named("beaconLogService") val beaconLogService: BeaconLogService,
    @Named("beaconAdminService") val beaconAdminService: BeaconAdminService,
    @Named("beaconBrowseService") val beaconBrowseService: BeaconBrowseService,
+   @Named("beaconCloudCredService") val beaconCloudCredService: BeaconCloudCredService,
    val dataplaneService: DataplaneService,
    val ambariService: AmbariService) {
 
