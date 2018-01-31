@@ -35,6 +35,20 @@ object AmazonS3Entities {
   case class S3FileItem(pathSuffix: String, `type`: String, length: Option[Long], modificationTime: Option[Long]) extends FileListItem
   case class S3FileListResponse(fileList: Seq[S3FileItem], provider: CloudAccountProvider = CloudAccountProvider.S3) extends FileListResponse
 
+  case class StatementPrincipal(AWS: String)
+  case class StatementPrincipals(AWS: Seq[String])
+
+
+  case class PolicyJsValueStatement(Sid: String, Effect: String, Principal: JsValue, Action: JsValue, Resource: JsValue)
+  case class PolicyStatement(Sid: String, Effect: String, Principal: StatementPrincipals, Action: Seq[String], Resource: Seq[String])
+  case class BucketPolicy(Version: String, Id: String, Statement: Seq[PolicyStatement])
+
+  implicit val statementPrincipalFmt = Json.format[StatementPrincipal]
+  implicit val statementPrincipalsFmt = Json.format[StatementPrincipals]
+  implicit val policyJsValueStatementFmt = Json.format[PolicyJsValueStatement]
+  implicit val policyStatementFmt = Json.format[PolicyStatement]
+  implicit val bucketPolicyFmt = Json.format[BucketPolicy]
+
   implicit val amazonS3ErrorReads = Json.reads[AmazonS3Error]
   implicit val amazonS3ErrorWrites = Json.writes[AmazonS3Error]
 

@@ -10,7 +10,6 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {PairingsComponent} from './pairings.component';
 import {RouterTestingModule} from '@angular/router/testing';
-import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {PairingCardListComponent} from './components/pairing-card-list/pairing-card-list.component';
 import {PairingCardComponent} from './components/pairing-card/pairing-card.component';
 import {ModalModule, TooltipModule} from 'ngx-bootstrap';

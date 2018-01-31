@@ -77,6 +77,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() showPageSizeMenu = true;
   @Input() multiExpand = false;
   @Input() rowDetailHeight = 200;
+  @Input() showFooter = true;
   /**
    * Table theme one of 'plain', 'cards'. 'plain' by default
    * @type {string}
@@ -150,6 +151,9 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   }
 
   get footerHeight(): string | number {
+    if (!this.showFooter) {
+      return 0;
+    }
     return this._footerHeight || TableThemeSettings[this.theme].footerHeight;
   }
 
@@ -298,8 +302,10 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   recalculateTable() {
     // this will call change detection checker inside of ngx-datatable component
     // and trigger resize. Add random attribute here because it's cheaper than deep copy
-    this.rows = [...this.rows.map(i => ({...i, __tmpCache: genId()}))];
-    this.table.recalculate();
+    if (this.rows) {
+      this.rows = [...this.rows.map(i => ({...i, __tmpCache: genId()}))];
+      this.table.recalculate();
+    }
   }
 
   ngAfterViewInit() {

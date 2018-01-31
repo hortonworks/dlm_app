@@ -53,3 +53,8 @@ export interface Progress {
   addCloudStore: HttpProgress;
   validateCredentials: HttpProgress;
 }
+
+export interface CloudAccountAction {
+  label: string;
+  type: string;
+}

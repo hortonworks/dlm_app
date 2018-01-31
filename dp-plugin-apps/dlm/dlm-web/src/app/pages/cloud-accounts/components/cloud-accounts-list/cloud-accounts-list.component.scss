@@ -7,6 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+@import '../../../../styles/variables';
+
 .cell-content {
   font-size: 16px;
 }
@@ -16,24 +18,10 @@
 }
 
 .datatable-body-cell {
-  span.unit {
-    font-size: 0.8em;
-  }
-  .cluster-name {
-    font-size: 20px;
-  }
-  .datacenter-name {
-    font-size: 16px;
-  }
-  .disabled {
-    cursor: not-allowed;
-  }
   &.add-actions-cell {
     justify-content: flex-end !important;
-  }
-  &.status {
     .datatable-body-cell-label {
-      padding-left: 20px;
+      text-align: center;
     }
   }
 }
@@ -56,4 +44,29 @@
   .datatable-body-cell-label {
     width: 100%;
   }
+}
+
+span.provider {
+  background-color: $link-color;
+  color: $white-color;
+  text-align: center;
+  font-size: 12px;
+  position: absolute;
+  top: 24px;
+  width: 60px;
+  left: -10px;
+  z-index: 2;
+}
+
+span.left-arrow {
+  font-size: 15px;
+  color: #A0A0A0;
+  position: absolute;
+  top: 32px;
+  left: -12px;
+  z-index: 1;
+}
+
+.accountName {
+  color: $grey-color;
 }

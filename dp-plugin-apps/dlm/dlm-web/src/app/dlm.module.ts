@@ -109,11 +109,12 @@ import { IssuesListItemComponent } from './pages/overview/issues-list-item/issue
 import { JobsOverviewTableComponent } from './pages/overview/jobs-overview-table/jobs-overview-table.component';
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
-import { CloudStoresComponent } from './pages/cloud-stores/cloud-stores.component';
-import { CloudAccountsListComponent } from './pages/cloud-stores/components/cloud-accounts-list/cloud-accounts-list.component';
-import { AddAccountModalComponent } from 'pages/cloud-stores/components/add-account-modal/add-account-modal.component';
+import { CloudAccountsComponent } from './pages/cloud-accounts/cloud-accounts.component';
+import { CloudAccountsListComponent } from './pages/cloud-accounts/components/cloud-accounts-list/cloud-accounts-list.component';
+import { AddAccountModalComponent } from 'pages/cloud-accounts/components/add-account-modal/add-account-modal.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
 import { CloudContainerBrowserComponent } from 'components/cloud-container-browser/cloud-container-browser.component';
+import { CloudAccountActionsComponent } from './pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
 // tslint:disable-next-line
 import { CloudContainerBrowserBreadcrumbComponent } from 'components/cloud-container-browser/breadcrumb/cloud-container-browser-breadcrumb.component';
 
@@ -164,7 +165,7 @@ import { HortonStyleModule } from 'common/horton-style.module';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { AsyncActionsService } from 'services/async-actions.service';
 
-import { AddCloudFormComponent } from './pages/cloud-stores/components/add-cloud-form/add-cloud-form.component';
+import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-cloud-form/add-cloud-form.component';
 
 @NgModule({
   imports: [
@@ -228,9 +229,10 @@ import { AddCloudFormComponent } from './pages/cloud-stores/components/add-cloud
     NotificationsTableComponent,
     ClustersComponent,
     ClusterListComponent,
-    CloudStoresComponent,
+    CloudAccountsComponent,
     CloudAccountsListComponent,
     CloudContainerBrowserComponent,
+    CloudAccountActionsComponent,
     CloudContainerBrowserBreadcrumbComponent,
     AddAccountModalComponent,
     PairingsComponent,

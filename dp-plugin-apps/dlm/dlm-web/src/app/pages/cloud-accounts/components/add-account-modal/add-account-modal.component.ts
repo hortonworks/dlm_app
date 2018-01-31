@@ -11,7 +11,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { CloudAccountService } from 'services/cloud-account.service';
 import { Subscription } from 'rxjs/Subscription';
-import { AddCloudFormComponent } from 'pages/cloud-stores/components/add-cloud-form/add-cloud-form.component';
+import { AddCloudFormComponent } from 'pages/cloud-accounts/components/add-cloud-form/add-cloud-form.component';
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';

@@ -92,24 +92,16 @@ export class DlmComponent implements OnDestroy, OnInit {
         'go-to-overview'
       ),
       new MenuItem(
-        t.instant('sidenav.menuItem.data_stores'),
-        '',
-        'navigation-icon fa fa-fw fa-database',
-        'toggle-data-sources',
-        [
-          new MenuItem(
-            t.instant('sidenav.menuItem.clusters'),
-            './clusters',
-            'navigation-icon fa fa-fw fa-cubes',
-            'go-to-clusters'
-          ),
-          new MenuItem(
-            t.instant('sidenav.menuItem.cloud_stores'),
-            './cloud-stores',
-            'navigation-icon fa fa-fw fa-cloud',
-            'go-to-cloud-stores'
-          )
-        ]
+        t.instant('sidenav.menuItem.clusters'),
+        './clusters',
+        'navigation-icon fa fa-fw fa-cubes',
+        'go-to-clusters'
+      ),
+      new MenuItem(
+        t.instant('sidenav.menuItem.cloud_stores'),
+        './cloud-accounts',
+        'navigation-icon fa fa-fw fa-cloud',
+        'go-to-cloud-stores'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),

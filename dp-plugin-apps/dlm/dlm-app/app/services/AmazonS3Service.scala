@@ -11,17 +11,24 @@ package services
 
 import com.amazonaws.AmazonClientException
 import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient
+import com.amazonaws.services.identitymanagement.model.GetUserPolicyRequest
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
 import com.typesafe.scalalogging.Logger
-import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails, S3FileItem, S3FileListResponse}
+import models.AmazonS3Entities.{BucketPolicy, PolicyJsValueStatement, PolicyStatement, S3AccountCredential, S3AccountDetails, S3FileItem, S3FileListResponse, StatementPrincipal, StatementPrincipals}
 import models.AmazonS3Entities.Error.AmazonS3Error
 import models.CloudAccountEntities.Error.GenericError
 import com.google.inject.{Inject, Singleton}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors}
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
-import models.{CloudAccountProvider, CloudCredentialType}
+import models.{AmazonS3Entities, CloudAccountProvider, CloudCredentialType}
 import models.CloudResponseEntities.{FileListItem, FileListResponse, MountPointDefinition, MountPointsResponse}
+import play.api.http.Status.BAD_GATEWAY
+import play.api.libs.json
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.ws.ahc.AhcWSResponse
 
 import collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -70,6 +77,77 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
         Future.successful(Left(AmazonS3Error(ex.getMessage)))
     }
   }
+
+
+  def getBucketPolicy(accountId: String, bucketName: String) : Future[Either[AmazonS3Error, BucketPolicy]] = {
+    dlmKeyStore.getCloudAccount(accountId) map {
+      case Right(result) =>
+        val credential = result.accountCredentials.asInstanceOf[S3AccountCredential]
+        val amazonS3Client = createS3Client(credential)
+        try {
+          getTranslatedPolicy(amazonS3Client.getBucketPolicy(bucketName).getPolicyText)
+        } catch {
+          case ex : AmazonClientException =>
+            logger.error(ex.getMessage)
+            Left(AmazonS3Error(ex.getMessage))
+        }
+      case Left(error) => Left(AmazonS3Error(error.message))
+    }
+  }
+
+  def getTranslatedPolicy(policyText: String) = {
+    val bucketPolicy = Json.parse(policyText)
+    val bucketStatement = (bucketPolicy \ "Statement").get
+
+    val policyStatements : Either[AmazonS3Error, Seq[PolicyJsValueStatement]] = bucketStatement.validate[PolicyJsValueStatement] match {
+      case JsSuccess(result, _) => Right(List(result))
+      case JsError(error) => {
+        bucketStatement.validate[Seq[PolicyJsValueStatement]] match {
+          case JsSuccess(result, _) => Right(result)
+          case JsError(error) => {
+            Left(AmazonS3Error(error.toString()))
+          }
+        }
+      }
+    }
+
+    policyStatements match  {
+      case Right(statements) => {
+        val constructedStatements : Seq[PolicyStatement] = statements.map(x => {
+          val principal = x.Principal.validate[StatementPrincipal] match {
+            case JsSuccess(principalResult, _) => StatementPrincipals(List(principalResult.AWS))
+            case JsError(error) => {
+              x.Principal.validate[StatementPrincipals] match {
+                case JsSuccess(principalResult, _) => principalResult
+              }
+            }
+          }
+
+          val action = x.Action.validate[String] match {
+            case JsSuccess(actionResult, _) => List(actionResult)
+            case JsError(error) => {
+              x.Action.validate[Seq[String]] match {
+                case JsSuccess(actionResult, _) => actionResult
+              }
+            }
+          }
+
+          val resource = x.Resource.validate[String] match {
+            case JsSuccess(resourceResult, _) => List(resourceResult)
+            case JsError(error) => {
+              x.Resource.validate[Seq[String]] match {
+                case JsSuccess(resourceResult, _) => resourceResult
+              }
+            }
+          }
+          PolicyStatement(x.Sid, x.Effect, principal, action, resource)
+        })
+        Right(BucketPolicy((bucketPolicy \ "Version").get.as[String], (bucketPolicy \ "Id").get.as[String], constructedStatements))
+      }
+      case Left(error) => Left(error)
+    }
+  }
+
 
   override def checkUserIdentityValid(accountId: String) : Future[Either[GenericError, Unit]] = {
     dlmKeyStore.getCloudAccount(accountId) map {

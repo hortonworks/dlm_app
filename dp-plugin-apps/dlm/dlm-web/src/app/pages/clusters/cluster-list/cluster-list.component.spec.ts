@@ -8,6 +8,7 @@
  */
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { RouterModule } from '@angular/router';
 import { CommonComponentsModule } from 'components/common-components.module';
@@ -19,26 +20,32 @@ import { CheckboxColumnComponent } from 'components/table-columns/checkbox-colum
 import { ClusterListComponent } from './cluster-list.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
+import { PipesModule } from 'pipes/pipes.module';
 import { HdfsBrowserComponent } from 'components/hdfs-browser/hdfs-browser.component';
 import { FormsModule } from '@angular/forms';
 import { NavbarService } from 'services/navbar.service';
+import { TooltipModule } from 'ngx-bootstrap';
+import { MomentModule } from 'angular2-moment';
 
-xdescribe('ClusterListComponent', () => {
+describe('ClusterListComponent', () => {
   let component: ClusterListComponent;
   let fixture: ComponentFixture<ClusterListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        RouterTestingModule,
         TranslateModule.forRoot(),
         CommonComponentsModule,
+        TooltipModule.forRoot(),
         RouterModule,
         NgxDatatableModule,
-        FormsModule
+        FormsModule,
+        PipesModule,
+        MomentModule
       ],
       declarations: [
         ClusterListComponent,
-        BytesSizePipe,
         TableComponent,
         TableFooterComponent,
         ActionColumnComponent,

@@ -11,7 +11,7 @@ import { Routes } from '@angular/router';
 
 import { OverviewComponent } from 'pages/overview/overview.component';
 import { ClustersComponent } from 'pages/clusters/clusters.component';
-import { CloudStoresComponent } from 'pages/cloud-stores/cloud-stores.component';
+import { CloudAccountsComponent } from 'pages/cloud-accounts/cloud-accounts.component';
 import { PairingsComponent } from 'pages/pairings/pairings.component';
 import { PoliciesComponent } from 'pages/policies/policies.component';
 import { NotificationsPageComponent } from 'pages/notifications/notifications.component';
@@ -43,8 +43,8 @@ export const routes: Routes = [{
     component: ClustersComponent
   },
   {
-    path: 'cloud-stores',
-    component: CloudStoresComponent,
+    path: 'cloud-accounts',
+    component: CloudAccountsComponent,
     data: {
       breadcrumb: 'page.cloud_stores.header'
     }

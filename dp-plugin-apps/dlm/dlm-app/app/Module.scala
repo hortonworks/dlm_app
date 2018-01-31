@@ -139,6 +139,14 @@ class Module extends AbstractModule {
     new BeaconAdminServiceImpl()
   }
 
+  @Provides
+  @Singleton
+  @Named("beaconCloudCredService")
+  def provideBeaconCloudCredService(implicit ws: WSClient,configuration: Configuration):BeaconCloudCredService = {
+    implicit val knoxProxyWsClient:KnoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
+    new BeaconCloudCredServiceImpl()
+  }
+
 
   @Provides
   @Singleton
