@@ -90,6 +90,19 @@ object WebService {
                            (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
+  trait BeaconCloudCredService extends ClientService {
+    def listAllCloudCred(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredsResponse]]
+    def getCloudCred(beaconEndpoint : String, clusterId: Long, cloudCredId : String)
+                  (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredResponse]]
+    def createCloudCred(beaconEndpoint : String, clusterId: Long, cloudCredRequest : CloudCredRequest)
+                        (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredPostResponse]]
+    def updateCloudCred(beaconEndpoint : String, clusterId: Long, cloudCredId : String, cloudCredRequest : CloudCredRequest)
+                               (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def deleteCloudCred(beaconEndpoint : String, clusterId: Long, cloudCredId : String)
+                     (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+  }
+
   trait BeaconPolicyService extends ClientService {
 
     def listPolicies(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])

@@ -25,6 +25,7 @@ import { State } from 'reducers';
 import {
   FormBuilder, FormGroup, Validators
 } from '@angular/forms';
+import { getError } from 'utils/http-util';
 
 const ADD_CLOUD_FORM_REQUEST_ID = '[ADD_CLOUD_FORM] RESET_PROGRESS_REQUEST';
 const ACCOUNTS_REQUEST = '[ADD_CLOUD_FORM] ACCOUNTS_REQUEST';
@@ -156,7 +157,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   }
 
   getErrorMessage(progressId): string {
-    return this.progress[progressId]['response']['error']['error']['message'];
+    return getError(this.progress[progressId]['response']['error']).message;
   }
 
   resetErrors() {

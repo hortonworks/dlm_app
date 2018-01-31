@@ -59,7 +59,7 @@ object Entities {
   case class PoliciesDetails(policyId: String, name: String, description: Option[String], `type`: String,
                              executionType: Option[String], status: String, sourceDataset: String, targetDataset: String,
                              frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String,
-                             targetCluster:String, customProperties: Option[Map[String, String]],
+                             targetCluster:Option[String], customProperties: Option[Map[String, String]],
                              jobs: Seq[PolicyInstanceResponse], report: PolicyReport)
 
   case class PoliciesDetailsResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), policies: Seq[PoliciesDetails])
