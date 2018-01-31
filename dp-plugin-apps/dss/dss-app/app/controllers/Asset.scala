@@ -5,7 +5,6 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DataAssetService
-import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}

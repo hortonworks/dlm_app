@@ -8,7 +8,6 @@
  */
 
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
-import java.time.Clock
 import java.util
 import java.util.Optional
 
@@ -19,8 +18,7 @@ import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
 import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
-import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient, KnoxProxyWsClient}
-import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
+import com.hortonworks.dataplane.cs._
 
 
 /**
@@ -39,6 +37,93 @@ class Module extends AbstractModule {
     bind(classOf[ConsulInitializer]).asEagerSingleton()
 
     bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("dss-app"))
+  }
+
+  @Provides
+  @Singleton
+  @Named("userService")
+  def provideUserService(implicit ws: WSClient, configuration: Configuration): UserService = {
+    new UserServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("dpClusterService")
+  def provideDpClusterService(implicit ws: WSClient, configuration: Configuration): DpClusterService = {
+    new DpClusterServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("dataSetService")
+  def provideDataSetService(implicit ws: WSClient, configuration: Configuration): DataSetService = {
+    new DataSetServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("dataAssetService")
+  def provideDataAssetService(implicit ws: WSClient,configuration: Configuration): DataAssetService = {
+    new DataAssetServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("categoryService")
+  def provideCategoryService(implicit ws: WSClient, configuration: Configuration): CategoryService = {
+    new CategoryServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("dataSetCategoryService")
+  def provideDataSetCategoryService(implicit ws: WSClient, configuration: Configuration): DataSetCategoryService = {
+    new DataSetCategoryServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("atlasService")
+  def provideAtlasService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.AtlasService = {
+    implicit val wSClient = ClusterWsClient(ws)
+    new AtlasServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("rangerService")
+  def provideRangerService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.RangerService = {
+    implicit val wSClient = ClusterWsClient(ws)
+    new RangerServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("dpProfilerService")
+  def provideDpProfilerService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.DpProfilerService = {
+    implicit val wSClient = ClusterWsClient(ws)
+    new DpProfilerServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("clusterService")
+  def provideClusterService(implicit ws: WSClient, configuration: Configuration): ClusterService = {
+    new ClusterServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("configService")
+  def provideConfigService(implicit ws: WSClient, configuration: Configuration): ConfigService = {
+    new ConfigServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("commentService")
+  def provideCommentService(implicit ws: WSClient, configuration: Configuration): CommentService = {
+    new CommentServiceImpl(configuration.underlying)
   }
 }
 
