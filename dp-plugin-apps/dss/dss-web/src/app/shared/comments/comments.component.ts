@@ -40,6 +40,7 @@ export class CommentsComponent implements OnInit {
   size:number = 10;
   allCommentsLoaded: boolean = false;
   timer = null;
+  newCommentsAvailable:boolean = false;
   @ViewChild('newComment') newCommentTextArea : ElementRef;
   @ViewChild('edge') edgeElement: ElementRef;
 
@@ -59,7 +60,7 @@ export class CommentsComponent implements OnInit {
     this.commentService.getByObjectRef(this.objectId,this.objectType,this.offset,this.size).subscribe(comments =>{
         this.commentWithUsers = this.offset === 0 ? comments : this.commentWithUsers.concat(comments);
         this.allCommentsLoaded = comments.length < this.size ? true : false;
-        this.offset = this.offset + 10;
+        this.offset = this.offset + comments.length;
         this.fetchInProgress = false;
         setTimeout(() => {
           this.loadNext();       // required in case 'edge' is already in viewport (without scrolling). setTimeout is needed as window takes some time to adjust with newly loaded comments.
@@ -79,8 +80,11 @@ export class CommentsComponent implements OnInit {
       newCommentObject.comment = this.newCommentText;
       newCommentObject.createdBy = Number(AuthUtils.getUser().id);
       this.commentService.add(newCommentObject).subscribe(_ => {
-        this.resetOffset();
-        this.getComments(false);
+        if(this.isEdgeInViewport()){
+          this.getComments(false);
+        }else{
+          this.newCommentsAvailable = true;
+        }
         this.newCommentText = "";
         this.resizeTextArea();
       });
@@ -134,7 +138,7 @@ export class CommentsComponent implements OnInit {
   }
 
   shouldLoadNext(){
-    return this.isEdgeInViewport() && !this.allCommentsLoaded;
+    return this.isEdgeInViewport() && (!this.allCommentsLoaded || this.newCommentsAvailable);
   }
 
   loadNext(){
@@ -144,6 +148,7 @@ export class CommentsComponent implements OnInit {
       let that = this;
       this.timer = setTimeout(() => {
         that.getComments(false);
+        this.newCommentsAvailable = false;
         this.timer = null;
       }, 1000);
     }
