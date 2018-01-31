@@ -145,9 +145,8 @@ export class CommentsComponent implements OnInit {
     if(this.shouldLoadNext()){
       clearTimeout(this.timer);
       this.timer = null;
-      let that = this;
       this.timer = setTimeout(() => {
-        that.getComments(false);
+        this.getComments(false);
         this.newCommentsAvailable = false;
         this.timer = null;
       }, 1000);
