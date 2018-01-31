@@ -82,8 +82,8 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     else{
       commentService
         .getByObjectRef(req.rawQueryString)
-        .map { cmnts =>
-          Ok(Json.toJson(cmnts))
+        .map { comments =>
+          Ok(Json.toJson(comments))
         }
         .recover(apiError)
     }
