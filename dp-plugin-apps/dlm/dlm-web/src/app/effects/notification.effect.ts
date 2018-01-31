@@ -57,10 +57,7 @@ export class NotificationEffects {
 
   private getErrorBody(action: ActionWithPayload<ErrorPayload>) {
     const err = action.payload.error;
-    let errorMessage = getError(err.json && typeof err.json === 'function' ? err.json() : err);
-    if (errorMessage.message) {
-      errorMessage = errorMessage.message;
-    }
+    const errorMessage = getError(err).message;
     return typeof errorMessage === 'string' ? this.t.instant(errorMessage) : JSON.stringify(errorMessage, null, 4);
   }
 

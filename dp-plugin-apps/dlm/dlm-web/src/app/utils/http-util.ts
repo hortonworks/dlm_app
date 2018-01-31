@@ -8,10 +8,11 @@
  */
 
 import { Response, RequestOptionsArgs, Headers, URLSearchParams } from '@angular/http';
-import { HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { User } from 'models/user.model';
 import { TranslateService } from '@ngx-translate/core';
+import { APIError, APIErrorDetails } from 'models/error.model';
 
 export const toJson = (response: Response) => response.json();
 export const mapResponse = (response$: Observable<Response>) => response$.map(toJson);
@@ -24,13 +25,13 @@ export const getHeaders = (): HttpHeaders => {
   return new HttpHeaders(headers);
 };
 
-export const getError = (response) => {
-  const message = (response.message || 'common.errors.unknown').replace('Failed with ', '');
+export const getError = (errResponse: HttpErrorResponse): APIErrorDetails => {
+  const message = (errResponse.error.message || 'common.errors.unknown').replace('Failed with ', '');
   let error;
   try {
-    error = JSON.parse(message).error;
+    error = (JSON.parse(message) as APIError).error;
   } catch (e) {
-    error = message;
+    error = { message };
   }
   return error;
 };

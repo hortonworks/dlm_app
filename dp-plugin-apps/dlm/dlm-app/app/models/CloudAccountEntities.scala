@@ -136,9 +136,21 @@ object CloudAccountEntities {
   implicit val cloudCredentialNameExistsWrites = Json.writes[CloudCredentialNameExists]
 
   implicit val genericErrorReads = Json.reads[GenericError]
-  implicit val genericErrorWrites = Json.writes[GenericError]
+  implicit val genericErrorWrites = new Writes[GenericError] {
+    override def writes(o: GenericError): JsValue = {
+      Json.obj(
+        "error" -> Json.obj("message" -> o.message)
+      )
+    }
+  }
 
   implicit val keyStoreWriteErrorReads = Json.reads[KeyStoreWriteError]
-  implicit val keyStoreWriteErrorWrites = Json.writes[KeyStoreWriteError]
+  implicit val keyStoreWriteErrorWrites = new Writes[KeyStoreWriteError] {
+    override def writes(o: KeyStoreWriteError): JsValue = {
+      Json.obj(
+        "error" -> Json.obj("message" -> o.message)
+      )
+    }
+  }
 }
 

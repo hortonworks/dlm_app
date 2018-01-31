@@ -50,7 +50,7 @@ object ResponseEntities {
 
   case class PoliciesDetailResponse(policyId: String, name: String, description: Option[String], `type`: String,
                                     status: String, sourceDataset: String, targetDataset: String, frequencyInSec: Long,
-                                    sourceCluster: String, targetCluster: String, instances: Seq[PolicyInstanceResponse],
+                                    sourceCluster: String, targetCluster: Option[String], instances: Seq[PolicyInstanceResponse],
                                     report: PolicyReport, startTime: Option[String], endTime: String,
                                     executionType: Option[String], customProperties: Option[Map[String, String]])
 
@@ -79,6 +79,12 @@ object ResponseEntities {
   case class HiveDbTables(database: String, table: Seq[String])
 
   case class BeaconHiveDbTablesResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbTables])
+
+  case class CloudCredPostResponse(status: String, message: String, requestId: String, entityId: String)
+
+  case class CloudCredResponse(id: String, name: String, provider: String, creationTime: String, lastModifiedTime: String)
+
+  case class CloudCredsResponse(requestId: String, totalResults: Long, results: Long, cloudCred: Seq[CloudCredResponse])
 }
 
 object RequestEntities {
@@ -88,11 +94,14 @@ object RequestEntities {
                                        rangerService: Option[RangerServiceDetails], hsEndpoint: Option[String],
                                        hsKerberosPrincipal: Option[String])
   
-  case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
-                                      sourceCluster: String, targetCluster: String, frequencyInSec: Long,
-                                      startTime: Option[String], endTime: Option[String], distcpMaxMaps: Option[Long],
-                                      distcpMapBandwidth: Option[Long], queueName: Option[String],
-                                      `tde.sameKey`: Option[Boolean], description: Option[String])
+  case class PolicyDefinitionRequest(name: String, `type`: String, sourceDataset: String, targetDataset: Option[String],
+                                      cloudCred: Option[String], sourceCluster: Option[String], targetCluster: Option[String],
+                                      frequencyInSec: Long, startTime: Option[String], endTime: Option[String],
+                                      distcpMaxMaps: Option[Long], distcpMapBandwidth: Option[Long], queueName: Option[String],
+                                      `tde.sameKey`: Option[Boolean], description: Option[String], sourceSnapshotRetentionAgeLimit: Option[Long],
+                                      sourceSnapshotRetentionNumber: Option[Long], targetSnapshotRetentionAgeLimit: Option[Long],
+                                      targetSnapshotRetentionNumber: Option[Long], retryAttempts: Option[Long], retryDelay: Option[Long])
+  case class CloudCredRequest(name: Option[String], provider: Option[String], `s3.access.key`: Option[String], `s3.secret.key`: Option[String], `s3.encryption.key`: Option[String])
 }
 
 object JsonFormatters {
@@ -176,12 +185,24 @@ object JsonFormatters {
   implicit val beaconHiveDbTablesResponseWrites = Json.writes[BeaconHiveDbTablesResponse]
   implicit val beaconHiveDbTablesResponseReads = Json.reads[BeaconHiveDbTablesResponse]
 
+  implicit val cloudCredPostResponseWrites = Json.writes[CloudCredPostResponse]
+  implicit val cloudCredPostResponseReads = Json.reads[CloudCredPostResponse]
+
+  implicit val cloudCredResponseWrites = Json.writes[CloudCredResponse]
+  implicit val cloudCredResponseReads = Json.reads[CloudCredResponse]
+
+  implicit val cloudCredsResponseWrites = Json.writes[CloudCredsResponse]
+  implicit val cloudCredsResponseReads = Json.reads[CloudCredsResponse]
+
 
 
   //-- RequestEntities
 
   implicit val policyDefinitionRequestWrites = Json.writes[PolicyDefinitionRequest]
   implicit val policyDefinitionRequestReads = Json.reads[PolicyDefinitionRequest]
+
+  implicit val cloudCredRequestRequestWrites = Json.writes[CloudCredRequest]
+  implicit val cloudCredRequestRequestReads = Json.reads[CloudCredRequest]
 }
 
 
