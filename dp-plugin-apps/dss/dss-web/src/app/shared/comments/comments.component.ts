@@ -38,7 +38,10 @@ export class CommentsComponent implements OnInit {
   returnURl: string = '';
   offset:number = 0;
   size:number = 10;
-  @ViewChild('newComment') newCommentTextArea : ElementRef
+  allCommentsLoaded: boolean = false;
+  timer = null;
+  @ViewChild('newComment') newCommentTextArea : ElementRef;
+  @ViewChild('edge') edgeElement: ElementRef;
 
   ngOnInit() {
     this.objectType = this.route.snapshot.params['objectType'];
@@ -54,8 +57,13 @@ export class CommentsComponent implements OnInit {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
     this.commentService.getByObjectRef(this.objectId,this.objectType,this.offset,this.size).subscribe(comments =>{
-        this.commentWithUsers = comments;
+        this.commentWithUsers = this.offset === 0 ? comments : this.commentWithUsers.concat(comments);
+        this.allCommentsLoaded = comments.length < this.size ? true : false;
+        this.offset = this.offset + 10;
         this.fetchInProgress = false;
+        setTimeout(() => {
+          this.loadNext();       // required in case 'edge' is already in viewport (without scrolling). setTimeout is needed as window takes some time to adjust with newly loaded comments.
+        },50);
       }, () => {
         this.fetchInProgress = false;
         this.fetchError = true;
@@ -71,6 +79,7 @@ export class CommentsComponent implements OnInit {
       newCommentObject.comment = this.newCommentText;
       newCommentObject.createdBy = Number(AuthUtils.getUser().id);
       this.commentService.add(newCommentObject).subscribe(_ => {
+        this.resetOffset();
         this.getComments(false);
         this.newCommentText = "";
         this.resizeTextArea();
@@ -78,8 +87,13 @@ export class CommentsComponent implements OnInit {
     }
   }
 
+  resetOffset(){
+    this.offset =0;
+    this.allCommentsLoaded = false;
+  }
   onDeleteComment(commentWU: CommentWithUser) {
     this.commentService.deleteComment(commentWU.comment.id).subscribe(_ => {
+      this.resetOffset();
       this.getComments(false);
     });
   }
@@ -106,5 +120,32 @@ export class CommentsComponent implements OnInit {
       textArea.style.cssText = 'height:auto';
       textArea.style.cssText = 'height:'+Math.min(textArea.scrollHeight, 100) + "px";
     },0);
+  }
+
+  isEdgeInViewport() {
+    let element = this.edgeElement.nativeElement;
+    let rect = element.getBoundingClientRect();
+    let parentEle = this.edgeElement.nativeElement.parentElement;
+    let parentRect = parentEle.getBoundingClientRect();
+    return (
+      rect.top < parentRect.bottom &&
+      rect.bottom > 0
+    );
+  }
+
+  shouldLoadNext(){
+    return this.isEdgeInViewport() && !this.allCommentsLoaded;
+  }
+
+  loadNext(){
+    if(this.shouldLoadNext()){
+      clearTimeout(this.timer);
+      this.timer = null;
+      let that = this;
+      this.timer = setTimeout(() => {
+        that.getComments(false);
+        this.timer = null;
+      }, 1000);
+    }
   }
 }

@@ -9,7 +9,7 @@
   ~  */
   -->
 
-<div class="slider-mask"></div>
+<div class="slider-mask" [routerLink]="[returnURl]"></div>
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
@@ -24,23 +24,23 @@
     <div class="rating-stars"><star-rating-comp [starType]="'svg'" [labelText]="'RATE THIS COLLECTION'" [labelPosition]="'top'" [size]="'medium'" [speed]="'noticeable'" [step]="0.5"
                                  [showHalfStars]="true" [id]="'rating-id'" [hoverEnabled]="true"></star-rating-comp></div>
     <div class="rating-class">
-      <div>2000 votes</div>
+      <div>0 votes</div>
       <div class="fixed-star">
-        <star-rating-comp [starType]="'svg'" [labelText]="'4.1'" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
+        <star-rating-comp [starType]="'svg'" [labelText]="'0'" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
       </div>
     </div>
   </div>
   <div class="mdl-grid" *ngIf="fetchError">
     <div class="mdl-cell mdl-cell--12-col load-comment-error">{{"pages.comments.fetchErrorMsg" | translate}}</div>
   </div>
-  <div class="mdl-grid" *ngIf="fetchInProgress">
+  <div class="mdl-grid" *ngIf="fetchInProgress && commentWithUsers.length === 0">
     <div class="mdl-cell mdl-cell--12-col">{{"common.loading" | translate}}...</div>
   </div>
   <div *ngIf="!fetchInProgress">
-    <div class="mdl-grid" *ngIf="!fetchError && commentWithUsers.length === 0">
+    <div class="mdl-grid" *ngIf="!fetchError && commentWithUsers.length === 0 && allCommentsLoaded">
       <div class="mdl-cell mdl-cell--12-col no-comments">{{"pages.comments.noComments" | translate}}</div>
     </div>
-    <div class="comment-tree">
+    <div class="comment-tree" (scroll)="loadNext()">
       <ul>
         <li *ngFor="let commentWithUser of commentWithUsers">
           <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(commentWithUser)}">
@@ -78,7 +78,7 @@
           </div>
         </li>
       </ul>
-      <div class="edge"></div>
+      <div class="edge" #edge><i *ngIf="!allCommentsLoaded" class="fa fa-spinner fa-spin fa-2x fa-fw" aria-hidden="true"></i></div>
     </div>
   </div>
   <div class="slider-footer">

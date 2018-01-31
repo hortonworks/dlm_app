@@ -21,7 +21,7 @@ export class CommentService {
   constructor(private http:Http) { }
 
   getByObjectRef(objectId: string, objectType: string, offset:number, size:number): Observable<CommentWithUser[]>  {
-    const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}`;
+    const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}&offset=${offset}&size=${size}`;
 
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))

@@ -44,7 +44,7 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
       d => Date.valueOf(d),
       d => d.toLocalDate)
     val query = Comments.filter(m => (m.objectId === objectId && m.objectType === objectType))
-      .join(userRepo.Users).on(_.createdBy === _.id).map(t => (t._1,t._2.username)).sortBy(_._1.createdOn.desc)
+      .join(userRepo.Users).on(_.createdBy === _.id).map(t => (t._1,t._2.username)).sortBy(_._1.createdOn)
     val q = paginatedQuery.map { pq =>
       query.drop(pq.offset).take(pq.size)
     }.getOrElse(query)
