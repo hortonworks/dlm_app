@@ -12,16 +12,13 @@ package controllers
 import com.google.inject.Inject
 import java.io.File
 
+import akka.util.ByteString
 import play.api.Mode
-import play.api.mvc.{Action, AnyContent, Controller}
-import play.utils.UriEncoding
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import play.api.http.HttpEntity
+import play.api.mvc.{Action, AnyContent, Result, ResponseHeader}
 
 class StaticAssets @Inject() (environment: play.api.Environment,
                               configuration: play.api.Configuration) extends ExternalAssets(environment) {
-
 
   /**
     * Generates an `Action` that serves a static resource from an external folder
@@ -47,16 +44,10 @@ class StaticAssets @Inject() (environment: play.api.Environment,
         }
 
       }
-      case Mode.Dev => {
-        val fileToServe = new File("./dss-web/dist", file);
-
-        if (fileToServe.exists) {
-          Ok.sendFile(fileToServe, inline = true).withHeaders(CACHE_CONTROL -> "max-age=3600")
-        } else {
-          NotFound
-        }
-      }
-      case _ => NotFound
+      case _ => Result (
+        header = ResponseHeader(404, Map.empty),
+        body = HttpEntity.Strict(ByteString(views.html.defaultpages.notFound.apply("404", rootPath).body), Some("text/html"))
+      )
     }
   }
 }
