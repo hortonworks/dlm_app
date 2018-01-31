@@ -158,7 +158,7 @@ class StatusRoute @Inject()(val ws: WSClient,
         // Step 4
         for {
           credential <- credentialInterface.getCredential(
-            "dp.credential.ambari")
+            "DPSPlatform.credential.ambari")
           response <- ws
             .url(endpoint)
             .withAuth(credential.user.get,

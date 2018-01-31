@@ -167,6 +167,8 @@ class RangerRoute @Inject()(
     }
   }
 
+  private val RANGER_CREDENTIAL_KEY = "DPSPlatform.credential.ranger"
+
   private def requestRangerForTagPolicies(request: HttpRequest,
                                           clusterId: Long,
                                           serviceType: String,
@@ -183,7 +185,7 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      credential <- credentialInterface.getCredential("dp.credential.ranger")
+      credential <- credentialInterface.getCredential(RANGER_CREDENTIAL_KEY)
       services <- getRangerServicesForType(baseUrls.head,
                                            credential,
                                            serviceType,
@@ -344,7 +346,7 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      credential <- credentialInterface.getCredential("dp.credential.ranger")
+      credential <- credentialInterface.getCredential(RANGER_CREDENTIAL_KEY)
       urlToHit1 <- Future.successful(
         s"${baseUrls.head}/service/plugins/definitions?pageSource=Audit")
       wsRequest <- getDefinitionsRequest(credential, urlToHit1, executor)
@@ -469,7 +471,7 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      credential <- credentialInterface.getCredential("dp.credential.ranger")
+      credential <- credentialInterface.getCredential(RANGER_CREDENTIAL_KEY)
       wsRequest <- createPolicyRequest(dbName,
                                        tableName,
                                        offset,

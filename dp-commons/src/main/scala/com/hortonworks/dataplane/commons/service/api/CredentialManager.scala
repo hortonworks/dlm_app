@@ -11,29 +11,9 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
-import java.io.{FileInputStream, FileOutputStream, InputStream, OutputStream}
-import java.nio.file.{Path, Paths}
-import java.security.KeyStore
-import javax.crypto.spec.SecretKeySpec
+import scala.util.Try
 
-import scala.collection.mutable
-import scala.util.{Try, Success, Failure}
-
-case class KeystoreReloadEvent()
-
-class CredentialManager(private val storePath: String, private val storePassword: String) extends mutable.Publisher[KeystoreReloadEvent] {
-
-  //  initialize
-  private var keystore = load(storePath, storePassword)
-  private val watcher = new ThreadFileMonitor(Paths.get(storePath)) {
-    override def onChange(path: Path): Unit = {
-      keystore = load(storePath, storePassword)
-
-      // publishing event
-      publish(KeystoreReloadEvent())
-    }
-  }
-  watcher.start()
+class CredentialManager(private val storePath: String, private val storePassword: String) extends KeyStoreManager(storePath, storePassword) {
 
   def readUserCredential(alias: String): Try[(String, String)] = {
     read(alias, Set("username", "password")).map {
@@ -45,66 +25,9 @@ class CredentialManager(private val storePath: String, private val storePassword
     }
   }
 
-  def read(alias: String, keys: Set[String]): Try[Map[String, Array[Byte]]] = {
-    keystore.map { keystore =>
-      (for {
-        key <- keys
-        value = if (!keystore.containsAlias(s"$alias.$key")) {
-            throw CredentialNotFoundInKeystoreException(s"Credential not found for key $key of $alias")
-          } else {
-            keystore.getKey(s"$alias.$key", storePassword.toCharArray).getEncoded
-          }
-
-      } yield {
-        key -> value
-      }).toMap
-    }
-  }
-
   def writeUserCredential(key: String, username: String, password: String): Try[Unit] = {
     write(key, Map("username" -> username.getBytes("UTF-8"), "password" -> password.getBytes("UTF-8")))
   }
-
-  def write(alias: String, keyValueMap: Map[String, Array[Byte]]): Try[Unit] = {
-    keystore.map { keystore =>
-      keyValueMap foreach {
-        case (key, value) =>
-          if (keystore.containsAlias(s"$alias.$key")) {
-            keystore.deleteEntry(s"$alias.$key")
-          }
-          keystore.setKeyEntry(s"$alias.$key", new SecretKeySpec(value, "AES"), storePassword.toCharArray, null)
-      }
-      flush(storePath, storePassword, keystore)
-    }
-  }
-
-  private def load(storePath: String, storePassword: String): Try[KeyStore] = Try({
-    var is: InputStream = null
-    var keystore: KeyStore = null
-    try {
-      is = new FileInputStream(storePath)
-      keystore = KeyStore.getInstance("JCEKS")
-      keystore.load(is, storePassword.toCharArray)
-    } finally {
-      if (is != null) {
-        is.close()
-      }
-    }
-    keystore
-  })
-
-  private def flush(storePath: String, storePassword: String, keystore: KeyStore): Try[Unit] = Try({
-    var os: OutputStream = null
-    try {
-      os = new FileOutputStream(storePath)
-      keystore.store(os, storePassword.toCharArray)
-    } finally {
-      if(os != null) {
-        println("close after flush")
-        os.close()
-      }
-    }
-  })
 }
 
 object CredentialManager {

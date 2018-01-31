@@ -36,7 +36,7 @@ class AmbariClusterInterfaceV2(
 
   val logger = Logger(classOf[AmbariClusterInterfaceV2])
 
-  val credentials: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
+  val credentials: Future[Credentials] = credentialInterface.getCredential("DPSPlatform.credential.ambari")
 
   override def getAtlas(implicit hJwtToken: Option[HJwtToken])
     : Future[Either[Throwable, Atlas]] = {

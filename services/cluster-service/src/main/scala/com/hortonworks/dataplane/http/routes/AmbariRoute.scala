@@ -92,6 +92,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
     Future.sequence(futures)
   }
 
+  private val AMBARI_CREDENTIAL_KEY = "DPSPlatform.credential.ambari"
+
   def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest,
                        request: HttpRequest): Future[Seq[AmbariCluster]] = {
 
@@ -127,7 +129,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
 
     val finalList = for {
       dataplaneCluster <- getDpCluster(ambariDetailRequest,expectConfigGroup,checkCredentials)
-      creds <- credentialInterface.getCredential("dp.credential.ambari")
+      creds <- credentialInterface.getCredential(AMBARI_CREDENTIAL_KEY)
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
                                             ws,
@@ -235,7 +237,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
       Future.successful(baseReq)
     else {
       for {
-        creds <- credentialInterface.getCredential("dp.credential.ambari")
+        creds <- credentialInterface.getCredential(AMBARI_CREDENTIAL_KEY)
         req <- Future.successful(
           baseReq.withAuth(creds.user.get, creds.pass.get, WSAuthScheme.BASIC))
       } yield req
@@ -365,7 +367,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
     implicit val token =
       if (header.isPresent) Some(HJwtToken(header.get.value)) else None
     val list = for {
-      creds <- credentialInterface.getCredential("dp.credential.ambari")
+      creds <- credentialInterface.getCredential(AMBARI_CREDENTIAL_KEY)
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dpcwServices.dataplaneCluster,
           ws,

@@ -96,7 +96,7 @@ class ClusterDataApi @Inject()(
     new DateTime().toInstant.getMillis <= expiry
   }
 
-  def getCredentials: Future[Credentials] = credentialInterface.getCredential("dp.credential.atlas")
+  def getCredentials: Future[Credentials] = credentialInterface.getCredential("DPSPlatform.credential.atlas")
 
   def shouldUseToken(clusterId:Long):Future[Boolean] =  {
 

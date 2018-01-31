@@ -62,7 +62,7 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                                 hJwtToken: Option[HJwtToken]): Future[Cluster] = {
     implicit val token = hJwtToken
     val clusters = for {
-      creds <- credentialInterface.getCredential("dp.credential.ambari")
+      creds <- credentialInterface.getCredential("DPSPlatform.credential.ambari")
       interface <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
           wSClient,
