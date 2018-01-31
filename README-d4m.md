@@ -75,7 +75,6 @@ serviceaccount "default" patched
 > brew install kubernetes-helm
 > helm init
 > helm install ./dataplane/helm-charts/dp-umbrella -n "$ORG" --set global.dpVersion=0.0.1-latest  --set global.adminPassword=admin
-> helm install ./dataplane/helm-charts/dp-umbrella -n "$ORG" --set global.dpVersion=0.0.1-latest  --set global.adminPassword=admin
 > helm delete --purge "$ORG"
 ```
 
