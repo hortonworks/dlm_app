@@ -18,6 +18,7 @@ GET           /api/dataset-tag/:tagName                              controllers
 
 GET           /api/assets/auditMockStatus                            controllers.QueryAttributes.checkAuditMockStatus
 GET           /api/assets/details/:clusterId/:atlasGuid              controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)
+GET           /api/assets/details/:clusterId                         controllers.QueryAttributes.getAssetsDetails(clusterId: String, guids: Seq[String])
 GET           /api/assets/typeDefs/:clusterId/:defType               controllers.QueryAttributes.getTypeDefs(clusterId: String, defType: String)
 GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)
 
@@ -60,6 +61,15 @@ POST          /api/add-selected-atlas-assets                         controllers
 # ===========================================
 GET           /api/dataset/:datasetId/assets                         controllers.DataSets.getDataAssetsByDatasetId(datasetId: String, queryName: String, offset: Long, limit: Long)
 DELETE        /api/dataset/:datasetId/allassets                      controllers.DataSets.removeAllAssetsFromDataset(datasetId: Long)
+DELETE        /api/dataset/:datasetId/assets                         controllers.DataSets.removeAssetsFromDataset(datasetId: Long)
+
+# DpProfiler
+# ===========================================
+POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
+GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
+GET           /api/dpProfiler/scheduleStatus                          controllers.DpProfilerAttributes.getScheduleStatus(clusterId: String, dataSetId: String)
+GET           /api/dpProfiler/auditResults                            controllers.DpProfilerAttributes.getAuditResults(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
+GET           /api/dpProfiler/auditActions                            controllers.DpProfilerAttributes.getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
 
 # Ranger
 # ===========================================
