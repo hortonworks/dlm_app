@@ -86,7 +86,6 @@ class KeyStoreManager(private val storePath: String, private val storePassword: 
       keystore.store(os, storePassword.toCharArray)
     } finally {
       if(os != null) {
-        println("close after flush")
         os.close()
       }
     }
