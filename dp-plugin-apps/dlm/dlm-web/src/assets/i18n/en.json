@@ -481,6 +481,7 @@
       },
       "form": {
         "selected": "Selected",
+        "validateBtn": "validate",
         "sections": {
           "general": "General",
           "database": "Select Database",
@@ -505,7 +506,18 @@
             "noPair": "No paired cluster available for the selected source cluster"
           },
           "destination_type": "Destination Type",
+          "source_type": "Source Type",
           "cloud_account": "Account",
+          "s3": {
+            "account": "IAM Account",
+            "endpoint": "S3 Endpoint"
+          },
+          "wasb": {
+            "container": "Container",
+            "container_placeholder": "Enter Container Name",
+            "blockPath": "Block Path",
+            "blockPath_placeholder": "Enter Block Path"
+          },
           "container": "Container",
           "sourceDataCenter": "Source Data Center",
           "destinationDataCenter": "Destination Data Center",
