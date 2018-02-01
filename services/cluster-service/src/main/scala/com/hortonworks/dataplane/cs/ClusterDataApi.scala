@@ -20,6 +20,7 @@ import akka.stream.ActorMaterializer
 import com.google.common.base.{Supplier, Suppliers}
 import com.google.common.cache.{Cache, CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
+import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
@@ -96,7 +97,7 @@ class ClusterDataApi @Inject()(
     new DateTime().toInstant.getMillis <= expiry
   }
 
-  def getCredentials: Future[Credentials] = credentialInterface.getCredential("DPSPlatform.credential.atlas")
+  def getCredentials: Future[Credentials] = credentialInterface.getCredential(CSConstants.ATLAS_CREDENTIAL_KEY)
 
   def shouldUseToken(clusterId:Long):Future[Boolean] =  {
 

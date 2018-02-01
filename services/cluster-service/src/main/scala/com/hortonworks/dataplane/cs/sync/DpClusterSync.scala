@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
+import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.cs.sync.TaskStatus.TaskStatus
@@ -62,7 +63,7 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                                 hJwtToken: Option[HJwtToken]): Future[Cluster] = {
     implicit val token = hJwtToken
     val clusters = for {
-      creds <- credentialInterface.getCredential("DPSPlatform.credential.ambari")
+      creds <- credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       interface <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
           wSClient,

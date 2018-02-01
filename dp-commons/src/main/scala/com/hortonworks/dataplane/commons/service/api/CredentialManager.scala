@@ -11,12 +11,19 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
+import scala.collection.mutable
 import scala.util.Try
 
-class CredentialManager(private val storePath: String, private val storePassword: String) extends KeyStoreManager(storePath, storePassword) {
+case class CredentialReloadEvent()
+
+class CredentialManager(private val storePath: String, private val storePassword: String) extends mutable.Publisher[CredentialReloadEvent] with mutable.Subscriber[KeystoreReloadEvent, mutable.Publisher[KeystoreReloadEvent]] {
+
+  private val keyStoreManager = new KeyStoreManager(storePath, storePassword)
+
+  keyStoreManager.subscribe(this)
 
   def readUserCredential(alias: String): Try[(String, String)] = {
-    read(alias, Set("username", "password")).map {
+    keyStoreManager.read(alias, Set("username", "password")).map {
       x => {
         x.values.toList.map(x => new String(x, "UTF-8")) match {
           case List(username, password) => (username, password)
@@ -26,7 +33,11 @@ class CredentialManager(private val storePath: String, private val storePassword
   }
 
   def writeUserCredential(key: String, username: String, password: String): Try[Unit] = {
-    write(key, Map("username" -> username.getBytes("UTF-8"), "password" -> password.getBytes("UTF-8")))
+    keyStoreManager.write(key, Map("username" -> username.getBytes("UTF-8"), "password" -> password.getBytes("UTF-8")))
+  }
+
+  override def notify(publisher: mutable.Publisher[KeystoreReloadEvent], event: KeystoreReloadEvent): Unit = {
+    publish(CredentialReloadEvent())
   }
 }
 

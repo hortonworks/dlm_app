@@ -11,21 +11,35 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
+import java.io.File
+
 import org.scalamock.scalatest.AsyncMockFactory
-import org.scalatest.{AsyncFlatSpec, Matchers}
+import org.scalatest.{AsyncFlatSpec, BeforeAndAfterEach, Matchers}
 import org.scalatest.TryValues._
 
-class CredentialManagerSpec extends AsyncFlatSpec with AsyncMockFactory with Matchers {
+import sys.process._
 
-  private val keyStoreFile = getClass.getResource("/dp-test-keystore.jceks")
-  private val credentialManager = new CredentialManager(keyStoreFile.getPath,"changeit")
+class CredentialManagerSpec extends AsyncFlatSpec with AsyncMockFactory with Matchers with BeforeAndAfterEach {
+
+  private val keyStoreFilePath = "/tmp/test.jceks"
+  private val keyStorePassword = "changeit"
+
+  override def afterEach(): Unit ={
+    val file:File = new File(keyStoreFilePath)
+    file.delete()
+  }
 
   "CredentialManager" should "write credentials to the keystore" in {
+    s"keytool -genseckey -keystore $keyStoreFilePath -storetype jceks -storepass $keyStorePassword -alias jceksaes -keypass mykeypass" !!
+    val credentialManager = new CredentialManager(keyStoreFilePath, keyStorePassword)
     val result = credentialManager.writeUserCredential("DPSPlatform.test.credential","test","test@123")
     assert(result.isSuccess)
   }
 
   "CredentialManager" should "read credentials from the keystore" in {
+    s"keytool -genseckey -keystore $keyStoreFilePath -storetype jceks -storepass $keyStorePassword -alias jceksaes -keypass mykeypass" !!
+    val credentialManager = new CredentialManager(keyStoreFilePath, keyStorePassword)
+    credentialManager.writeUserCredential("DPSPlatform.test.credential","test","test@123")
     val result = credentialManager.readUserCredential("DPSPlatform.test.credential")
     assert(result.isSuccess)
     assert(result.success.value._1 === "test")
@@ -33,6 +47,8 @@ class CredentialManagerSpec extends AsyncFlatSpec with AsyncMockFactory with Mat
   }
 
   "CredentialManager" should "throw exception if a key read is not present in the keystore" in {
+    s"keytool -genseckey -keystore $keyStoreFilePath -storetype jceks -storepass $keyStorePassword -alias jceksaes -keypass mykeypass" !!
+    val credentialManager = new CredentialManager(keyStoreFilePath, keyStorePassword)
     val result = credentialManager.readUserCredential("xyz.credential")
     assert(result.isFailure)
     result.failure.exception shouldBe a [CredentialNotFoundInKeystoreException]

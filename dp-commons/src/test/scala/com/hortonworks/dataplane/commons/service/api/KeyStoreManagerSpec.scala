@@ -11,29 +11,44 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
+import java.io.File
+
 import org.scalamock.scalatest.AsyncMockFactory
-import org.scalatest.{AsyncFlatSpec, Matchers}
+import org.scalatest.{AsyncFlatSpec, BeforeAndAfterEach, Matchers}
 import org.scalatest.TryValues._
+import sys.process._
 
 import scala.util.Try
 
-class KeyStoreManagerSpec extends AsyncFlatSpec with AsyncMockFactory with Matchers {
+class KeyStoreManagerSpec extends AsyncFlatSpec with AsyncMockFactory with Matchers with BeforeAndAfterEach {
 
-  private val keyStoreFile = getClass.getResource("/dp-test-keystore.jceks")
-  private val keyStoreManager = new KeyStoreManager(keyStoreFile.getPath,"changeit")
+  private val keyStoreFilePath = "/tmp/test.jceks"
+  private val keyStorePassword = "changeit"
+
+  override def afterEach(): Unit ={
+    val file:File = new File(keyStoreFilePath)
+    file.delete()
+  }
 
   "KeyStoreManager" should "write to key store" in {
+    s"keytool -genseckey -keystore $keyStoreFilePath -storetype jceks -storepass $keyStorePassword -alias jceksaes -keypass mykeypass" !!
+    val keyStoreManager = new KeyStoreManager(keyStoreFilePath, keyStorePassword)
     val res: Try[Unit] = keyStoreManager.write("DPSPlatform.test",Map("username" -> "testuser".getBytes("UTF-8"), "password" -> "testpass".getBytes("UTF-8")))
     assert(res.isSuccess === true)
   }
 
   "KeyStoreManager" should "read from keystore" in {
+    s"keytool -genseckey -keystore $keyStoreFilePath -storetype jceks -storepass $keyStorePassword -alias jceksaes -keypass mykeypass" !!
+    val keyStoreManager = new KeyStoreManager(keyStoreFilePath, keyStorePassword)
+    keyStoreManager.write("DPSPlatform.test",Map("username" -> "testuser".getBytes("UTF-8"), "password" -> "testpass".getBytes("UTF-8")))
     val res = keyStoreManager.read("DPSPlatform.test", Set("username","password"))
     assert(res.isSuccess === true)
     assert(res.success.value.values.toList.map(x => new String(x, "UTF-8")) === List("testuser", "testpass"))
   }
 
   "KeyStoreManager" should "throw exception if key is not found" in {
+    s"keytool -genseckey -keystore $keyStoreFilePath -storetype jceks -storepass $keyStorePassword -alias jceksaes -keypass mykeypass" !!
+    val keyStoreManager = new KeyStoreManager(keyStoreFilePath, keyStorePassword)
     val res = keyStoreManager.read("DPSPlatform.test123", Set("username","password"))
     assert(res.isFailure === true)
     res.failure.exception shouldBe a [CredentialNotFoundInKeystoreException]
