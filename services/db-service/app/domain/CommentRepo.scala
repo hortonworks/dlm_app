@@ -39,7 +39,7 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     db.run(query)
   }
 
-  def findByObejctRef(objectId:Long, objectType:String, paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[CommentWithUser]] = {
+  def findByObjectRef(objectId:Long, objectType:String, paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[CommentWithUser]] = {
     implicit val localDateColumnType = MappedColumnType.base[LocalDate, Date](
       d => Date.valueOf(d),
       d => d.toLocalDate)

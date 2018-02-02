@@ -58,7 +58,7 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     Logger.info("dp-service Comments Controller: Received get comment request")
     if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
     else{
-      commentRepo.findByObejctRef(objectId.get.toLong,objectType.get,getPaginatedQuery(req))
+      commentRepo.findByObjectRef(objectId.get.toLong,objectType.get,getPaginatedQuery(req))
         .map{ commentswithuser =>
           success(commentswithuser)
         }.recoverWith(apiError)
