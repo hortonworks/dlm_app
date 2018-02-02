@@ -26,6 +26,14 @@ paths:
         description: the type of the object (e.g. assetCollection)
         required: true
         type: string
+      - name: offset
+        in: query
+        description: the offset for new call
+        type: integer
+      - name: size
+        in: query
+        description: number of comments to be fetched in each call
+        type: integer
 
       responses:
         200:
@@ -33,7 +41,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/OneLevelComment'
+              $ref: '#/definitions/CommentWithUser'
         400:
           description: comment is not supported for the supplied objectType or request was malformed
         404:
@@ -102,19 +110,12 @@ paths:
           name: id
           required: true
           type: string
-        - name: userId
-          in: query
-          description: the user id information associated with this comment. It will be used to determine whether the logged in user can delete this comment or not.
-          required: true
-          type: string
       responses:
         200:
           description: OK
           schema:
             type: string
-            description: Success message
-        401:
-          description: If the user is not authorized to delete that comment
+            description: Success message with number of rows deleted
         500:
           description: internal server error
           schema:
@@ -153,9 +154,6 @@ definitions:
       lastModified:
         type: string
         format: date-time
-      parentCommentId:
-        type: integer
-        format: integer64
       editVersion:
         type: integer
         format: integer32
@@ -171,20 +169,6 @@ definitions:
         $ref: '#/definitions/Comment'
       userName:
         type: string
-
-  OneLevelComment:
-    description: contains CommentWithUser along with its children
-    type: object
-    required:
-      - commentWithUser
-      - children
-    properties:
-      commentWithUser:
-        $ref: '#/definitions/CommentWithUser'
-      children:
-        type: array
-        items:
-          $ref: '#/definitions/CommentWithUser'
 
   CommentTextWithUser:
     description: a tuple which consists of commentText and user id

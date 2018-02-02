@@ -26,6 +26,14 @@ paths:
         description: the type of the object (e.g. assetCollection)
         required: true
         type: string
+      - name: offset
+        in: query
+        description: the offset for new call
+        type: integer
+      - name: size
+        in: query
+        description: number of comments to be fetched in each call
+        type: integer
 
       responses:
         200:
@@ -113,7 +121,7 @@ paths:
           description: OK
           schema:
             type: string
-            description: Success message
+            description: Success message with number of rows deleted
         500:
           description: internal server error
           schema:
@@ -152,9 +160,6 @@ definitions:
       lastModified:
         type: string
         format: date-time
-      parentCommentId:
-        type: integer
-        format: integer64
       editVersion:
         type: integer
         format: integer32
