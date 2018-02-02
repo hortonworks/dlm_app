@@ -78,10 +78,17 @@ GET           /api/ranger/:clusterId/policies                         controller
 
 # comments
 # ===========================================
-POST          /api/comments                                         controllers.Comments.addComments
-GET           /api/comments                                         controllers.Comments.getByObjectRef
-DELETE        /api/comments/:id                                     controllers.Comments.deleteCommentById(id: String)
-PATCH         /api/comments/:id                                     controllers.Comments.updateComments(id: String)
+POST          /api/comments                                           controllers.Comments.addComments
+GET           /api/comments                                           controllers.Comments.getByObjectRef
+DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
+PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
+
+# ratings
+# ===========================================
+POST         /api/ratings                                             controllers.Ratings.add
+GET          /api/ratings                                             controllers.Ratings.get
+GET          /api/ratings/actions/getAverage                          controllers.Ratings.getAverage
+PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
 
 # others

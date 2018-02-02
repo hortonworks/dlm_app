@@ -12,6 +12,16 @@ CREATE TABLE IF NOT EXISTS dataplane.comments (
   edit_version BIGINT DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS dataplane.ratings (
+  id           BIGSERIAL PRIMARY KEY,
+  rating       DECIMAL(2,1)                                           NOT NULL,
+  object_type  VARCHAR(255)                                           NOT NULL,
+  object_id    BIGINT                                                 NOT NULL,
+  createdby    BIGINT REFERENCES dataplane.users (id)                 NOT NULL,
+
+  CONSTRAINT unique_creator_objId_objType_constraint UNIQUE (createdby, object_id,object_type)
+);
+
 -- currently not using this table. If we want to use it then we will need to have some mechanism to swap the contents of this table at regular intervals to external store.
 /*CREATE TABLE IF NOT EXISTS dataplane.comment_edits (
   id           BIGSERIAL PRIMARY KEY,
