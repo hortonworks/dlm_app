@@ -147,7 +147,7 @@ class KnoxConfig @Inject()(
 
               val userDnTemplate =
                 s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
-              val password=ldapService.getPassword(ldapConfig.bindDn.get)
+              val password=ldapService.getPassword()
               val knoxLdapConfig =
                 KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl.get,
                                   bindDn = ldapConfig.bindDn,

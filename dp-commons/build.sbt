@@ -22,4 +22,5 @@ libraryDependencies ++= Seq(
   "io.prometheus" % "simpleclient_common" % "0.1.0",
   "io.prometheus" % "simpleclient_dropwizard" % "0.1.0",
   "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.1",
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test")
+  "org.scalatest" % "scalatest_2.11" % "3.0.1" % Test,
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test)
