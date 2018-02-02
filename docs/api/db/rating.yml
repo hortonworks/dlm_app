@@ -98,7 +98,7 @@ paths:
             items:
               $ref: '#/definitions/Error'
 
-  /api/ratings/action/getAverage:
+  /api/ratings/action/average:
     get:
       summary: Get average rating related to a particular object( e.g. a particular asset collection)
       parameters:
