@@ -35,7 +35,7 @@ export class RatingService {
   }
 
   getAverage(objectId: string, objectType: string): Observable<any>  {
-    const uri = `${this.uri}/actions/getAverage?objectId=${objectId}&objectType=${objectType}`;
+    const uri = `${this.uri}/actions/average?objectId=${objectId}&objectType=${objectType}`;
 
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))

@@ -42,7 +42,6 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def get(queryString: String, userId: Long): Future[Rating] = {
-    println("in get----------------")
     ws.url(s"$url/ratings?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -50,7 +49,7 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def getAverage(queryString: String): Future[JsObject] = {
-    ws.url(s"$url/ratings/actions/getAverage?$queryString")
+    ws.url(s"$url/ratings/actions/average?$queryString")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapResultsGeneric)
@@ -74,7 +73,6 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
     ) tupled
 
   private def mapToRating(res: WSResponse) = {
-    println("in map to rating---------------")
     res.status match {
       case 200 => (res.json \ "results").validate[Rating].get
       case _ => mapResponseToError(res)

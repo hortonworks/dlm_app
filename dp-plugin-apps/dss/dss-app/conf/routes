@@ -87,7 +87,7 @@ PATCH         /api/comments/:id                                       controller
 # ===========================================
 POST         /api/ratings                                             controllers.Ratings.add
 GET          /api/ratings                                             controllers.Ratings.get
-GET          /api/ratings/actions/getAverage                          controllers.Ratings.getAverage
+GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
 

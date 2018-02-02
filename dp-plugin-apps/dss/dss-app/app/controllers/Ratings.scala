@@ -30,7 +30,7 @@ class Ratings @Inject()(@Named("ratingService") val ratingService: RatingService
                         private val config: Configuration)
   extends Controller with JsonAPI {
   def add = AuthenticatedAction.async(parse.json) { request =>
-    Logger.info("Ratings Controller: Received add rating request")
+    Logger.info("dss Ratings Controller: Received add rating request")
     request.body
       .validate[Rating]
       .map { rating =>
@@ -49,7 +49,7 @@ class Ratings @Inject()(@Named("ratingService") val ratingService: RatingService
   }
 
   def get = AuthenticatedAction.async { req =>
-    Logger.info("dp-app Ratings Controller: Received get rating request")
+    Logger.info("dss Ratings Controller: Received get rating request")
     ratingService
       .get(req.rawQueryString,req.user.id.get)
       .map { rating =>
@@ -59,7 +59,7 @@ class Ratings @Inject()(@Named("ratingService") val ratingService: RatingService
   }
 
   def getAverage = Action.async { req =>
-    Logger.info("dp-app Ratings Controller: Received get-average rating request")
+    Logger.info("dss Ratings Controller: Received get-average rating request")
     ratingService
       .getAverage(req.rawQueryString)
       .map { (avgAndVotes: JsObject) =>
@@ -69,7 +69,7 @@ class Ratings @Inject()(@Named("ratingService") val ratingService: RatingService
   }
 
   def update(ratingId: String) = AuthenticatedAction.async(parse.json) { request =>
-    Logger.info("dp-app Ratings Controller: Received update rating request")
+    Logger.info("dss Ratings Controller: Received update rating request")
     request.body
       .validate[(Float)]
       .map { rt =>

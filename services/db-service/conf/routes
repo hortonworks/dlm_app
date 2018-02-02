@@ -223,5 +223,5 @@ PATCH       /comments/:id                                                   cont
 #ratings api
 POST        /ratings                                                        controllers.Ratings.add
 GET         /ratings                                                        controllers.Ratings.get
-GET         /ratings/actions/getAverage                                     controllers.Ratings.getAverage
+GET         /ratings/actions/average                                        controllers.Ratings.getAverage
 PATCH       /ratings/:id                                                    controllers.Ratings.update(id: String)
