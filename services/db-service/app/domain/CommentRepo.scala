@@ -39,13 +39,16 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     db.run(query)
   }
 
-  def findByObejctRef(objectId:Long,objectType:String): Future[Seq[CommentWithUser]] = {
+  def findByObjectRef(objectId:Long, objectType:String, paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[CommentWithUser]] = {
     implicit val localDateColumnType = MappedColumnType.base[LocalDate, Date](
       d => Date.valueOf(d),
       d => d.toLocalDate)
     val query = Comments.filter(m => (m.objectId === objectId && m.objectType === objectType))
-      .join(userRepo.Users).on(_.createdBy === _.id).map(t => (t._1,t._2.username)).sortBy(_._1.createdOn).result
-    db.run(query).map{res =>
+      .join(userRepo.Users).on(_.createdBy === _.id).map(t => (t._1,t._2.username)).sortBy(_._1.createdOn)
+    val q = paginatedQuery.map { pq =>
+      query.drop(pq.offset).take(pq.size)
+    }.getOrElse(query)
+    db.run(q.result).map{res =>
       res.map{ r =>
         CommentWithUser(r._1,r._2)
       }
@@ -81,11 +84,9 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
     def lastModified = column[Option[LocalDateTime]]("lastmodified")
 
-    def parentCommentId = column[Option[Long]]("parent_comment_id")
-
     def editVersion = column[Option[Int]]("edit_version")
 
-    def * = (id, comment, objectType, objectId, createdBy, createdOn, lastModified, parentCommentId, editVersion) <> ((Comment.apply _).tupled, Comment.unapply)
+    def * = (id, comment, objectType, objectId, createdBy, createdOn, lastModified, editVersion) <> ((Comment.apply _).tupled, Comment.unapply)
   }
 
 }

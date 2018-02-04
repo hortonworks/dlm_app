@@ -8,11 +8,11 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {CommentService} from "../../services/comment.service";
-import {CommentWithUserAndChildren, Comment, CommentWithUser, ReplyParent} from "../../models/comment";
+import {Comment, CommentWithUser} from "../../models/comment";
 import {AuthUtils} from "../utils/auth-utils";
 import * as moment from 'moment';
 
@@ -31,13 +31,18 @@ export class CommentsComponent implements OnInit {
   isRatingEnabled: boolean = false;
   objectType: string;
   objectId: string;
-  commentsWithUserAndChildren: CommentWithUserAndChildren[]= [];
+  commentWithUsers: CommentWithUser[]= [];
   fetchInProgress: boolean =true;
   newCommentText: string;
-  isReply: boolean = false;
-  reply: ReplyParent;
   fetchError: boolean= false;
   returnURl: string = '';
+  offset:number = 0;
+  size:number = 10;
+  allCommentsLoaded: boolean = false;
+  timer = null;
+  newCommentsAvailable:boolean = false;
+  @ViewChild('newComment') newCommentTextArea : ElementRef;
+  @ViewChild('edge') edgeElement: ElementRef;
 
   ngOnInit() {
     this.objectType = this.route.snapshot.params['objectType'];
@@ -52,9 +57,14 @@ export class CommentsComponent implements OnInit {
   getComments(refreshScreen: boolean) {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
-    this.commentService.getByObjectRef(this.objectId,this.objectType).subscribe(comments =>{
-        this.commentsWithUserAndChildren = comments;
+    this.commentService.getByObjectRef(this.objectId,this.objectType,this.offset,this.size).subscribe(comments =>{
+        this.commentWithUsers = this.offset === 0 ? comments : this.commentWithUsers.concat(comments);
+        this.allCommentsLoaded = comments.length < this.size ? true : false;
+        this.offset = this.offset + comments.length;
         this.fetchInProgress = false;
+        setTimeout(() => {
+          this.loadNext();       // required in case 'edge' is already in viewport (without scrolling). setTimeout is needed as window takes some time to adjust with newly loaded comments.
+        },50);
       }, () => {
         this.fetchInProgress = false;
         this.fetchError = true;
@@ -69,37 +79,27 @@ export class CommentsComponent implements OnInit {
       newCommentObject.objectId = Number(this.objectId);
       newCommentObject.comment = this.newCommentText;
       newCommentObject.createdBy = Number(AuthUtils.getUser().id);
-      if(this.isReply) newCommentObject.parentCommentId = this.reply.parentId;
       this.commentService.add(newCommentObject).subscribe(_ => {
-        this.getComments(false);
+        if(this.isEdgeInViewport()){
+          this.getComments(false);
+        }else{
+          this.newCommentsAvailable = true;
+        }
         this.newCommentText = "";
-        this.removeReply();
+        this.resizeTextArea();
       });
     }
   }
 
+  resetOffset(){
+    this.offset =0;
+    this.allCommentsLoaded = false;
+  }
   onDeleteComment(commentWU: CommentWithUser) {
     this.commentService.deleteComment(commentWU.comment.id).subscribe(_ => {
+      this.resetOffset();
       this.getComments(false);
     });
-  }
-
-  onReplyToComment(parentCommentWU: CommentWithUser){
-     this.reply = new ReplyParent();
-     let parentComment = parentCommentWU.comment;
-     if(parentComment.parentCommentId){
-       this.reply.parentId = parentComment.parentCommentId;
-     }else{
-       this.reply.parentId = parentComment.id;
-     }
-     this.reply.commentText = parentComment.comment;
-     this.reply.username = parentCommentWU.userName;
-     this.isReply = true;
-  }
-
-  removeReply(){
-    this.reply = new ReplyParent();
-    this.isReply = false;
   }
 
   isLoggedInUser(commentWu: CommentWithUser){
@@ -111,4 +111,45 @@ export class CommentsComponent implements OnInit {
     return date.format("hh:mm A MMM DD 'YY");
   }
 
+  lengthAdjustedComment(comment: string, isExpanded: boolean) {
+    if(!isExpanded){
+      return comment.substring(0,128)+"...  ";
+    }
+    return comment+"  ";
+  }
+
+  resizeTextArea(){
+    let textArea = this.newCommentTextArea.nativeElement;
+    setTimeout(function() {
+      textArea.style.cssText = 'height:auto';
+      textArea.style.cssText = 'height:'+Math.min(textArea.scrollHeight, 100) + "px";
+    },0);
+  }
+
+  isEdgeInViewport() {
+    let element = this.edgeElement.nativeElement;
+    let rect = element.getBoundingClientRect();
+    let parentEle = this.edgeElement.nativeElement.parentElement;
+    let parentRect = parentEle.getBoundingClientRect();
+    return (
+      rect.top < parentRect.bottom &&
+      rect.bottom > 0
+    );
+  }
+
+  shouldLoadNext(){
+    return this.isEdgeInViewport() && (!this.allCommentsLoaded || this.newCommentsAvailable);
+  }
+
+  loadNext(){
+    if(this.shouldLoadNext()){
+      clearTimeout(this.timer);
+      this.timer = null;
+      this.timer = setTimeout(() => {
+        this.getComments(false);
+        this.newCommentsAvailable = false;
+        this.timer = null;
+      }, 1000);
+    }
+  }
 }
