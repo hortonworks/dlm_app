@@ -41,6 +41,7 @@ import { CloudContainer } from 'models/cloud-container.model';
 import { getAllAccounts } from 'selectors/cloud-account.selector';
 import { loadContainers } from 'actions/cloud-container.action';
 import { loadAccounts } from 'actions/cloud-account.action';
+import { getError } from 'utils/http-util';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -96,6 +97,12 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     });
     this.store.dispatch(loadPairings());
     this.store.dispatch(loadClusters());
+  }
+
+  get errorBody() {
+    const errorMessage = this.creationState && 'error' in this.creationState && this.creationState.error === true
+      ? getError(this.creationState.errorMessage).message : '';
+    return typeof errorMessage === 'string' ? errorMessage.trim() : JSON.stringify(errorMessage, null, 4);
   }
 
   ngOnInit() {
