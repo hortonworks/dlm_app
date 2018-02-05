@@ -29,6 +29,7 @@ export class TableFooterComponent {
   @Input() offset: number;
   @Input() limits: number[] = [10, 25, 50];
   @Input() options: TableFooterOptions;
+  @Input() dropdownContainer = '';
   @Output() changePageSize: EventEmitter<any> = new EventEmitter();
   @Output() changePage: EventEmitter<any> = new EventEmitter();
 
