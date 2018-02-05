@@ -1768,7 +1768,7 @@ dot-prop@^3.0.0:
   dependencies:
     is-obj "^1.0.0"
 
-"dps-apps@git+ssh://git@github.com/hortonworks/dps-apps.git#0.1.4-alpha":
+"dps-apps@git+ssh://git@github.com/hortonworks/dps-apps.git#>0.1.4-alpha":
   version "0.1.0-alpha"
   resolved "git+ssh://git@github.com/hortonworks/dps-apps.git#5fb930a604149467d379b3ea2d570ac79ca48fa2"
 
