@@ -20,12 +20,6 @@
   margin-top: 3px;
   cursor: pointer;
 }
-.close-icon.close-reply{
-  color: #808080;
-  padding-left: 5px;
-  padding-bottom: 5px;
-  margin-top: 0px;
-}
 .flex-grid {
   display: flex;
 }
@@ -41,7 +35,6 @@
   line-height: 1;
   outline: none;
   margin: 0;
-  height: 36px;
 }
 .primary-space {
   flex-grow: 1;
@@ -70,18 +63,19 @@
   display: block;
 }
 .slider-footer {
-  position: fixed;
-  height: 40px;
-  width: 400px;
+  position: inherit;
+  width: 396px;
   transition: bottom .8s ease;
   -webkit-font-smoothing: antialiased;
-  padding: 3px 2px 2px;
+  padding: 2px 2px 2px;
   background-color: rgb(238, 238, 238);
   bottom: 0px;
 }
 .dialog1x {
+  top: 60px;
   width: 400px;
   border-top: 1px solid $silver;
+  position: fixed;
 }
 ol, ul {
   list-style: none;
@@ -113,8 +107,6 @@ ol, ul {
   width:100%;
   border: none;
   resize: none;
-  min-height: 36px;
-  padding-bottom: 0px;
   font-size: 14px;
 }
 
@@ -167,9 +159,14 @@ ol, ul {
   margin-left: 10px;
 }
 .comment-tree {
-  padding: 0 0 50px;
-  max-height: calc(100vh - 190px);
+  padding: 0 0 0px;
   overflow: auto;
+  max-height: calc(100vh - 230px);
+  height: 100%;
+}
+.edge {
+  height: 20px;
+  text-align: center;
 }
 .comment-user {
   display: inline-block;
@@ -201,28 +198,12 @@ ol, ul {
 .response-group > li + li {
   margin-top: 5px;
 }
-.comment-reply {
-  display: inline-block;
-  padding-top: 10px;
-  vertical-align: top;
-  float: left ;
-}
-.comment-reply + .comment {
+
+.comment {
   margin-left: 14px;
 }
-.comment-reply + .comment.online-user:before {
+.comment.online-user:before {
   margin-left: -50px;
-}
-.comment-reply-to-placeholder {
-  position: absolute;
-  bottom: 45px;
-  left: 2px;
-  right: 2px;
-  background: #eee;
-  border-radius: 4px;
-  border-left-width: 5px;
-  border-left-style: solid;
-  padding: 10px;
 }
 .user-display {
   display: inline-block;
@@ -235,10 +216,6 @@ ol, ul {
 .comment-date {
   color: #999;
   font-size: .9em;
-}
-.comment-reply {
-  margin-top: -7px;
-  line-height: 1.2;
 }
 .comment-text {
   margin-top: 15px;
@@ -271,7 +248,7 @@ ol, ul {
   background: #eff1f2;
   border: 1px solid #fff;
   padding: 4px 15px;
-  display: flow-root;
+  overflow: hidden;
 }
 .rating-class{
   float: right;
@@ -285,6 +262,27 @@ ol, ul {
 
 .fixed-star{
   float: right;
+}
+
+.expandable-view{
+  cursor: pointer;
+}
+
+textarea{
+  display:block;
+}
+
+.slider-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, .1);
+  z-index: 10;
+  opacity: 1;
+  -webkit-transition: opacity .8s ease;  /* Safari */
+  transition: opacity .8s ease;
 }
 
 :host /deep/ .rating:focus{

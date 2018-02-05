@@ -20,6 +20,7 @@ import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.google.common.annotations.VisibleForTesting
 import com.google.common.net.HttpHeaders
+import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
 import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
@@ -158,7 +159,7 @@ class StatusRoute @Inject()(val ws: WSClient,
         // Step 4
         for {
           credential <- credentialInterface.getCredential(
-            "dp.credential.ambari")
+            CSConstants.AMBARI_CREDENTIAL_KEY)
           response <- ws
             .url(endpoint)
             .withAuth(credential.user.get,

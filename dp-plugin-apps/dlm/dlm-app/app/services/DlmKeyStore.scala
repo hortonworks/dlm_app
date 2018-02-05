@@ -12,7 +12,7 @@ package services
 import java.io.{ByteArrayInputStream, ObjectInputStream}
 
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
-import com.hortonworks.dataplane.commons.service.api.{CredentialManager, KeystoreReloadEvent}
+import com.hortonworks.dataplane.commons.service.api.{KeyStoreManager, KeystoreReloadEvent}
 import com.google.inject.{Inject, Singleton}
 import com.typesafe.scalalogging.Logger
 import models.ADLSEntities.ADLSAccountDetails
@@ -32,7 +32,7 @@ import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManager) extends
+class DlmKeyStore @Inject()(cache: CacheApi, keyStoreManager: KeyStoreManager) extends
   mutable.Subscriber[KeystoreReloadEvent, mutable.Publisher[KeystoreReloadEvent]] {
 
   private val logger = Logger(classOf[DlmKeyStore])
@@ -41,7 +41,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     CacheBuilder.newBuilder().build(new CloudAccountsCacheLoader())
 
   // subscribe for events
-  credentialManager.subscribe(this)
+  keyStoreManager.subscribe(this)
 
   override def notify(publisher: mutable.Publisher[KeystoreReloadEvent], event: KeystoreReloadEvent): Unit = {
     cloudAccountsCache.invalidate(DpKeyStore.ALIAS)
@@ -177,7 +177,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
 
   def saveCloudAccountsToKeyStore(cloudAccountsInfo: List[CloudAccountWithCredentials]): Try[Unit] = {
     val serializedCloudAccount = SerializationUtils.serialize(cloudAccountsInfo)
-    credentialManager.write(DpKeyStore.ALIAS, Map(DpKeyStore.KEY -> serializedCloudAccount)) map {
+    keyStoreManager.write(DpKeyStore.ALIAS, Map(DpKeyStore.KEY -> serializedCloudAccount)) map {
       _ => cloudAccountsCache.invalidate(DpKeyStore.ALIAS)
     }
   }
@@ -188,7 +188,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     * @return
     */
   def getCloudAccountsFromKeyStore (alias: String): Future[Either[CredentialNotFoundInKeystoreError, List[CloudAccountWithCredentials]]] =  {
-    credentialManager.read(alias, Set(DpKeyStore.KEY)) match {
+    keyStoreManager.read(alias, Set(DpKeyStore.KEY)) match {
       case Success(keyValueMap) =>
         keyValueMap.get(DpKeyStore.KEY) match {
           case Some(result) =>

@@ -64,11 +64,11 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   policyForm$: Observable<any>;
   sourceCluster: Cluster;
   targetCluster: Cluster;
-  targetContainer: CloudContainer;
+  targetS3Endpoint: string;
   creationState: ProgressState;
   sourceCluster$: Observable<Cluster>;
   destinationCluster$: Observable<Cluster>;
-  destinationContainer$: Observable<CloudContainer>;
+  destinationS3endpoint$: Observable<string>;
 
   private policyFormValue: any;
 
@@ -81,11 +81,11 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID))
       .filter(policyForm => !isEmpty(policyForm));
     this.sourceCluster$ = this.policyForm$
-      .switchMap(policyForm => store.select(getCluster(policyForm.general.sourceCluster)));
+      .switchMap(policyForm => store.select(getCluster(policyForm.general.source.cluster)));
     this.destinationCluster$ = this.policyForm$
-      .switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
-    this.destinationContainer$ = this.policyForm$
-      .switchMap(policyForm => store.select(getContainer(policyForm.general.destinationContainer)));
+      .switchMap(policyForm => store.select(getCluster(policyForm.general.destination.cluster)));
+    this.destinationS3endpoint$ = this.policyForm$
+      .switchMap(policyForm => store.select(getContainer(policyForm.general.destination.s3enpoint)));
     this.subscriptions.push(store
       .select(getProgressState(CREATE_POLICY_REQUEST))
       .subscribe((progressState: ProgressState) => this.creationState = progressState));
@@ -100,13 +100,13 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscriptions.push(
-      Observable.combineLatest(this.policyForm$, this.sourceCluster$, this.destinationCluster$, this.destinationContainer$)
+      Observable.combineLatest(this.policyForm$, this.sourceCluster$, this.destinationCluster$, this.destinationS3endpoint$)
         .filter(([policyForm, sourceCluster, destinationCluster, destinationContainer]) =>
           sourceCluster && (destinationCluster || destinationContainer) && !isEmpty(policyForm))
         .subscribe(([policyForm, sourceCluster, destinationCluster, destinationContainer]) => {
           this.sourceCluster = sourceCluster;
           this.targetCluster = destinationCluster;
-          this.targetContainer = destinationContainer;
+          this.targetS3Endpoint = destinationContainer;
           this.policyFormValue = policyForm;
 
           this.descriptionTranslateParam = {
@@ -152,7 +152,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   getTargetId() {
     return this.targetCluster ?
       PolicyService.makeClusterId(this.targetCluster.dataCenter, this.targetCluster.name) :
-      this.targetContainer.id; // todo use real id
+      this.targetS3Endpoint; // todo use real id
   }
 
   formatDateValue(timeField, timezone = true) {
@@ -193,7 +193,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       requestId: CREATE_POLICY_REQUEST,
       notification
     };
-    const targetId = this.targetCluster ? this.targetCluster.id : this.targetContainer.id;
+    const targetId = this.targetCluster ? this.targetCluster.id : this.targetS3Endpoint;
     this.store.dispatch(createPolicy(formValue, targetId, meta));
   }
 
@@ -209,7 +209,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     this.errorDetailsDialog.show();
   }
 
-  setDetails(sourceCluster: Cluster, destinationCluster: Cluster, destinationContainer: CloudContainer, policyForm) {
+  setDetails(sourceCluster: Cluster, destinationCluster: Cluster, destinationEndpoint: string, policyForm) {
     const type = policyForm.general.type;
     const repeatMode = policyForm.job.repeatMode;
     const timezone = policyForm.userTimezone;
@@ -234,9 +234,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       {
         name: 'destinationCluster',
         label: this.t.instant('common.destination'),
-        value: destinationCluster ?
-          `${destinationCluster.dataCenter} / ${destinationCluster.name}` :
-          `${destinationContainer.provider} / ${destinationContainer.name}`
+        value: destinationCluster ? `${destinationCluster.dataCenter} / ${destinationCluster.name}` : destinationEndpoint
       },
       {
         name: 'type',

@@ -81,7 +81,7 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     if(objectId.isEmpty || objectType.isEmpty || !objectTypes.contains(objectType.get)) Future.successful(BadRequest)
     else{
       commentService
-        .getByObjectRef(objectId.get, objectType.get)
+        .getByObjectRef(req.rawQueryString)
         .map { comments =>
           Ok(Json.toJson(comments))
         }
