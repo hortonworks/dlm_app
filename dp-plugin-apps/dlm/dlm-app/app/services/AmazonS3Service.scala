@@ -85,7 +85,11 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
         val credential = result.accountCredentials.asInstanceOf[S3AccountCredential]
         val amazonS3Client = createS3Client(credential)
         try {
-          getTranslatedPolicy(amazonS3Client.getBucketPolicy(bucketName).getPolicyText)
+          val policyText = Option(amazonS3Client.getBucketPolicy(bucketName).getPolicyText)
+          policyText match {
+            case None => Left(AmazonS3Error(AmazonS3Service.bucketPolicyDoesNotExistsErrMsg(bucketName)))
+            case Some(policyTextValue) => getTranslatedPolicy(policyTextValue)
+          }
         } catch {
           case ex : AmazonClientException =>
             logger.error(ex.getMessage)
@@ -95,7 +99,7 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
     }
   }
 
-  def getTranslatedPolicy(policyText: String) = {
+  def getTranslatedPolicy(policyText: String) : Either[AmazonS3Error, BucketPolicy] = {
     val bucketPolicy = Json.parse(policyText)
     val bucketStatement = (bucketPolicy \ "Statement").get
 
@@ -113,36 +117,49 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
 
     policyStatements match  {
       case Right(statements) => {
-        val constructedStatements : Seq[PolicyStatement] = statements.map(x => {
-          val principal = x.Principal.validate[StatementPrincipal] match {
-            case JsSuccess(principalResult, _) => StatementPrincipals(List(principalResult.AWS))
+        val constructedStatements : Seq[Either[AmazonS3Error, PolicyStatement]] = statements.map(x => {
+          val principal : Either [AmazonS3Error, StatementPrincipals] = x.Principal.validate[StatementPrincipal] match {
+            case JsSuccess(principalResult, _) => Right(StatementPrincipals(List(principalResult.AWS)))
             case JsError(error) => {
               x.Principal.validate[StatementPrincipals] match {
-                case JsSuccess(principalResult, _) => principalResult
+                case JsSuccess(principalResult, _) => Right(principalResult)
+                case JsError(error) => Left(AmazonS3Error(error.toString()))
               }
             }
           }
 
-          val action = x.Action.validate[String] match {
-            case JsSuccess(actionResult, _) => List(actionResult)
+          val action : Either [AmazonS3Error, Seq[String]] = x.Action.validate[String] match {
+            case JsSuccess(actionResult, _) => Right(List(actionResult))
             case JsError(error) => {
               x.Action.validate[Seq[String]] match {
-                case JsSuccess(actionResult, _) => actionResult
+                case JsSuccess(actionResult, _) => Right(actionResult)
+                case JsError(error) => {
+                  Left(AmazonS3Error(error.toString()))
+                }
               }
             }
           }
 
-          val resource = x.Resource.validate[String] match {
-            case JsSuccess(resourceResult, _) => List(resourceResult)
+          val resource: Either [AmazonS3Error, Seq[String]] = x.Resource.validate[String] match {
+            case JsSuccess(resourceResult, _) => Right(List(resourceResult))
             case JsError(error) => {
               x.Resource.validate[Seq[String]] match {
-                case JsSuccess(resourceResult, _) => resourceResult
+                case JsSuccess(resourceResult, _) => Right(resourceResult)
+                case JsError(error) => Left(AmazonS3Error(error.toString()))
+
               }
             }
           }
-          PolicyStatement(x.Sid, x.Effect, principal, action, resource)
+          val anyError = List(principal, action, resource).find(_.isLeft)
+          if (anyError.isDefined) {
+            Left(AmazonS3Error(anyError.get.left.get.message))
+          } else {
+            Right(PolicyStatement(x.Sid, x.Effect, principal.right.get, action.right.get, resource.right.get))
+          }
+
         })
-        Right(BucketPolicy((bucketPolicy \ "Version").get.as[String], (bucketPolicy \ "Id").get.as[String], constructedStatements))
+        val filteredConstructedStatements = constructedStatements.filter(_.isRight).map(x => x.right.get)
+        Right(BucketPolicy((bucketPolicy \ "Version").get.as[String], (bucketPolicy \ "Id").get.as[String], filteredConstructedStatements))
       }
       case Left(error) => Left(error)
     }
@@ -214,4 +231,5 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
 
 object AmazonS3Service {
   val arnUserNameLabel = "user/"
+  def bucketPolicyDoesNotExistsErrMsg(bucketName: String) : String = "No Bucket policy configured for " + bucketName
 }

@@ -77,6 +77,10 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
       "\ntype = " + policyDefinitionRequest.`type` +
       "\nsourceDataset = " +  policyDefinitionRequest.sourceDataset +
       "\nfrequencyInSec = " + policyDefinitionRequest.frequencyInSec +
+      (policyDefinitionRequest.targetDataset match {
+        case Some(targetDataset) => "\ntargetDataset = " + targetDataset
+        case None => ""
+      }) +
       (policyDefinitionRequest.cloudCred match {
         case Some(cloudCred) => "\ncloudCred = " + cloudCred
         case None => ""

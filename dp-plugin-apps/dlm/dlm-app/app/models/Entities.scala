@@ -41,6 +41,8 @@ object Entities {
                                        hiveServerService : Map[String, Option[String]], rangerService: Option[RangerServiceDetails],
                                        clusterDefinitions: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
 
+  case class ClusterDetails (cluster:Cluster, dpCluster: DataplaneCluster)
+
   // Request schema submitted to Beacon for cluster definition
   case class ClusterDefinition (beaconUrl:String, clusterId: Long, clusterDefRequest : ClusterDefinitionRequest)
 
@@ -58,7 +60,7 @@ object Entities {
 
   case class PoliciesDetails(policyId: String, name: String, description: Option[String], `type`: String,
                              executionType: Option[String], status: String, sourceDataset: String, targetDataset: String,
-                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String,
+                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:Option[String],
                              targetCluster:Option[String], customProperties: Option[Map[String, String]],
                              jobs: Seq[PolicyInstanceResponse], report: PolicyReport)
 
@@ -74,6 +76,9 @@ object Entities {
 
   case class YarnQueueDefinition(name: String, children: Seq[YarnQueueDefinition], path: String)
   case class YarnQueuesResponse(items: Seq[YarnQueueDefinition])
+
+  case class CloudCredsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), cloudCreds: Seq[CloudCredsBeaconResponse])
+  case class CloudCredsUpdateResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq())
 }
 
 object JsonFormatters {
@@ -119,5 +124,12 @@ object JsonFormatters {
 
   implicit val yarnQueuesResponseReads = Json.reads[YarnQueuesResponse]
   implicit val yarnQueuesResponseWrites = Json.writes[YarnQueuesResponse]
+
+  implicit val cloudCredsDetailResponseReads = Json.reads[CloudCredsDetailResponse]
+  implicit val cloudCredsDetailResponseWrites = Json.writes[CloudCredsDetailResponse]
+
+  implicit val cloudCredsUpdateResponseReads = Json.reads[CloudCredsUpdateResponse]
+  implicit val cloudCredsUpdateResponseWrites = Json.writes[CloudCredsUpdateResponse]
+
 }
 

@@ -12,9 +12,11 @@ package services
 import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconApiError, BeaconApiErrors, BeaconEntityResponse, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconApiError, BeaconApiErrors, BeaconEntityResponse, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse, BeaconLogResponse, CloudCredPostResponse, CloudCredResponse, CloudCredsBeaconResponse, CloudCredsResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
 import com.hortonworks.dlm.beacon.WebService._
-import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
+import com.hortonworks.dlm.beacon.domain.RequestEntities.{CloudCredRequest, ClusterDefinitionRequest}
+import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
+import models.CloudAccountEntities.CloudAccountWithCredentials
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import models.Entities.{UnpairClusterDefinition, _}
@@ -35,8 +37,10 @@ import scala.concurrent.{Future, Promise}
   * @param beaconLogService      beacon service to get beacon logs
   * @param beaconAdminService    beacon service to get beacon plugin status
   * @param beaconBrowseService  beacon service to browse HDFS files and Hive databases
+  * @param beaconCloudCredService  beacon service to get beacon cloud credentials
   * @param dataplaneService     dataplane service to interact with dataplane db service
   * @param ambariService        ambari client service
+  * @param dlmKeyStore          DLM keystore service
   */
 @Singleton
 class BeaconService @Inject()(
@@ -50,7 +54,8 @@ class BeaconService @Inject()(
    @Named("beaconBrowseService") val beaconBrowseService: BeaconBrowseService,
    @Named("beaconCloudCredService") val beaconCloudCredService: BeaconCloudCredService,
    val dataplaneService: DataplaneService,
-   val ambariService: AmbariService) {
+   val ambariService: AmbariService,
+   val dlmKeyStore: DlmKeyStore) {
 
 
 
@@ -228,8 +233,7 @@ class BeaconService @Inject()(
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
                   nnService,
                   rangerService,
-                  hiveServerConfigDetails("hsEndpoint"),
-                  hiveServerConfigDetails("hive.server2.authentication.kerberos.principal")
+                  hiveServerConfigDetails
                 )
               )
               acc.+(clusterDefinition)
@@ -480,7 +484,17 @@ class BeaconService @Inject()(
               }
             }
           }.reverse.filter((policy) => { // filter policies on cluster set that are registered to dataplane
-            beaconClusters.exists(x => x.dataCenter + "$" + x.name == policy.sourceCluster) && beaconClusters.exists(x => x.dataCenter + "$" + x.name == policy.targetCluster)
+            val isSourceClusterRegisteredToDp = policy.sourceCluster match {
+              case None => true
+              case Some(sourceCluster) => beaconClusters.exists(x => x.dataCenter + "$" + x.name == sourceCluster)
+            }
+
+            // @TODO: Uncomment below lines once beacon bug is fixed
+           val isTargetClusterRegisteredToDp = true /*policy.targetCluster match {
+              case None => true
+              case Some(targetCluster) => beaconClusters.exists(x => x.dataCenter + "$" + x.name == targetCluster)
+            } */
+            isSourceClusterRegisteredToDp && isTargetClusterRegisteredToDp
           })
 
           val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
@@ -535,13 +549,143 @@ class BeaconService @Inject()(
     dataplaneService.getBeaconService(clusterId).map {
       case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
       case Right(beaconUrl) =>
-        val policyResponseFuture: Future[Either[BeaconApiErrors, PostActionResponse]] = beaconPolicyService.submitAndSchedulePolicy(beaconUrl, clusterId, policyName, policySubmitRequest.policyDefinition)
+        policySubmitRequest.policyDefinition.cloudCred match {
+          case None =>
+            // DLM - 1.0 cluster
+            beaconPolicyService.submitAndSchedulePolicy(beaconUrl, clusterId, policyName, policySubmitRequest.policyDefinition).map {
+              case Left(errors) => p.success(Left(errors))
+              case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
+            }
+          case Some(cloudCredName) =>
+            // DLM - 1.1 cluster
 
-        policyResponseFuture.map {
-          case Left(errors) => p.success(Left(errors))
-          case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
+            getCloudCredByName(clusterId, cloudCredName) map {
+              case Left(errors) => p.success(Left(errors))
+              case Right(cloudCredResponse) =>
+                checkAndCreateClusterDefinition(clusterId, beaconUrl).map {
+                  case Right(result) =>
+                    if (cloudCredResponse.isEmpty) {
+                      dlmKeyStore.getCloudAccount(cloudCredName) map {
+                        case Right(cloudAccount) =>
+                          CloudAccountProvider.withName(cloudAccount.accountDetails.provider) match {
+                            case CloudAccountProvider.S3 =>
+                              val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
+                              val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
+                              val cloudCredRequest = CloudCredRequest(Some(cloudCredName), Some(accountDetails.provider), Some(accountCredentials.accessKeyId), Some(accountCredentials.secretAccessKey))
+                              createCloudCred(clusterId, cloudCredRequest) map  {
+                                case Left(errors) => p.success(Left(errors))
+                                case Right(cloudCredPostResponse) =>
+                                  val policyDefinition = policySubmitRequest.policyDefinition.copy(cloudCred = Some(cloudCredPostResponse.entityId))
+                                  beaconPolicyService.submitAndSchedulePolicy(beaconUrl, clusterId, policyName, policyDefinition).map {
+                                    case Left(errors) => p.success(Left(errors))
+                                    case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
+                                  }
+                              }
+                            case CloudAccountProvider.WASB =>
+                              p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some("Creating policy with WASB credentials not supported")))) // @TODO: Update all beacon clusters having WASB credentials
+                            case CloudAccountProvider.ADLS =>
+                              p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some("Creating policy with ADLS credentials not supported")))) // @TODO: Update all beacon clusters having ADLS credentials
+                          }
+                        case Left(error) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message))))
+                      }
+                    } else {
+                      // Cloud credential exists on the cluster
+                      val policyDefinition = policySubmitRequest.policyDefinition.copy(cloudCred = Some(cloudCredResponse.head.id))
+                      beaconPolicyService.submitAndSchedulePolicy(beaconUrl, clusterId, policyName, policyDefinition).map {
+                        case Left(errors) => p.success(Left(errors))
+                        case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
+                      }
+                    }
+                  case Left(errors) => p.success(Left(errors))
+                }
+          }
         }
     }
+    p.future
+  }
+
+  /**
+    * Check if the local cluster definition present and if not then create it for the cluster
+    * @param clusterId
+    * @param beaconUrl
+    * @param token
+    * @return
+    */
+  def checkAndCreateClusterDefinition(clusterId: Long, beaconUrl: String)(implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Unit]] = {
+    val p: Promise[Either[BeaconApiErrors, Unit]] = Promise()
+    isLocalClusterDefSubmitted(clusterId, beaconUrl).map {
+      case Right(result) =>
+        result match {
+          case None => p.success(Right(Unit))
+          case Some(clusterDetails) =>
+            for {
+              clusterFs <- ambariService.getHDFSConfigDetails(clusterId)
+              hiveService <- ambariService.getHiveConfigDetails(clusterId)
+              rangerService <- ambariService.getRangerEndpointDetails(clusterId)
+            } yield {
+              val futureFailedList = List(clusterFs, hiveService, rangerService).filter(_.isLeft)
+              if (futureFailedList.isEmpty) {
+                val name = clusterDetails.cluster.name
+                val dcName = clusterDetails.dpCluster.dcName
+                val description = clusterDetails.dpCluster.description
+                val clusterName = dcName + "$" + name
+                val local = true
+                val clusterFsValue = clusterFs.right.get
+                val rangerServiceValue = rangerService.right.get
+                val hiveServiceValue = hiveService.right.get
+                val clusterDefRequest = ClusterDefinitionRequest(name, dcName, description,
+                  local, beaconUrl, clusterFsValue, rangerServiceValue, hiveServiceValue)
+
+                beaconClusterService.createClusterDefinition(beaconUrl, clusterId, clusterName, clusterDefRequest).map {
+                  case Right(result) => {
+                    p.success(Right(Unit))
+                  }
+                  case Left(errors) => {
+                    p.success(Left(errors))
+                  }
+                }
+
+              } else {
+                val failedApi = futureFailedList.find(_.isLeft)
+                val errors = failedApi.get.left.get.errors
+                p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.map(x => BeaconApiError(x.message)).head))))
+              }
+            }
+        }
+
+      case Left (errors) => p.success(Left(errors))
+    }
+    p.future
+  }
+
+  /**
+    * Check if the cluster has the local definition submitted
+    * @param clusterId
+    * @param beaconUrl
+    * @param token
+    * @return
+    */
+  def isLocalClusterDefSubmitted(clusterId: Long, beaconUrl: String)(implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Option[ClusterDetails]]] = {
+    val p: Promise[Either[BeaconApiErrors, Option[ClusterDetails]]] = Promise()
+    dataplaneService.getCluster(clusterId).map {
+      case Right(cluster) => dataplaneService.getDpCluster(cluster.dataplaneClusterId.get) map {
+        case Right(dpCluster) =>
+          val clusterName = dpCluster.dcName + "$" + cluster.name
+          beaconPairService.listPairedClusters(beaconUrl, clusterId).map {
+            case Right(pairedClusters) =>
+              if (pairedClusters.exists(x => x.name == clusterName)) {
+                p.success(Right(None))
+              } else {
+                p.success(Right(Some(ClusterDetails(cluster, dpCluster))))
+              }
+
+            case Left (errors) => p.success(Left(errors))
+          }
+        case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      }
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+    }
+
     p.future
   }
 
@@ -698,7 +842,7 @@ class BeaconService @Inject()(
         } yield {
           val allBeaconAdminStatus: Seq[BeaconAdminStatusDetails] = allBeaconAdminStatusFuture.filter(_.isRight).map(x => x.right.get)
           val failedResponses: Seq[BeaconApiErrors] = allBeaconAdminStatusFuture.filter(_.isLeft).map(_.left.get)
-          if (failedResponses.length == beaconClusters.length) {
+          if (failedResponses.lengthCompare(beaconClusters.length) == 0) {
             p.success(Left(DlmApiErrors(failedResponses)))
           } else {
             p.success(Right(AdminStatusResponse(failedResponses, allBeaconAdminStatus)))
@@ -771,6 +915,212 @@ class BeaconService @Inject()(
     p.future
   }
 
+  /**
+    * Create cloud credential for a beacon cluster
+    * @param clusterId
+    * @param cloudCredRequest
+    * @param token
+    * @return
+    */
+  def createCloudCred(clusterId: Long, cloudCredRequest : CloudCredRequest)
+                      (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredPostResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, CloudCredPostResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconCloudCredService.createCloudCred(beaconUrl, clusterId, cloudCredRequest).map({
+          case Left(errors) => p.success(Left(errors))
+          case Right(cloudCredResponse) => p.success(Right(cloudCredResponse))
+        })
+    }
+
+
+    p.future
+  }
+
+  /**
+    * Update cloud credential in the keystore and in all existing beacon clusters
+    * @param cloudAccount
+    * @param token
+    * @return
+    */
+  def updateCloudCreds(cloudAccount: CloudAccountWithCredentials)
+                      (implicit token:Option[HJwtToken]): Future[DlmApiErrors] = {
+    val p: Promise[DlmApiErrors] = Promise()
+    dlmKeyStore.updateCloudAccount(cloudAccount) map {
+      case Right(result) =>
+        val queryString = Map(("numResults","100"))
+        getAllCloudCreds(queryString).map {
+        case Left(errors) =>  p.success(errors)
+        case Right(cloudCredsDetailResponse) =>
+          val filteredCloudCreds = cloudCredsDetailResponse.cloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudAccount.id.get))
+          if (filteredCloudCreds.isEmpty) {
+            p.success(DlmApiErrors(cloudCredsDetailResponse.unreachableBeacon))
+          } else {
+            CloudAccountProvider.withName(cloudAccount.accountDetails.provider) match {
+              case CloudAccountProvider.S3 =>
+                val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
+                val cloudCredRequest = CloudCredRequest(None, None,
+                  Some(accountCredentials.accessKeyId), Some(accountCredentials.secretAccessKey))
+                Future.sequence(filteredCloudCreds.map(x => {
+                  beaconCloudCredService.updateCloudCred(x.beaconUrl, x.clusterId, x.cloudCreds.cloudCred.head.id, cloudCredRequest)
+                })).map({
+                  cloudCredUpdateResponse => {
+                    val failedResponses: Seq[BeaconApiErrors] = cloudCredUpdateResponse.filter(_.isLeft).map(_.left.get)
+                    p.success(DlmApiErrors(failedResponses ++ cloudCredsDetailResponse.unreachableBeacon))
+                  }
+                })
+              case CloudAccountProvider.WASB =>
+                p.success(DlmApiErrors(Seq())) // @TODO: Update all beacon clusters having this WASB credentials
+              case CloudAccountProvider.ADLS =>
+                p.success(DlmApiErrors(Seq())) // @TODO: Update all beacon clusters having this ADLS credentials
+            }
+
+          }
+      }
+      case Left(error) =>  p.success(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message)))))
+    }
+
+    p.future
+  }
+
+  /**
+    * Delete cloud credential from all existing beacon clusters and then from keystore
+    * @param cloudCredName
+    * @param token
+    * @return
+    */
+  def deleteCloudCreds(cloudCredName: String)
+                      (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors, Unit]] = {
+    val p: Promise[Either[DlmApiErrors, Unit]] = Promise()
+    val queryString = Map(("numResults","100"))
+    getAllCloudCreds(queryString).map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(cloudCredsDetailResponse) =>
+        val filteredCloudCreds = cloudCredsDetailResponse.cloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudCredName))
+        if (filteredCloudCreds.isEmpty) {
+          if (cloudCredsDetailResponse.unreachableBeacon.isEmpty) {
+            dlmKeyStore.deleteCloudAccount(cloudCredName) map {
+              case Left(errors) => p.success(Left(errors))
+              case Right(result) => Right(result)
+            }
+          } else {
+            p.success(Left(DlmApiErrors(cloudCredsDetailResponse.unreachableBeacon)))
+          }
+        } else {
+          Future.sequence(filteredCloudCreds.map(x => {
+            beaconCloudCredService.deleteCloudCred(x.beaconUrl, x.clusterId, x.cloudCreds.cloudCred.head.id)
+          })).map({
+            cloudCredUpdateResponse => {
+              val failedResponses: Seq[BeaconApiErrors] = cloudCredUpdateResponse.filter(_.isLeft).map(_.left.get)
+              if (failedResponses.isEmpty) {
+                dlmKeyStore.deleteCloudAccount(cloudCredName) map {
+                  case Left(errors) => p.success(Left(errors))
+                  case Right(result) => Right(result)
+                }
+              } else
+              p.success(Left(DlmApiErrors(failedResponses ++ cloudCredsDetailResponse.unreachableBeacon)))
+            }
+          })
+        }
+    }
+    p.future
+  }
+
+
+  /**
+    * Get cloud credentials from all beacon clusters
+    * @param queryString
+    * @param token
+    * @return
+    */
+  def getAllCloudCreds(queryString: Map[String, String])
+                  (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors, CloudCredsDetailResponse]] = {
+    val p: Promise[Either[DlmApiErrors, CloudCredsDetailResponse]] = Promise()
+    getAllBeaconAdminStatus().map ({
+      case Left(errors) => p.success(Left(errors))
+      case Right(adminStatusResponse) =>
+        val originalPageLenth : Option[String] = queryString.get(BeaconService.API_PAGE_SIZE_KEY)
+        val originalOffset : Int = queryString.getOrElse(BeaconService.API_OFFSET_KEY,BeaconService.API_OFFSET_DEFAULT_VALUE).toInt
+        val queryStringPaginated = getQueryStringForResources(queryString, originalPageLenth, originalOffset)
+        val clustersWithCloudSupport : Seq[BeaconAdminStatusDetails] = adminStatusResponse.response.filter(x => x.beaconAdminStatus.replication_cloud_fs.isDefined)
+        Future.sequence(clustersWithCloudSupport.map( x => beaconCloudCredService.listAllCloudCred(x.beaconEndpoint, x.clusterId, queryStringPaginated))).map({
+          cloudCredListFromAllClusters => {
+            val allCloudCreds: Seq[CloudCredsBeaconResponse] = cloudCredListFromAllClusters.filter(_.isRight).map(_.right.get)
+            val failedResponses: Seq[BeaconApiErrors] = cloudCredListFromAllClusters.filter(_.isLeft).map(_.left.get)
+            if (failedResponses.lengthCompare(clustersWithCloudSupport.length) == 0) {
+              p.success(Left(DlmApiErrors(failedResponses ++ adminStatusResponse.unreachableBeacon)))
+            } else {
+              p.success(Right(CloudCredsDetailResponse(failedResponses, allCloudCreds)))
+            }
+          }
+        })
+    })
+    p.future
+  }
+
+  /**
+    * Get cloud credential details
+    *
+    * @param clusterId      cluster id
+    * @param cloudCredId    cloudcred id
+    * @return
+    */
+  def getCloudCredById(clusterId: Long, cloudCredId: String)
+               (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, CloudCredResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconCloudCredService.getCloudCred(beaconUrl, clusterId, cloudCredId).map({
+          case Left(errors) => p.success(Left(errors))
+          case Right(cloudCredResponse) => p.success(Right(cloudCredResponse))
+        })
+    }
+    p.future
+  }
+
+  /**
+    * Get cloud credential details
+    *
+    * @param clusterId      cluster id
+    * @param cloudCredName    cloudcred id
+    * @return
+    */
+  def getCloudCredByName(clusterId: Long, cloudCredName: String)
+                                (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[CloudCredResponse]]] = {
+    val p: Promise[Either[BeaconApiErrors, Seq[CloudCredResponse]]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        val queryString = Map(("filterBy",s"name:$cloudCredName"))
+        getFilteredCloudCredByName(beaconUrl, clusterId, queryString).map({
+          case Left(errors) => p.success(Left(errors))
+          case Right(cloudCredResponse) => p.success(Right(cloudCredResponse))
+        })
+    }
+    p.future
+  }
+
+
+  /**
+    * Get cloud credential details
+    *
+    * @param beaconUrl      beacon url
+    * @param clusterId      cluster id
+    * @return
+    */
+  def getFilteredCloudCredByName(beaconUrl: String, clusterId: Long, queryString: Map[String, String])
+                      (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[CloudCredResponse]]] = {
+    val p: Promise[Either[BeaconApiErrors, Seq[CloudCredResponse]]] = Promise()
+    beaconCloudCredService.listAllCloudCred(beaconUrl, clusterId, queryString).map({
+      case Left(errors) => p.success(Left(errors))
+      case Right(cloudCredsBeaconResponse) =>
+        p.success(Right(cloudCredsBeaconResponse.cloudCreds.cloudCred))
+    })
+
+    p.future
+  }
 
 }
 
