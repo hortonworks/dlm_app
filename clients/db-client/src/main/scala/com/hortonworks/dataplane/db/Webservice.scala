@@ -217,6 +217,8 @@ object Webservice {
 
     def update(commentText: String, commentId: String): Future[CommentWithUser]
 
+    def deleteByObjectRef(objectId: String, objectType: String): Future[String]
+
 
   }
 

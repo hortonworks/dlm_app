@@ -218,4 +218,5 @@ POST         /blacklisted-tokens                                            cont
 POST        /comments                                                       controllers.Comments.addComment
 GET         /comments                                                       controllers.Comments.getCommentByObjectRef
 DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
+DELETE      /comments                                                       controllers.Comments.delete
 PATCH       /comments/:id                                                   controllers.Comments.update(id: String)

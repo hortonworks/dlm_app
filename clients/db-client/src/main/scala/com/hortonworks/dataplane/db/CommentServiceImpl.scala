@@ -57,6 +57,19 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
+  override def deleteByObjectRef(objectId: String, objectType: String): Future[String] = {
+    ws.url(s"$url/comments?objectId=${objectId}&objectType=${objectType}")
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map{ res =>
+        res.status match {
+          case 200 => (res.json \ "results").validate[String].get
+          case _ =>
+            mapResponseToError(res)
+        }
+      }
+  }
+
   override def update(commentText: String, commentId: String): Future[CommentWithUser] = {
     ws.url(s"$url/comments/$commentId")
       .withHeaders(

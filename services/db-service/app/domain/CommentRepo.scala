@@ -59,6 +59,10 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     db.run(Comments.filter(m =>(m.id === commentId && m.createdBy === userId)).delete)
   }
 
+  def deleteByObjectRef(objectId:Long, objectType:String)={
+    db.run(Comments.filter(m =>(m.objectId === objectId && m.objectType === objectType)).delete)
+  }
+
   def update(commentText: String, commentId: Long) = {
     val query = (for {
       editVersion <- Comments.filter(_.id === commentId).map(t => t.editVersion).result.head
