@@ -602,7 +602,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         } else if (sourceClusterId > 0) {
           policyForm.patchValue({
             general: {
-              sourceCluster: sourceClusterId
+              source: {
+                cluster: sourceClusterId,
+                type: CLUSTER
+              }
             }
           });
           this.selectedSource$.next(sourceClusterId);
@@ -685,13 +688,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   private setupDestinationChanges(policyForm: FormGroup): void {
     let skipFieldChange = this.formRestored;
-    const valueChange$: Observable<number> = policyForm.valueChanges
-      .pluck<any, number>('general', 'destinationCluster')
-      .distinctUntilChanged();
-    const loadQueues = valueChange$
-      .subscribe(clusterId => {
-        if (clusterId) {
-          this.store.dispatch(loadYarnQueues(clusterId));
+    const destinationChange$: Observable<any> = policyForm.valueChanges
+      .pluck<any, any>('general', 'destination')
+      .distinctUntilChanged(isEqual);
+    const loadQueues = destinationChange$
+      .subscribe(({ cluster, type }) => {
+        if (cluster && type === CLUSTER) {
+          this.store.dispatch(loadYarnQueues(cluster));
         }
       });
 
@@ -704,10 +707,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       return all.concat(listItem);
     };
 
-    const clusterQueues$ = Observable.combineLatest(valueChange$, this.store.select(getYarnQueueEntities))
-      .map(([clusterId, entities]) => {
-        return entities[clusterId];
-      })
+    const clusterQueues$ = Observable.combineLatest(destinationChange$, this.store.select(getYarnQueueEntities))
+      .map(([{cluster, type }, entities]) => entities[cluster])
       .distinctUntilChanged(isEqual);
     const updateQueueList = clusterQueues$.subscribe(yarnQueues => {
       if (yarnQueues && yarnQueues.length) {
