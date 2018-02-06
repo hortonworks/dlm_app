@@ -30,13 +30,10 @@ import { POLL_INTERVAL } from 'constants/api.constant';
 import { HeaderData } from 'models/header-data';
 import { UserService } from 'services/user.service';
 import { AuthUtils } from 'utils/auth-utils';
-import { RELOAD_TIME } from './constants/application.constant';
 import { AsyncActionsService } from 'services/async-actions.service';
 
 const POLL_EVENTS_ID = '[DLM_COMPONENT] POLL_EVENT_ID';
 const POLL_NEW_EVENTS_ID = '[DLM_COMPONENT] POLL_NEW_EVENTS_ID';
-
-let reloadTimeOut;
 
 @Component({
   selector: 'dlm',
@@ -126,19 +123,12 @@ export class DlmComponent implements OnDestroy, OnInit {
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
     this.store.dispatch(loadEvents(null, { requestId: POLL_EVENTS_ID}));
-    const pathChange$ = router.events
-      .filter(e => e instanceof NavigationEnd)
-      .subscribe(_ => {
-        clearTimeout(reloadTimeOut);
-        reloadTimeOut = setTimeout(() => location.reload(), RELOAD_TIME);
-      });
     const clustersRequestSubscription = this.asyncActions.dispatch(loadClusters())
       .subscribe(_ => {
         this.store.dispatch(loadClustersStatuses());
         this.initPolling();
       });
     this.subscriptions.push(clustersRequestSubscription);
-    this.subscriptions.push(pathChange$);
   }
 
   getUser(): User {
