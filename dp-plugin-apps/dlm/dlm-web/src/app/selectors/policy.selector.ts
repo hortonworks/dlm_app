@@ -58,11 +58,23 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
     const lastJobResource = jobsResource.length ? jobsResource[0] : null;
     const lastGoodJobResource = jobsResource.length ? jobsResource.find(j => j.status === JOB_STATUS.SUCCESS) : null;
     const lastTenJobs = jobsResource.length ? policyJobs.slice(0, 10) : [];
+    let lastJobDuration;
+    if (!jobsResource.length) {
+      lastJobDuration = null;
+    } else {
+      if (jobsResource.length === 1) {
+        lastJobDuration = jobsResource[0].duration;
+      } else {
+        const lastCompletedJob = jobsResource.find(j => j.isCompleted);
+        lastJobDuration = lastCompletedJob ? lastCompletedJob.duration : null;
+      }
+    }
     return {
       ...policy,
       jobsResource,
       lastJobResource,
       lastGoodJobResource,
+      lastJobDuration,
       lastTenJobs
     };
   });
