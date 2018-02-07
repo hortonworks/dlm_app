@@ -50,10 +50,19 @@ object Entities {
 
   case class HJwtToken(token: String)
 
-  case class Error(status: Int, message: String, errorType: String = ErrorType.General.toString)
+  case class InnerError(code: String, exception: Option[Throwable] = None, innererror: Option[InnerError] = None)
 
-  case class RestApiException(respCode : Int,
-                              errorsObj: Errors) extends Exception(errorsObj.firstMessage.toString)
+  case class Error(status: Int,
+                   message: String,
+                   errorType: String = ErrorType.General.toString,
+                   code: String = "generic",
+                   target: Option[String] = None,
+                   exception: Option[Throwable] = None,
+                   details: Option[Seq[Error]] = None,
+                   innererror: Option[InnerError] = None)
+
+  case class RestApiException(respCode: Int, errorsObj: Errors)
+      extends Exception(errorsObj.firstMessage.toString)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
