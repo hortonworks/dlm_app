@@ -12,6 +12,7 @@
 package com.hortonworks.dataplane.http
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
 
@@ -34,7 +35,7 @@ trait BaseRoute {
           Error(status = status,
                 code = code,
                 message = message,
-                exception = Some(exception)))))
+                trace = Some(ExceptionUtils.getStackTrace(exception))))))
 
   def notFound =
     Json.obj("error" -> Json.obj("message" -> "Not found", "trace" -> ""))
