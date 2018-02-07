@@ -68,24 +68,18 @@ class Config @Inject()(
 
   def getConfig(key: String) = Action.async {
     configService
-      .getConfig(key).map { configuration => {
-      configuration match {
+      .getConfig(key).map {
         case None => Ok("")
         case Some(config) => Ok(config.configValue)
       }
-    }
-    }
   }
 
   def getTrackingStatus() = Action.async {
     configService
-      .getConfig("dps.ga.tracking.enabled").map { configuration => {
-      configuration match {
+      .getConfig("dps.ga.tracking.enabled").map {
         case None => Ok("false")
         case Some(config) => Ok(config.configValue)
       }
-    }
-    }
   }
 
 }
