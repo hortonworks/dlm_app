@@ -228,6 +228,8 @@ object Webservice {
 
     def update(ratingId: String, ratingUserTuple: (Float, Long)): Future[Rating]
 
+    def deleteByObjectRef(objectId: String, objectType: String): Future[String]
+
   }
 
   trait ClusterService extends DbClientService {

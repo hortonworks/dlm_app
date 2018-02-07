@@ -118,6 +118,10 @@ export class CommentsComponent implements OnInit {
     }
     return totalVotes+ " votes";
   }
+
+  formatAverageRating(averageRating){
+    return Math.round(averageRating*10)/10;
+  }
   getComments(refreshScreen: boolean) {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
