@@ -32,8 +32,8 @@ class DpKeyStore @Inject()(configuration: Configuration) {
 
   def getCredentialEntry(alias: String): Try[CredentialEntry] = {
     credentialManager.readUserCredential(alias)
-      .map { credential => CredentialEntry(alias, credential._2)}
+      .map { credential => CredentialEntry(credential._1, credential._2)}
   }
 
-  def createCredentialEntry(alias: String, password: String): Try[Unit] = credentialManager.writeUserCredential(alias, "dummy", password)
+  def createCredentialEntry(alias: String, username: String, password: String): Try[Unit] = credentialManager.writeUserCredential(alias, username , password)
 }

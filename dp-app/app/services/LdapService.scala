@@ -55,6 +55,8 @@ class LdapService @Inject()(
     private val configuration: Configuration) {
   private val logger = Logger(classOf[LdapService])
 
+  private val LDAP_CREDENTIAL_KEY = "DPSPlatform.credential.ldap"
+
   def configure(knoxConf: KnoxConfigInfo,
                 requestHost: String): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
@@ -73,6 +75,7 @@ class LdapService @Inject()(
                 case Left(errors) => Future.successful(Left(errors))
                 case Right(isBound) =>
                   val tryToWrite = ldapKeyStore.createCredentialEntry(
+                    LDAP_CREDENTIAL_KEY,
                     knoxConf.bindDn.get,
                     knoxConf.password.get
                   )
@@ -119,6 +122,7 @@ class LdapService @Inject()(
         case Left(errors) => Future.successful(Left(errors))
         case Right(isBound) => {
           val tryToWrite = ldapKeyStore.createCredentialEntry(
+            LDAP_CREDENTIAL_KEY,
             knoxConfig.bindDn.get,
             knoxConfig.password.get
           )
@@ -212,7 +216,7 @@ class LdapService @Inject()(
     configuredLdap.headOption match {
       case Some(l) => {
         val cred: Option[CredentialEntry] =
-          ldapKeyStore.getCredentialEntry(l.bindDn.get).toOption
+          ldapKeyStore.getCredentialEntry(LDAP_CREDENTIAL_KEY).toOption
         cred match {
           case Some(cred) =>
             getLdapContext(l.ldapUrl.get, l.bindDn.get, cred.password)
@@ -236,9 +240,9 @@ class LdapService @Inject()(
     }
   }
 
-  def getPassword(bindDn: String): Option[String] = {
+  def getPassword(): Option[String] = {
     val cred: Option[CredentialEntry] =
-      ldapKeyStore.getCredentialEntry(bindDn).toOption
+      ldapKeyStore.getCredentialEntry(LDAP_CREDENTIAL_KEY).toOption
     if (cred.isDefined) Some(cred.get.password) else None
   }
 

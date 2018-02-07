@@ -66,6 +66,15 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       }
     }
 
+    val hiveConfigs = clusterDefinitionRequest.nameNodeConfigs.foldLeft("": String) {
+      (acc, next) => {
+        next._2 match {
+          case Some(value) => acc + s"${next._1} = $value\n"
+          case None =>  acc
+        }
+      }
+    }
+
     val rangerConfigs =  clusterDefinitionRequest.rangerService match {
       case None => ""
       case Some(rangerServiceDetails) => {
@@ -82,14 +91,7 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
     "description = " + clusterDefinitionRequest.description + "\n" +
     "local = " + clusterDefinitionRequest.local + "\n" +
     nnConfigs +
-    (clusterDefinitionRequest.hsEndpoint match {
-      case Some(hsEndpoint) => "hsEndpoint= " + hsEndpoint + "\n"
-      case None => ""
-    }) +
-    (clusterDefinitionRequest.hsKerberosPrincipal match {
-      case Some(hsKerberosPrincipal) => "hive.server2.authentication.kerberos.principal= " + hsKerberosPrincipal + "\n"
-      case None => ""
-    }) +
+    hiveConfigs +
     rangerConfigs
   }
 

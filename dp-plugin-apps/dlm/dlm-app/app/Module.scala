@@ -16,7 +16,7 @@ import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import com.hortonworks.dataplane.commons.service.api.CredentialManager
+import com.hortonworks.dataplane.commons.service.api.KeyStoreManager
 import com.hortonworks.dlm.beacon._
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.datapalane.consul._
@@ -41,7 +41,7 @@ class Module extends AbstractModule {
   def configure() = {
     val config = new Configuration(ConfigFactory.load())
     bind(classOf[ConsulInitializer]).asEagerSingleton()
-    bind(classOf[CredentialManager]).toInstance(CredentialManager(config.getString("dp.keystore.path").get,
+    bind(classOf[KeyStoreManager]).toInstance(KeyStoreManager(config.getString("dp.keystore.path").get,
       config.getString("dp.keystore.password").get))
     bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("dlm-app"))
   }

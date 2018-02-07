@@ -92,7 +92,7 @@ object WebService {
 
   trait BeaconCloudCredService extends ClientService {
     def listAllCloudCred(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
-                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredsResponse]]
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredsBeaconResponse]]
     def getCloudCred(beaconEndpoint : String, clusterId: Long, cloudCredId : String)
                   (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, CloudCredResponse]]
     def createCloudCred(beaconEndpoint : String, clusterId: Long, cloudCredRequest : CloudCredRequest)

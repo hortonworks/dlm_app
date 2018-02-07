@@ -9,9 +9,11 @@
 package controllers
 
 import com.google.inject.Inject
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.AmazonS3Entities._
 import models.CloudAccountEntities._
-import services.DlmKeyStore
+import models.JsonFormatters._
+import services.{BeaconService, DlmKeyStore}
 import play.api.mvc.{Action, Controller}
 import models.JsonResponses
 import play.api.Logger
@@ -21,7 +23,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CredentialStore @Inject()(
-  val dlmKeyStoreService: DlmKeyStore
+  val dlmKeyStoreService: DlmKeyStore,
+  val beaconService: BeaconService
 ) extends Controller {
 
   def listAllCredentialNames = Action.async {
@@ -52,19 +55,20 @@ class CredentialStore @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def updateCredentialAccount = Action.async (parse.json) { request =>
+  def updateCredentialAccount = AuthenticatedAction.async (parse.json) { request =>
     Logger.info("Received update cloud credential request")
+    implicit val token = request.token
     request.body.validate[CloudAccountWithCredentials].map { credentialAccount =>
-      dlmKeyStoreService.updateCloudAccount(credentialAccount).map {
-        case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
-        case Right(response) => Ok(JsonResponses.statusOk)
+      beaconService.updateCloudCreds(credentialAccount).map {
+        dlmApiErrors => Ok(Json.toJson(dlmApiErrors))
       }
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def deleteCredentialAccount(cloudAccountId: String) = Action.async {
+  def deleteCredentialAccount(cloudAccountId: String) = AuthenticatedAction.async { request =>
     Logger.info("Received delete cloud credential request")
-    dlmKeyStoreService.deleteCloudAccount(cloudAccountId).map {
+    implicit val token = request.token
+    beaconService.deleteCloudCreds(cloudAccountId).map {
       case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
       case Right(response) => Ok(JsonResponses.statusOk)
     }

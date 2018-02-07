@@ -16,6 +16,7 @@ import javax.inject.{Inject, Singleton}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
 import com.google.common.base.Supplier
+import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.hortonworks.dataplane.commons.service.api.Poll
 import com.typesafe.config.Config
@@ -102,7 +103,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
   override def receive = {
     case Poll() =>
       log.info("Loading credentials from configuration")
-      val creds: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
+      val creds: Future[Credentials] = credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       // notify that credentials were loaded
       creds.map(CredentialsLoaded(_)).pipeTo(self)
 
@@ -162,7 +163,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
 
     case DpClusterAdded(dpCluster) =>
     // Perform the same steps but for a single data lake
-      val creds: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
+      val creds: Future[Credentials] = credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       // notify that credentials were loaded
       creds.map(CredentialsLoaded(_,Seq(dpCluster))).pipeTo(self)
 

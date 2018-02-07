@@ -13,15 +13,15 @@ import {Injectable} from '@angular/core';
 import {Http, Headers, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {Comment, CommentWithUserAndChildren} from "../models/comment";
+import {Comment, CommentWithUser} from "../models/comment";
 
 @Injectable()
 export class CommentService {
   uri = 'api/comments';
   constructor(private http:Http) { }
 
-  getByObjectRef(objectId: string, objectType: string): Observable<CommentWithUserAndChildren[]>  {
-    const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}`;
+  getByObjectRef(objectId: string, objectType: string, offset:number, size:number): Observable<CommentWithUser[]>  {
+    const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}&offset=${offset}&size=${size}`;
 
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))

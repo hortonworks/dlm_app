@@ -396,14 +396,10 @@ object Entities {
                       createdBy: Long,
                       createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
                       lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                      parentCommentId: Option[Long],
                       editVersion: Option[Int] = Some(0))
 
   case class CommentWithUser(comment:Comment,
                              userName: String)
-
-  case class commentWithUserAndChildren(commentWithUser: CommentWithUser,
-                                        children: Seq[CommentWithUser])
 
   case class Rating(id: Option[Long] = None,
                     rating: Float,
@@ -596,9 +592,6 @@ object JsonFormatters {
 
   implicit val commentWithUserWrites = Json.writes[CommentWithUser]
   implicit val commentWithUserReads = Json.reads[CommentWithUser]
-
-  implicit val oneLevelCommentWrites = Json.writes[commentWithUserAndChildren]
-  implicit val oneLevelCommentReads = Json.reads[commentWithUserAndChildren]
 
   implicit val ratingWrites = Json.writes[Rating]
   implicit val ratingReads = Json.reads[Rating]

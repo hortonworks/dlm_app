@@ -9,6 +9,7 @@
   ~  */
   -->
 
+<div class="slider-mask" [routerLink]="[returnURl]"></div>
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
@@ -23,112 +24,71 @@
     <div class="rating-stars"><star-rating-comp [starType]="'svg'" [labelText]="'RATE THIS COLLECTION'" [labelPosition]="'top'" [size]="'medium'" [speed]="'noticeable'" [step]="0.5"
                                  [showHalfStars]="true" [id]="'rating-id'" [hoverEnabled]="true"></star-rating-comp></div>
     <div class="rating-class">
-      <div>2000 votes</div>
+      <div>0 votes</div>
       <div class="fixed-star">
-        <star-rating-comp [starType]="'svg'" [labelText]="'4.1'" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
+        <star-rating-comp [starType]="'svg'" [labelText]="'0'" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
       </div>
     </div>
   </div>
   <div class="mdl-grid" *ngIf="fetchError">
     <div class="mdl-cell mdl-cell--12-col load-comment-error">{{"pages.comments.fetchErrorMsg" | translate}}</div>
   </div>
-  <div class="mdl-grid" *ngIf="fetchInProgress">
+  <div class="mdl-grid" *ngIf="fetchInProgress && commentWithUsers.length === 0">
     <div class="mdl-cell mdl-cell--12-col">{{"common.loading" | translate}}...</div>
   </div>
   <div *ngIf="!fetchInProgress">
-    <div class="mdl-grid" *ngIf="!fetchError && commentsWithUserAndChildren.length === 0">
+    <div class="mdl-grid" *ngIf="!fetchError && commentWithUsers.length === 0 && allCommentsLoaded">
       <div class="mdl-cell mdl-cell--12-col no-comments">{{"pages.comments.noComments" | translate}}</div>
     </div>
-    <div class="comment-tree">
+    <div class="comment-tree" (scroll)="loadNext()">
       <ul>
-        <li *ngFor="let oneLevelComment of commentsWithUserAndChildren">
-          <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(oneLevelComment.commentWithUser)}">
+        <li *ngFor="let commentWithUser of commentWithUsers">
+          <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(commentWithUser)}">
             <div class="flex-grid">
               <div class="primary-space">
-                        <span class="comment-user" [ngClass]= "{'hwx-warning-bg': !isLoggedInUser(oneLevelComment.commentWithUser), 'hwx-external-bg': isLoggedInUser(oneLevelComment.commentWithUser)}">
+                        <span class="comment-user" [ngClass]= "{'hwx-warning-bg': !isLoggedInUser(commentWithUser), 'hwx-external-bg': isLoggedInUser(commentWithUser)}">
                             <i class="fa fa-user"></i>
                         </span>
                 <div class="user-display">
-                  <div class="username-text">{{oneLevelComment.commentWithUser.userName}}</div>
-                  <div class="comment-date">{{formatDate(oneLevelComment.commentWithUser.comment.lastModified)}}</div>
+                  <div class="username-text">{{commentWithUser.userName}}</div>
+                  <div class="comment-date">{{formatDate(commentWithUser.comment.lastModified)}}</div>
                 </div>
               </div>
               <div>
-                <div class="utility-action-selection">
+                <div class="utility-action-selection" [ngClass]= "{'hide': !isLoggedInUser(commentWithUser)}">
                             <span>
                                 <i class="fa fa-ellipsis-v"></i>
                             </span>
                   <ul class="utility-action-options">
-                    <li (click)="onReplyToComment(oneLevelComment.commentWithUser)">
-                      <i class="fa fa-reply"></i>
-                      <span>Reply</span></li>
-                    <li (click)="onDeleteComment(oneLevelComment.commentWithUser)" [ngClass]= "{'hide': !isLoggedInUser(oneLevelComment.commentWithUser)}">
+                    <li (click)="onDeleteComment(commentWithUser)">
                       <i class="fa fa-times"></i>
                       <span>Delete</span></li>
                   </ul>
                 </div>
               </div>
             </div>
-            <div class="comment-text">
-              {{oneLevelComment.commentWithUser.comment.comment}}
+            <div class="comment-text" *ngIf="commentWithUser.comment.comment.length < 128">
+              {{commentWithUser.comment.comment}}
             </div>
-            <ul [ngClass]="{'response-group': oneLevelComment.children && oneLevelComment.children.length > 0  }">
-              <li *ngFor="let child of oneLevelComment.children">
-                        <span class="comment-reply">
-                            <i class="fa fa-reply"></i>
-                        </span>
-                <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(child)}">
-                  <div class="flex-grid">
-                    <div class="primary-space">
-                                    <span class="comment-user" [ngClass]= "{'hwx-warning-bg': !isLoggedInUser(child), 'hwx-external-bg': isLoggedInUser(child)}">
-                                        <i class="fa fa-user"></i>
-                                    </span>
-                      <div class="user-display">
-                        <div class="username-text">{{child.userName}}</div>
-                        <div class="comment-date">{{formatDate(child.comment.lastModified)}}</div>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="utility-action-selection">
-                                        <span>
-                                            <i class="fa fa-ellipsis-v"></i>
-                                        </span>
-                        <ul class="utility-action-options">
-                          <li (click)="onReplyToComment(child)">
-                            <i class="fa fa-reply"></i>
-                            <span>Reply</span></li>
-                          <li (click)="onDeleteComment(child)" [ngClass]= "{'hide': !isLoggedInUser(child)}">
-                            <i class="fa fa-times"></i>
-                            <span>Delete</span></li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="comment-text">
-                    {{child.comment.comment}}
-                  </div>
-                </div>
-              </li>
-            </ul>
+            <div class="comment-text" *ngIf="commentWithUser.comment.comment.length >= 128">
+              {{lengthAdjustedComment(commentWithUser.comment.comment,commentWithUser.isCommentExpanded)}}
+              <div><a class="expandable-view" (click)=" commentWithUser.isCommentExpanded = !commentWithUser.isCommentExpanded"><i>view
+                {{commentWithUser.isCommentExpanded? 'less':'more'}}</i></a></div>
+            </div>
           </div>
         </li>
       </ul>
+      <div class="edge" #edge><i *ngIf="(!allCommentsLoaded || newCommentsAvailable)" class="fa fa-spinner fa-spin fa-2x fa-fw" aria-hidden="true"></i></div>
     </div>
   </div>
   <div class="slider-footer">
-    <div class="comment-reply-to-placeholder" *ngIf="isReply">
-      <div class="username-text"><span>{{reply.username}}</span>
-        <i class="fa fa-remove close-icon close-reply" (click)="removeReply()" id="close-reply"></i>
-      </div>
-      <div class="comment-reply">{{reply.commentText}}</div>
-    </div>
     <div class="flex-grid form-reply">
         <span class="primary-space">
-          <textarea type="text" placeholder="Add your comment here..." class="comment-input" [(ngModel)]="newCommentText" rows="2"></textarea>
+          <textarea #newComment type="text" placeholder="Add your comment here..." class="comment-input" [(ngModel)]="newCommentText" rows="2" (keydown)="resizeTextArea()" (cut)="resizeTextArea()" (paste)="resizeTextArea()"></textarea>
         </span>
       <span>
             <button class="paper-btn" (click)="onPostComment()" id="post">
-                <i class="fa fa-paper-plane"></i>
+                <i class="fa fa-chevron-up"></i>
             </button>
         </span>
     </div>

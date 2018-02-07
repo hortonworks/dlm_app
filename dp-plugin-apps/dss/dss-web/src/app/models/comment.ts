@@ -24,15 +24,5 @@ export class Comment {
 export class CommentWithUser {
   comment: Comment;
   userName: string;
-}
-
-export class CommentWithUserAndChildren {
-  commentWithUser: CommentWithUser;
-  children: CommentWithUser[] = [];
-}
-
-export class ReplyParent {
-  commentText: string;
-  username: string;
-  parentId: number;
+  isCommentExpanded?: boolean = false;
 }

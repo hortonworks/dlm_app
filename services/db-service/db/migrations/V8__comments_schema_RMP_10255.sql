@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS dataplane.comments (
   createdby    BIGINT REFERENCES dataplane.users (id)                 NOT NULL,
   createdon    TIMESTAMP DEFAULT now(),
   lastmodified TIMESTAMP DEFAULT now(),
-  parent_comment_id  BIGINT REFERENCES dataplane.comments(id)         ON DELETE CASCADE DEFAULT NULL,  --is it ok to use 'ON DELETE cascade' ?
   edit_version BIGINT DEFAULT 0
 );
 
@@ -37,6 +36,3 @@ CREATE TABLE IF NOT EXISTS dataplane.comments (
   object_id    BIGINT,
   UNIQUE(type,object_id)
 );*/
-
---Index on comments table
-CREATE INDEX idx_dp_comments_parent_id on dataplane.comments(parent_comment_id);

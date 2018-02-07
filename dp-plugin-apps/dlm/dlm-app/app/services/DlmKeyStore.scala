@@ -12,27 +12,32 @@ package services
 import java.io.{ByteArrayInputStream, ObjectInputStream}
 
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
-import com.hortonworks.dataplane.commons.service.api.{CredentialManager, KeystoreReloadEvent}
+import com.hortonworks.dataplane.commons.service.api.{KeyStoreManager, KeystoreReloadEvent}
 import com.google.inject.{Inject, Singleton}
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dlm.beacon.domain.RequestEntities.CloudCredRequest
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors}
 import com.typesafe.scalalogging.Logger
 import models.ADLSEntities.ADLSAccountDetails
-import models.AmazonS3Entities.S3AccountDetails
+import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
 import models.CloudAccountEntities.Error._
 import models.CloudAccountEntities.{CloudAccountWithCredentials, CloudAccountsBody, CloudAccountsItem}
 import models.{CloudAccountProvider, CloudCredentialType}
 import models.CloudAccountProvider.CloudAccountProvider
+import models.Entities.DlmApiErrors
 import models.WASBEntities.WASBAccountDetails
 import play.api.cache._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import org.apache.commons.lang.SerializationUtils
+import play.api.http.Status.INTERNAL_SERVER_ERROR
 
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManager) extends
+class DlmKeyStore @Inject()(cache: CacheApi, keyStoreManager: KeyStoreManager) extends
   mutable.Subscriber[KeystoreReloadEvent, mutable.Publisher[KeystoreReloadEvent]] {
 
   private val logger = Logger(classOf[DlmKeyStore])
@@ -41,7 +46,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     CacheBuilder.newBuilder().build(new CloudAccountsCacheLoader())
 
   // subscribe for events
-  credentialManager.subscribe(this)
+  keyStoreManager.subscribe(this)
 
   override def notify(publisher: mutable.Publisher[KeystoreReloadEvent], event: KeystoreReloadEvent): Unit = {
     cloudAccountsCache.invalidate(DpKeyStore.ALIAS)
@@ -159,25 +164,25 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     * Deletes a cloud account
     * @param accountId
     */
-  def deleteCloudAccount(accountId: String) : Future[Either[GenericError,Unit]] = {
+  def deleteCloudAccount(accountId: String): Future[Either[DlmApiErrors, Unit]] = {
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
         val cloudAccountsToBeSaved = cloudAccounts.filterNot(_.id.get.equals(accountId))
         if (cloudAccounts.lengthCompare(cloudAccountsToBeSaved.length) != 0) {
           saveCloudAccountsToKeyStore(cloudAccountsToBeSaved) match {
             case Success(v) => Right(Unit)
-            case Failure(ex) => Left(GenericError(ex.getMessage))
+            case Failure(ex) => Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(ex.getMessage)))))
           }
         } else {
-          Left(GenericError(DpKeyStore.credentialDoesNotExistsErrMsg))
+          Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(DpKeyStore.credentialDoesNotExistsErrMsg)))))
         }
-      case Left(error) => Left(GenericError(error.message))
+      case Left(error) => Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message)))))
     }
   }
 
   def saveCloudAccountsToKeyStore(cloudAccountsInfo: List[CloudAccountWithCredentials]): Try[Unit] = {
     val serializedCloudAccount = SerializationUtils.serialize(cloudAccountsInfo)
-    credentialManager.write(DpKeyStore.ALIAS, Map(DpKeyStore.KEY -> serializedCloudAccount)) map {
+    keyStoreManager.write(DpKeyStore.ALIAS, Map(DpKeyStore.KEY -> serializedCloudAccount)) map {
       _ => cloudAccountsCache.invalidate(DpKeyStore.ALIAS)
     }
   }
@@ -188,7 +193,7 @@ class DlmKeyStore @Inject()(cache: CacheApi, credentialManager: CredentialManage
     * @return
     */
   def getCloudAccountsFromKeyStore (alias: String): Future[Either[CredentialNotFoundInKeystoreError, List[CloudAccountWithCredentials]]] =  {
-    credentialManager.read(alias, Set(DpKeyStore.KEY)) match {
+    keyStoreManager.read(alias, Set(DpKeyStore.KEY)) match {
       case Success(keyValueMap) =>
         keyValueMap.get(DpKeyStore.KEY) match {
           case Some(result) =>

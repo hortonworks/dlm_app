@@ -9,6 +9,13 @@
  *
  */
 
-package models
+package com.hortonworks.dataplane
 
-case class CredentialEntry(bindDn: String, password: String)
+
+object CSConstants {
+
+  val AMBARI_CREDENTIAL_KEY = "DPSPlatform.credential.ambari"
+  val ATLAS_CREDENTIAL_KEY = "DPSPlatform.credential.atlas"
+  val RANGER_CREDENTIAL_KEY = "DPSPlatform.credential.ranger"
+
+}
