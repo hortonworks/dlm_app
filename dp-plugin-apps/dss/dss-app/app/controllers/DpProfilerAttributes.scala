@@ -40,9 +40,9 @@ class DpProfilerAttributes @Inject()(
         .startProfilerJob(clusterId, dbName, tableName)
         .map {
           case Left(errors) => {
-            errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+            errors.errors.head.status match {
+              case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 405 => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
               case _ => InternalServerError(Json.toJson(errors))
             }
           }
@@ -60,9 +60,9 @@ class DpProfilerAttributes @Inject()(
         .getProfilerJobStatus(clusterId, dbName, tableName)
         .map {
           case Left(errors) => {
-            errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+            errors.errors.head.status match {
+              case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 405 => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
               case _ => InternalServerError(Json.toJson(errors))
             }
           }
@@ -86,9 +86,9 @@ class DpProfilerAttributes @Inject()(
           } yield {
             feu match {
               case Left(errors) => {
-                errors.errors.head.code match {
-                  case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
-                  case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+                errors.errors.head.status match {
+                  case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+                  case 405 => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
                   case _ => InternalServerError(Json.toJson(errors))
                 }
               }
@@ -108,10 +108,10 @@ class DpProfilerAttributes @Inject()(
         .getAuditResults(clusterId, dbName, tableName, userName, startDate, endDate)
         .map {
           case Left(errors) => {
-            errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
-              case "503" => ServiceUnavailable(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+            errors.errors.head.status match {
+              case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 405 => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 503 => ServiceUnavailable(JsonResponses.statusError(s"${Json.toJson(errors)}"))
               case _ => InternalServerError(Json.toJson(errors))
             }
           }
@@ -130,10 +130,10 @@ class DpProfilerAttributes @Inject()(
         .getAuditActions(clusterId, dbName, tableName, userName, startDate, endDate)
         .map {
           case Left(errors) => {
-            errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
-              case "503" => ServiceUnavailable(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+            errors.errors.head.status match {
+              case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 405 => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 503 => ServiceUnavailable(JsonResponses.statusError(s"${Json.toJson(errors)}"))
               case _ => InternalServerError(Json.toJson(errors))
             }
           }

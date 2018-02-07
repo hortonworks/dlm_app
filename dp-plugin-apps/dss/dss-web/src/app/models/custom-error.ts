@@ -10,7 +10,7 @@
  */
 
 export class CustomError {
-  code : string;
+  status : string;
   errorType : string;
   message : string;
 }

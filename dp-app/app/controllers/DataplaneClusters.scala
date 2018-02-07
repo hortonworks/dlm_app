@@ -91,7 +91,7 @@ class DataplaneClusters @Inject()(
         .map {
           case Left(errors) =>
             errors.firstMessage match {
-              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
               case _ => InternalServerError(Json.toJson(errors))
             }
           case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
@@ -156,7 +156,7 @@ class DataplaneClusters @Inject()(
         case Right(checkResponse) =>{
           dpClusterService.checkExistenceByIp(checkResponse.ambariIpAddress).map{
             case Left(errors) => InternalServerError(
-              JsonResponses.statusError(errors.firstMessage))
+              JsonResponses.statusError(errors.errors.head.message))
             case Right(status) =>
               if(status){
                 Ok(Json.obj("alreadyExists" -> true))

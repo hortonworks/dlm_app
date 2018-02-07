@@ -49,7 +49,7 @@ class Groups @Inject()(groupsRepo: GroupsRepo, rolesUtil: RolesUtil)(
       .validate[GroupInfo]
       .map { groupInfo =>
         groupsRepo.groupExists(groupInfo.groupName).flatMap {
-          case true=>Future.successful(Conflict(Json.toJson(Errors(Seq(Error("GROUP_ALREADY_EXISTS",s"Group Already Exists:${groupInfo.groupName}"))))))
+          case true=>Future.successful(Conflict(Json.toJson(Errors(Seq(Error(409, s"Group Already Exists:${groupInfo.groupName}"))))))
           case _=>{
             groupsRepo
               .addGroupWithRoles(groupInfo)

@@ -32,7 +32,7 @@ class GroupManager @Inject()(@Named("groupService") val groupService: GroupServi
   val logger = Logger(classOf[GroupManager])
 
   private def handleErrors(errors: Errors) = {
-    if (errors.errors.exists(_.code == "400"))
+    if (errors.errors.exists(_.status == "400"))
       BadRequest(Json.toJson(errors))
     else
       InternalServerError(Json.toJson(errors))
