@@ -16,6 +16,14 @@ export class MockTimeZoneService {
     'fake-zone': {}
   };
 
+  userTimezone = {
+    value: 'Atlantic/Reykjavik',
+    label: 'Atlantic/Reykjavik',
+    zones: [
+      { value: 'Atlantic/Reykjavik' }
+    ]
+  };
+
   getMomentTzByIndex() { }
   formatDateTimeWithTimeZone() {
   }

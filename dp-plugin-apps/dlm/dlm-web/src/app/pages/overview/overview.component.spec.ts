@@ -220,7 +220,10 @@ describe('OverviewComponent', () => {
       }
     ].forEach(test => {
       it(test.m, () => {
-        expect(component.mapTableData(test.policy)).toEqual(test.e);
+        interface MapTableResult extends Policy {
+          service: string;
+        }
+        expect(component.mapTableData(test.policy)).toEqual(test.e as MapTableResult);
       });
     });
   });
