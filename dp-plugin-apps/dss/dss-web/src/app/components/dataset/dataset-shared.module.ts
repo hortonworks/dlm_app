@@ -24,7 +24,7 @@ import {DsNavResultViewer} from "./views/dashboard/ds-result-viewer/ds-result-vi
 import {DsRowProxy} from "./views/dashboard/ds-result-viewer/row-proxy/row-proxy.component";
 import {DsTileProxy} from "./views/dashboard/ds-result-viewer/tile-proxy/tile-proxy.component";
 import {NavTagPanel} from "./views/dashboard/nav-tag-panel/nav-tag-panel.component";
-// import {DsAssetSearch} from "./views/ds-asset-search/ds-asset-search.component";
+import {DsAssetSearch_Old} from "./views/ds-asset-search/ds-asset-search.component";
 import {DsAssetSearch} from "./views/ds-asset-search-v2/ds-asset-search.component";
 import {AdvanceQueryEditor} from "./views/ds-asset-search/queryEditors/advance/advance-query-editor.component";
 import {QueryFilter} from "./views/ds-asset-search/queryEditors/advance/filter/filter.component";
@@ -77,6 +77,7 @@ import {CommentService} from '../../services/comment.service';
     DsAssetListStyle1,
     DsRowProxy,
     DatasetDashboardComponent,
+    DsAssetSearch_Old,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,
@@ -121,6 +122,7 @@ import {CommentService} from '../../services/comment.service';
     DsAssetList,
     DsRowProxy,
     DatasetDashboardComponent,
+    DsAssetSearch_Old,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,

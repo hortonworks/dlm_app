@@ -20,11 +20,11 @@ import {BasicQueryEditor, SimpleQueryObjectModel} from "./queryEditors/basic/bas
 export enum DsAssetSearchTabEnum { NORMAL, ADVANCE}
 
 @Component({
-  selector: "asset-search",
+  selector: "asset-search-old",
   styleUrls: ["./ds-asset-search.component.scss"],
   templateUrl: "./ds-asset-search.component.html"
 })
-export class DsAssetSearch {
+export class DsAssetSearch_Old {
   tabEnum = DsAssetSearchTabEnum;
   activeTab = this.tabEnum.NORMAL;
   queryObj: SimpleQueryObjectModel = new SimpleQueryObjectModel("");

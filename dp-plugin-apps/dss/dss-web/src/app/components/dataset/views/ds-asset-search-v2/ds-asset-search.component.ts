@@ -51,14 +51,14 @@ export class DsAssetSearch implements OnInit {
 		setTimeout(()=>this.dsAssetList.freshFetch(), 100);
 	}
 
-	onSearchTextChange() {
+	onSearchTextChange(e:any) {
 		this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "name");
 		if(this.searchText){
 			this.queryModel.filters.push({column: "name", operator: "contains", value: this.searchText, dataType:"string"});
 		}
 		this.freshFetch();
 	}
-	onOwnerNameChange() {
+	onOwnerNameChange(e) {
 		this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "owner");
 		if(this.ownerName){
 			this.queryModel.filters.push({column: "owner", operator: "contains", value: this.ownerName, dataType:"string"});
@@ -67,9 +67,9 @@ export class DsAssetSearch implements OnInit {
 	}
 	clearOwnerName() {
 		this.ownerName="";
-		this.onOwnerNameChange();
+		this.onOwnerNameChange(null);
 	}
-	onDbNameChange() {
+	onDbNameChange(e) {
 		this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "db.name");
 		if(this.dbName){
 			this.queryModel.filters.push({column: "db.name", operator: "contains", value: this.dbName, dataType:"string"});
@@ -78,9 +78,9 @@ export class DsAssetSearch implements OnInit {
 	}
 	clearDbName() {
 		this.dbName="";
-		this.onDbNameChange();
+		this.onDbNameChange(null);
 	}
-	onTagSelectionChange () {
+	onTagSelectionChange (e) {
 		console.log(this.selectedTag);
 		this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "tag");
 		if(this.dbName){
@@ -90,7 +90,7 @@ export class DsAssetSearch implements OnInit {
 	}
 	clearTag() {
 		this.selectedTag="";
-		this.onTagSelectionChange();
+		this.onTagSelectionChange(null);
 	}
 
 	onListAction (action) {
