@@ -52,10 +52,10 @@ object Webservice {
 
       errorsObj match {
         case Success(e :JsSuccess[Errors]) =>
-          throw new RestApiException(res.status, e.get)
+          throw new WrappedErrorException(e.get.errors.head)
         case _ =>
           val msg = if(Strings.isNullOrEmpty(res.body)) res.statusText else  res.body
-          throw new RestApiException(res.status, Errors(Seq(Error(res.status, msg, code = "database.generic"))))
+          throw new WrappedErrorException(Error(res.status, msg, code = "database.generic"))
       }
     }
 
