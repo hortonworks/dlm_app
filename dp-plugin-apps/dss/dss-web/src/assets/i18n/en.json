@@ -325,7 +325,7 @@
           "cancel": "Cancel",
           "edit": "Edit",
           "addAssets": "Add Assets",
-          "removeAll": "Remove All",
+          "removeAll": "Remove Selected",
           "addMoreAssets": "Add More Assets"
         },
         "errors": {
@@ -345,7 +345,7 @@
         "done": "Done"
       },
       "asset-list": {
-        "starAssetmessage": "Few assets listed above already belong to asset collection, and cannot be used in any other asset collection"
+        "starAssetmessage": "Few assets listed above already belong to other asset collections."
       },
       "dashboard": {
         "tag-nav": {
