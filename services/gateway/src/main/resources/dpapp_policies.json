@@ -12,6 +12,10 @@
 
     },
     {
+      "path":"/config/ga-tracking-status",
+      "roles": ["*"]
+    },
+    {
       "path":"/api/identity",
       "roles": ["*"]
 

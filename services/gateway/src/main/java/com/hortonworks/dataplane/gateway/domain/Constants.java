@@ -31,6 +31,7 @@ public interface Constants {
   String DPAPP_BASE_PATH="/service/core";
   String KNOX_CONFIG_PATH = DPAPP_BASE_PATH + "/api/knox/configuration";
   String PERMS_POLICY_ENTRY_POINT = DPAPP_BASE_PATH + "/access/policies";
+  String GA_TRACKING_STATUS_PATH = DPAPP_BASE_PATH + "/api/config/ga-tracking-status";
 
   String LOCAL_SIGNIN_PATH = "sign-in";
 

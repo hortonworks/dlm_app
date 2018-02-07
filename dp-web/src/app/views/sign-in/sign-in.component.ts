@@ -18,6 +18,7 @@ import {Credential} from '../../models/credential';
 import {AuthenticationService} from '../../services/authentication.service';
 import {ConfigurationService} from '../../services/configuration.service';
 import {TranslateService} from '@ngx-translate/core';
+import {AuthUtils} from "../../shared/utils/auth-utils";
 
 @Component({
   selector: 'dp-sign-in',
@@ -34,6 +35,7 @@ export class SignInComponent implements OnInit {
   credential: Credential = new Credential('', '');
   authenticate: Subject<Credential>;
   originalUrl = '/';
+  gaTrackingStatus = AuthUtils.getGATrackingStatus();
 
   constructor(private authenticaionService: AuthenticationService,
               private router: Router,
@@ -48,7 +50,6 @@ export class SignInComponent implements OnInit {
   ngOnInit() {
     let currentLocation = window.location.href.split('/');
     this.landingPage = `${currentLocation[0]}//${currentLocation[2]}`;
-
     this.activatedRoute
       .queryParams
       .subscribe((params: Params) => {

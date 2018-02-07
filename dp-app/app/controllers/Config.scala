@@ -77,4 +77,15 @@ class Config @Inject()(
     }
   }
 
+  def getTrackingStatus() = Action.async {
+    configService
+      .getConfig("dps.ga.tracking.enabled").map { configuration => {
+      configuration match {
+        case None => Ok("false")
+        case Some(config) => Ok(config.configValue)
+      }
+    }
+    }
+  }
+
 }

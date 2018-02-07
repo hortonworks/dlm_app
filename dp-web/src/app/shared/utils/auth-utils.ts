@@ -15,6 +15,7 @@ export class AuthUtils {
 
   private static user;
   private static validUser;
+  private static gaTrackingEnabled = true;
 
   public static loggedIn = new Subject<boolean>();
   public static loggedIn$ =  AuthUtils.loggedIn.asObservable();
@@ -39,6 +40,14 @@ export class AuthUtils {
 
   public static clearUser(){
     this.user = null;
+  }
+
+  public static getGATrackingStatus(){
+    return AuthUtils.gaTrackingEnabled;
+  }
+
+  public static setGATrackingStatus(status: boolean){
+    AuthUtils.gaTrackingEnabled = status
   }
 
   public static setUser(user: User) {
