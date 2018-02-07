@@ -114,10 +114,10 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def removeAssets(datasetId:Long, assetIds: Seq[Long]) :Future[RichDataset] = {
+  def removeAssets(datasetId:Long, assetGuIds: Seq[String]) :Future[RichDataset] = {
     var query = for {
       _ <- Datasets.filter(_.id === datasetId).result.head // if no result, .head will throw NoSuchElementException
-      _ <- dataAssetRepo.DatasetAssets.filter(_.datasetId === datasetId).filter(_.id inSet assetIds).delete
+      _ <- dataAssetRepo.DatasetAssets.filter(_.datasetId === datasetId).filter(_.guid inSet assetGuIds).delete
     } yield ()
     db.run(query.transactionally).flatMap{
       case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None).map(_.head)
