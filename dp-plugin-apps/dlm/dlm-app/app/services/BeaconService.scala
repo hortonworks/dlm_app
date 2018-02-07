@@ -309,8 +309,8 @@ class BeaconService @Inject()(
             if (failedRequest.isDefined) {
               val failedError = failedRequest.get.left.get.errors.head
               val failedErrorMsg = failedError.message
-              val errorCode = failedError.code
-              p.success(Left(BeaconApiErrors(errorCode.toInt, None, None, Some(failedErrorMsg))))
+              val errorCode = failedError.status
+              p.success(Left(BeaconApiErrors(errorCode, None, None, Some(failedErrorMsg))))
             } else {
               val dpClusterARightProj = dpClusterA.right.get
               val dpClusterBRightProj = dpClusterB.right.get
@@ -339,8 +339,8 @@ class BeaconService @Inject()(
           }
         } else {
           val failedErrorMsg = futureFailedList.head.left.get.errors.head.message
-          val errorCode = futureFailedList.head.left.get.errors.head.code
-          p.success(Left(BeaconApiErrors(errorCode.toInt, None, None, Some(failedErrorMsg))))
+          val errorCode = futureFailedList.head.left.get.errors.head.status
+          p.success(Left(BeaconApiErrors(errorCode, None, None, Some(failedErrorMsg))))
         }
       }
     }

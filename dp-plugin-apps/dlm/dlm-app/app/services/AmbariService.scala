@@ -165,14 +165,14 @@ class AmbariService @Inject()(
           adminProperties match {
             case None =>
               p.success(
-                Left(Errors(Seq(Error(BAD_GATEWAY.toString,
+                Left(Errors(Seq(Error(BAD_GATEWAY,
                                       AmbariService.adminPropertiesErrorMsg)))))
             case Some(ap) =>
               ap.properties.as[RangerProperties].policymgr_external_url match {
                 case None =>
                   p.success(
                     Left(
-                      Errors(Seq(Error(BAD_GATEWAY.toString,
+                      Errors(Seq(Error(BAD_GATEWAY,
                                        AmbariService.policymgrUrlErrorMsg)))))
                 case Some(policymgr_external_url) =>
                   val clusterName = ap.Config.cluster_name
@@ -190,7 +190,7 @@ class AmbariService @Inject()(
                     if (futureList.exists(_.isLeft)) {
                       p.success(
                         Left(Errors(
-                          Seq(Error(BAD_GATEWAY.toString,
+                          Seq(Error(BAD_GATEWAY,
                                     AmbariService.rangerPolicyNameErrorMsg)))))
                     } else {
                       val rangerHdfsSecurityConfigs
@@ -406,7 +406,7 @@ class AmbariService @Inject()(
       implicit token: Option[HJwtToken])
     : Future[Either[Errors, Ambari.ServiceConfigurations]] = {
     val p: Promise[Either[Errors, Ambari.ServiceConfigurations]] = Promise()
-    val configError = Errors(Seq(Error("500", "no configs")))
+    val configError = Errors(Seq(Error(500, "no configs")))
 
     getServiceConfigDetails(clusterId, AmbariService.YARN_SERVICE_NAME).map {
       case Left(errors) => p.success(Left(errors))
@@ -524,12 +524,12 @@ class AmbariService @Inject()(
             val errorMsg =
               s"$configName is not found in $configType for $serviceName"
             Logger.error(errorMsg)
-            Left(Errors(Seq(Error("500", errorMsg))))
+            Left(Errors(Seq(Error(500, errorMsg))))
         }
       case None =>
         val errorMsg = s"$configType is not associated with $serviceName"
         Logger.error(errorMsg)
-        Left(Errors(Seq(Error("500", errorMsg))))
+        Left(Errors(Seq(Error(500, errorMsg))))
     }
 
   }
