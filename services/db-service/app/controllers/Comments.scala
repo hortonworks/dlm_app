@@ -52,17 +52,12 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
 
   }
 
-  def getCommentByObjectRef = Action.async { req =>
-    val objectId = req.getQueryString("objectId")
-    val objectType  = req.getQueryString("objectType")
+  def getCommentByObjectRef(objectId: Long, objectType: String) = Action.async { req =>
     Logger.info("db-service Comments Controller: Received get comment request")
-    if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
-    else{
-      commentRepo.findByObjectRef(objectId.get.toLong,objectType.get,getPaginatedQuery(req))
-        .map{ commentswithuser =>
-          success(commentswithuser)
-        }.recoverWith(apiError)
-    }
+    commentRepo.findByObjectRef(objectId,objectType,getPaginatedQuery(req))
+      .map{ commentswithuser =>
+        success(commentswithuser)
+      }.recoverWith(apiError)
   }
 
   def delete(objectId: Long, objectType: String) = Action.async { req =>
@@ -71,13 +66,12 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
   }
 
-  def deleteById(id: String) = Action.async { req =>
+  def deleteById(id: String, userId: Long) = Action.async { req =>
     Logger.info("db-service Comments controller:  Received delete comment request")
-    val userId = req.getQueryString("userId")
-    if(userId.isEmpty || !isNumeric(userId.get) || !isNumeric(id)) Future.successful(BadRequest)
+    if(!isNumeric(id)) Future.successful(BadRequest)
     else{
       val commentId = id.toLong
-      val futureId = commentRepo.deleteById(commentId, userId.get.toLong)
+      val futureId = commentRepo.deleteById(commentId, userId)
       futureId.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
     }
   }

@@ -74,25 +74,18 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
   ) tupled
 
   def getByObjectRef = Action.async { req =>
-    val objectId = req.getQueryString("objectId")
-    val objectType  = req.getQueryString("objectType")
-    val objectTypes = config.getStringSeq("dp.comments.object.types").getOrElse(Nil)
-    Logger.info("dp-app Comments Controller: Received get comment request")
-    if(objectId.isEmpty || objectType.isEmpty || !objectTypes.contains(objectType.get)) Future.successful(BadRequest)
-    else{
-      commentService
-        .getByObjectRef(req.rawQueryString)
-        .map { comments =>
-          Ok(Json.toJson(comments))
-        }
-        .recover(apiError)
-    }
+    commentService
+      .getByObjectRef(req.rawQueryString)
+      .map { comments =>
+        Ok(Json.toJson(comments))
+      }
+      .recover(apiError)
   }
 
   private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
 
   def deleteCommentById(commentId: String) = AuthenticatedAction.async { req =>
-    Logger.info("dp-app Comments Controller: Received delete comment request")
+    Logger.info("Comments Controller: Received delete comment request")
     val loggedinUser = req.user.id.get
     commentService.deleteById(commentId,loggedinUser)
       .map{ msg =>
