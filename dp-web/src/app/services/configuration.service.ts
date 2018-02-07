@@ -22,7 +22,7 @@ import {LDAPProperties, LDAPUpdateProperties} from '../models/ldap-properties';
 export class ConfigurationService {
   uri = 'api/init';
   knowConfigUri = 'api/knox';
-  configUri = '/api/config';
+  configUri = 'api/config';
 
   constructor(private http:Http) { }
 
