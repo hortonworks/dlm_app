@@ -219,3 +219,9 @@ POST        /comments                                                       cont
 GET         /comments                                                       controllers.Comments.getCommentByObjectRef
 DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
 PATCH       /comments/:id                                                   controllers.Comments.update(id: String)
+
+#ratings api
+POST        /ratings                                                        controllers.Ratings.add
+GET         /ratings                                                        controllers.Ratings.get
+GET         /ratings/actions/average                                        controllers.Ratings.getAverage
+PATCH       /ratings/:id                                                    controllers.Ratings.update(id: String)

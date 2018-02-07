@@ -46,14 +46,6 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
-  @Named("commentService")
-  def provideCommentService(implicit ws: WSClient, configuration: Configuration): CommentService = {
-    new CommentServiceImpl(configuration.underlying)
-  }
-
-
-  @Provides
-  @Singleton
   @Named("dataSetService")
   def provideDataSetService(implicit ws: WSClient, configuration: Configuration): DataSetService = {
     new DataSetServiceImpl(configuration.underlying)

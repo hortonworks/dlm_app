@@ -207,8 +207,6 @@ object Webservice {
 
   trait CommentService extends DbClientService {
 
-    //def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
-
     def add(comment: Comment): Future[CommentWithUser]
 
     def getByObjectRef(queryString: String): Future[Seq[CommentWithUser]]
@@ -217,6 +215,18 @@ object Webservice {
 
     def update(commentText: String, commentId: String): Future[CommentWithUser]
 
+
+  }
+
+  trait RatingService extends DbClientService {
+
+    def add(rating: Rating): Future[Rating]
+
+    def get(queryString: String, userId: Long): Future[Rating]
+
+    def getAverage(queryString: String): Future[JsObject]
+
+    def update(ratingId: String, ratingUserTuple: (Float, Long)): Future[Rating]
 
   }
 
