@@ -29,7 +29,7 @@ trait BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Entities.ErrorType._
 
-  def errors(e: Throwable,errorType: ErrorType = ErrorType.General) = Json.toJson(e.asError(e.getMessage,errorType))
+  def errors(e: Throwable,errorType: ErrorType = ErrorType.General, status: Int = 500) = Json.toJson(e.asError(status, errorType))
 
   def notFound = Json.obj("error" -> Json.obj("message" -> "Not found", "trace" -> ""))
 

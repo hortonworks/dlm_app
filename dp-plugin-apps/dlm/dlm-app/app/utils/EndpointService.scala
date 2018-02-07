@@ -191,17 +191,17 @@ class EndpointService @Inject()(
                 val errorMsg =
                   s"$configName is not found in $configType for $serviceName"
                 Logger.error(errorMsg)
-                Left(Errors(Seq(Error("500", errorMsg))))
+                Left(Errors(Seq(Error(500, errorMsg))))
             }
           case None =>
             val errorMsg = s"$configType is not associated with $serviceName"
             Logger.error(errorMsg)
-            Left(Errors(Seq(Error("500", errorMsg))))
+            Left(Errors(Seq(Error(500, errorMsg))))
         }
       case None =>
         val errorMsg = s"configuration blob is not available for $serviceName"
         Logger.error(errorMsg)
-        Left(Errors(Seq(Error("500", errorMsg))))
+        Left(Errors(Seq(Error(500, errorMsg))))
     }
   }
 

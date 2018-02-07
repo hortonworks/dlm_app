@@ -49,7 +49,7 @@ class AssetWorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToAssets(res: WSResponse): Either[Errors, Seq[DataAsset]] = {
     res.status match {
       case 200 => extractEntity[Seq[DataAsset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[DataAsset].get })
-      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case _ => mapErrors(res)
     }
   }

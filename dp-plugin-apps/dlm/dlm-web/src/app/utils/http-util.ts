@@ -29,7 +29,8 @@ export const getError = (errResponse: HttpErrorResponse): APIErrorDetails => {
   const message = (errResponse.error.message || 'common.errors.unknown').replace('Failed with ', '');
   let error;
   try {
-    error = (JSON.parse(message) as APIError).error;
+    const apiError = JSON.parse(message) as APIError;
+    error = 'error' in apiError ? apiError.error : apiError;
   } catch (e) {
     error = { message };
   }

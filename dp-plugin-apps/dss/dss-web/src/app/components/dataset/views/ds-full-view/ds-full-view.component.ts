@@ -54,6 +54,7 @@ export class DsFullView implements OnInit {
   }
 
   private onEdit(action: AssetListActionsEnum) {
+    if(action !== AssetListActionsEnum.EDIT) return;
     this.router.navigate(['dss/collections', this.dsModel.id, 'edit']);
   }
 

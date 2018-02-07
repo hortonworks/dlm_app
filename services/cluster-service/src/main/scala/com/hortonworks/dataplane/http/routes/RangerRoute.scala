@@ -79,7 +79,7 @@ class RangerRoute @Inject()(
                   case Failure(th) =>
                     th match {
                       case th: ServiceNotFound =>
-                        complete(StatusCodes.NotFound, errors(th))
+                        complete(StatusCodes.NotFound, errors(th, status = 404))
                       case _ =>
                         complete(StatusCodes.InternalServerError, errors(th))
                     }
@@ -113,7 +113,7 @@ class RangerRoute @Inject()(
                 case Failure(th) =>
                   th match {
                     case th: ServiceNotFound =>
-                      complete(StatusCodes.NotFound, errors(th))
+                      complete(StatusCodes.NotFound, errors(th, status = 404))
                     case _ =>
                       complete(StatusCodes.InternalServerError, errors(th))
                   }

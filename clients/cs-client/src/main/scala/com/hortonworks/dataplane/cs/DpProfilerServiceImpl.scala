@@ -28,16 +28,16 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       case 200 =>  Right((res.json \ "results" \ "data").as[JsObject])
       case 404 => Left(
         Errors(Seq(
-          Error("404", "Not found"))))
+          Error(404, "Not found"))))
       case 405 => Left(
         Errors(Seq(
-          Error("405", (res.json \ "errors" \\ "code").head.toString()))))
+          Error(405, (res.json \ "errors" \\ "code").head.toString()))))
       case 503 => Left(
         Errors(Seq(
-          Error("503", (res.json \ "error" \ "message").toString()))))
+          Error(503, (res.json \ "error" \ "message").toString()))))
       case _ => Left(
         Errors(Seq(
-          Error(res.status.toString(), (res.json \ "error" \ "message").toString()))))
+          Error(res.status, (res.json \ "error" \ "message").toString()))))
 
         //mapErrors(res)
     }

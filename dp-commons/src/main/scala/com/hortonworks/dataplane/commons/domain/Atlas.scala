@@ -49,7 +49,7 @@ object Atlas {
     def getEntity() = {
       val entityAttr: Map[String,String] = attributes.fields
         .filter(e => requiredKeySet.contains(e._1))
-        .map(e => (e._1, try e._2.as[String] catch{case a => e._2.toString()})).toMap
+        .map(e => (e._1, try e._2.as[String] catch{case a: Throwable => e._2.toString()})).toMap
       Entity(typeName,
         Some(entityAttr),
         guid, status, entityAttr.get("name"), None, None, None)

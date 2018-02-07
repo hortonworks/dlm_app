@@ -34,13 +34,13 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
   val HEADER_FOR_GATEWAY_USER_CTX = "X-DP-User-Info"
 
   private def handleErrors(errors: Errors) = {
-    if (errors.errors.exists(_.code == "400"))
+    if (errors.errors.exists(_.status == 400))
       BadRequest(Json.toJson(errors))
-    else if (errors.errors.exists(_.code == "403"))
+    else if (errors.errors.exists(_.status == 403))
       Forbidden(Json.toJson(errors))
-    else if (errors.errors.exists(_.code == "404"))
+    else if (errors.errors.exists(_.status == 404))
       NotFound(Json.toJson(errors))
-    else if (errors.errors.exists(_.code == "409"))
+    else if (errors.errors.exists(_.status == 409))
       Conflict(Json.toJson(errors))
     else
       InternalServerError(Json.toJson(errors))
