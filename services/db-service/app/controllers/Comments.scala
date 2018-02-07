@@ -65,15 +65,10 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     }
   }
 
-  def delete = Action.async { req =>
-    val objectId = req.getQueryString("objectId")
-    val objectType  = req.getQueryString("objectType")
+  def delete(objectId: Long, objectType: String) = Action.async { req =>
     Logger.info("db-service Comments Controller: Received delete comment by object reference request")
-    if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
-    else{
-      val numOfRowsDel = commentRepo.deleteByObjectRef(objectId.get.toLong,objectType.get)
-      numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
-    }
+    val numOfRowsDel = commentRepo.deleteByObjectRef(objectId,objectType)
+    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
   }
 
   def deleteById(id: String) = Action.async { req =>
