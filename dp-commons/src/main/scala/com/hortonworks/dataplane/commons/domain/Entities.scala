@@ -36,10 +36,10 @@ object Entities {
     val General, Network, Database, Cluster, Ambari,Url = Value
 
     implicit class WrappedThrowable(th: Throwable) {
-      def asError(code: String, errorType: ErrorType):Errors =
+      def asError(status: Int, errorType: ErrorType):Errors =
         Errors(
           Seq(
-            Error(code, ExceptionUtils.getStackTrace(th), errorType.toString)))
+            Error(status, ExceptionUtils.getStackTrace(th), errorType.toString)))
     }
   }
 
@@ -50,16 +50,14 @@ object Entities {
 
   case class HJwtToken(token: String)
 
-  case class Error(code: String,
-                   message: String,
-                   errorType: String = ErrorType.General.toString)
+  case class Error(status: Int, message: String, errorType: String = ErrorType.General.toString)
 
   case class RestApiException(respCode : Int,
-                              errorsObj: Errors) extends Exception(errorsObj.firstMessage)
+                              errorsObj: Errors) extends Exception(errorsObj.firstMessage.toString)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
-    def firstMessage = errors.headOption.map(_.code).getOrElse("Unknown Error")
+    def firstMessage: Int = errors.headOption.map(_.status).getOrElse(500)
   }
 
   // Pagination

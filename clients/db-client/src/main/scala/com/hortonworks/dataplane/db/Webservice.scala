@@ -28,7 +28,7 @@ object Webservice {
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
     protected  def createEmptyErrorResponse = {
-      Left(Errors(Seq(Error(code="404",message = "No response from server"))))
+      Left(Errors(Seq(Error(status=404, message = "No response from server"))))
     }
     
     protected def extractEntity[T](res: WSResponse,
@@ -55,7 +55,7 @@ object Webservice {
           throw new RestApiException(res.status, e.get)
         case _ =>
           val msg = if(Strings.isNullOrEmpty(res.body)) res.statusText else  res.body
-          throw new RestApiException(res.status, Errors(Seq(Error(res.status.toString, msg, ErrorType.General.toString))))
+          throw new RestApiException(res.status, Errors(Seq(Error(res.status, msg, ErrorType.General.toString))))
       }
     }
 

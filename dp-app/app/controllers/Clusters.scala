@@ -179,7 +179,7 @@ class Clusters @Inject()(
             clusterHealthService
               .getClusterHealthData(clusterId.toLong, dpClusterId)
           case false =>
-            Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
+            Future.successful(Left(Errors(Seq(Error(500, "Sync failed")))))
         }
         .map {
           case Left(errors) => InternalServerError(Json.toJson(errors))
@@ -238,7 +238,7 @@ class Clusters @Inject()(
         hostsResponse <- clusterHostsService.getHostsByCluster(clusterId)
         hosts <- {
           if (hostsResponse.isLeft)
-            Future.failed(new Exception(hostsResponse.left.get.firstMessage))
+            Future.failed(new Exception(hostsResponse.left.get.firstMessage.toString))
           else
             Future.successful(hostsResponse.right.get)
         }
