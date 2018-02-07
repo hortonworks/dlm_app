@@ -55,7 +55,7 @@ object Webservice {
           throw new RestApiException(res.status, e.get)
         case _ =>
           val msg = if(Strings.isNullOrEmpty(res.body)) res.statusText else  res.body
-          throw new RestApiException(res.status, Errors(Seq(Error(res.status, msg, ErrorType.General.toString))))
+          throw new RestApiException(res.status, Errors(Seq(Error(res.status, msg, code = "database.generic"))))
       }
     }
 

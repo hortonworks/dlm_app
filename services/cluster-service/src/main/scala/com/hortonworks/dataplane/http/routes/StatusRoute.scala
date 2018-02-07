@@ -22,7 +22,7 @@ import com.google.common.annotations.VisibleForTesting
 import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, HJwtToken}
 import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
@@ -316,15 +316,15 @@ class StatusRoute @Inject()(val ws: WSClient,
                 e match {
                   case c: ConnectionError =>
                     complete(StatusCodes.InternalServerError,
-                             errors(c, ErrorType.Network))
+                             errors(500, "cluster.ambari.network", "Unable to connect to Ambari.", c))
                   case c: UrlError =>
                     complete(StatusCodes.InternalServerError,
-                             errors(c, ErrorType.Url))
+                             errors(500, "cluster.ambari.uri", "Invalid Ambari URI.", c))
                   case c: AmbariError =>
                     complete(StatusCodes.InternalServerError,
-                             errors(c, ErrorType.Ambari))
+                             errors(500, "cluster.ambari.application", "Error fetching information from Ambari.", c))
                   case _ =>
-                    complete(StatusCodes.InternalServerError, errors(e))
+                    complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "Generic error while communicating with Ambari.", e))
                 }
 
             }

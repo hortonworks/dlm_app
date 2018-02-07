@@ -51,8 +51,8 @@ class DpProfilerRoute @Inject()(
             case 404 => complete(StatusCodes.NotFound, notFound)
           }
           case Failure(th) => th match {
-            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
-            case _ => complete(StatusCodes.InternalServerError, errors(th))
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+            case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
           }
         }
       }
@@ -72,8 +72,8 @@ class DpProfilerRoute @Inject()(
                 case _ => complete(res.status)
               }
               case Failure(th) => th match {
-                case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
-                case _ => complete(StatusCodes.InternalServerError, errors(th))
+                case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+                case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
               }
             }
           }
@@ -90,8 +90,8 @@ class DpProfilerRoute @Inject()(
             case 404 => complete(StatusCodes.NotFound, notFound)
           }
           case Failure(th) => th match {
-            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
-            case _ => complete(StatusCodes.InternalServerError, errors(th))
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+            case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
           }
         }
       }
@@ -107,8 +107,8 @@ class DpProfilerRoute @Inject()(
             case _ => complete(res.status)
           }
           case Failure(th) => th match {
-            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
-            case _ => complete(StatusCodes.InternalServerError, errors(th))
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+            case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
           }
         }
       }
@@ -125,8 +125,8 @@ class DpProfilerRoute @Inject()(
               case _ => complete(StatusCodes.InternalServerError, badRequest)
             }
             case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
-              case _ => complete(StatusCodes.InternalServerError, errors(th))
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+              case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
             }
           }
         }
@@ -146,8 +146,8 @@ class DpProfilerRoute @Inject()(
               case _ => complete(StatusCodes.InternalServerError, serverError)
             }
             case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
-              case _ => complete(StatusCodes.InternalServerError, errors(th))
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+              case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
             }
           }
         }
@@ -166,8 +166,8 @@ class DpProfilerRoute @Inject()(
               case _ => complete(StatusCodes.InternalServerError, serverError)
             }
             case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
-              case _ => complete(StatusCodes.InternalServerError, errors(th))
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+              case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
             }
           }
         }
