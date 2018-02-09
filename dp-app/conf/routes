@@ -17,7 +17,7 @@
 GET           /health                                                controllers.Status.health
 GET           /metrics                                               controllers.Status.metrics
 
-GET           /api/config/ga-tracking-status                         controllers.Config.getTrackingStatus()
+GET           /api/ga/properties                                     controllers.Config.getGAProperies()
 GET           /api/config/:key                                       controllers.Config.getConfig(key: String)
 
 # identity calls

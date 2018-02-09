@@ -48,7 +48,7 @@ public class AuthorizationPreFilter  extends ZuulFilter {
     }
     String serviceId = context.get(SERVICE_ID_KEY).toString();
 
-    if ((serviceId.equals(Constants.DPAPP) && context.getRequest().getServletPath().endsWith(Constants.KNOX_CONFIG_PATH)) || context.getRequest().getServletPath().endsWith(Constants.GA_TRACKING_STATUS_PATH)){
+    if ((serviceId.equals(Constants.DPAPP) && context.getRequest().getServletPath().endsWith(Constants.KNOX_CONFIG_PATH)) || context.getRequest().getServletPath().endsWith(Constants.GA_PROPERTIES_PATH)){
       // FIXME: possible security risk
       return false;
     }

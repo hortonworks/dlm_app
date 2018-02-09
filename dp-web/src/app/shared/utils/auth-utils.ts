@@ -15,7 +15,7 @@ export class AuthUtils {
 
   private static user;
   private static validUser;
-  private static gaTrackingEnabled = true;
+  private static gaTrackingEnabled = false;
 
   public static loggedIn = new Subject<boolean>();
   public static loggedIn$ =  AuthUtils.loggedIn.asObservable();

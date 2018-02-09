@@ -76,9 +76,9 @@ export function init_app(userService: UserService) {
 
 export function getGATrackingStatus(configService: ConfigurationService) {
   return () => new Promise((resolve, reject) => {
-    configService.getGATrackingStatus()
-      .subscribe(status => {
-        AuthUtils.setGATrackingStatus(status as boolean);
+    configService.getGAProperties()
+      .subscribe((gaProperties:any) => {
+        AuthUtils.setGATrackingStatus(gaProperties.enabled);
         resolve(true)
       }, (error) => {
         resolve(false)
