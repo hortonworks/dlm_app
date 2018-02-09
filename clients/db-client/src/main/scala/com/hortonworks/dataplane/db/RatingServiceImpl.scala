@@ -71,7 +71,7 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
       .delete()
       .map{ res =>
         res.status match {
-          case 200 => (res.json \ "results").validate[String].get
+          case 200 => (res.json \ "results").as[String]
           case _ =>
             mapResponseToError(res)
         }
