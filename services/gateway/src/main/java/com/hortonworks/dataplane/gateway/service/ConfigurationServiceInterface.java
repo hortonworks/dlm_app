@@ -22,9 +22,6 @@ public interface ConfigurationServiceInterface {
   @RequestMapping(method = RequestMethod.GET, value = "/api/knox/status")
   KnoxConfigurationResponse getKnoxStatus();
 
-  @RequestMapping(method = RequestMethod.GET, value = "/api/config/ga-tracking-status")
-  String getGATrackingStatus();
-
   @RequestMapping(method = RequestMethod.GET, value = "/api/config/{key}")
   String getTokenValidity(@PathVariable("key") String key);
 
