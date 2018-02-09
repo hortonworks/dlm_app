@@ -237,7 +237,7 @@ class DataSets @Inject()(
                     .map {
                       case Left(errors) =>{
                         errors.firstMessage match {
-                          case "409" => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
+                          case 409 => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
                           case _ => InternalServerError(Json.toJson(errors))
                         }
                       }
@@ -253,7 +253,7 @@ class DataSets @Inject()(
                         } yield results)
                           .onComplete {
                             case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
-                            case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+                            case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.status} ${Json.toJson(errors)}")
                             case Failure(th) => Logger.error(th.getMessage, th)
                           }
                         Ok(
@@ -305,7 +305,7 @@ class DataSets @Inject()(
         .getRichDatasetById(id.toLong,req.user.id.get)
         .map {
           case Left(errors)
-            if errors.errors.size > 0 && errors.errors.head.code == "404" =>
+            if errors.errors.size > 0 && errors.errors.head.status == 404 =>
             NotFound
           case Left(errors) =>
             InternalServerError(Json.toJson(errors))
@@ -333,7 +333,7 @@ class DataSets @Inject()(
       .retrieve(dataSetId)
       .map {
         case Left(errors)
-            if errors.errors.size > 0 && errors.errors.head.code == "404" =>
+            if errors.errors.size > 0 && errors.errors.head.status == 404 =>
           NotFound
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
@@ -483,7 +483,7 @@ class DataSets @Inject()(
           Future.successful(true)
         }
         case Left(errors) => {
-          Logger.error(s"Delete Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+          Logger.error(s"Delete Profiler Failed with ${errors.errors.head.status} ${Json.toJson(errors)}")
           Future.successful(false)
         }
       }

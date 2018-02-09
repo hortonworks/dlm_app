@@ -58,9 +58,11 @@ export class HttpUtil {
     let message;
     if (error._body) {
       let errorJSON = JSON.parse(error._body);
-      if((Array.isArray(errorJSON.errors) && HttpUtil.isValidErrArray(errorJSON)) || (Array.isArray(errorJSON.errorsObj.errors) && HttpUtil.isValidErrArray(errorJSON.errorsObj))){
-        let errObject = (Array.isArray(errorJSON.errors) ? errorJSON : errorJSON.errorsObj)
-        message = HttpUtil.getMsgsFromErrArray(errObject);
+
+      if(Array.isArray(errorJSON.errors) && errorJSON.errors[0] && errorJSON.errors[0].status && errorJSON.errors[0].message && errorJSON.errors[0].errorType) {
+        message = errorJSON.errors.filter(err => {return (err.status && err.message && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
+      } else if(errorJSON.error && errorJSON.error.message){
+        message = errorJSON.error.message;
       }else if(Array.isArray(errorJSON)){
         message = errorJSON.map(err => {return HttpUtil.truncateErrorMessage(err.message)}).join(', ')
       }else if(errorJSON.message){
@@ -76,17 +78,13 @@ export class HttpUtil {
   }
 
   private static isValidErrArray(errObject) {
-    return errObject.errors[0] && errObject.errors[0].code && errObject.errors[0].errorType
+    return errObject.errors[0] && errObject.errors[0].status && errObject.errors[0].errorType
   }
   private static getMsgsFromErrArray(errorObj){
-    return errorObj.errors.filter(err => {return (err.code && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
+    return errorObj.errors.filter(err => {return (err.status && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
   }
   private static processErrorMessage(error:CustomError){
-    if(error.code.length > 16){
-      return error.code;
-    }
-    let errorMsg = error.code+"\n"+error.message;
-    return HttpUtil.truncateErrorMessage(errorMsg);
+    return HttpUtil.truncateErrorMessage(error.message);
   }
 
   private static truncateErrorMessage(errorMessage: String){

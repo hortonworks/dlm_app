@@ -49,7 +49,7 @@ export class PolicyEffects {
           new RouterActions.Go({path: ['/policies']}),
           resetFormValue(POLICY_FORM_ID)
         ])
-        .catch(err => Observable.of(createPolicyFail(err.json(), payload.meta)));
+        .catch(err => Observable.of(createPolicyFail(err, payload.meta)));
     });
 
   @Effect()

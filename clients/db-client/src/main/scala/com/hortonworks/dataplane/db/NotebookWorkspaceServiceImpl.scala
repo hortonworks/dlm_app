@@ -67,7 +67,7 @@ class NotebookWorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToNotebooks(res: WSResponse): Either[Errors, Seq[NotebookWorkspace]] = {
     res.status match {
       case 200 => extractEntity[Seq[NotebookWorkspace]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[NotebookWorkspace].get })
-      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case _ => mapErrors(res)
     }
   }
@@ -75,7 +75,7 @@ class NotebookWorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToNotebook(res: WSResponse): Either[Errors, NotebookWorkspace] = {
     res.status match {
       case 200 => Right((res.json \ "results" \\ "data").head.validate[NotebookWorkspace].get)
-      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case _ => mapErrors(res)
     }
   }

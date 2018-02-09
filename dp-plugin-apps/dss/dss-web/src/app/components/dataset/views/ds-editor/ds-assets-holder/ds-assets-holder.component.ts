@@ -9,12 +9,12 @@
  *
  */
 
-import {Component, EventEmitter, Input, OnInit, Output, SimpleChange} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild} from "@angular/core";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
 import {RichDatasetService} from "../../../services/RichDatasetService";
 import {
   AssetListActionsEnum, AssetSetQueryFilterModel,
-  AssetSetQueryModel
+  AssetSetQueryModel, DsAssetList
 } from "../../ds-assets-list/ds-assets-list.component";
 
 @Component({
@@ -34,6 +34,8 @@ export class DsAssetsHolder {
   
   @Output('onNext') nextEE: EventEmitter<void> = new EventEmitter<void>();
   @Output('onCancel') cancelEE: EventEmitter<void> = new EventEmitter<void>();
+
+  @ViewChild("dsAssetList") dsAssetList: DsAssetList;
 
   constructor(private richDatasetService: RichDatasetService){}
 
@@ -61,7 +63,10 @@ export class DsAssetsHolder {
       this.showPopup = true;
     }
     if (action == AssetListActionsEnum.REMOVE) {
-      this.actionRemoveAll();
+      if(this.dsAssetList.checkedAllState())
+        this.actionRemoveAll();
+      else 
+        this.actionRemoveSelected(this.dsAssetList.selExcepList)
     }
   }
 
@@ -73,6 +78,15 @@ export class DsAssetsHolder {
         this.dsModel = rData;
         // this.assetSetQueryModelsForAddition.splice(0);
         // this.dsModel.counts=null;
+      })
+  }
+  actionRemoveSelected (ids:string[]) {
+    console.log("Remove selected called!!!")
+    if(!ids.length) return console.log("cannot remove without selection")
+    this.richDatasetService
+      .deleteSelectedAssets(this.dsModel.id, ids)
+      .subscribe(rData => {
+        this.dsModel = rData;
       })
   }
 

@@ -53,7 +53,7 @@ class ClusterHealthService @Inject()(
 
     chd.map(x => Right(x)).recoverWith {
       case e: Exception =>
-        Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+        Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
     }
 
   }

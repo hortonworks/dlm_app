@@ -51,7 +51,7 @@ class DpProfilerRoute @Inject()(
             case 404 => complete(StatusCodes.NotFound, notFound)
           }
           case Failure(th) => th match {
-            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
             case _ => complete(StatusCodes.InternalServerError, errors(th))
           }
         }
@@ -72,7 +72,7 @@ class DpProfilerRoute @Inject()(
                 case _ => complete(res.status)
               }
               case Failure(th) => th match {
-                case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+                case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
                 case _ => complete(StatusCodes.InternalServerError, errors(th))
               }
             }
@@ -90,7 +90,7 @@ class DpProfilerRoute @Inject()(
             case 404 => complete(StatusCodes.NotFound, notFound)
           }
           case Failure(th) => th match {
-            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
             case _ => complete(StatusCodes.InternalServerError, errors(th))
           }
         }
@@ -107,7 +107,7 @@ class DpProfilerRoute @Inject()(
             case _ => complete(res.status)
           }
           case Failure(th) => th match {
-            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
             case _ => complete(StatusCodes.InternalServerError, errors(th))
           }
         }
@@ -125,7 +125,7 @@ class DpProfilerRoute @Inject()(
               case _ => complete(StatusCodes.InternalServerError, badRequest)
             }
             case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
               case _ => complete(StatusCodes.InternalServerError, errors(th))
             }
           }
@@ -146,7 +146,7 @@ class DpProfilerRoute @Inject()(
               case _ => complete(StatusCodes.InternalServerError, serverError)
             }
             case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
               case _ => complete(StatusCodes.InternalServerError, errors(th))
             }
           }
@@ -166,7 +166,7 @@ class DpProfilerRoute @Inject()(
               case _ => complete(StatusCodes.InternalServerError, serverError)
             }
             case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th, status = 405))
               case _ => complete(StatusCodes.InternalServerError, errors(th))
             }
           }

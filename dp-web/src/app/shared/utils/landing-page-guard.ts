@@ -39,7 +39,11 @@ export class LandingPageGuard implements CanActivate {
     observer.next(canActivate);
     observer.complete();
     if (route) {
-      this.router.navigate([route]);
+      if (this.router.config.filter(r => r.path === `/${route}`).length) {
+        this.router.navigate([route]);
+      } else {
+        window.location.pathname = route;
+      }
     }
   }
 }

@@ -65,7 +65,7 @@ class AmbariWebServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
         } else {
           Left(
             Errors(Seq(
-              Error("500", (response.json \ "error" \ "message").as[String]))))
+              Error(500, (response.json \ "error" \ "message").as[String]))))
         }
       }
   }

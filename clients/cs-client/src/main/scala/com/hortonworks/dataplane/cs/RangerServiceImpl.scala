@@ -29,7 +29,7 @@ class RangerServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
       case 200 =>  Right((res.json \ "results" \ "data").as[JsValue])
       case 404 => Left(
         Errors(Seq(
-          Error("404", (res.json \ "errors" \\ "code").head.toString()))))
+          Error(404, (res.json \ "errors" \\ "code").head.toString()))))
       case _ => mapErrors(res)
     }
   }

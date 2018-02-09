@@ -11,7 +11,7 @@
 
 package controllers
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, RestApiException}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, WrappedErrorException}
 import play.api.libs.json.Json
 import play.api.mvc.{Controller, Result}
 
@@ -20,13 +20,9 @@ trait JsonAPI extends Controller {
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   val apiError: PartialFunction[Throwable, Result] = {
-    case rae: RestApiException => new Status(rae.respCode)(Json.toJson(rae))
+    case rae: WrappedErrorException => Status(rae.error.status)(Json.toJson(rae))
     case e: Exception =>
-      InternalServerError(Json.toJson(wrapErrors("500",e.getMessage)))
-  }
-
-  private def wrapErrors(code: String, message: String): Errors = {
-    Errors(Seq(Error(code,message)))
+      InternalServerError(Json.toJson(Errors(Seq(Error(500, e.getMessage)))))
   }
 
 

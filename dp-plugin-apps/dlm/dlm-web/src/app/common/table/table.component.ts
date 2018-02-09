@@ -92,6 +92,11 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() scrollbarH = false;
   @Input() reorderable = true;
   @Input() count = 0;
+  /**
+   * `body` or ``
+   * @type {string}
+   */
+  @Input() footerDropdownContainer = '';
 
   /**
    * Rows count before any filter is applied
@@ -289,7 +294,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   ngOnChanges(changes) {
     if (changes.rows) {
       const { firstChange, currentValue, previousValue } = changes.rows;
-      if (!firstChange && currentValue && previousValue && currentValue.length < previousValue.length) {
+      if (!firstChange && currentValue && previousValue && currentValue.length < this.table.offset + this.table.limit) {
         this.table.offset = 0;
       }
     }

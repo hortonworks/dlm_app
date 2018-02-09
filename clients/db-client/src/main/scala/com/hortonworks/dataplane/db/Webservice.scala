@@ -28,7 +28,7 @@ object Webservice {
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
     protected  def createEmptyErrorResponse = {
-      Left(Errors(Seq(Error(code="404",message = "No response from server"))))
+      Left(Errors(Seq(Error(status=404, message = "No response from server"))))
     }
     
     protected def extractEntity[T](res: WSResponse,
@@ -52,10 +52,10 @@ object Webservice {
 
       errorsObj match {
         case Success(e :JsSuccess[Errors]) =>
-          throw new RestApiException(res.status, e.get)
+          throw new WrappedErrorException(e.get.errors.head)
         case _ =>
           val msg = if(Strings.isNullOrEmpty(res.body)) res.statusText else  res.body
-          throw new RestApiException(res.status, Errors(Seq(Error(res.status.toString, msg, ErrorType.General.toString))))
+          throw new WrappedErrorException(Error(res.status, msg, ErrorType.General.toString))
       }
     }
 
@@ -207,8 +207,6 @@ object Webservice {
 
   trait CommentService extends DbClientService {
 
-    //def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
-
     def add(comment: Comment): Future[CommentWithUser]
 
     def getByObjectRef(queryString: String): Future[Seq[CommentWithUser]]
@@ -217,6 +215,18 @@ object Webservice {
 
     def update(commentText: String, commentId: String): Future[CommentWithUser]
 
+
+  }
+
+  trait RatingService extends DbClientService {
+
+    def add(rating: Rating): Future[Rating]
+
+    def get(queryString: String, userId: Long): Future[Rating]
+
+    def getAverage(queryString: String): Future[JsObject]
+
+    def update(ratingId: String, ratingUserTuple: (Float, Long)): Future[Rating]
 
   }
 

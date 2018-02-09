@@ -144,9 +144,9 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
   }
 
   private def handleErrors(errors: Errors) = {
-    if (errors.errors.exists(_.code == "400"))
+    if (errors.errors.exists(_.status == "400"))
       BadRequest(Json.toJson(errors))
-    else if (errors.errors.exists(_.code == "403"))
+    else if (errors.errors.exists(_.status == "403"))
       Forbidden(Json.toJson(errors))
     else
       InternalServerError(Json.toJson(errors))

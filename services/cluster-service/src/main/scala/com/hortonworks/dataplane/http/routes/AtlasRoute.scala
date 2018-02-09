@@ -179,7 +179,7 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
       case Failure(th) =>
         th match {
           case exception: AtlasServiceException =>
-            complete(exception.getStatus.getStatusCode, errors(th))
+            complete(exception.getStatus.getStatusCode, errors(th, status = exception.getStatus.getStatusCode))
           case _ => complete(StatusCodes.InternalServerError, errors(th))
         }
     }

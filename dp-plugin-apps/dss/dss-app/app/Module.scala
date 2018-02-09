@@ -125,6 +125,13 @@ class Module extends AbstractModule {
   def provideCommentService(implicit ws: WSClient, configuration: Configuration): CommentService = {
     new CommentServiceImpl(configuration.underlying)
   }
+
+  @Provides
+  @Singleton
+  @Named("ratingService")
+  def provideRatingService(implicit ws: WSClient, configuration: Configuration): RatingService = {
+    new RatingServiceImpl(configuration.underlying)
+  }
 }
 
 @Singleton
