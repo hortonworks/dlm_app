@@ -55,9 +55,9 @@ export class CommentsComponent implements OnInit {
     this.objectType = this.route.snapshot.params['objectType'];
     this.objectId = this.route.parent.snapshot.params['id'];
     this.isRatingEnabled = this.route.snapshot.params['isRatingEnabled'];
+    this.getComments(true,this.offset,this.size);
     this.userRating.rating =0;
     this.getRating();
-    this.getComments(true);
     this.route.queryParams.subscribe((params) => {
       this.returnURl = params.returnURl;
     });
@@ -119,10 +119,10 @@ export class CommentsComponent implements OnInit {
     return totalVotes+ " votes";
   }
 
-  getComments(refreshScreen: boolean) {
+  getComments(refreshScreen: boolean, offset:number, size: number) {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;
-    this.commentService.getByObjectRef(this.objectId,this.objectType,this.offset,this.size).subscribe(comments =>{
+    this.commentService.getByObjectRef(this.objectId,this.objectType,offset,size).subscribe(comments =>{
         this.commentWithUsers = this.offset === 0 ? comments : this.commentWithUsers.concat(comments);
         this.allCommentsLoaded = comments.length < this.size ? true : false;
         this.offset = this.offset + comments.length;
@@ -146,7 +146,7 @@ export class CommentsComponent implements OnInit {
       newCommentObject.createdBy = Number(AuthUtils.getUser().id);
       this.commentService.add(newCommentObject).subscribe(_ => {
         if(this.isEdgeInViewport()){
-          this.getComments(false);
+          this.getComments(false,this.offset,this.size);
         }else{
           this.newCommentsAvailable = true;
         }
@@ -162,8 +162,9 @@ export class CommentsComponent implements OnInit {
   }
   onDeleteComment(commentWU: CommentWithUser) {
     this.commentService.deleteComment(commentWU.comment.id).subscribe(_ => {
+      let size = this.offset;
       this.resetOffset();
-      this.getComments(false);
+      this.getComments(false,this.offset,size);
     });
   }
 
@@ -211,7 +212,7 @@ export class CommentsComponent implements OnInit {
       clearTimeout(this.timer);
       this.timer = null;
       this.timer = setTimeout(() => {
-        this.getComments(false);
+        this.getComments(false,this.offset,this.size);
         this.newCommentsAvailable = false;
         this.timer = null;
       }, 1000);
