@@ -28,5 +28,6 @@ docker start dp-gateway >> install.log 2>&1 || \
         --network dp \
         --detach \
         --env "CONSUL_HOST=$CONSUL_HOST" \
+        --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
         --volume $(pwd)/certs:/dp-shared \
         hortonworks/dp-gateway:$VERSION
