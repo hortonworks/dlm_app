@@ -687,7 +687,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setupDestinationChanges(policyForm: FormGroup): void {
-    let skipFieldChange = this.formRestored;
+    let initialValueIsSet = false;
     const destinationChange$: Observable<any> = policyForm.valueChanges
       .pluck<any, any>('general', 'destination')
       .distinctUntilChanged(isEqual);
@@ -714,8 +714,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       if (yarnQueues && yarnQueues.length) {
         this.yarnQueueList = yarnQueues[0].children ? yarnQueues.reduce(createQueueList, []) :
           [makeQueueItem(yarnQueues[0].path)];
-        if (skipFieldChange) {
-          skipFieldChange = false;
+        if (!initialValueIsSet && this.formRestored) {
+          initialValueIsSet = true;
           return;
         }
         policyForm.patchValue({

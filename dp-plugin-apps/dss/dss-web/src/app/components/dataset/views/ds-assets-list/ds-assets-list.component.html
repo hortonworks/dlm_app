@@ -59,7 +59,7 @@
         <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>{{"pages.dataset.asset-search.noResultsMsg" | translate}}</span></div>
         <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>{{"common.loading" | translate}} ...</span></div>
         <div *ngIf="dsAssets.length">
-          <div class="listRow"  *ngFor="let asset of dsAssets;" [class.disabledRow]="asset.dsName">
+          <div class="listRow"  *ngFor="let asset of dsAssets;">
             <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox" [checked]="showChecked(asset)"
               (change)="onAssetSelectionChange(asset)"/></div>
             <div class="col starCol" *ngIf="showBelongsToColumn">{{asset.dsName?"*":"&nbsp;"}}</div>

@@ -21,12 +21,12 @@
     </div>
   </div>
   <div class="rating-section" *ngIf="isRatingEnabled">
-    <div class="rating-stars"><star-rating-comp [starType]="'svg'" [labelText]="'RATE THIS COLLECTION'" [labelPosition]="'top'" [size]="'medium'" [speed]="'noticeable'" [step]="0.5"
-                                 [showHalfStars]="true" [id]="'rating-id'" [hoverEnabled]="true"></star-rating-comp></div>
+    <div class="rating-stars"><star-rating-comp [starType]="'svg'" [labelText]="userRatingLabel" [labelPosition]="'top'" [size]="'medium'" [speed]="'noticeable'" [step]="0.5"
+                                 [showHalfStars]="true" [id]="'rating-id'" [rating]="userRating.rating" [hoverEnabled]="true" (onRatingChange)="onRatingChange($event)" (onHoverRatingChange)="onHoverRatingChange()" (mouseleave)="onMouseLeave()"></star-rating-comp></div>
     <div class="rating-class">
-      <div>0 votes</div>
+      <div>{{formatTotalVotes(totalVotes)}}</div>
       <div class="fixed-star">
-        <star-rating-comp [starType]="'svg'" [labelText]="'0'" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
+        <star-rating-comp [starType]="'svg'" [labelText]="averageRating" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
       </div>
     </div>
   </div>

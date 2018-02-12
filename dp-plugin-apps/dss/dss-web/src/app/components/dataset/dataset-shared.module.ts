@@ -24,12 +24,14 @@ import {DsNavResultViewer} from "./views/dashboard/ds-result-viewer/ds-result-vi
 import {DsRowProxy} from "./views/dashboard/ds-result-viewer/row-proxy/row-proxy.component";
 import {DsTileProxy} from "./views/dashboard/ds-result-viewer/tile-proxy/tile-proxy.component";
 import {NavTagPanel} from "./views/dashboard/nav-tag-panel/nav-tag-panel.component";
-import {DsAssetSearch} from "./views/ds-asset-search/ds-asset-search.component";
+import {DsAssetSearch_Old} from "./views/ds-asset-search/ds-asset-search.component";
+import {DsAssetSearch} from "./views/ds-asset-search-v2/ds-asset-search.component";
 import {AdvanceQueryEditor} from "./views/ds-asset-search/queryEditors/advance/advance-query-editor.component";
 import {QueryFilter} from "./views/ds-asset-search/queryEditors/advance/filter/filter.component";
 import {BasicQueryEditor} from "./views/ds-asset-search/queryEditors/basic/basic-query-editor.component";
 import {SearchWidget} from "./views/ds-asset-search/queryEditors/basic/search-widget/search-widget.component";
 import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
+import {DsAssetListStyle1} from "./views/ds-assets-list/styled/style1";
 import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holder.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
 import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.component";
@@ -60,6 +62,7 @@ import {DatasetTagService} from "app/services/tag.service";
 import {DataSetService} from '../../services/dataset.service';
 import {LakeService} from '../../services/lake.service';
 import {CommentService} from '../../services/comment.service';
+import {RatingService} from "../../services/rating.service";
 
 @NgModule({
   declarations: [
@@ -72,8 +75,10 @@ import {CommentService} from '../../services/comment.service';
     DsAssetsHolder,
     DsSummaryHolder,
     DsAssetList,
+    DsAssetListStyle1,
     DsRowProxy,
     DatasetDashboardComponent,
+    DsAssetSearch_Old,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,
@@ -118,6 +123,7 @@ import {CommentService} from '../../services/comment.service';
     DsAssetList,
     DsRowProxy,
     DatasetDashboardComponent,
+    DsAssetSearch_Old,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,
@@ -134,7 +140,8 @@ import {CommentService} from '../../services/comment.service';
     DatasetTagService,
     DataSetService,
     LakeService,
-    CommentService
+    CommentService,
+    RatingService
   ]
 })
 export class DatasetSharedModule {

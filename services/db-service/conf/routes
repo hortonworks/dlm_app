@@ -149,7 +149,7 @@ DELETE        /clusters/:clusterId/properties/:propertiesId                  con
 GET           /datasets                                                      controllers.Datasets.all(name: Option[String])
 POST          /datasets                                                      controllers.Datasets.add
 POST          /datasets/:datasetId/addassets                                 controllers.Datasets.addAssets(datasetId:Long)
-DELETE        /datasets/:datasetId/assets                                    controllers.Datasets.removeAssets(datasetId: Long, ids: Seq[Long])
+DELETE        /datasets/:datasetId/assets                                    controllers.Datasets.removeAssets(datasetId: Long, ids: Seq[String])
 DELETE        /datasets/:datasetId/removeallassets                           controllers.Datasets.removeAllAssets(datasetId:Long)
 POST          /datasetswithassets                                            controllers.Datasets.addWithAsset
 PUT           /datasets                                                      controllers.Datasets.update
@@ -219,3 +219,9 @@ POST        /comments                                                       cont
 GET         /comments                                                       controllers.Comments.getCommentByObjectRef
 DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
 PATCH       /comments/:id                                                   controllers.Comments.update(id: String)
+
+#ratings api
+POST        /ratings                                                        controllers.Ratings.add
+GET         /ratings                                                        controllers.Ratings.get
+GET         /ratings/actions/average                                        controllers.Ratings.getAverage
+PATCH       /ratings/:id                                                    controllers.Ratings.update(id: String)

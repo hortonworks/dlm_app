@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild, IterableDiffers} from "@angular/core";
 import {DsAssetModel} from "../../models/dsAssetModel";
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {DsAssetsService} from "../../services/dsAssetsService";
@@ -20,7 +20,7 @@ export enum AssetTypeEnum { ALL, HIVE, HDFS}
 export enum AssetSelectionStateEnum { CHECKALL, CHECKALLWITHEXCEPTION, CHECKSOME}
 
 export let AssetTypeEnumString = ["all", "hive", "file"];
-export enum AssetListActionsEnum {EDIT, REMOVE, ADD}
+export enum AssetListActionsEnum {EDIT, REMOVE, ADD, RELOADED, STARTRELOAD, SELECTIONCHANGE}
 export class AssetSetQueryFilterModel {
   constructor(public column: string, public operator: string, public value: (string | number | boolean), public dataType: string) {
   }
@@ -65,6 +65,7 @@ export class DsAssetList implements OnInit {
   pageSizeOptions: number[] = [10, 15, 20, 50, 100, 150, 200];
   pageSize: number = 20;
   pageStartIndex: number = 1;
+  pageEndIndex: number = 0;
   assetsCount: number = 0;
   dsAssets: DsAssetModel[] = [];
   selExcepList: string[] = [];
@@ -74,12 +75,16 @@ export class DsAssetList implements OnInit {
   actionEnum = AssetListActionsEnum;
   resultState:ResultState = ResultState.LOADED;
   resultStates = ResultState;
+  iterableDiffer:any;
   private tableHeight: number = 0;
   private totalPages: number = 1;
   private initDone: boolean = false;
 
   constructor(private dsAssetsService: DsAssetsService
-  ,           private router: Router) {
+  ,           private router: Router
+  ,           private _iterableDiffers: IterableDiffers
+  ) {
+    this.iterableDiffer = this._iterableDiffers.find([]).create(null);
   }
   ngOnInit() {
     if (this.innerListScrollable) {
@@ -93,8 +98,18 @@ export class DsAssetList implements OnInit {
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+    if(this.initDone && changes["selectState"]) {
+      console.log('Changes detected! -1');
+    }
     if(this.initDone && (changes["dsModel"] || changes["searchText"] || changes["queryModels"] || changes["pageSize"])) {
       this.fetchAssets();
+    }
+  }
+
+  ngDoCheck() {
+    let changes = this.iterableDiffer.diff(this.selExcepList);
+    if (changes) {
+        this.onChangeInSelection();
     }
   }
 
@@ -111,6 +126,7 @@ export class DsAssetList implements OnInit {
     this.setFirstPage();
     this.selExcepList = [];
     this.selectState = this.selStates.CHECKSOME
+    this.onChangeInSelection();
     return this.fetchAssets();
   }
 
@@ -131,7 +147,11 @@ export class DsAssetList implements OnInit {
     this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize, this.clusterId)
       .subscribe(assets => {
         this.dsAssets = assets;
-        setTimeout(() => this.setTableHeight(), 0);
+        this.pageEndIndex = this.pageStartIndex-1+assets.length;
+        setTimeout(() => {
+          this.setTableHeight();
+          this.actionReload();
+        }, 0);
         this.resultState = (this.dsAssets.length)?this.resultStates.LOADED:(this.pageStartIndex==1)?this.resultStates.EMPTY:this.resultStates.NOMORE;
       });
   }
@@ -173,7 +193,7 @@ export class DsAssetList implements OnInit {
     this.selExcepList = [];
     if(e.target.checked) this.selectState = this.selStates.CHECKALLWITHEXCEPTION
     else this.selectState = this.selStates.CHECKSOME
-    console.log(this.selectState);  
+    this.onChangeInSelection();  
   }
   checkedAllState() {
     if (this.selectState == this.selStates.CHECKSOME) return false;
@@ -191,6 +211,10 @@ export class DsAssetList implements OnInit {
     else this.selExcepList = this.selExcepList.filter(id => id !== asset.id);
   }
 
+  onChangeInSelection () {
+    this.actionEmitter.emit(this.actionEnum.SELECTIONCHANGE);
+  }
+
   actionAddMore() {
     this.actionEmitter.emit(this.actionEnum.ADD);
   }
@@ -201,6 +225,10 @@ export class DsAssetList implements OnInit {
 
   actionEdit() {
     this.actionEmitter.emit(this.actionEnum.EDIT);
+  }
+
+  actionReload() {
+    this.actionEmitter.emit(this.actionEnum.RELOADED);
   }
 
   updateQueryModels() {
