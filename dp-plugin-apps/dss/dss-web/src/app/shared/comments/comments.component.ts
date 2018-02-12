@@ -118,6 +118,7 @@ export class CommentsComponent implements OnInit {
     }
     return totalVotes+ " votes";
   }
+
   getComments(refreshScreen: boolean, offset:number, size: number) {
     this.fetchError = false;
     this.fetchInProgress = refreshScreen;

@@ -71,6 +71,10 @@ class RatingRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     }
   }
 
+  def deleteByObjectRef(objectId:Long, objectType:String)={
+    db.run(Ratings.filter(m =>(m.objectId === objectId && m.objectType === objectType)).delete)
+  }
+
 
   final class RatingsTable(tag: Tag) extends Table[Rating](tag, Some("dataplane"), "ratings") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)

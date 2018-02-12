@@ -26,7 +26,7 @@
     <div class="rating-class">
       <div>{{formatTotalVotes(totalVotes)}}</div>
       <div class="fixed-star">
-        <star-rating-comp [starType]="'svg'" [labelText]="averageRating" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
+        <star-rating-comp [starType]="'svg'" [labelText]="averageRating.toFixed(1)" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
       </div>
     </div>
   </div>
