@@ -44,6 +44,7 @@ class DataSets @Inject()(
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
     @Named("ratingService") val ratingService: RatingService,
+    @Named("commentService") val commentService: CommentService,
     val utilityService: UtilityService)
     extends Controller with JsonAPI {
 
@@ -366,13 +367,14 @@ class DataSets @Inject()(
     Logger.info("Received delete dataSet request")
     (for {
       dataset <- doGetDataset(dataSetId,request.user.id.get)
+      cmntDelMsg <- commentService.deleteByObjectRef(dataSetId, "assetCollection")
       clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toString)
       _ <- ratingService.deleteByObjectRef(dataSetId, "assetCollection")
       deleted <- doDeleteDataset(dataset.id.get.toString)
       jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
       _ <- doDeleteProfilers(clusterId, jobName)
     }  yield {
-      Ok(Json.obj("deleted" -> deleted))
+      Ok(Json.obj("datasetsDeleted" -> deleted,"commentsDeleted" -> cmntDelMsg))
     })
     .recover{
       case ex: WrappedErrorsException => InternalServerError(Json.toJson(ex.errors))

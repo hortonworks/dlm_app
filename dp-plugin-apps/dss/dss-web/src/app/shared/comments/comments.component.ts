@@ -139,10 +139,13 @@ export class CommentsComponent implements OnInit {
 
   onPostComment() {
     if(this.newCommentText && this.newCommentText.trim()){
+      let newCommentText = this.newCommentText;
+      this.newCommentText = "";
+      this.resizeTextArea();
       let newCommentObject = new Comment();
       newCommentObject.objectType = this.objectType;
       newCommentObject.objectId = Number(this.objectId);
-      newCommentObject.comment = this.newCommentText;
+      newCommentObject.comment = newCommentText;
       newCommentObject.createdBy = Number(AuthUtils.getUser().id);
       this.commentService.add(newCommentObject).subscribe(_ => {
         if(this.isEdgeInViewport()){
@@ -150,8 +153,6 @@ export class CommentsComponent implements OnInit {
         }else{
           this.newCommentsAvailable = true;
         }
-        this.newCommentText = "";
-        this.resizeTextArea();
       });
     }
   }

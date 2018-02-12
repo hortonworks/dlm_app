@@ -11,6 +11,7 @@
 
 package controllers
 
+import play.api.Logger
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, WrappedErrorException}
 import play.api.libs.json.Json
 import play.api.mvc.{Controller, Result}
@@ -18,6 +19,17 @@ import play.api.mvc.{Controller, Result}
 trait JsonAPI extends Controller {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+
+  def apiErrorWithLog(logBlock : (Throwable) => Unit = defaultLogMessage): PartialFunction[Throwable, Result] = {
+    case e: Throwable =>{
+      logBlock(e)
+      apiError.apply(e)
+    }
+  }
+
+  private def defaultLogMessage =
+    (e : Throwable) => Logger.error(e.getMessage, e)
+
 
   val apiError: PartialFunction[Throwable, Result] = {
     case rae: WrappedErrorException => Status(rae.error.status)(Json.toJson(rae))

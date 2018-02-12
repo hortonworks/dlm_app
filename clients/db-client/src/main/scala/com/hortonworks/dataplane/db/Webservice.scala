@@ -15,6 +15,7 @@ import com.google.common.base.Strings
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, EntityDatasetRelationship}
+import play.api.Logger
 import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}
 import play.api.libs.ws.WSResponse
 
@@ -47,18 +48,27 @@ object Webservice {
       Left(extractError(res, r => r.json.validate[Errors]))
     }
 
-    protected def mapResponseToError(res: WSResponse) = {
+    protected def mapResponseToError(res: WSResponse, loggerMsg: Option[String]= None) = {
       val errorsObj = Try(res.json.validate[Errors])
 
       errorsObj match {
         case Success(e :JsSuccess[Errors]) =>
+          printLogs(res,loggerMsg)
           throw new WrappedErrorException(e.get.errors.head)
         case _ =>
           val msg = if(Strings.isNullOrEmpty(res.body)) res.statusText else  res.body
+          val logMsg = loggerMsg.map { lmsg =>
+            s"""$lmsg | $msg""".stripMargin
+          }.getOrElse(s"In db-client: Failed with $msg")
+          printLogs(res,Option(logMsg))
           throw new WrappedErrorException(Error(res.status, msg, ErrorType.General.toString))
       }
     }
 
+    private def printLogs(res: WSResponse,msg: Option[String]) ={
+      val logMsg = msg.getOrElse(s"Could not get expected response status from service. Response status ${res.statusText}")
+      Logger.warn(logMsg)
+    }
   }
 
   trait UserService extends DbClientService {
@@ -214,6 +224,8 @@ object Webservice {
     def deleteById(commentId: String,userId: Long): Future[String]
 
     def update(commentText: String, commentId: String): Future[CommentWithUser]
+
+    def deleteByObjectRef(objectId: String, objectType: String): Future[String]
 
 
   }
