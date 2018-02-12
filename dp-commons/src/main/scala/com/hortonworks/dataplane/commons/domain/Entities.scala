@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 
 import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
 import org.apache.commons.lang3.exception.ExceptionUtils
-import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.libs.json._
 
 /**
   * Data plane main domain entities
@@ -36,10 +36,10 @@ object Entities {
     val General, Network, Database, Cluster, Ambari,Url = Value
 
     implicit class WrappedThrowable(th: Throwable) {
-      def asError(code: String, errorType: ErrorType):Errors =
+      def asError(status: Int, errorType: ErrorType):Errors =
         Errors(
           Seq(
-            Error(code, ExceptionUtils.getStackTrace(th), errorType.toString)))
+            Error(status, ExceptionUtils.getStackTrace(th), errorType.toString)))
     }
   }
 
@@ -50,16 +50,23 @@ object Entities {
 
   case class HJwtToken(token: String)
 
-  case class Error(code: String,
-                   message: String,
-                   errorType: String = ErrorType.General.toString)
+  case class InnerError(code: String, trace: Option[String] = None, innererror: Option[InnerError] = None)
 
-  case class RestApiException(respCode : Int,
-                              errorsObj: Errors) extends Exception(errorsObj.firstMessage)
+  case class Error(status: Int,
+                   message: String,
+                   errorType: String = ErrorType.General.toString,
+                   code: String = "generic",
+                   target: Option[String] = None,
+                   trace: Option[String] = None,
+                   details: Option[Seq[Error]] = None,
+                   innererror: Option[InnerError] = None)
+
+  case class WrappedErrorException(error: Error)
+      extends Exception(error.message)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
-    def firstMessage = errors.headOption.map(_.code).getOrElse("Unknown Error")
+    def firstMessage: Int = errors.headOption.map(_.status).getOrElse(500)
   }
 
   // Pagination
@@ -415,14 +422,15 @@ object JsonFormatters {
 
   val defaultJson = Json.using[Json.WithDefaultValues]
 
+  implicit val innerErrorFormat = Json.format[InnerError]
+
   implicit val errorWrites = Json.writes[Error]
   implicit val errorReads = Json.reads[Error]
 
   implicit val errorsWrites = Json.writes[Errors]
   implicit val errorsReads = Json.reads[Errors]
 
-  implicit val restApiExceptionWrites = Json.writes[RestApiException]
-  implicit val restApiExceptionReads = Json.reads[RestApiException]
+  implicit val wrappedErrorExceptionFormat = Json.format[WrappedErrorException]
 
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]

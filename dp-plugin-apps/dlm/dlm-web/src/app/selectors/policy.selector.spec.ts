@@ -23,8 +23,8 @@ describe('Policy Selectors', () => {
     this.policy3 = <Policy>{id: 'p3', targetCluster: 'not-existing-cluster-1', sourceCluster: 'not-existing-cluster-2'};
     this.cluster1 = <Cluster>{id: 1, name: 'c1', dataCenter: 'dc1'};
     this.cluster2 = <Cluster>{id: 2, name: 'c2', dataCenter: 'dc2'};
-    this.job1 = <Job>{id: '1', name: 'p1', startTime: '2016-06-12T03:32:00', policyId: 'p1'};
-    this.job2 = <Job>{id: '2', name: 'p2', startTime: '2017-06-12T03:32:00', policyId: 'p2'};
+    this.job1 = <Job>{id: '1', name: 'p1', startTime: '2016-06-12T03:32:00', policyId: 'p1', duration: 12};
+    this.job2 = <Job>{id: '2', name: 'p2', startTime: '2017-06-12T03:32:00', policyId: 'p2', duration: 20};
     const policiesState = {
       policies: {
         entities: {
@@ -104,6 +104,7 @@ describe('Policy Selectors', () => {
           sourceClusterResource: this.cluster2,
           jobsResource: [this.job1],
           lastJobResource: this.job1,
+          lastJobDuration: 12,
           lastGoodJobResource: undefined,
           lastTenJobs: [this.job1]
         },
@@ -113,6 +114,7 @@ describe('Policy Selectors', () => {
           sourceClusterResource: this.cluster1,
           jobsResource: [this.job2],
           lastJobResource: this.job2,
+          lastJobDuration: 20,
           lastGoodJobResource: undefined,
           lastTenJobs: [this.job2]
         },
@@ -122,6 +124,7 @@ describe('Policy Selectors', () => {
           sourceClusterResource: {},
           jobsResource: [],
           lastJobResource: null,
+          lastJobDuration: null,
           lastGoodJobResource: null,
           lastTenJobs: []
         }

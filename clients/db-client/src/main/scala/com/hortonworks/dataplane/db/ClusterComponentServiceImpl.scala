@@ -47,7 +47,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToService)
       .recoverWith {
         case e: Exception =>
-          Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+          Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
       }
   }
 
@@ -111,7 +111,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToService)
       .recoverWith {
         case e: Exception =>
-          Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+          Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
       }
   }
 
@@ -127,12 +127,12 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
         res.status match {
           case 200 => Right(true)
           case x =>
-            Left(Errors(Seq(Error(x.toString, "Cannot update service"))))
+            Left(Errors(Seq(Error(x, "Cannot update service"))))
         }
       }
       .recoverWith {
         case e: Exception =>
-          Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+          Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
       }
   }
 
@@ -150,7 +150,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
         .recoverWith {
           case e: Exception =>
             logger.error(s"Cannot add cluster endpoint $cse", e)
-            Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+            Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
         }
 
     }
@@ -174,11 +174,11 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
             case x =>
               Left(
                 Errors(
-                  Seq(Error(x.toString, "Cannot update service endpoint"))))
+                  Seq(Error(x, "Cannot update service endpoint"))))
         })
         .recoverWith {
           case e: Exception =>
-            Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+            Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
         }
     }
     Future.sequence(requests)
@@ -218,7 +218,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       "Content-Type" -> "application/json",
       "Accept" -> "application/json"
     ).get.map(mapToServiceEndpoints).recoverWith {
-        case e: Exception => Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+        case e: Exception => Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
       }
   }
 

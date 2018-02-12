@@ -13,6 +13,11 @@ POST     /api/store/credential                                        controller
 PUT      /api/store/credential                                        controllers.CredentialStore.updateCredentialAccount
 DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
 
+#CloudCred
+GET     /api/cluster/:clusterId/credId/:credId                        controllers.CloudCred.retrieveById(clusterId: Long, credId: String)
+GET     /api/cluster/:clusterId/credName/:credName                    controllers.CloudCred.retrieveByName(clusterId: Long, credName: String)
+GET     /api/cluster/cloudCredentials                                 controllers.CloudCred.listAllCloudCred
+
 #Cloud
 GET      /api/cloud/account/:accountId/mountpoints                        controllers.Cloud.listAllMountPoints(accountId: String)
 GET      /api/cloud/account/:accountId/mountpoint/:mountPoint/files       controllers.Cloud.listFiles(accountId: String, mountPoint: String)

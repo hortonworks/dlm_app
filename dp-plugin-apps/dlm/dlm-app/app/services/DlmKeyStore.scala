@@ -14,19 +14,24 @@ import java.io.{ByteArrayInputStream, ObjectInputStream}
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.hortonworks.dataplane.commons.service.api.{KeyStoreManager, KeystoreReloadEvent}
 import com.google.inject.{Inject, Singleton}
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dlm.beacon.domain.RequestEntities.CloudCredRequest
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors}
 import com.typesafe.scalalogging.Logger
 import models.ADLSEntities.ADLSAccountDetails
-import models.AmazonS3Entities.S3AccountDetails
+import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
 import models.CloudAccountEntities.Error._
 import models.CloudAccountEntities.{CloudAccountWithCredentials, CloudAccountsBody, CloudAccountsItem}
 import models.{CloudAccountProvider, CloudCredentialType}
 import models.CloudAccountProvider.CloudAccountProvider
+import models.Entities.DlmApiErrors
 import models.WASBEntities.WASBAccountDetails
 import play.api.cache._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import org.apache.commons.lang.SerializationUtils
+import play.api.http.Status.INTERNAL_SERVER_ERROR
 
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
@@ -159,19 +164,19 @@ class DlmKeyStore @Inject()(cache: CacheApi, keyStoreManager: KeyStoreManager) e
     * Deletes a cloud account
     * @param accountId
     */
-  def deleteCloudAccount(accountId: String) : Future[Either[GenericError,Unit]] = {
+  def deleteCloudAccount(accountId: String): Future[Either[DlmApiErrors, Unit]] = {
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
         val cloudAccountsToBeSaved = cloudAccounts.filterNot(_.id.get.equals(accountId))
         if (cloudAccounts.lengthCompare(cloudAccountsToBeSaved.length) != 0) {
           saveCloudAccountsToKeyStore(cloudAccountsToBeSaved) match {
             case Success(v) => Right(Unit)
-            case Failure(ex) => Left(GenericError(ex.getMessage))
+            case Failure(ex) => Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(ex.getMessage)))))
           }
         } else {
-          Left(GenericError(DpKeyStore.credentialDoesNotExistsErrMsg))
+          Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(DpKeyStore.credentialDoesNotExistsErrMsg)))))
         }
-      case Left(error) => Left(GenericError(error.message))
+      case Left(error) => Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message)))))
     }
   }
 

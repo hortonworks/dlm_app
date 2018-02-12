@@ -50,7 +50,7 @@ object ResponseEntities {
 
   case class PoliciesDetailResponse(policyId: String, name: String, description: Option[String], `type`: String,
                                     status: String, sourceDataset: String, targetDataset: String, frequencyInSec: Long,
-                                    sourceCluster: String, targetCluster: Option[String], instances: Seq[PolicyInstanceResponse],
+                                    sourceCluster: Option[String], targetCluster: Option[String], instances: Seq[PolicyInstanceResponse],
                                     report: PolicyReport, startTime: Option[String], endTime: String,
                                     executionType: Option[String], customProperties: Option[Map[String, String]])
 
@@ -64,7 +64,7 @@ object ResponseEntities {
                                        wireEncryption: Boolean, rangerCreateDenyPolicy: String, replication_TDE: Option[Boolean],
                                        replication_cloud_fs: Option[Boolean], replication_cloud_hive_withCluster: Option[Boolean])
 
-  case class BeaconAdminStatusDetails(clusterId: Long, beaconAdminStatus: BeaconAdminStatusResponse)
+  case class BeaconAdminStatusDetails(clusterId: Long, beaconEndpoint: String, beaconAdminStatus: BeaconAdminStatusResponse)
 
   case class HdfsFile(accessTime: Long, blockSize: Long, group: String, length: Long, modificationTime: Long,
                       owner: String, pathSuffix: String, permission: String, replication: Int, `type`: String,
@@ -82,17 +82,18 @@ object ResponseEntities {
 
   case class CloudCredPostResponse(status: String, message: String, requestId: String, entityId: String)
 
-  case class CloudCredResponse(id: String, name: String, provider: String, creationTime: String, lastModifiedTime: String)
+  case class CloudCredResponse(id: String, name: String, provider: String, creationTime: String, lastModifiedTime: String, configs: Option[Map[String, String]])
 
   case class CloudCredsResponse(requestId: String, totalResults: Long, results: Long, cloudCred: Seq[CloudCredResponse])
+
+  case class CloudCredsBeaconResponse(clusterId: Long, beaconUrl: String, cloudCreds: CloudCredsResponse)
 }
 
 object RequestEntities {
   case class RangerServiceDetails (rangerEndPoint: String, rangerHDFSServiceName: String, rangerHIVEServiceName: Option[String])
   case class ClusterDefinitionRequest( name: String, dataCenter: String, description: String, local: Boolean = false,
                                        beaconEndpoint: String, nameNodeConfigs: Map[String, Option[String]],
-                                       rangerService: Option[RangerServiceDetails], hsEndpoint: Option[String],
-                                       hsKerberosPrincipal: Option[String])
+                                       rangerService: Option[RangerServiceDetails], hiveConfigs: Map[String, Option[String]])
   
   case class PolicyDefinitionRequest(name: String, `type`: String, sourceDataset: String, targetDataset: Option[String],
                                       cloudCred: Option[String], sourceCluster: Option[String], targetCluster: Option[String],
@@ -101,7 +102,7 @@ object RequestEntities {
                                       `tde.sameKey`: Option[Boolean], description: Option[String], sourceSnapshotRetentionAgeLimit: Option[Long],
                                       sourceSnapshotRetentionNumber: Option[Long], targetSnapshotRetentionAgeLimit: Option[Long],
                                       targetSnapshotRetentionNumber: Option[Long], retryAttempts: Option[Long], retryDelay: Option[Long])
-  case class CloudCredRequest(name: Option[String], provider: Option[String], `s3.access.key`: Option[String], `s3.secret.key`: Option[String], `s3.encryption.key`: Option[String])
+  case class CloudCredRequest(name: Option[String], provider: Option[String], `s3.access.key`: Option[String], `s3.secret.key`: Option[String], `s3.encryption.key`: Option[String] = None)
 }
 
 object JsonFormatters {
@@ -193,6 +194,9 @@ object JsonFormatters {
 
   implicit val cloudCredsResponseWrites = Json.writes[CloudCredsResponse]
   implicit val cloudCredsResponseReads = Json.reads[CloudCredsResponse]
+
+  implicit val cloudCredsBeaconResponseWrites = Json.writes[CloudCredsBeaconResponse]
+  implicit val cloudCredsBeaconResponseReads = Json.reads[CloudCredsBeaconResponse]
 
 
 

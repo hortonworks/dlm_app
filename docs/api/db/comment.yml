@@ -179,13 +179,13 @@ definitions:
   Error:
     type: object
     required:
-      - code
+      - status
       - message
       - errorType
     properties:
-      code:
-        type: string
-        description: Error code
+      status:
+        type: number
+        description: HTTP status code
       message:
         type: string
         description: Description/trace of the error

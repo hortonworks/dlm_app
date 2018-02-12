@@ -70,8 +70,8 @@ export class ChangePasswordComponent {
           error => {
             if (error._body) {
               let errorJSON = JSON.parse(error._body);
-              if(Array.isArray(errorJSON.errors) && errorJSON.errors[0] && errorJSON.errors[0].code && errorJSON.errors[0].errorType){
-                this.serverError = errorJSON.errors.filter(err => {return (err.code && err.errorType)}).map(err => {return err.message}).join(', ');
+              if(Array.isArray(errorJSON.errors) && errorJSON.errors[0] && errorJSON.errors[0].status && errorJSON.errors[0].errorType){
+                this.serverError = errorJSON.errors.filter(err => {return (err.status && err.errorType)}).map(err => {return err.message}).join(', ');
               } else if(errorJSON.message){
                 this.serverError = errorJSON.message
               } else if (errorJSON.errors){

@@ -102,6 +102,19 @@ export class RichDatasetService {
       .catch(HttpUtil.handleError);
   }
 
+  deleteSelectedAssets(dSetId: number, ids: string[]) : Observable<RichDatasetModel> {
+    let qStr = "";
+    ids.forEach((id, indx)=>{
+      if(indx) qStr = qStr + "&";
+      qStr = qStr + "ids=" + id;
+    })
+    return this.http
+      .delete(`/api/dataset/${dSetId}/assets?${qStr}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(this.extractRichDataModel)
+      .catch(HttpUtil.handleError);
+  }
+
   extractRichDataModel(data: any): RichDatasetModel { // converts RichDataset(backend case class) to RichDatasetModel
     const ASSET_TYPES = [{label: 'hiveCount', key: 'hive_table'}, {label: 'filesCount', key: 'hdfs_files'}];
 
