@@ -136,6 +136,7 @@ body {
     font-size: 11px;
     font-weight: 100;
     color: #EEEEEE;
+    margin-top: 10px;
 }
 
 input[type="text"], input[type="password"], input[type="email"], input:not([type]), input[type=""], textarea, select {

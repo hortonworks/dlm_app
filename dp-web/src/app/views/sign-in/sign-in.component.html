@@ -29,12 +29,12 @@
                         <label aria-label="Password">Password</label>
                         <input type="password" name="password" [(ngModel)]="credential.password" required data-se="sign_in__password">
                     </div>
-                    <div class="tracking-message" *ngIf="gaTrackingStatus">
-                    <span>{{'pages.signin.description.trackingMessage' | translate }}</span><span [innerHTML]="'pages.signin.description.privacyPolicyLink' | translate"></span>
-                    </div>
                     <div class="error-message"
                          *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message"
                          data-se="sign_in__message">{{message}}
+                    </div>
+                    <div class="tracking-message" *ngIf="gaTrackingStatus">
+                     <span>{{'pages.signin.description.trackingMessage' | translate }}</span><span [innerHTML]="'pages.signin.description.privacyPolicyLink' | translate"></span>
                     </div>
                     <div class="action-group">
                         <button class="mdl-button btn-hwx-primary" [disabled]="_isAuthInProgress" data-se="sign_in__submit">

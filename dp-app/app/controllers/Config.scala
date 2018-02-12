@@ -17,7 +17,8 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.{ConfigService, DpClusterService}
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
-import models.{JsonResponses, WrappedErrorsException}
+import com.typesafe.scalalogging.Logger
+import models.WrappedErrorsException
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.Configuration
@@ -33,6 +34,7 @@ class Config @Inject()(
                         @Named("configService") val configService: ConfigService)
   extends Controller {
 
+  val logger = Logger(classOf[Config])
 
   def init = AuthenticatedAction.async { request =>
     for {
@@ -74,12 +76,16 @@ class Config @Inject()(
       }
   }
 
-  def getGAProperies() = Action.async {
+  def getGAProperties() = Action.async {
     configService.getConfig("dps.ga.tracking.enabled").map {
       case None => Ok(Json.obj("enabled" -> false))
       case Some(config) => config.configValue match {
         case "true" => Ok(Json.obj("enabled" -> true))
         case "false" => Ok(Json.obj("enabled" -> false))
+        case _ => {
+          logger.warn("Config value for GA is not present/not a boolean. Returning false instead.")
+          Ok(Json.obj("enabled" -> false))
+        }
       }
     }
   }

@@ -20,9 +20,7 @@ var webssoURL = "/api/v1/websso?originalUrl=";
 var userAgent = navigator.userAgent.toLowerCase();
 
 $(document).ready(function () {
-    console.log("Ready")
     var originalUrl = get("originalUrl");
-    console.log(originalUrl)
     $.get(originalUrl+"/api/ga/properties", function (res) {
         if(res.enabled === true){
             $("#tracking-message").html("Hortonworks DataPlane Service uses cookies and other telemetry mechanisms to improve the product and your experience. By logging in, you give consent to Hortonworks to use cookies. To learn more, please review our <a href='https://hortonworks.com/privacy-policy/' target='_blank'>Privacy Policy</a>");
