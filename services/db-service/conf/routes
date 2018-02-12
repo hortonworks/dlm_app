@@ -216,8 +216,9 @@ POST         /blacklisted-tokens                                            cont
 
 #comments api
 POST        /comments                                                       controllers.Comments.addComment
-GET         /comments                                                       controllers.Comments.getCommentByObjectRef
-DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
+GET         /comments                                                       controllers.Comments.getCommentByObjectRef(objectId: Long, objectType: String)
+DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String, userId: Long)
+DELETE      /comments                                                       controllers.Comments.delete(objectId: Long, objectType: String)
 PATCH       /comments/:id                                                   controllers.Comments.update(id: String)
 
 #ratings api
@@ -225,3 +226,4 @@ POST        /ratings                                                        cont
 GET         /ratings                                                        controllers.Ratings.get
 GET         /ratings/actions/average                                        controllers.Ratings.getAverage
 PATCH       /ratings/:id                                                    controllers.Ratings.update(id: String)
+
