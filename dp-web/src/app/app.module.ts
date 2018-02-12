@@ -74,6 +74,19 @@ export function init_app(userService: UserService) {
   });
 }
 
+export function getGATrackingStatus(configService: ConfigurationService) {
+  return () => new Promise((resolve, reject) => {
+    configService.getGAProperties()
+      .subscribe((gaProperties:any) => {
+        AuthUtils.setGATrackingStatus(gaProperties.enabled);
+        resolve(true)
+      }, (error) => {
+        resolve(false)
+      });
+  });
+}
+
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -121,6 +134,12 @@ export function init_app(userService: UserService) {
       provide: APP_INITIALIZER,
       useFactory: init_app,
       deps: [UserService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: getGATrackingStatus,
+      deps: [ConfigurationService],
       multi: true
     },
     CollapsibleNavService,

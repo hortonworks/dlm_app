@@ -67,6 +67,8 @@
   "pages": {
     "signin" :{
       "description": {
+        "trackingMessage" :"Hortonworks DataPlane Service uses cookies and other telemetry mechanisms to improve the product and your experience. By logging in, you give consent to Hortonworks to use cookies. To learn more, please review our ",
+        "privacyPolicyLink":"<a href='https://hortonworks.com/privacy-policy/' target='_blank'>Privacy Policy</a>",
         "invalidCredentials":"Credentials were incorrect. Please try again.",
         "systemError": "System Error"
       }
