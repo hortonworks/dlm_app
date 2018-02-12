@@ -5,6 +5,9 @@
 /project/target/
 /target/
 .gradle/
+gradle/
 .idea/
 bin/
 build/
+gradlew
+gradlew.bat
