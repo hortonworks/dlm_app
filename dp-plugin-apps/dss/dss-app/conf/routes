@@ -89,7 +89,7 @@ POST         /api/ratings                                             controller
 GET          /api/ratings                                             controllers.Ratings.get
 GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
->>>>>>> f4f75913bff2f67534b4567b09fae93a9f1ca4c0
+
 
 
 # others
