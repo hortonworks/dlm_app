@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, Input, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { POLICY_MODES } from 'constants/policy.constant';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -23,6 +23,10 @@ import { TranslateService } from '@ngx-translate/core';
         <div ngClass="flow-desired-state">
           {{modeAbbrev}}
         </div>
+        <div class="flow-ranger-warn" *ngIf="POLICY_MODES.READ_WRITE === mode">
+          <i class="text-warning fa fa-exclamation-triangle"
+            [tooltip]="'page.policies.flow_status.ranger_disabled_tooltip' | translate"></i>
+        </div>
       </div>
       <div class="flow-status-text">
         <div class="flow-current-state">{{'common.source' | translate}}</div>
@@ -35,6 +39,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class FlowStatusComponent {
   private translateNS = 'page.policies.flow_status';
+  POLICY_MODES = POLICY_MODES;
   @Input() mode: POLICY_MODES = POLICY_MODES.READ_WRITE;
 
   get modeTranslate(): string {
