@@ -462,7 +462,8 @@
         "read_write": "Read / Write",
         "read_only": "Read Only",
         "read_write_abbrev": "RW",
-        "read_only_abbrev": "RO"
+        "read_only_abbrev": "RO",
+        "ranger_disabled_tooltip": "Ranger is not enabled on this cluster. Accidental writes might occur on the replicated data. Enable Ranger to prevent this issue"
       },
       "success": {
         "title": "Policy Creation Successful",
