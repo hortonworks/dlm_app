@@ -52,8 +52,8 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
         res.status match {
           case 200 => (res.json \ "results").validate[String].get
           case _ =>{
-            Logger.warn(s"Db-Client CommentServiceImpl: In deleletById method , result status ${res.status} with comment Id $commentId and userId $userId")
-            mapResponseToError(res)
+            val logMsg = s"Db-Client CommentServiceImpl: In deleletById method , result status ${res.status} with comment Id $commentId and userId $userId"
+            mapResponseToError(res, Option(logMsg))
           }
         }
       }
@@ -67,8 +67,8 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
         res.status match {
           case 200 => (res.json \ "results").validate[String].get
           case _ =>
-            Logger.warn(s"Db-Client CommentServiceImpl: In deleteByObjectRef, result status ${res.status} with object Id $objectId and object type $objectType")
-            mapResponseToError(res)
+            val logMsg = s"Db-Client CommentServiceImpl: In deleteByObjectRef, result status ${res.status} with object Id $objectId and object type $objectType"
+            mapResponseToError(res,Option(logMsg))
         }
       }
   }
@@ -95,8 +95,8 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => (res.json \ "results").validate[CommentWithUser].get
       case _ => {
-        Logger.warn(s"Db-Client CommentServiceImpl: In mapToCommentWithUser method, result status ${res.status}")
-        mapResponseToError(res)
+        val logMsg = s"Db-Client CommentServiceImpl: In mapToCommentWithUser method, result status ${res.status}"
+        mapResponseToError(res,Option(logMsg))
       }
     }
   }
@@ -106,8 +106,8 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         (res.json \ "results").validate[Seq[CommentWithUser]].getOrElse(Seq())
       case _ => {
-        Logger.warn(s"Db-Client CommentServiceImpl: In mapToCommentWithUsers method, result status ${res.status}")
-        mapResponseToError(res)
+        val logMsg = s"Db-Client CommentServiceImpl: In mapToCommentWithUsers method, result status ${res.status}"
+        mapResponseToError(res,Option(logMsg))
       }
     }
   }
