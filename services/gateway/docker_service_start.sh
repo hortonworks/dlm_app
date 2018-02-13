@@ -14,8 +14,24 @@ if [ -z "$CONSUL_HOST" ]; then
     exit 1
 fi
 
+# if JWT_PUBLIC_KEY_LOCATION, JWT_PRIVATE_KEY_LOCATION and JWT_PRIVATE_KEY_PASSWORD are available, use them; else, use ones supplied by Knox.
+if [ -z "$JWT_PUBLIC_KEY_LOCATION" ]; then
+    JWT_PUBLIC_KEY_LOCATION="/dp-shared/ssl-cert.pem"
+fi
+if [ -z "$JWT_PRIVATE_KEY_LOCATION" ]; then
+    JWT_PRIVATE_KEY_LOCATION="/dp-shared/ssl-key.pem"
+fi
+if [ -z "$JWT_PRIVATE_KEY_PASSWORD" ]; then
+    JWT_PRIVATE_KEY_PASSWORD="$CERTIFICATE_PASSWORD"
+fi
+
+
+
 java  \
     -jar /usr/gateway-service/gateway-1.0.jar \
         --spring.cloud.consul.host="$CONSUL_HOST" \
         --sso.enabled=true \
-        --signing.pub.key.path=/dp-shared/ssl-cert.pem "$@"
+        --signing.pub.key.path=/dp-shared/ssl-cert.pem \
+        --jwt.public.key.path="${JWT_PUBLIC_KEY_LOCATION}" \
+        --jwt.private.key.path="${JWT_PRIVATE_KEY_LOCATION}" \
+        --jwt.private.key.password="${JWT_PRIVATE_KEY_PASSWORD}" "$@"
