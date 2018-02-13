@@ -11,11 +11,13 @@
 #
 
 
-update_admin_password(){
+run_db_command() {
+    ENTRY_POINT=$1
+    shift
     docker run \
             --network dp \
             --rm \
-            --entrypoint /scripts/user-update.sh \
+            --entrypoint ${ENTRY_POINT} \
             --env "PGHOST=$DB_HOST" \
             --env "PGPORT=$DB_PORT" \
             --env "PGUSER=$DB_USER" \
@@ -24,17 +26,12 @@ update_admin_password(){
             hortonworks/dp-migrate:$VERSION "$@"
 }
 
+update_admin_password(){
+    run_db_command /scripts/user-update.sh "$@"
+}
+
 update_config(){
-    docker run \
-            --network dp \
-            --rm \
-            --entrypoint /scripts/config-update.sh \
-            --env "PGHOST=$DB_HOST" \
-            --env "PGPORT=$DB_PORT" \
-            --env "PGUSER=$DB_USER" \
-            --env "PGPASSWORD=$DB_PASS" \
-            --env "PGDATABASE=$DB_NAME" \
-            hortonworks/dp-migrate:$VERSION "$@"
+    run_db_command /scripts/config-update.sh "$@"
 }
 
 main() {
@@ -59,18 +56,23 @@ main() {
         DB_PASS="$DATABASE_PASS"
     fi
 
-    CMD_ARGS=( $@ )
-    ARG_LEN=${#CMD_ARGS[@]}
-    LAST_ARG=${CMD_ARGS[$ARG_LEN-1]}
-    OTHER_ARGS=${CMD_ARGS[@]:0:$ARG_LEN-1}
-
-    if [ "$LAST_ARG" == "UPDATE_ADMIN_PASSWORD" ]; then
-        update_admin_password "$OTHER_ARGS"
-     elif [ "$LAST_ARG" == "ENABLE_CONFIG" ] || [ "$LAST_ARG" == "DISABLE_CONFIG" ]; then
-        update_config "$@"
-     else
-        echo "Unknown command"
+    if [ "$#" -lt 1 ]; then
+        echo "Error: Could not find a database command to execute."
     fi
+
+    DB_CMD=$1
+    case ${DB_CMD} in
+        UPDATE_ADMIN_PASSWORD)
+            shift
+            update_admin_password "$@"
+            ;;
+        ENABLE_CONFIG|DISABLE_CONFIG)
+            update_config "$@"
+            ;;
+        *)
+            echo "Error: Invalid database command $DB_CMD."
+            ;;
+    esac
 }
 
 main "$@"

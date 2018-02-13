@@ -405,15 +405,15 @@ read_master_password_safely() {
 
 update_admin_password() {
     read_admin_password_safely
-    source $(pwd)/database-run-script.sh "$USER_ADMIN_PASSWORD" "UPDATE_ADMIN_PASSWORD"
+    source $(pwd)/database-run-script.sh "UPDATE_ADMIN_PASSWORD" "$USER_ADMIN_PASSWORD"
 }
 
 utils_enable_config_value() {
-  source $(pwd)/database-run-script.sh "$@" "ENABLE_CONFIG"
+  source $(pwd)/database-run-script.sh "ENABLE_CONFIG" "$@"
 }
 
 utils_disable_config_value() {
-  source $(pwd)/database-run-script.sh "$@" "DISABLE_CONFIG"
+  source $(pwd)/database-run-script.sh "DISABLE_CONFIG" "$@"
 }
 
 
