@@ -10,7 +10,6 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { mapResponse } from 'utils/http-util';
 import { HiveDatabase, HiveTable } from 'models/hive-database.model';
 
 @Injectable()
