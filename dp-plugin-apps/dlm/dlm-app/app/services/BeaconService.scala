@@ -953,7 +953,7 @@ class BeaconService @Inject()(
         getAllCloudCreds(queryString).map {
         case Left(errors) =>  p.success(errors)
         case Right(cloudCredsDetailResponse) =>
-          val filteredCloudCreds = cloudCredsDetailResponse.cloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudAccount.id.get))
+          val filteredCloudCreds = cloudCredsDetailResponse.cloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudAccount.id))
           if (filteredCloudCreds.isEmpty) {
             p.success(DlmApiErrors(cloudCredsDetailResponse.unreachableBeacon))
           } else {

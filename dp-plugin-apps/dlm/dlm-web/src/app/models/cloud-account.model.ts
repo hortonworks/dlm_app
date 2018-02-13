@@ -20,6 +20,7 @@ export interface CloudAccountDetails {
 }
 
 export interface AddCloudStoreRequestBody {
+  id: string;
   accountDetails: AddCloudAccountDetails;
   accountCredentials: ValidateCredentialsRequestBody;
 }

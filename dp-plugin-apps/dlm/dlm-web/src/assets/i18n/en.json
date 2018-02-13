@@ -403,15 +403,25 @@
         "no_accounts": "No Accounts",
         "no_containers": "No Containers",
         "table": {
-          "actions": "Actions",
-          "user_details": "Account"
+          "actions": "ACTIONS",
+          "user_details": "CREDENTIAL"
         },
         "accounts": {
           "add": {
             "title": "Add Cloud Account",
             "provider": "Cloud Service Provider",
-            "access_key": "Access Key",
-            "secret_key": "Secret Key",
+            "name" : {
+              "label" : "Name",
+              "placeholder": "Enter a unique name for the cloud credential"
+            },
+            "access_key": {
+              "label" : "Access Key",
+              "placeholder": "Enter S3 access key"
+            },
+            "secret_key" : {
+              "label" : "Secret Key",
+              "placeholder": "Enter S3 secret key"
+            },
             "username": "IAM USERNAME",
             "account_id": "ACCOUNT ID",
             "validate": "Validate",

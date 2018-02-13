@@ -44,17 +44,9 @@ object CloudAccountEntities {
     def provider: String
     def credentialType: Option[CloudCredentialType]
     def accountName: String
-    def getAccountId(): String
   }
   @SerialVersionUID(1234)
-  case class CloudAccountWithCredentials(var id: Option[String] = None, accountCredentials: CloudAccountCredentials, accountDetails: CloudAccountDetails) extends Serializable {
-    /**
-      * Generate and set `id`. It's used to generate id before serialization and storing to credential store
-      */
-    def presetId: Unit = {
-      id = Option(s"${id.getOrElse(accountDetails.getAccountId())}_${accountCredentials.credentialType}")
-    }
-  }
+  case class CloudAccountWithCredentials(id: String, accountCredentials: CloudAccountCredentials, accountDetails: CloudAccountDetails) extends Serializable
   case class CloudAccountsItem(id: String, accountDetails: CloudAccountDetails)
   case class CloudAccountsBody(accounts: List[CloudAccountsItem])
 

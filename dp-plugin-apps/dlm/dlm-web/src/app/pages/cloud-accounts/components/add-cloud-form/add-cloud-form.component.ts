@@ -75,6 +75,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     this.resetErrors();
     this.addCloudForm =  this.formBuilder.group({
       credentialType: [this.defaultCredentialType, Validators.required],
+      credentialName: ['', Validators.required],
       accessKey: ['', Validators.required],
       secretKey: ['', Validators.required],
       accountId: [''],
@@ -165,6 +166,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     if (this.addCloudForm) {
       this.addCloudForm.controls['accessKey'].setErrors(null);
       this.addCloudForm.controls['secretKey'].setErrors(null);
+      this.addCloudForm.controls['credentialName'].setErrors(null);
     }
   }
 
@@ -177,9 +179,11 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     this.resetErrors();
     if (this.isValidationSuccess && this.progress.validateCredentials.response) {
       this.isSaveInProgress = true;
+      //const {value} = addCloudForm;
       const {accountName, credentialType, userName, provider, payload} =
         <ValidateCredentialsResponse>this.progress.validateCredentials.response;
       const requestPayload: AddCloudStoreRequestBody = <AddCloudStoreRequestBody> {
+        id: this.addCloudForm.get('credentialName').value.trim(),
         accountDetails: {
           provider,
           accountName,

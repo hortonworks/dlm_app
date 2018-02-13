@@ -24,8 +24,11 @@
 </ng-template>
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
-  <div class="userName" [attr.qe-attr]="'cloud-account-username-' + index" *ngIf="account.accountDetails.userName">{{account.accountDetails.userName}}</div>
-  <div class="accountName" [attr.qe-attr]="'cloud-account-account-name-' + index" *ngIf="account.accountDetails.accountName">{{account.accountDetails.accountName}}</div>
+  <div class="credentialName" [attr.qe-attr]="'cloud-account-credentialName-' + index"> {{account.id}} </div>
+  <div class="userDetails">
+    <span class="userName" [attr.qe-attr]="'cloud-account-account-userName-' + index" *ngIf="account.accountDetails.userName">{{account.accountDetails.userName}}</span>
+    <span class="accountName" [attr.qe-attr]="'cloud-account-account-name-' + index" *ngIf="account.accountDetails.accountName"> | {{account.accountDetails.accountName}}</span>
+  </div>
 </ng-template>
 
 <ng-template #actionsCell let-account="row" let-index="rowIndex">
