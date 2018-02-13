@@ -18,15 +18,18 @@ import com.typesafe.config.ConfigFactory;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
+import javax.crypto.Cipher;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -43,9 +46,20 @@ import static org.springframework.cloud.commons.httpclient.ApacheHttpClientConne
 @EnableZuulProxy
 @EnableFeignClients
 public class RouteService {
+  private static final Logger logger = LoggerFactory.getLogger(RouteService.class);
 
   public static void main(String[] args) {
-    new SpringApplicationBuilder(RouteService.class).profiles("zuul").web(true).run(args);
+    ConfigurableApplicationContext ctx = new SpringApplicationBuilder(RouteService.class).profiles("zuul").web(true).run(args);
+    try {
+      int maxKeyLen = Cipher.getMaxAllowedKeyLength("AES");
+      if(maxKeyLen < 256) {
+        logger.error("JCE is not enabled. Shutting down.");
+        ctx.close();
+      }
+    } catch (NoSuchAlgorithmException e) {
+      logger.error("Invalid crypto state. Shutting down.", e);
+      ctx.close();
+    }
   }
 
   /**
