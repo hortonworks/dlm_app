@@ -405,8 +405,17 @@ read_master_password_safely() {
 
 update_admin_password() {
     read_admin_password_safely
-    source $(pwd)/database-user-update.sh "$USER_ADMIN_PASSWORD"
+    source $(pwd)/database-run-script.sh "$USER_ADMIN_PASSWORD" "UPDATE_ADMIN_PASSWORD"
 }
+
+utils_enable_config_value() {
+  source $(pwd)/database-run-script.sh "$@" "ENABLE_CONFIG"
+}
+
+utils_disable_config_value() {
+  source $(pwd)/database-run-script.sh "$@" "DISABLE_CONFIG"
+}
+
 
 init_all() {
     read_admin_password_safely
@@ -543,6 +552,8 @@ usage() {
     printf "%-${tabspace}s:%s\n" "Commands"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "utils enable-config <key>" "Sets config value to true for the given config key"
+    printf "%-${tabspace}s:%s\n" "utils disable-config <key>" "Sets config value to false for the given config key"
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that DataPlane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
@@ -592,6 +603,14 @@ else
                 update-user)
                     shift
                     utils_update_user_secret "$@"
+                    ;;
+                enable-config)
+                    shift
+                    utils_enable_config_value "$@"
+                    ;;
+                disable-config)
+                    shift
+                    utils_disable_config_value "$@"
                     ;;
                 reload-apps)
                     utils_reload_app_containers
