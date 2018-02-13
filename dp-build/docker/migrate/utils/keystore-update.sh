@@ -18,7 +18,7 @@ init_keystore() {
             -storetype jceks \
             -keystore /dp-shared/dp-keystore.jceks \
             -storepass "$MASTER_PASSWORD" \
-            -alias "$ALIAS" \
+            -alias "dummy" \
             -keypass "dummy" &> /dev/null && echo "Keystore bootstrapped."
 
     # fix permissions

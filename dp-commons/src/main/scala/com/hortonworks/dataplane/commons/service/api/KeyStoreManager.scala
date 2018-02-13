@@ -11,24 +11,29 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
-import java.io.{FileInputStream, FileOutputStream, InputStream, OutputStream}
+import java.io._
 import java.nio.file.{Path, Paths}
 import java.security.KeyStore
 import javax.crypto.spec.SecretKeySpec
 
 import scala.collection.mutable
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 case class KeystoreReloadEvent()
 
 class KeyStoreManager(private val storePath: String, private val storePassword: String) extends mutable.Publisher[KeystoreReloadEvent] {
 
   //  initialize
-  private var keystore = load(storePath, storePassword)
+  private var keystore = load(storePath, storePassword).recover{
+    case exception: IOException =>
+      throw new Exception(exception.getMessage)
+  }
   private val watcher = new ThreadFileMonitor(Paths.get(storePath)) {
     override def onChange(path: Path): Unit = {
-      keystore = load(storePath, storePassword)
-
+      keystore = load(storePath, storePassword).recover{
+        case exception: IOException =>
+          throw new Exception(exception.getMessage)
+      }
       // publishing event
       publish(KeystoreReloadEvent())
     }
@@ -48,6 +53,9 @@ class KeyStoreManager(private val storePath: String, private val storePassword: 
       } yield {
         key -> value
       }).toMap
+    }.recover{
+      case exception: IOException =>
+        throw new Exception(exception.getMessage)
     }
   }
 
@@ -60,7 +68,10 @@ class KeyStoreManager(private val storePath: String, private val storePassword: 
           }
           keystore.setKeyEntry(s"$alias.$key", new SecretKeySpec(value, "AES"), storePassword.toCharArray, null)
       }
-      flush(storePath, storePassword, keystore)
+      val f = flush(storePath, storePassword, keystore)
+    }.recover{
+      case exception: IOException =>
+        throw new Exception(exception.getMessage)
     }
   }
 

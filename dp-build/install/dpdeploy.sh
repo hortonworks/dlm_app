@@ -136,7 +136,7 @@ utils_update_user_secret() {
 
 update_user_entry() {
     if [ "$MASTER_PASSWORD" == "" ]; then
-        read_master_password
+        get_master_password
     fi
     source $(pwd)/keystore-manage.sh "$@"
 }
@@ -219,6 +219,12 @@ read_master_password() {
         exit 1
        fi
     fi
+    MASTER_PASSWORD="$MASTER_PASSWD"
+}
+
+get_master_password(){
+    echo "Enter master password for DataPlane Service: "
+    read -s MASTER_PASSWD
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
