@@ -87,9 +87,9 @@ public class GatewayKeystore {
   private String getKeyFileAsString(String path) {
     try {
       if (!StringUtils.isBlank(path)) {
-        return FileUtils.readFileToString(new File(getClass().getClassLoader().getResource(path).getFile()));
+        return FileUtils.readFileToString(new File(path));
       } else {
-        throw new RuntimeException("File not found.");
+        throw new RuntimeException("File path was not supplied.");
       }
     } catch (IOException e) {
       logger.error("Exception", e);
