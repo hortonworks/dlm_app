@@ -25,6 +25,7 @@ export class DropdownComponent implements OnInit {
   @Input() showChevron = true;
   @Input() selectable = false;
   @Input() isDropup = false;
+  @Input() container = 'body';
   @Output() onSelectItem = new EventEmitter<DropdownItem>();
 
   get placement(): string {

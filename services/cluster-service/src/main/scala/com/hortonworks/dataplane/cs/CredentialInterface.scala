@@ -14,7 +14,7 @@ package com.hortonworks.dataplane.cs
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.service.api.{CredentialManager, CredentialNotFoundInKeystoreException, KeystoreReloadEvent}
+import com.hortonworks.dataplane.commons.service.api.{CredentialManager, CredentialNotFoundInKeystoreException, CredentialReloadEvent}
 import com.typesafe.config.Config
 
 import scala.concurrent.Future
@@ -30,7 +30,7 @@ trait CredentialInterface {
 }
 
 @Singleton
-class CredentialInterfaceImpl @Inject()(val config: Config) extends CredentialInterface with mutable.Subscriber[KeystoreReloadEvent, mutable.Publisher[KeystoreReloadEvent]] {
+class CredentialInterfaceImpl @Inject()(val config: Config) extends CredentialInterface with mutable.Subscriber[CredentialReloadEvent, mutable.Publisher[CredentialReloadEvent]] {
 
   private val storePath = config.getString("dp.keystore.path")
   private val storePassword = config.getString("dp.keystore.password")
@@ -45,7 +45,7 @@ class CredentialInterfaceImpl @Inject()(val config: Config) extends CredentialIn
   override def getCredential(key: String): Future[Credentials] =
     Future
       .fromTry(
-        credentialManager.read(key)
+        credentialManager.readUserCredential(key)
         .map (credential => Credentials(Some(credential._1), Some(credential._2)))
         .recover {
           case ex: CredentialNotFoundInKeystoreException => Credentials(Some(config.getString(s"$key.username")), Some(config.getString(s"$key.password")))
@@ -55,7 +55,7 @@ class CredentialInterfaceImpl @Inject()(val config: Config) extends CredentialIn
     callbacks.put(key, callback)
   }
 
-  override def notify(publisher: mutable.Publisher[KeystoreReloadEvent], event: KeystoreReloadEvent): Unit = {
+  override def notify(publisher: mutable.Publisher[CredentialReloadEvent], event: CredentialReloadEvent): Unit = {
     callbacks.values.foreach(cCallback => cCallback())
   }
 }

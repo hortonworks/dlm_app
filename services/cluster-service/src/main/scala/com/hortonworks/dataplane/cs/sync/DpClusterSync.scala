@@ -16,8 +16,9 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
+import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.cs.sync.TaskStatus.TaskStatus
 import com.hortonworks.dataplane.cs._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
@@ -58,16 +59,16 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
   }
 
   def createClusterIfNotExists(
-      dataplaneCluster: Entities.DataplaneCluster,
-      hJwtToken: Option[HJwtToken]): Future[Cluster] = {
+                                dataplaneCluster: Entities.DataplaneCluster,
+                                hJwtToken: Option[HJwtToken]): Future[Cluster] = {
     implicit val token = hJwtToken
     val clusters = for {
-      creds <- credentialInterface.getCredential("dp.credential.ambari")
+      creds <- credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       interface <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
-                                            wSClient,
-                                            config,
-                                            creds))
+          wSClient,
+          config,
+          creds))
       clusterNames <- interface.discoverClusters
       clusterDetails <- interface.getClusterDetails(clusterNames.head)
     } yield (clusterNames.head, clusterDetails)
@@ -88,7 +89,7 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
       result <- storageInterface.addClusters(Seq(cl))
     } yield result
 
-    clusters.onFailure{
+    clusters.onFailure {
       case e: Throwable =>
         logger.warn("Caught error on contacting cluster", e)
         storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNC_ERROR")))
@@ -118,13 +119,14 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
     val dpCluster = dpClusterService.retrieve(dpClusterId.toString)
     val actorRef: AtomicReference[ActorRef] = new AtomicReference[ActorRef]()
     dpCluster.flatMap {
-      case Left(errors)            => {logger.error(s"Cannot load cluster - $errors")
+      case Left(errors) => {
+        logger.error(s"Cannot load cluster - $errors")
         Future.successful(false)
       }
       case Right(dataplaneCluster) =>
         // Cluster loaded
-        if (dataplaneCluster.state.get == "SYNC_IN_PROGRESS"){
-         logger.warn(s"Sync in progress for cluster ${dataplaneCluster.ambariUrl}, ignoring request")
+        if (dataplaneCluster.state.get == "SYNC_IN_PROGRESS") {
+          logger.warn(s"Sync in progress for cluster ${dataplaneCluster.ambariUrl}, ignoring request")
           Future.successful(true)
         }
         else {
@@ -134,10 +136,12 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                 logger.info("Sync task completed")
                 actorRef.get() ! PoisonPill
                 storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNCED")))
+                detectDatalake(dataplaneCluster)
               case TaskStatus.Failed =>
                 logger.info("Sync task failed")
                 actorRef.get() ! PoisonPill
                 storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNCED")))
+                detectDatalake(dataplaneCluster)
             }
             val sync = actorSystem.actorOf(
               Props(classOf[ClusterSynchronizer],
@@ -152,11 +156,27 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
             logger.info(s"Starting cluster sync for ${dataplaneCluster.ambariUrl}")
             sync ! ExecuteTask(hJwtToken)
             true
-
           }
+
         }
     }
 
   }
 
+  private def detectDatalake(dataplaneCluster: DataplaneCluster) = {
+      val isDatalake = dataplaneCluster.isDatalake.get
+      dpClusterService.retrieveServiceInfo(dataplaneCluster.id.get.toString).map {
+        services => {
+          if (services.isRight) {
+            val clusterServices = services.right.get
+            val atlas = clusterServices.filter(service => service.servicename == "ATLAS")
+            if (atlas.nonEmpty && !isDatalake) {
+              storageInterface.markAsDatalake(dataplaneCluster.id.get, !isDatalake)
+            } else if (atlas.isEmpty && isDatalake) {
+              storageInterface.markAsDatalake(dataplaneCluster.id.get, !isDatalake)
+            }
+          }
+        }
+      }
+  }
 }

@@ -36,7 +36,7 @@
     (sort)="onSort($event)">
     <ngx-datatable-row-detail [rowHeight]="rowDetailHeight" [template]="rowDetailTemplate">
     </ngx-datatable-row-detail>
-    <ngx-datatable-footer>
+    <ngx-datatable-footer *ngIf="showFooter">
       <ng-template
         ngx-datatable-footer-template
         let-rowCount="rowCount"
@@ -45,6 +45,7 @@
         let-curPage="curPage"
         let-offset="offset">
         <dlm-table-footer
+          [dropdownContainer]="footerDropdownContainer"
           [rowsCount]="rowsCount"
           [filteredRowsCount]="rowCount"
           [pageSize]="pageSize"

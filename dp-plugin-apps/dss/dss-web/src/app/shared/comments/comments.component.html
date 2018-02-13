@@ -1,0 +1,102 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="slider-mask" [routerLink]="[returnURl]"></div>
+<div class="load-right-to-left-slider dialog1x">
+  <div class="title-container">
+    <div class="hwx-subtitle">
+      <span class="primary-space comment-heading">
+        <i class="fa fa-comments"></i>
+        <span>{{"pages.comments.collaborate" | translate}}</span>
+    </span>
+      <i id="back" class="fa fa-remove close-icon" [routerLink]="[returnURl]"></i>
+    </div>
+  </div>
+  <div class="rating-section" *ngIf="isRatingEnabled">
+    <div class="rating-stars"><star-rating-comp [starType]="'svg'" [labelText]="userRatingLabel" [labelPosition]="'top'" [size]="'medium'" [speed]="'noticeable'" [step]="0.5"
+                                 [showHalfStars]="true" [id]="'rating-id'" [rating]="userRating.rating" [hoverEnabled]="true" (onRatingChange)="onRatingChange($event)" (onHoverRatingChange)="onHoverRatingChange()" (mouseleave)="onMouseLeave()"></star-rating-comp></div>
+    <div class="rating-class">
+      <div>{{formatTotalVotes(totalVotes)}}</div>
+      <div class="fixed-star">
+        <star-rating-comp [starType]="'svg'" [labelText]="averageRating.toFixed(1)" [labelPosition]="'left'" [size]="'medium'" [id]="'rating-id2'" [hoverEnabled]="false" [numOfStars]="1" [staticColor]="'positive'" [readOnly]="true"></star-rating-comp>
+      </div>
+    </div>
+  </div>
+  <div class="mdl-grid" *ngIf="fetchError">
+    <div class="mdl-cell mdl-cell--12-col load-comment-error">{{"pages.comments.fetchErrorMsg" | translate}}</div>
+  </div>
+  <div class="mdl-grid" *ngIf="fetchInProgress && commentWithUsers.length === 0">
+    <div class="mdl-cell mdl-cell--12-col">{{"common.loading" | translate}}...</div>
+  </div>
+  <div *ngIf="!fetchInProgress">
+    <div class="mdl-grid" *ngIf="!fetchError && commentWithUsers.length === 0 && allCommentsLoaded">
+      <div class="mdl-cell mdl-cell--12-col no-comments">{{"pages.comments.noComments" | translate}}</div>
+    </div>
+    <div class="comment-tree" (scroll)="loadNext()">
+      <ul>
+        <li *ngFor="let commentWithUser of commentWithUsers">
+          <div class="comment" [ngClass]= "{'online-user': isLoggedInUser(commentWithUser)}">
+            <div class="flex-grid">
+              <div class="primary-space">
+                        <span class="comment-user" [ngClass]= "{'hwx-warning-bg': !isLoggedInUser(commentWithUser), 'hwx-external-bg': isLoggedInUser(commentWithUser)}">
+                            <i class="fa fa-user"></i>
+                        </span>
+                <div class="user-display">
+                  <div class="username-text">{{commentWithUser.userName}}</div>
+                  <div class="comment-date">{{formatDate(commentWithUser.comment.lastModified)}}</div>
+                </div>
+              </div>
+              <div>
+                <div class="utility-action-selection" [ngClass]= "{'hide': !isLoggedInUser(commentWithUser)}">
+                            <span>
+                                <i class="fa fa-ellipsis-v"></i>
+                            </span>
+                  <ul class="utility-action-options">
+                    <li (click)="onDeleteComment(commentWithUser)">
+                      <i class="fa fa-times"></i>
+                      <span>Delete</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="comment-text" *ngIf="commentWithUser.comment.comment.length < 128">
+              {{commentWithUser.comment.comment}}
+            </div>
+            <div class="comment-text" *ngIf="commentWithUser.comment.comment.length >= 128">
+              {{lengthAdjustedComment(commentWithUser.comment.comment,commentWithUser.isCommentExpanded)}}
+              <div><a class="expandable-view" (click)=" commentWithUser.isCommentExpanded = !commentWithUser.isCommentExpanded"><i>view
+                {{commentWithUser.isCommentExpanded? 'less':'more'}}</i></a></div>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="edge" #edge><i *ngIf="(!allCommentsLoaded || newCommentsAvailable)" class="fa fa-spinner fa-spin fa-2x fa-fw" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="slider-footer">
+    <div class="flex-grid form-reply">
+        <span class="primary-space">
+          <textarea #newComment type="text" placeholder="Add your comment here..." class="comment-input" [(ngModel)]="newCommentText" rows="2" (keydown)="resizeTextArea()" (cut)="resizeTextArea()" (paste)="resizeTextArea()"></textarea>
+        </span>
+      <span>
+            <button class="paper-btn" (click)="onPostComment()" id="post">
+                <i class="fa fa-chevron-up"></i>
+            </button>
+        </span>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

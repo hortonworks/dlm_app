@@ -43,14 +43,24 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSets)
   }
 
-  override def create(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]] = {
+  override def create(dataSetAndTags: DatasetAndTags): Future[RichDataset] = {
     ws.url(s"$url/datasets")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .post(Json.toJson(dataSetAndCatIds))
-      .map(mapToDataSetAndCategories)
+      .post(Json.toJson(dataSetAndTags))
+      .map(mapToRichDataset1)
+  }
+
+  override def update(dataSetAndTags: DatasetAndTags): Future[RichDataset] = {
+    ws.url(s"$url/datasets")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .put(Json.toJson(dataSetAndTags))
+      .map(mapToRichDataset1)
   }
 
   def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]] = {
@@ -60,22 +70,43 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  def listRichDataset(queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets?$queryString")
+  def addAssets(datasetId: Long, dataAssets: Seq[DataAsset]) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$datasetId/addassets")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(dataAssets))
+      .map(mapToRichDataset1)
+  }
+
+  def removeAssets(datasetId: Long, queryString: String) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$datasetId/assets?$queryString")
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map(mapToRichDataset1)
+  }
+
+  def removeAllAssets(datasetId: Long) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$datasetId/removeallassets")
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map(mapToRichDataset1)
+  }
+
+  def listRichDataset(queryString: String, userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)
   }
 
-  def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]] = {
-    ws.url(s"$url/richdatasets/$id")
+  def getRichDatasetById(id: Long,userId:Long): Future[Either[Errors, RichDataset]] = {
+    ws.url(s"$url/richdatasets/$id?userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDataset)
   }
 
-  def listRichDatasetByTag(tagName: String, queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets/tags/$tagName?$queryString")
+  def listRichDatasetByTag(tagName: String, queryString: String,userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets/tags/$tagName?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)
@@ -97,14 +128,14 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  override def update(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]] = {
-    ws.url(s"$url/datasets")
+  override def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset] = {
+    ws.url(s"$url/datasets/$datasetId")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .put(Json.toJson(dataSetAndCatIds))
-      .map(mapToDataSetAndCategories)
+      .patch(Json.toJson(dataset))
+      .map(mapDataSet)
   }
 
   override def delete(datasetId: String): Future[Either[Errors, Long]] = {
@@ -118,6 +149,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => extractEntity[Seq[Dataset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[Dataset].get })
       case _ => mapErrors(res)
+    }
+  }
+
+  private def mapDataSet(res: WSResponse) = {
+    res.status match {
+      case 200 => (res.json \ "results").validate[Dataset].get
+      case _ => mapResponseToError(res)
     }
   }
 
@@ -138,8 +176,8 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToDataSetAndCategories(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results" \ "data").validate[DatasetAndCategories].get)
-      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
-      case 409 => Left(Errors(Seq(Error("409", "Conflict"))))
+      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
+      case 409 => Left(Errors(Seq(Error(409, "Conflict"))))
       case _ => mapErrors(res)
     }
   }
@@ -147,15 +185,23 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToRichDataset(res: WSResponse): Either[Errors, RichDataset] = {
     res.status match {
       case 200 => Right((res.json \ "results" \\ "data").head.validate[RichDataset].get)
-      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case _ => mapErrors(res)
     }
   }
 
+  private def mapToRichDataset1(res: WSResponse): RichDataset = {
+    res.status match {
+      case 200 => (res.json \ "results" \\ "data").head.validate[RichDataset].get
+      case _ => throw new Exception(res.status.toString)
+    }
+  }
+
+
   private def mapToRichDatasets(res: WSResponse): Either[Errors, Seq[RichDataset]] = {
     res.status match {
       case 200 => extractEntity[Seq[RichDataset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[RichDataset].get })
-      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case _ => mapErrors(res)
     }
   }
@@ -163,7 +209,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToDataAssets(res: WSResponse): Either[Errors, Seq[DataAsset]] = {
     res.status match {
       case 200 => extractEntity[Seq[DataAsset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[DataAsset].get })
-      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case _ => mapErrors(res)
     }
   }

@@ -34,6 +34,7 @@ import { CheckboxColumnComponent } from 'components/table-columns/checkbox-colum
 import { ActionColumnType, ActionItemType, ActionColumnComponent } from 'components/';
 import { TableTheme, TableThemeSettings } from './table-theme.type';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import { genId } from 'utils/string-utils';
 
 export const SELECTED_KEY_NAME = '__selected';
 
@@ -76,6 +77,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() showPageSizeMenu = true;
   @Input() multiExpand = false;
   @Input() rowDetailHeight = 200;
+  @Input() showFooter = true;
   /**
    * Table theme one of 'plain', 'cards'. 'plain' by default
    * @type {string}
@@ -90,6 +92,11 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() scrollbarH = false;
   @Input() reorderable = true;
   @Input() count = 0;
+  /**
+   * `body` or ``
+   * @type {string}
+   */
+  @Input() footerDropdownContainer = '';
 
   /**
    * Rows count before any filter is applied
@@ -149,6 +156,9 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   }
 
   get footerHeight(): string | number {
+    if (!this.showFooter) {
+      return 0;
+    }
     return this._footerHeight || TableThemeSettings[this.theme].footerHeight;
   }
 
@@ -284,7 +294,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   ngOnChanges(changes) {
     if (changes.rows) {
       const { firstChange, currentValue, previousValue } = changes.rows;
-      if (!firstChange && currentValue && previousValue && currentValue.length < previousValue.length) {
+      if (!firstChange && currentValue && previousValue && currentValue.length < this.table.offset + this.table.limit) {
         this.table.offset = 0;
       }
     }
@@ -295,7 +305,12 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   }
 
   recalculateTable() {
-    this.table.recalculate();
+    // this will call change detection checker inside of ngx-datatable component
+    // and trigger resize. Add random attribute here because it's cheaper than deep copy
+    if (this.rows) {
+      this.rows = [...this.rows.map(i => ({...i, __tmpCache: genId()}))];
+      this.table.recalculate();
+    }
   }
 
   ngAfterViewInit() {

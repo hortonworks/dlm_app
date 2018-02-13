@@ -85,17 +85,19 @@
         </div>
       </div>
     </div>
-    <div class="row" *ngIf="!(overallProgress$ | async)?.isInProgress">
+    <div class="row">
       <div class="col-xs-12">
-        <div *ngIf="(tableData$ | async)?.length === 0; else jobs_table" id="no_issues_warning" class="well well-lg">{{'page.overview.issues.no_issues' | translate}}</div>
-        <ng-template #jobs_table>
-          <dlm-jobs-overview-table
-           [jobs]="tableData$ | async"
-           [jobsCount]="(tableResources$ | async).length"
-           (onShowPolicyLog)="handleOnShowPolicyLog($event)"
-           [footerOptions]="jobsTableFooterOptions">
-          </dlm-jobs-overview-table>
-        </ng-template>
+        <div *ngIf="shouldShowTable$ | async">
+          <div *ngIf="(tableData$ | async).length === 0; else jobs_table" id="no_issues_warning" class="well well-lg">{{'page.overview.issues.no_issues' | translate}}</div>
+          <ng-template #jobs_table>
+            <dlm-jobs-overview-table
+              [jobs]="tableData$ | async"
+              [jobsCount]="(tableResources$ | async).length"
+              (onShowPolicyLog)="handleOnShowPolicyLog($event)"
+              [footerOptions]="jobsTableFooterOptions">
+            </dlm-jobs-overview-table>
+          </ng-template>
+        </div>
       </div>
     </div>
   </div>

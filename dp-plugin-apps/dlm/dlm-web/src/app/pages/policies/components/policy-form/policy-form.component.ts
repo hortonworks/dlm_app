@@ -7,11 +7,13 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
-  HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
+  HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy
+} from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import {
-  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn, ValidationErrors
+  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, ValidationErrors
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { IMyOptions, IMyDateModel, IMyInputFieldChanged } from 'mydatepicker';
@@ -23,15 +25,17 @@ import * as RouterActions from 'actions/router.action';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { State } from 'reducers/index';
 import { Pairing } from 'models/pairing.model';
-import { POLICY_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS,
-  POLICY_DAYS, POLICY_START} from 'constants/policy.constant';
+import {
+  POLICY_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS,
+  POLICY_DAYS, POLICY_START
+} from 'constants/policy.constant';
 import { getFormValues } from 'selectors/form.selector';
 import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
 import { simpleSearch } from 'utils/string-utils';
-import { loadFullDatabases, loadDatabases, loadTables } from 'actions/hivelist.action';
+import { loadDatabases, loadTables } from 'actions/hivelist.action';
 import { resetFormValue } from 'actions/form.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
@@ -47,9 +51,13 @@ import { HiveBrowserTablesLoadingMap, DatabaseTablesCollapsedEvent } from 'compo
 import { removeProgressState } from 'actions/progress.action';
 import { FILES_REQUEST } from 'components/hdfs-browser/hdfs-browser.component';
 import { loadYarnQueues } from 'actions/yarnqueues.action';
-import { YarnQueue } from 'models/yarnqueues.model';
 import { getYarnQueueEntities } from 'selectors/yarn.selector';
 import { isEqual } from 'utils/object-utils';
+import { CloudContainer } from 'models/cloud-container.model';
+import { PROVIDERS, S3, WASB, ADLS } from 'constants/cloud.constant';
+import { CloudAccount } from 'models/cloud-account.model';
+import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
+import { Cluster } from 'models/cluster.model';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
@@ -95,6 +103,8 @@ export function nameValidator(): ValidatorFn {
   };
 }
 
+const CLUSTER = 'CLUSTER';
+
 @Component({
   selector: 'dlm-policy-form',
   templateUrl: './policy-form.component.html',
@@ -107,8 +117,19 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   private formRestored = false;
   databaseTablesLoadingMap: HiveBrowserTablesLoadingMap = {};
   yarnQueueList: any[] = [];
+  CLUSTER = CLUSTER;
+  PROVIDERS = PROVIDERS;
+  ADLS = ADLS;
+  WASB = WASB;
+  S3 = S3;
+  DESTINATION_TYPES = [CLUSTER, S3];
 
   @Input() pairings: Pairing[] = [];
+  @Input() containers: any = {};
+  @Input() accounts: CloudAccount[] = [];
+  @Input() clusters: Cluster[] = [];
+  @Input() containersList: CloudContainer[] = [];
+  @Input() beaconStatuses: BeaconAdminStatus[] = [];
   @Input() sourceClusterId = 0;
   @Output() formSubmit = new EventEmitter<any>();
   @HostBinding('class') className = 'dlm-policy-form';
@@ -133,6 +154,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   startTimeDateField = {fieldLabel: 'Start Date'};
   endTimeDateField = {fieldLabel: 'End Date'};
   userTimezone = '';
+
   get datePickerOptions(): IMyOptions {
     const yesterday = moment().subtract(1, 'day');
     const today = moment();
@@ -147,6 +169,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }]
     };
   }
+
   sectionCollapsedMap = {
     general: false,
     database: false,
@@ -240,6 +263,21 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   hdfsRootPath = '/';
   selectedHdfsPath = '/';
   userTimeZone$: BehaviorSubject<any>;
+
+  /**
+   * List of field-names related to cluster (source or destination)
+   *
+   * @type {string[]}
+   */
+  clusterFields = ['cluster'];
+
+  /**
+   * List of field-names related to cloud (source or destination)
+   *
+   * @type {string[]}
+   */
+  s3Fields = ['cloudAccount', 's3endpoint'];
+
   get defaultTime(): Date {
     const date = moment();
     date.hours(0);
@@ -261,23 +299,80 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get destinationClusters() {
-    if (this.sourceCluster) {
-      const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => +cluster.id === +this.sourceCluster).length);
-      if (pairings.length) {
-        const clusterEntities = this.getClusterEntities(pairings);
-        // Remove source cluster from the entities
-        delete clusterEntities[this.sourceCluster];
-        return mapToList(clusterEntities);
+    const sourceType = this.policyForm.value.general.source.type;
+    if (sourceType === CLUSTER) {
+      if (this.sourceCluster) {
+        const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => +cluster.id === +this.sourceCluster).length);
+        if (pairings.length) {
+          const clusterEntities = this.getClusterEntities(pairings);
+          // Remove source cluster from the entities
+          delete clusterEntities[this.sourceCluster];
+          return mapToList(clusterEntities);
+        }
+        return [{
+          label: this.t.instant('page.policies.form.fields.destinationCluster.noPair'),
+          value: ''
+        }];
       }
       return [{
-        label: this.t.instant('page.policies.form.fields.destinationCluster.noPair'),
+        label: this.t.instant('page.policies.form.fields.destinationCluster.default'),
         value: ''
       }];
     }
-    return [{
-      label: this.t.instant('page.policies.form.fields.destinationCluster.default'),
-      value: ''
+    return this.clusters.filter(cluster => {
+      const status = this.beaconStatuses.find(c => c.clusterId === cluster.id);
+      return status ? status.beaconAdminStatus.replicationCloudFS : false;
+    }).map(cluster => this.clusterToListOption(cluster));
+  }
+
+  private filterCloudAccounts(provider) {
+    return this.accounts
+      .filter(a => a.accountDetails.provider === provider)
+      .map(a => ({label: a.accountDetails['userName'] || a.accountDetails['accountName'], value: a.id}));
+  }
+
+  get destinationCloudAccounts() {
+    return this.filterCloudAccounts(this.policyForm.value.general.destination.type);
+  }
+
+  get sourceCloudAccounts() {
+    return this.filterCloudAccounts(this.policyForm.value.general.source.type);
+  }
+
+  /**
+   * List of Source Type options
+   * Only Cluster can be a Source for HIVE Policies
+   * Both Cluster and Cloud can be a Source for HDFS Policies
+   *
+   * @type {{label: string, value: string}}[]
+   */
+  get sourceTypes() {
+    const cluster = {label: this.CLUSTER, value: this.CLUSTER};
+    const s3 = {label: this.S3, value: this.S3};
+    return this.isHivePolicy() ? [cluster] : [s3, cluster];
+  }
+
+  /**
+   * List of Destination Type options
+   * Only Cluster can be a Destination for HIVE Policy
+   * Only Cluster can be a Destination for Cloud Source
+   * If Source Cluster has `replicationCloudFS` set to `true` both Cluster and Cloud may be a Destination,
+   * otherwise only Cluster can be used
+   *
+   * @type {{label: string, value: string}}[]
+   */
+  get destinationTypes() {
+    const sourceClusterId = this.selectedSource$.getValue();
+    const onlyCluster = [{
+      label: this.CLUSTER,
+      value: this.CLUSTER
     }];
+    if (this.isHivePolicy() || this.policyForm.value.general.source.type === this.S3) {
+      return onlyCluster;
+    }
+    const status = this.beaconStatuses.find(c => c.clusterId === sourceClusterId);
+    const replicationCloudFS = status ? status.beaconAdminStatus.replicationCloudFS : false;
+    return replicationCloudFS ? this.DESTINATION_TYPES.map(dt => ({label: dt, value: dt})) : onlyCluster;
   }
 
   get selectedDay() {
@@ -297,11 +392,23 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get sourceCluster() {
-    return this.policyForm.value.general.sourceCluster;
+    return this.policyForm.value.general.source.cluster;
+  }
+
+  get sourceType() {
+    return this.policyForm.value.general.source.type;
   }
 
   get destinationCluster() {
-    return this.policyForm.value.general.destinationCluster;
+    return this.policyForm.value.general.destination.cluster;
+  }
+
+  get destinationType() {
+    return this.policyForm.value.general.destination.type;
+  }
+
+  get destinationCloudAccount() {
+    return this.policyForm.value.general.destination.cloudAccount;
   }
 
   getEndTime(endDate) {
@@ -316,8 +423,18 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
         description: ['', Validators.maxLength(512)],
         type: [this.selectedPolicyType],
-        sourceCluster: ['', Validators.required],
-        destinationCluster: ['', Validators.required]
+        source: this.formBuilder.group({
+          type: ['', Validators.required],
+          cluster: ['', Validators.required],
+          cloudAccount: ['', Validators.required],
+          s3endpoint: ['', Validators.required],
+        }),
+        destination: this.formBuilder.group({
+          type: ['', Validators.required],
+          cluster: ['', Validators.required],
+          cloudAccount: ['', Validators.required],
+          s3endpoint: ['', Validators.required],
+        })
       }),
       databases: ['', Validators.required],
       directories: ['', Validators.compose([Validators.required])],
@@ -331,11 +448,11 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         endTime: this.formBuilder.group({
           date: [''],
           time: [this.defaultEndTime]
-        }, { validator: this.validateTime }),
+        }, {validator: this.validateTime}),
         startTime: this.formBuilder.group({
           date: [''],
           time: [this.defaultTime]
-        }, { validator: this.validateTime })
+        }, {validator: this.validateTime})
       }),
       advanced: this.formBuilder.group({
         queue_name: [''],
@@ -343,6 +460,86 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }),
       userTimezone: ['']
     });
+  }
+
+  /**
+   * Reset source and destination form groups if Policy Type is changed
+   * Activate a file-browser or db-viewer depends on Policy Type
+   */
+  private subscribeToPolicyType() {
+    const generalControls = this.policyForm.controls.general['controls'];
+    const policyTypeChangeSubscription = generalControls.type.valueChanges.subscribe(type => {
+      generalControls.source.reset();
+      generalControls.destination.reset();
+      this.activateFieldsForType(type);
+      this.databaseSearch$.next('');
+    });
+    this.subscriptions.push(policyTypeChangeSubscription);
+  }
+
+  /**
+   * Reset destination form group if Source Type is changed
+   * Reset other fields in the Source form group
+   * Enable `directories`-field for Cluster and disable it for Cloud
+   */
+  private subscribeToSourceType() {
+    const generalControls = this.policyForm.controls.general['controls'];
+    const sourceTypeChangeSubscription = generalControls.source['controls'].type.valueChanges.subscribe(type => {
+      generalControls.destination.reset();
+      let toEnable = [], toDisable = [];
+      if (type === S3) {
+        toEnable = this.s3Fields;
+        toDisable = this.clusterFields;
+        this.policyForm.controls['directories'].disable();
+      }
+      if (type === CLUSTER) {
+        toEnable = this.clusterFields;
+        toDisable = this.s3Fields;
+        if (this.policyForm.value.general.type === POLICY_TYPES.HDFS) {
+          this.policyForm.controls['directories'].enable();
+        }
+      }
+      toDisable.forEach(p => generalControls.source['controls'][p].disable());
+      toEnable.forEach(p => generalControls.source['controls'][p].enable());
+    });
+    this.subscriptions.push(sourceTypeChangeSubscription);
+  }
+
+  /**
+   * Works only if Source Cluster is changed to another cluster and not for null or any other falsy value
+   * Reset HDFS-path to root if Source Cluster is changed
+   */
+  private subscribeToSourceCluster() {
+    const generalControls = this.policyForm.controls.general['controls'];
+    const sourceTypeChangeSubscription = generalControls.source['controls'].cluster.valueChanges.subscribe(cluster => {
+      if (cluster) {
+        this.selectedHdfsPath = this.root;
+        this.selectedSource$.next(cluster);
+        this.databaseSearch$.next('');
+      }
+    });
+    this.subscriptions.push(sourceTypeChangeSubscription);
+  }
+
+  /**
+   * Reset other fields in the Destination form group
+   */
+  private subscribeToDestinationType() {
+    const generalControls = this.policyForm.controls.general['controls'];
+    const destinationTypeChangeSubscription = generalControls.destination['controls'].type.valueChanges.subscribe(type => {
+      let toEnable = [], toDisable = [];
+      if (type === S3) {
+        toEnable = this.s3Fields;
+        toDisable = this.clusterFields;
+      }
+      if (type === CLUSTER) {
+        toEnable = this.clusterFields;
+        toDisable = this.s3Fields;
+      }
+      toDisable.forEach(p => generalControls.destination['controls'][p].disable());
+      toEnable.forEach(p => generalControls.destination['controls'][p].enable());
+    });
+    this.subscriptions.push(destinationTypeChangeSubscription);
   }
 
   private setupDatabaseChanges(policyForm: FormGroup): void {
@@ -356,20 +553,20 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         .map(databases => databases.filter(db => db.clusterId === sourceCluster))
         .do(databases => {
           const selectedDatabase = policyForm.value.databases;
-          const selectedSource = policyForm.value.general.sourceCluster;
+          const selectedSource = policyForm.value.general.source.cluster;
           // select first database when source changed and selected database is not exist on selected cluster
           if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
             policyForm.patchValue({databases: databases[0].name});
           }
         });
-      }) as Observable<HiveDatabase[]>;
+    }) as Observable<HiveDatabase[]>;
     this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
       .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.databaseRequest$ = this.store.select(getMergedProgress(DATABASE_REQUEST));
 
     const updateTablesLoadingProgress = this.store.select(getAllProgressStates)
       .subscribe(progressList => {
-        const updates: {[databaseId: string]: ProgressState}  = progressList
+        const updates: { [databaseId: string]: ProgressState } = progressList
           .reduce((all, progressState: ProgressState) => {
             if (progressState.requestId.startsWith(this.tableRequestPrefix)) {
               const databaseId = progressState.requestId.replace(this.tableRequestPrefix, '');
@@ -397,8 +594,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         if (needRestoreForm) {
           policyForm.patchValue(policyFormValues);
           this.selectedHdfsPath = policyFormValues['directories'];
-          this.selectedSource$.next(policyFormValues['general']['sourceCluster']);
-          this.activateFieldsForType(policyFormValues['general']['type']);
+          this.selectedSource$.next(policyFormValues['general']['source']['cluster']);
           if (Object.keys(policyFormValues['advanced']).some(k => policyFormValues['advanced'][k] !== '')) {
             this.sectionCollapsedMap.advanced = false;
           }
@@ -406,7 +602,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         } else if (sourceClusterId > 0) {
           policyForm.patchValue({
             general: {
-              sourceCluster: sourceClusterId
+              source: {
+                cluster: sourceClusterId,
+                type: CLUSTER
+              }
             }
           });
           this.selectedSource$.next(sourceClusterId);
@@ -429,7 +628,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setDirectoriesPending(policyForm: FormGroup, pending = true): void {
-    policyForm.get('directories').setErrors(pending ? { pending: true } : null);
+    policyForm.get('directories').setErrors(pending ? {pending: true} : null);
   }
 
   private setupJobControlsChanges(policyForm: FormGroup): void {
@@ -440,7 +639,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   private setupDirectoryChanges(policyForm: FormGroup) {
     const directoryFieldChange$: Observable<string> = policyForm.valueChanges
-      .map(values => values.directories)
+      .pluck<any, string>('directories')
       .distinctUntilChanged()
       .debounceTime(500)
       .do(path => {
@@ -450,27 +649,32 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       });
 
     const directoryRequestStatus$ = this.store.select(getProgressState(FILES_REQUEST))
+      .map(p => !p ? {isInProgress: true} as ProgressState : p)
       .distinctUntilKeyChanged('isInProgress')
       .filter((progressState: ProgressState) => {
         return progressState.isInProgress === false;
       });
     // this is the easiest way to get validation works for this field
-    const validateDirectories = directoryFieldChange$
-      .switchMap(() => directoryRequestStatus$)
-      .subscribe((progressState: ProgressState) => {
+    const validateDirectories = Observable
+      .combineLatest(directoryFieldChange$, directoryRequestStatus$)
+      .subscribe(([_, progressState]: [string, ProgressState]) => {
         const directoriesField = policyForm.get('directories');
         this.setDirectoriesPending(policyForm, false);
         if (progressState.error) {
-          directoriesField.setErrors({ notExist: true });
+          directoriesField.setErrors({notExist: true});
         } else {
+          if (!progressState.response || !this.hdfsRootPath) {
+            return;
+          }
           const files = progressState.response.fileList;
           const [tail] = this.hdfsRootPath.split('/').slice(-1);
           const isFile = files.length === 1 && files[0].type === FILE_TYPES.FILE &&
             tail === files[0].pathSuffix;
           if (isFile) {
-            directoriesField.setErrors({ isFile: true });
+            directoriesField.setErrors({isFile: true});
           }
         }
+        this.cdRef.detectChanges();
       });
     this.subscriptions.push(validateDirectories);
   }
@@ -483,14 +687,14 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setupDestinationChanges(policyForm: FormGroup): void {
-    let skipFieldChange = this.formRestored;
-    const valueChange$: Observable<number> = policyForm.valueChanges
-      .pluck<any, number>('general', 'destinationCluster')
-      .distinctUntilChanged();
-    const loadQueues = valueChange$
-      .subscribe(clusterId => {
-        if (clusterId) {
-          this.store.dispatch(loadYarnQueues(clusterId));
+    let initialValueIsSet = false;
+    const destinationChange$: Observable<any> = policyForm.valueChanges
+      .pluck<any, any>('general', 'destination')
+      .distinctUntilChanged(isEqual);
+    const loadQueues = destinationChange$
+      .subscribe(({ cluster, type }) => {
+        if (cluster && type === CLUSTER) {
+          this.store.dispatch(loadYarnQueues(cluster));
         }
       });
 
@@ -503,17 +707,15 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       return all.concat(listItem);
     };
 
-    const clusterQueues$ = Observable.combineLatest(valueChange$, this.store.select(getYarnQueueEntities))
-      .map(([clusterId, entities]) => {
-        return entities[clusterId];
-      })
+    const clusterQueues$ = Observable.combineLatest(destinationChange$, this.store.select(getYarnQueueEntities))
+      .map(([{cluster, type }, entities]) => entities[cluster])
       .distinctUntilChanged(isEqual);
     const updateQueueList = clusterQueues$.subscribe(yarnQueues => {
       if (yarnQueues && yarnQueues.length) {
         this.yarnQueueList = yarnQueues[0].children ? yarnQueues.reduce(createQueueList, []) :
           [makeQueueItem(yarnQueues[0].path)];
-        if (skipFieldChange) {
-          skipFieldChange = false;
+        if (!initialValueIsSet && this.formRestored) {
+          initialValueIsSet = true;
           return;
         }
         policyForm.patchValue({
@@ -533,10 +735,15 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
               private timezoneService: TimeZoneService,
               private t: TranslateService,
               private cdRef: ChangeDetectorRef,
-              private hdfs: HdfsService) { }
+              private hdfs: HdfsService) {
+  }
 
   ngOnInit() {
     this.policyForm = this.initForm();
+    this.subscribeToPolicyType();
+    this.subscribeToSourceType();
+    this.subscribeToSourceCluster();
+    this.subscribeToDestinationType();
     this.setupJobControlsChanges(this.policyForm);
     this.activateFieldsForType(this.selectedPolicyType);
     this.setupFormChanges(this.policyForm);
@@ -556,15 +763,19 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  clusterToListOption(cluster) {
+    return {
+      label: `${cluster.name} (${cluster.dataCenter})`,
+      value: cluster.id
+    };
+  }
+
   getClusterEntities(pairings) {
-    return pairings.reduce((entities: {[id: number]: {}}, entity: Pairing) => {
+    return pairings.reduce((entities: { [id: number]: {} }, entity: Pairing) => {
       const getClusters = (pairing) => {
         return pairing.pair.reduce((clusters: {}, cluster) => {
           return Object.assign({}, clusters, {
-            [cluster.id]: {
-              label: `${cluster.name} (${cluster.dataCenter})`,
-              value: cluster.id
-            }
+            [cluster.id]: this.clusterToListOption(cluster)
           });
         }, {});
       };
@@ -572,7 +783,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     }, {});
   }
 
-  handleSubmit({ value }) {
+  handleSubmit({value}) {
     const userTimezone = this.timezoneService.userTimezone;
     if (this.policyForm.valid) {
       if (value.job.repeatMode === this.policyRepeatModes.EVERY) {
@@ -598,7 +809,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         value.job.startTime.date = '';
         value.job.startTime.time = '';
       }
-      value.userTimezone =  userTimezone ? userTimezone.label : '';
+      value.userTimezone = userTimezone ? userTimezone.label : '';
       this.formSubmit.emit(value);
     }
     markAllTouched(this.policyForm);
@@ -609,7 +820,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleStartChange(radioItem) {
-    const { value } = radioItem;
+    const {value} = radioItem;
     this.policyForm.patchValue({
       job: {
         start: value,
@@ -622,9 +833,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       const userTimezone = this.timezoneService.userTimezone;
       const day = userTimezone ? moment().tz(userTimezone.zones[0].value).format('d') : moment().format('d');
       this.policyForm.patchValue({
-        job: {
-          day: day
-        }
+        job: { day }
       });
     }
   }
@@ -634,7 +843,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   updateFrequency(frequency) {
-    this.policyForm.patchValue({ job: { frequencyInSec: frequency }});
+    this.policyForm.patchValue({job: {frequencyInSec: frequency}});
   }
 
   isHDFSPolicy() {
@@ -647,29 +856,23 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   handleDateChange(date: IMyDateModel, dateType: string) {
     if (date.formatted) { // valid date
-      this.policyForm.patchValue({ job: { [dateType]: { date: date.formatted } } });
+      this.policyForm.patchValue({job: {[dateType]: {date: date.formatted}}});
     }
   }
 
   handleDateInputChange(field: IMyInputFieldChanged, dateType: string): void {
     const control: AbstractControl = this.policyForm.get('job').get(dateType).get('date');
-    control.setErrors(field.valid || field.value ===  '' ? null : {
+    control.setErrors(field.valid || field.value === '' ? null : {
       invalidDate: !field.valid
     });
   }
 
-  handlePolicyTypeChange(radioItem: RadioItem) {
-    const { value } = radioItem;
-    this.activateFieldsForType(value);
-    this.databaseSearch$.next('');
-  }
-
   activateFieldsForType(policyType: string) {
     let disableField,
-        enableField;
+      enableField;
     if (policyType === POLICY_TYPES.HDFS) {
       disableField = 'databases';
-      enableField  = 'directories';
+      enableField = 'directories';
     } else if (policyType === POLICY_TYPES.HIVE) {
       disableField = 'directories';
       enableField = 'databases';
@@ -679,7 +882,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleDayChange(radioItem: RadioItem) {
-    const { value } = radioItem;
+    const {value} = radioItem;
     this.policyForm.patchValue({
       job: {
         day: value
@@ -687,19 +890,31 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
-  handleSourceClusterChange(sourceCluster: SelectOption) {
-    this.selectedHdfsPath = this.root;
-    this.policyForm.patchValue({
-      general: {
-        destinationCluster: ''
-      }
-    });
-    this.selectedSource$.next(sourceCluster.value);
-    this.databaseSearch$.next('');
-  }
-
   handleHdfsPathChange(path) {
     this.selectedHdfsPath = path;
+  }
+
+  updateFieldsDependedOnType(value, cloudProps, clusterProps) {
+    let toEnable, toDisable;
+    if (value === this.CLUSTER) {
+      toDisable = cloudProps;
+      toEnable = clusterProps;
+    } else {
+      toDisable = clusterProps;
+      toEnable = cloudProps;
+    }
+    toDisable.map(p => {
+      const control = this.policyForm.get(p);
+      if (control.enabled) {
+        control.disable();
+      }
+    });
+    toEnable.map(p => {
+      const control = this.policyForm.get(p);
+      if (control.disabled) {
+        control.enable();
+      }
+    });
   }
 
   cancel() {
@@ -735,7 +950,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }
       const dateWithTime = this.setTimeForDate(mDate.format(), timeFieldValue);
       if (dateWithTime.isBefore(moment())) {
-        timeControl.setErrors({ lessThanCurrent: true });
+        timeControl.setErrors({lessThanCurrent: true});
         return null;
       }
       if (startTimeValue && endTimeValue && moment(endTimeValue).isBefore(moment(startTimeValue))) {
@@ -766,13 +981,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onDatabaseTablesCollapsed(event: DatabaseTablesCollapsedEvent): void {
-    const { database, collapsed } = event;
+    const {database, collapsed} = event;
     const databaseId = database.entityId;
     if (!(databaseId in this.databaseTablesLoadingMap)) {
       this.store.dispatch(loadTables({
         clusterId: database.clusterId,
         databaseId: database.name
-      }, { requestId: this.tableRequestPrefix + database.entityId}));
+      }, {requestId: this.tableRequestPrefix + database.entityId}));
       this.databaseTablesLoadingMap[databaseId] = {isInProgress: true} as ProgressState;
     }
   }

@@ -55,24 +55,27 @@ class LdapService @Inject()(
     private val configuration: Configuration) {
   private val logger = Logger(classOf[LdapService])
 
+  private val LDAP_CREDENTIAL_KEY = "DPSPlatform.credential.ldap"
+
   def configure(knoxConf: KnoxConfigInfo,
                 requestHost: String): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
       Future.successful(
-        Left(Errors(Seq(Error("400", "username and password mandatory")))))
+        Left(Errors(Seq(Error(400, "username and password mandatory")))))
     } else
       validate(knoxConf) match {
         case Left(errors) => Future.successful(Left(errors))
         case Right(isValid) =>
           if (!isValid) {
             Future.successful(
-              Left(Errors(Seq(Error("400", "invalid knox configuration")))))
+              Left(Errors(Seq(Error(400, "invalid knox configuration")))))
           } else
             validateBindDn(knoxConf.ldapUrl, knoxConf.bindDn, knoxConf.password)
               .flatMap {
                 case Left(errors) => Future.successful(Left(errors))
                 case Right(isBound) =>
                   val tryToWrite = ldapKeyStore.createCredentialEntry(
+                    LDAP_CREDENTIAL_KEY,
                     knoxConf.bindDn.get,
                     knoxConf.password.get
                   )
@@ -119,6 +122,7 @@ class LdapService @Inject()(
         case Left(errors) => Future.successful(Left(errors))
         case Right(isBound) => {
           val tryToWrite = ldapKeyStore.createCredentialEntry(
+            LDAP_CREDENTIAL_KEY,
             knoxConfig.bindDn.get,
             knoxConfig.password.get
           )
@@ -141,7 +145,7 @@ class LdapService @Inject()(
 
   def validate(knoxConf: KnoxConfigInfo): Either[Errors, Boolean] = {
     if (knoxConf.userSearchBase.isEmpty || knoxConf.userSearchAttributeName.isEmpty) {
-      Left(Errors(Seq(Error("invalid config", "user dn template mandatory"))))
+      Left(Errors(Seq(Error(500, "user dn template mandatory"))))
     } else {
       Right(true)
     }
@@ -212,7 +216,7 @@ class LdapService @Inject()(
     configuredLdap.headOption match {
       case Some(l) => {
         val cred: Option[CredentialEntry] =
-          ldapKeyStore.getCredentialEntry(l.bindDn.get).toOption
+          ldapKeyStore.getCredentialEntry(LDAP_CREDENTIAL_KEY).toOption
         cred match {
           case Some(cred) =>
             getLdapContext(l.ldapUrl.get, l.bindDn.get, cred.password)
@@ -225,20 +229,20 @@ class LdapService @Inject()(
               }
           case None => {
             Future.successful(
-              Left(Errors(Seq(Error("Exception", "no password ")))))
+              Left(Errors(Seq(Error(500, "no password ")))))
           }
         }
       }
       case None => {
         Future.successful(
-          Left(Errors(Seq(Error("409", "LDAP is not yet configured.")))))
+          Left(Errors(Seq(Error(409, "LDAP is not yet configured.")))))
       }
     }
   }
 
-  def getPassword(bindDn: String): Option[String] = {
+  def getPassword(): Option[String] = {
     val cred: Option[CredentialEntry] =
-      ldapKeyStore.getCredentialEntry(bindDn).toOption
+      ldapKeyStore.getCredentialEntry(LDAP_CREDENTIAL_KEY).toOption
     if (cred.isDefined) Some(cred.get.password) else None
   }
 
@@ -257,9 +261,7 @@ class LdapService @Inject()(
       searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
       try {
         if (ldapConfs.head.userSearchBase.isEmpty || ldapConfs.head.userSearchAttributeName.isEmpty) {
-          Future.successful(Left(Errors(Seq(Error(
-            "Exception",
-            "User search base and user search attribute must be configured.")))))
+          Future.successful(Left(Errors(Seq(Error(500, "User search base and user search attribute must be configured.")))))
         } else {
           val userSearchBase = ldapConfs.head.userSearchBase.get
           val userSearchAttributeName =
@@ -282,7 +284,7 @@ class LdapService @Inject()(
       } catch {
         case e: Exception =>
           logger.error("exception", e)
-          Future.successful(Left(Errors(Seq(Error("Exception", e.getMessage)))))
+          Future.successful(Left(Errors(Seq(Error(500, e.getMessage)))))
       }
     }
   }
@@ -296,7 +298,7 @@ class LdapService @Inject()(
       Future.successful(
         Left(
           Errors(
-            Seq(Error("Exception", "Group search base must be configured")))))
+            Seq(Error(500, "Group search base must be configured")))))
     } else {
       val searchControls: SearchControls = new SearchControls()
       searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
@@ -349,7 +351,7 @@ class LdapService @Inject()(
           case Right(userSearchResults) => {
             userSearchResults.headOption match {
               case None =>
-                Left(Errors(Seq(Error("No user", "There is no such user"))))
+                Left(Errors(Seq(Error(500, "There is no such user"))))
               case Some(userRes) =>
                 val groupSearchControls = new SearchControls
                 groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
@@ -396,14 +398,13 @@ class LdapService @Inject()(
     else {
       val errors = ArrayBuffer.empty[Error]
       if (ldapConf.groupSearchBase.isEmpty) {
-        errors += Error("Exception", "Group Search base not configured")
+        errors += Error(500, "Group Search base not configured")
       }
       if (ldapConf.groupObjectClass.isEmpty) {
-        errors += Error("Exception", "Group Search base not configured")
+        errors += Error(500, "Group Search base not configured")
       }
       if (ldapConf.groupMemberAttributeName.isEmpty) {
-        errors += Error("Exception",
-                        "Group Member AttributeName not configured")
+        errors += Error(500, "Group Member AttributeName not configured")
       }
       Some(Errors(errors.seq))
     }
@@ -430,22 +431,19 @@ class LdapService @Inject()(
         logger.error("error while getting ldapContext", e)
         val errors = Errors(
           Seq(
-            Error(
-              "Communication Exception",
-              "Could not communicate with LDAP server. Check connectivity.")))
+            Error(500, "Could not communicate with LDAP server. Check connectivity.")))
         Future.failed(WrappedErrorsException(errors))
       }
       case e: AuthenticationException => {
         logger.error("error while getting ldapContext", e)
         val errors = Errors(
           Seq(
-            Error("Authentication Exception",
-                  "Some credentials are incorrect for LDAP")))
+            Error(500, "Some credentials are incorrect for LDAP")))
         Future.failed(WrappedErrorsException(errors))
       }
       case e: NamingException => {
         logger.error("error while getting ldapContext", e)
-        val errors = Errors(Seq(Error("Exception", e.getMessage)))
+        val errors = Errors(Seq(Error(500, e.getMessage)))
         Future.failed(WrappedErrorsException(errors))
       }
     }

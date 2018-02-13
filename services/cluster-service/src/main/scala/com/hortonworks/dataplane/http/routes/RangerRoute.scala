@@ -17,28 +17,16 @@ import javax.inject.Inject
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.google.common.annotations.VisibleForTesting
+import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities.ClusterService
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
-import com.hortonworks.dataplane.cs.{
-  ClusterDataApi,
-  CredentialInterface,
-  Credentials,
-  StorageInterface
-}
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterHostsService,
-  DpClusterService,
-  ClusterService => CS
-}
+import com.hortonworks.dataplane.cs.{ClusterDataApi, CredentialInterface, Credentials, StorageInterface}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, DpClusterService, ClusterService => CS}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.http.JsonSupport._
 import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
-import com.hortonworks.dataplane.knox.{
-  KnoxApiExecutor,
-  TokenDisabledKnoxApiExecutor
-}
+import com.hortonworks.dataplane.knox.{KnoxApiExecutor, TokenDisabledKnoxApiExecutor}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -91,7 +79,7 @@ class RangerRoute @Inject()(
                   case Failure(th) =>
                     th match {
                       case th: ServiceNotFound =>
-                        complete(StatusCodes.NotFound, errors(th))
+                        complete(StatusCodes.NotFound, errors(th, status = 404))
                       case _ =>
                         complete(StatusCodes.InternalServerError, errors(th))
                     }
@@ -125,7 +113,7 @@ class RangerRoute @Inject()(
                 case Failure(th) =>
                   th match {
                     case th: ServiceNotFound =>
-                      complete(StatusCodes.NotFound, errors(th))
+                      complete(StatusCodes.NotFound, errors(th, status = 404))
                     case _ =>
                       complete(StatusCodes.InternalServerError, errors(th))
                   }
@@ -183,7 +171,7 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      credential <- credentialInterface.getCredential("dp.credential.ranger")
+      credential <- credentialInterface.getCredential(CSConstants.RANGER_CREDENTIAL_KEY)
       services <- getRangerServicesForType(baseUrls.head,
                                            credential,
                                            serviceType,
@@ -344,7 +332,7 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      credential <- credentialInterface.getCredential("dp.credential.ranger")
+      credential <- credentialInterface.getCredential(CSConstants.RANGER_CREDENTIAL_KEY)
       urlToHit1 <- Future.successful(
         s"${baseUrls.head}/service/plugins/definitions?pageSource=Audit")
       wsRequest <- getDefinitionsRequest(credential, urlToHit1, executor)
@@ -469,7 +457,7 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      credential <- credentialInterface.getCredential("dp.credential.ranger")
+      credential <- credentialInterface.getCredential(CSConstants.RANGER_CREDENTIAL_KEY)
       wsRequest <- createPolicyRequest(dbName,
                                        tableName,
                                        offset,

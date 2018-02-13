@@ -12,95 +12,58 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-
+# health checks
+# ===========================================
 GET           /health                                                controllers.Status.health
 GET           /metrics                                               controllers.Status.metrics
 
+GET           /api/ga/properties                                     controllers.Config.getGAProperties()
 GET           /api/config/:key                                       controllers.Config.getConfig(key: String)
 
-#auth calls
+# identity calls
+# ===========================================
 GET           /api/identity                                          controllers.Authentication.userDetail
 GET           /api/identity/:userId                                  controllers.Authentication.userById(userId: String)
 POST          /api/identity/actions/change-password                  controllers.Authentication.changePassword
 
-#api
-
+# fetch initial configuration required by ui
+# ===========================================
 GET           /api/init                                              controllers.Config.init
+
+# Locations
+# ===========================================
+GET           /api/locations                                         controllers.Locations.list(query: Option[String])
+GET           /api/locations/:locationId                             controllers.Locations.retrieve(locationId: String)
+
+# DataplaneClusters
+# ===========================================
 GET           /api/lakes                                             controllers.DataplaneClusters.list
 POST          /api/lakes                                             controllers.DataplaneClusters.create
-GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId: String)
-GET           /api/lakes/:lakeId/services                            controllers.DataplaneClusters.retrieveServices(lakeId)
-DELETE        /api/lakes/:lakeId                                     controllers.DataplaneClusters.delete(lakeId)
-PUT           /api/lakes                                             controllers.DataplaneClusters.update
+
+GET           /api/lakes/:dpClusterId                                controllers.DataplaneClusters.retrieve(dpClusterId: String)
+PUT           /api/lakes/:dpClusterId                                controllers.DataplaneClusters.update(dpClusterId: String)
+DELETE        /api/lakes/:dpClusterId                                controllers.DataplaneClusters.delete(dpClusterId: String)
+
+GET           /api/lakes/:dpClusterId/services                       controllers.DataplaneClusters.retrieveServices(dpClusterId: String)
+GET           /api/lakes/:dpClusterId/servicesDetails                controllers.DataplaneClusters.getDependentServicesDetails(dpClusterId: String)
+
 GET           /api/lakes/ambari/status                               controllers.DataplaneClusters.ambariCheck
-GET           /api/lakes/:lakeId/servicesDetails                     controllers.DataplaneClusters.getDependentServicesDetails(lakeId: String)
+POST          /api/lakes/:dpClusterId/sync                           controllers.Clusters.syncCluster(dpClusterId: String)
 
-GET           /api/locations                                         controllers.Locations.list(query: Option[String])
-GET           /api/locations/:locationId                             controllers.Locations.retrieve(locationId: Long)
+# AmbariClusters
+# ===========================================
+GET           /api/clusters                                          controllers.Clusters.list(dpClusterId: Option[String])
+GET           /api/clusters/:clusterId/health                        controllers.Clusters.getHealth(clusterId: String, summary: Option[Boolean])
+GET           /api/clusters/:clusterId/rmhealth                      controllers.Clusters.getResourceManagerHealth(clusterId: String)
+GET           /api/clusters/:clusterId/dnhealth                      controllers.Clusters.getDataNodeHealth(clusterId: String)
+GET           /api/clusters/:clusterId/hosts                         controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
 
-GET           /api/clusters                                          controllers.Clusters.list(lakeId: Option[Long])
 POST          /api/clusters/details                                  controllers.Clusters.getDetails
-GET           /api/clusters/:clusterId/health                        controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
-GET           /api/clusters/:clusterId/rmhealth                      controllers.Clusters.getResourceManagerHealth(clusterId: Long)
-GET           /api/clusters/:clusterId/dnhealth                      controllers.Clusters.getDataNodeHealth(clusterId: Long)
 
 GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
-POST          /api/clusters/sync/:dpClusterId                        controllers.Clusters.syncCluster(dpClusterId: Long)
 
-GET           /api/clusters/:clusterId/hosts                        controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
-
-
-
-#DTSet-Category
-GET           /api/datasets/categories                               controllers.DataSets.listAllCategories
-GET           /api/datasets/categories/:search                       controllers.DataSets.searchCategories(search : String, size :Option[Long])
-POST          /api/datasets/categories                               controllers.DataSets.createCategory
-
-#DataSet
-GET           /api/datasets                                          controllers.DataSets.list(name: Option[String])
-POST          /api/datasets                                          controllers.DataSets.create
-GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId)
-DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId)
-PUT           /api/datasets                                          controllers.DataSets.update()
-#GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
-
-# Dataset new
-POST          /api/atlas-dataset                                     controllers.DataSets.createDatasetWithAtlasSearch
-GET           /api/dataset/list                                      controllers.DataSets.getRichDataset
-GET           /api/dataset/list/tag/:tagName                         controllers.DataSets.getRichDatasetByTag(tagName : String)
-GET           /api/dataset/:id                                       controllers.DataSets.getRichDatasetById(id : String)
-
-#Dataasset
-GET           /api/dataset/:id/assets                                controllers.DataSets.getDataAssetsByDatasetId(id:Long, queryName: String, offset: Long, limit: Long)
-
-# Atlas API Search
-POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String)
-GET           /api/query-attributes                                  controllers.QueryAttributes.list(clusterId: String)
-
-#Tags API
-GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search:Option[String])
-GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName:String)
-
-GET           /api/assets/auditMockStatus                            controllers.QueryAttributes.checkAuditMockStatus()
-GET           /api/assets/details/:clusterId/:atlasGuid              controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)
-GET           /api/assets/typeDefs/:clusterId/:defType               controllers.QueryAttributes.getTypeDefs(clusterId: String, defType: String)
-GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)
-
-#Asset
-GET           /api/assets/byguid/:guid                                controllers.Asset.getByGuid(guid: String)
-
-#Ranger
-GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
-GET           /api/ranger/:clusterId/policies                        controllers.RangerAttributes.getPolicyDetails(clusterId: Long, offset: Long ?= 0, limit: Long ?= 20, serviceType: String, dbName: Option[String], tableName: Option[String], guid: Option[String])
-
-#DpProfiler
-POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
-GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
-GET           /api/dpProfiler/scheduleStatus                          controllers.DpProfilerAttributes.getScheduleStatus(clusterId: String, dataSetId: String)
-GET           /api/dpProfiler/auditResults                            controllers.DpProfilerAttributes.getAuditResults(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
-GET           /api/dpProfiler/auditActions                            controllers.DpProfilerAttributes.getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
-
-#LDAP
+# LDAP
+# ===========================================
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate
 POST          /api/knox/configure                                    controllers.KnoxConfig.configure
 GET           /api/knox/configuration                                controllers.KnoxConfig.configuration
@@ -109,50 +72,56 @@ POST          /api/knox/ldap                                         controllers
 GET           /api/knox/status                                       controllers.KnoxConfig.isKnoxConfigured
 GET           /api/users/ldapsearch                                  controllers.UserManager.ldapSearch
 
+# Roles
+# ===========================================
+GET           /api/roles                                             controllers.UserManager.getAllRoles
 
-#User Management
+# User Management
+# ===========================================
+POST          /api/users/registerAdmin                               controllers.UserManager.addSuperAdminUser
+POST          /api/users/registerAdmins                              controllers.UserManager.addSuperAdminUsers
+POST          /api/users/updateActiveAndRoles                        controllers.UserManager.adminUpdateUserRolesAndStatus
+POST          /api/users/addUserWithRoles                            controllers.UserManager.addUserWithRoles
+POST          /api/users/addUsersWithRoles                           controllers.UserManager.addUsersWithRoles
+GET           /api/users/withRoles                                   controllers.UserManager.listUsersWithRoles
+GET           /api/users                                             controllers.UserManager.listUsers
+GET           /api/users/detail                                      controllers.UserManager.getUserDetail
+GET           /api/userGroups                                        controllers.UserManager.getUserGroupsFromLdap
+POST          /api/users/withLdapGroups                              controllers.UserManager.createUserFromLdapGroupsConfiguration
+POST          /api/users/resyncLdapGroups                            controllers.UserManager.resyncUserFromLdap
+GET           /api/identity/:userId                                  controllers.UserManager.getUser(userId: String)
 
-POST          /api/users/registerAdmin                         controllers.UserManager.addSuperAdminUser
-POST          /api/users/registerAdmins                        controllers.UserManager.addSuperAdminUsers
-POST          /api/users/updateActiveAndRoles                  controllers.UserManager.adminUpdateUserRolesAndStatus
-POST          /api/users/addUserWithRoles                      controllers.UserManager.addUserWithRoles
-POST          /api/users/addUsersWithRoles                     controllers.UserManager.addUsersWithRoles
-GET           /api/users/withRoles                             controllers.UserManager.listUsersWithRoles
-GET           /api/users                                       controllers.UserManager.listUsers
-GET           /api/users/detail                                controllers.UserManager.getUserDetail
-GET           /api/roles                                       controllers.UserManager.getAllRoles
-GET           /api/userGroups                                  controllers.UserManager.getUserGroupsFromLdap
-POST          /api/users/withLdapGroups                        controllers.UserManager.createUserFromLdapGroupsConfiguration
-POST          /api/users/resyncLdapGroups                      controllers.UserManager.resyncUserFromLdap
+# Group Management
+# ===========================================
+GET           /api/groups/:name                                      controllers.GroupManager.getGroupsByName(name: String)
+GET           /api/groups                                            controllers.GroupManager.getGroups
+POST          /api/groups/admin                                      controllers.GroupManager.addAdminGroups
+POST          /api/groups/add                                        controllers.GroupManager.addGroupsWithRoles
+POST          /api/groups/update                                     controllers.GroupManager.updateGroupInfo
 
-#Group Management
-GET           /api/groups/:name                                controllers.GroupManager.getGroupsByName(name:String)
-GET           /api/groups                                      controllers.GroupManager.getGroups
-POST          /api/groups/admin                                controllers.GroupManager.addAdminGroups
-POST          /api/groups/add                                  controllers.GroupManager.addGroupsWithRoles
-POST          /api/groups/update                               controllers.GroupManager.updateGroupInfo
+# Services
+# ===========================================
+GET           /api/services                                          controllers.ServicesManager.getServices
+GET           /api/services/byName                                   controllers.ServicesManager.getSkuByName
+GET           /api/services/enabled                                  controllers.ServicesManager.getEnabledServices
+POST          /api/services/verifyCode                               controllers.ServicesManager.verifySmartSense
+POST          /api/services/enable                                   controllers.ServicesManager.enableService
+GET           /api/services/:serviceName/dependencies                controllers.ServicesManager.getDependentServices(serviceName: String)
 
-
-#Workspace API
+# Workspaces
+# ===========================================
 GET           /api/workspaces                                        controllers.Workspaces.list
-GET           /api/workspaces/name/:name                             controllers.Workspaces.retrieve(name)
+GET           /api/workspaces/name/:name                             controllers.Workspaces.retrieve(name: String)
 POST          /api/workspaces                                        controllers.Workspaces.create
-DELETE        /api/workspaces/name/:name                             controllers.Workspaces.delete(name)
+DELETE        /api/workspaces/name/:name                             controllers.Workspaces.delete(name: String)
 
-
-# WorkspaceAsset Api
+# WorkspaceAssets
+# ===========================================
 POST          /api/workspaces/assets                                 controllers.AssetWorkspaces.add
-GET           /api/workspaces/:id/assets                             controllers.AssetWorkspaces.getAssets(id:Long)
+GET           /api/workspaces/:workspaceId/assets                    controllers.AssetWorkspaces.getAssets(workspaceId: String)
 
-# WorkspaceNotebook Api
+# WorkspaceNotebooks
+# ===========================================
 POST          /api/workspaces/notebooks                              controllers.NotebookWorkspaces.add
-DELETE        /api/workspaces/notebooks/:id                          controllers.NotebookWorkspaces.delete(id:String)
-GET           /api/workspaces/:id/notebooks                          controllers.NotebookWorkspaces.getNotebooks(id:Long)
-
-#services
-GET           /api/services                                  controllers.ServicesManager.getServices
-GET           /api/services/byName                           controllers.ServicesManager.getSkuByName
-GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServices
-POST          /api/services/verifyCode                       controllers.ServicesManager.verifySmartSense
-POST          /api/services/enable                           controllers.ServicesManager.enableService
-GET           /api/services/:name/dependencies               controllers.ServicesManager.getDependentServices(name: String)
+DELETE        /api/workspaces/notebooks/:notebookId                  controllers.NotebookWorkspaces.delete(notebookId: String)
+GET           /api/workspaces/:workspaceId/notebooks                 controllers.NotebookWorkspaces.getNotebooks(workspaceId: String)

@@ -67,7 +67,9 @@ export class UserService {
       .get<any>(urlPrefix + UserService.signoutURL)
       .subscribe(response => {
         const challengeAt = response.headers.get(UserService.HEADER_CHALLENGE_HREF);
-        window.location.href = `${window.location.protocol}//${window.location.host}/${challengeAt}?originalUrl=${window.location.href}`;
+        const dpEndpoint = `${window.location.protocol}//${window.location.host}/`;
+        const redirectTo = `${dpEndpoint}${challengeAt}`;
+        window.location.href = `${redirectTo}?originalUrl=${dpEndpoint}`;
       });
   }
 

@@ -20,5 +20,8 @@ export interface BeaconAdminStatus {
     security: string;
     wireEncryption: boolean;
     rangerCreateDenyPolicy: string;
+    replicationTDE: boolean;
+    replicationCloudFS: boolean;
+    replicationCloudHiveWithCluster: boolean;
   };
 }

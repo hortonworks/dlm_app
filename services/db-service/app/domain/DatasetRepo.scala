@@ -30,7 +30,7 @@ class DatasetRepo @Inject()(
                              protected val categoryRepo: CategoryRepo,
                              protected val dataAssetRepo: DataAssetRepo,
                              protected val userRepo: UserRepo,
-                             protected val clusterRepo: DpClusterRepo,
+                             protected val clusterRepo: ClusterRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
@@ -58,13 +58,13 @@ class DatasetRepo @Inject()(
   def count(search:Option[String]): Future[Int] = {
     val query = search
       .map(s => Datasets.join(userRepo.Users).on(_.createdBy === _.id)
-        .join(clusterRepo.DataplaneClusters).on(_._1.dpClusterId === _.id)
+        .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
         .filter(m => filterDatasets(m,s)))
       .getOrElse(Datasets)
     db.run(query.length.result)
   }
 
-  def filterDatasets(m: ((DatasetsTable, userRepo.UsersTable), clusterRepo.DpClustersTable), s: String) ={
+  def filterDatasets(m: ((DatasetsTable, userRepo.UsersTable), clusterRepo.ClustersTable), s: String) ={
     val searchTextLowerCase = s.toLowerCase
     (m._1._1.name.toLowerCase like s"%${searchTextLowerCase}%") || (m._1._1.description.toLowerCase like s"%${searchTextLowerCase}%") || (m._1._2.username.toLowerCase like s"%${searchTextLowerCase}%") ||
     (m._2.name.toLowerCase like s"%${searchTextLowerCase}%")
@@ -103,6 +103,37 @@ class DatasetRepo @Inject()(
     }
   }
 
+  def addAssets(datasetId:Long, assets:Seq[DataAsset]) :Future[RichDataset] = {
+    val assetsToSave = assets.map(_.copy(datasetId = Some(datasetId)))
+    var query = for {
+      _ <- Datasets.filter(_.id === datasetId).result.head // if no result, .head will throw NoSuchElementException
+      _ <- dataAssetRepo.DatasetAssets ++= assetsToSave
+    } yield ()
+    db.run(query.transactionally).flatMap{
+      case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None).map(_.head)
+    }
+  }
+
+  def removeAssets(datasetId:Long, assetGuIds: Seq[String]) :Future[RichDataset] = {
+    var query = for {
+      _ <- Datasets.filter(_.id === datasetId).result.head // if no result, .head will throw NoSuchElementException
+      _ <- dataAssetRepo.DatasetAssets.filter(_.datasetId === datasetId).filter(_.guid inSet assetGuIds).delete
+    } yield ()
+    db.run(query.transactionally).flatMap{
+      case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None).map(_.head)
+    }
+  }
+
+  def removeAllAssets(datasetId:Long) :Future[RichDataset] = {
+    var query = for {
+      _ <- Datasets.filter(_.id === datasetId).result.head // if no result, .head will throw NoSuchElementException
+      _ <- dataAssetRepo.DatasetAssets.filter(_.datasetId === datasetId).delete
+    } yield ()
+    db.run(query.transactionally).flatMap{
+      case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None).map(_.head)
+    }
+  }
+
   def create(datasetCreateRequest: DatasetCreateRequest) = {
     val tags = datasetCreateRequest.tags
     val query = for {
@@ -122,7 +153,7 @@ class DatasetRepo @Inject()(
 
   private def getDatasetWithNameQuery(inputQuery: Query[DatasetsTable, Dataset, Seq], searchText:Option[String]) = {
     val query = (inputQuery.join(userRepo.Users).on(_.createdBy === _.id))
-      .join(clusterRepo.DataplaneClusters).on(_._1.dpClusterId === _.id)
+      .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
     for {
       ((dataset, user), cluster) <-
       searchText.map(st => query.filter(m => filterDatasets(m,st))).getOrElse(query)
@@ -200,40 +231,63 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets, paginatedQuery, searchText)
+  def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId:Long): Future[Seq[RichDataset]] = {
+    getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id)), paginatedQuery, searchText)
   }
 
-  def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
-    getRichDataset(Datasets.filter(_.id === id), None, None).map(_.headOption)
+  def getRichDatasetById(id: Long,userId:Long): Future[Option[RichDataset]] = {
+    getRichDataset(Datasets.filter(m => (m.id === id && m.createdBy === userId) || (m.id === id && m.sharedStatus === SharingStatus.PUBLIC.id)), None, None).map(_.headOption)
   }
 
-  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
+  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None,userId:Long): Future[Seq[RichDataset]] = {
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
-      .map(_._2)
+      .map(_._2).filter(m=>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
     getRichDataset(query, paginatedQuery, searchText)
   }
 
-  def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
+  def insertWithCategories(dsNtags: DatasetAndTags): Future[RichDataset] = {
+    val tags = dsNtags.tags
     val query = (for {
-      dataset <- doSafeInsert(datasetReq.dataset)
-      _ <- datasetCategoryRepo.DatasetCategories ++= datasetReq.categories.map(catId => DatasetCategory(catId, dataset.id.get))
-      categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
-    } yield (DatasetAndCategories(dataset, categories))).transactionally
-
-    db.run(query)
+      existingCategories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
+      _ <- {
+        val catNames = existingCategories.map(_.name)
+        categoryRepo.Categories ++= tags.filter(t => !catNames.contains(t)).map(t => Category(None, t, t))
+      }
+      savedDataset <- doSafeInsert(dsNtags.dataset)
+      categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
+      _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
+    } yield (savedDataset)).transactionally
+    db.run(query).flatMap{
+      case sDset => getRichDataset(Datasets.filter(_.id === sDset.id.get), None, None).map(_.head)
+    }
   }
 
-  def updateWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
+  def updateWithCategories(dsNtags: DatasetAndTags): Future[RichDataset] = {
+    val tags = dsNtags.tags
     val query = (for {
-      _ <- Datasets.filter(_.id === datasetReq.dataset.id).update(datasetReq.dataset)
-      _ <- datasetCategoryRepo.DatasetCategories.filter(_.datasetId === datasetReq.dataset.id).delete
-      _ <- datasetCategoryRepo.DatasetCategories ++= datasetReq.categories.map(catId => DatasetCategory(catId, datasetReq.dataset.id.get))
-      dataset <- Datasets.filter(_.id === datasetReq.dataset.id).result.head
-      categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
-    } yield (DatasetAndCategories(dataset, categories))).transactionally
+      _ <- Datasets.filter(_.id === dsNtags.dataset.id).update(dsNtags.dataset)
+      _ <- datasetCategoryRepo.DatasetCategories.filter(_.datasetId === dsNtags.dataset.id).delete
+      existingCategories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
+      _ <- {
+        val catNames = existingCategories.map(_.name)
+        categoryRepo.Categories ++= tags.filter(t => !catNames.contains(t)).map(t => Category(None, t, t))
+      }
+      savedDataset <- Datasets.filter(_.id === dsNtags.dataset.id).result.head
+      categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
+      _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
+    } yield (savedDataset)).transactionally
+    db.run(query).flatMap{
+      case sDset => getRichDataset(Datasets.filter(_.id === sDset.id.get), None, None).map(_.head)
+    }
+  }
+
+  def updateDatset(datasetId: Long, dataset: Dataset) = {
+    val query = ( for {
+      _ <- Datasets.filter(_.id === datasetId).update(dataset)
+      ds <- Datasets.filter(_.id === datasetId).result.headOption
+    } yield(ds)).transactionally
 
     db.run(query)
   }
@@ -245,7 +299,7 @@ class DatasetRepo @Inject()(
     def countQueryWithFilter(st: String) = {
       ((datasetCategoryRepo.DatasetCategories.joinLeft(
         Datasets.join(userRepo.Users).on(_.createdBy === _.id)
-          .join(clusterRepo.DataplaneClusters).on(_._1.dpClusterId === _.id)
+          .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
           .filter(m => filterDatasets(m, st))
       ) on (_.datasetId === _._1._1.id)).groupBy(_._1.categoryId)).map{
         case(catId, results) => (catId -> results.map(_._2.map(_._1._1.name)).countDefined)
@@ -306,6 +360,8 @@ class DatasetRepo @Inject()(
 
     def version = column[Int]("version")
 
+    def sharedStatus = column[Int]("sharedstatus")
+
     def customprops = column[Option[JsValue]]("custom_props")
 
     val select = Map("id" -> this.id, "name" -> this.name)
@@ -320,9 +376,11 @@ class DatasetRepo @Inject()(
         lastmodified,
         active,
         version,
+        sharedStatus,
         customprops
       ) <> ((Dataset.apply _).tupled, Dataset.unapply)
 
   }
 
 }
+

@@ -51,18 +51,16 @@ class Clusters @Inject()(
     configuration: Configuration
 ) extends Controller {
 
-
-
-  def list(dpClusterId: Option[Long]) = Action.async {
+  def list(dpClusterId: Option[String]) = Action.async {
     dpClusterId match {
-      case Some(clusterId) => listByDpClusterId(clusterId)
-      case None            => listAll()
+      case Some(id) => listByDpClusterId(id)
+      case None => listAll()
     }
   }
 
-  private def listByDpClusterId(dpClusterId: Long) = {
+  private def listByDpClusterId(dpClusterId: String) = {
     clusterService
-      .getLinkedClusters(dpClusterId)
+      .getLinkedClusters(dpClusterId.toLong)
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
@@ -157,9 +155,9 @@ class Clusters @Inject()(
 
   }
 
-  def syncCluster(dpClusterId: Long) = AuthenticatedAction.async { request =>
+  def syncCluster(dpClusterId: String) = AuthenticatedAction.async { request =>
     implicit val token = request.token
-    ambariService.syncCluster(DataplaneClusterIdentifier(dpClusterId)).map {
+    ambariService.syncCluster(DataplaneClusterIdentifier(dpClusterId.toLong)).map {
       case true =>
         Ok(Json.toJson(true))
       case false =>
@@ -169,7 +167,7 @@ class Clusters @Inject()(
 
   import models.ClusterHealthData._
 
-  def getHealth(clusterId: Long, summary: Option[Boolean]) =
+  def getHealth(clusterId: String, summary: Option[Boolean]) =
     AuthenticatedAction.async { request =>
       Logger.info("Received get cluster health request")
       implicit val token = request.token
@@ -179,9 +177,9 @@ class Clusters @Inject()(
         .flatMap {
           case true =>
             clusterHealthService
-              .getClusterHealthData(clusterId, dpClusterId)
+              .getClusterHealthData(clusterId.toLong, dpClusterId)
           case false =>
-            Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
+            Future.successful(Left(Errors(Seq(Error(500, "Sync failed")))))
         }
         .map {
           case Left(errors) => InternalServerError(Json.toJson(errors))
@@ -219,14 +217,14 @@ class Clusters @Inject()(
     )
   }
 
-  def getResourceManagerHealth(clusterId: Long) = AuthenticatedAction.async {
+  def getResourceManagerHealth(clusterId: String) = AuthenticatedAction.async {
     request =>
       {
         implicit val token = request.token
         val rmRequest =
           configuration.getString("cluster.rm.health.request.param").get;
 
-        ambariWebService.requestAmbariClusterApi(clusterId, rmRequest).map {
+        ambariWebService.requestAmbariClusterApi(clusterId.toLong, rmRequest).map {
           case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(resourceManagerHealth) =>
             Ok(Json.toJson(resourceManagerHealth))
@@ -240,7 +238,7 @@ class Clusters @Inject()(
         hostsResponse <- clusterHostsService.getHostsByCluster(clusterId)
         hosts <- {
           if (hostsResponse.isLeft)
-            Future.failed(new Exception(hostsResponse.left.get.firstMessage))
+            Future.failed(new Exception(hostsResponse.left.get.firstMessage.toString))
           else
             Future.successful(hostsResponse.right.get)
         }
@@ -264,14 +262,14 @@ class Clusters @Inject()(
 
     }
 
-  def getDataNodeHealth(clusterId: Long) = AuthenticatedAction.async {
+  def getDataNodeHealth(clusterId: String) = AuthenticatedAction.async {
     request =>
       {
         implicit val token = request.token
         val dnRequest =
           configuration.getString("cluster.dn.health.request.param").get
 
-        ambariWebService.requestAmbariClusterApi(clusterId, dnRequest).map {
+        ambariWebService.requestAmbariClusterApi(clusterId.toLong, dnRequest).map {
           case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(datanodeHealth) =>
             Ok(Json.toJson(datanodeHealth))

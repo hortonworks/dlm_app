@@ -28,7 +28,7 @@ export class RbacService {//role based access control
   constructor(private configService: ConfigurationService) {
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
-    this.landingPageMap.set('CURATOR', '/datasteward/collections');
+    this.landingPageMap.set('CURATOR', '/dss');
     this.landingPageMap.set('INFRAADMIN', '/infra');
     this.landingPageMap.set('INFRAADMIN_ONBOARD', '/onboard');
   }

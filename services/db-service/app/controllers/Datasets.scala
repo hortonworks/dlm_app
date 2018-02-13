@@ -13,10 +13,10 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetCreateRequest}
+import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DataAsset, DatasetAndTags, DatasetCreateRequest}
 import domain.API.{dpClusters, users}
 import domain.{DatasetRepo, PaginatedQuery, SortQuery}
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, __}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -47,25 +47,39 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   }
 
+  private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
+
   def allRichDataset = Action.async { req =>
-    datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req))
-      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-      .recoverWith(apiError)
+    val userId = req.getQueryString("userId")
+    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
+    else{
+      datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
+        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+        .recoverWith(apiError)
+    }
   }
 
   def richDatasetByTag(tagName: String) = Action.async { req =>
-    datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req))
-      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-      .recoverWith(apiError)
+    val userId = req.getQueryString("userId")
+    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
+    else{
+      datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
+        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+        .recoverWith(apiError)
+    }
   }
 
-  def richDatasetById(id: Long) = Action.async {
-    datasetRepo.getRichDatasetById(id).map { co =>
-      co.map { c =>
-        success(linkData(c, makeLink(c.dataset)))
-      }
-        .getOrElse(NotFound)
-    }.recoverWith(apiError)
+  def richDatasetById(id: Long) = Action.async { req=>
+    val userId = req.getQueryString("userId")
+    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
+    else{
+      datasetRepo.getRichDatasetById(id,userId.get.toLong).map { co =>
+        co.map { c =>
+          success(linkData(c, makeLink(c.dataset)))
+        }
+          .getOrElse(NotFound)
+      }.recoverWith(apiError)
+    }
   }
 
   private def makeLink(c: Dataset) = {
@@ -87,16 +101,58 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     future.map(i => success(i)).recoverWith(apiError)
   }
 
+  def updateDatset(datasetId: String) = Action.async(parse.json) { req =>
+    req.body
+      .validate[Dataset]
+      .map { dataset =>
+        if(!isNumeric(datasetId)) Future.successful(BadRequest)
+        else {
+          datasetRepo.updateDatset(datasetId.toLong, dataset).map{ ds =>
+            ds.map { d =>
+              success(Json.toJson(d))
+            }
+              .getOrElse(NotFound)
+          }.recoverWith(apiError)
+        }
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
 
   def add = Action.async(parse.json) { req =>
     req.body
-      .validate[DatasetAndCategoryIds]
+      .validate[DatasetAndTags]
       .map { cl =>
         val created = datasetRepo.insertWithCategories(cl)
-        created.map(c => success(linkData(c, makeLink(c.dataset))))
+        created.map(c => success(linkData(c)))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+
+  def addAssets (datasetId: Long) = Action.async(parse.json) { req =>
+    req.body
+      .validate[Seq[DataAsset]]
+      .map { assets =>
+        datasetRepo
+          .addAssets(datasetId, assets)
+          .map(c => success(linkData(c)))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def removeAssets (datasetId: Long, ids: Seq[String]) = Action.async { req =>
+    datasetRepo
+      .removeAssets(datasetId, ids)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
+  }
+
+  def removeAllAssets (datasetId: Long) = Action.async { req =>
+    datasetRepo
+      .removeAllAssets(datasetId)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
   }
 
   def addWithAsset = Action.async(parse.json) { req =>
@@ -112,10 +168,10 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   def update = Action.async(parse.json) { req =>
     req.body
-      .validate[DatasetAndCategoryIds]
+      .validate[DatasetAndTags]
       .map { cl =>
-        val created = datasetRepo.updateWithCategories(cl)
-        created.map(c => success(linkData(c, makeLink(c.dataset))))
+        val updated = datasetRepo.updateWithCategories(cl)
+        updated.map(c => success(linkData(c)))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))

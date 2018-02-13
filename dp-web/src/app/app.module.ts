@@ -54,6 +54,7 @@ import {GroupService} from './services/group.service';
 import {AuthUtils} from './shared/utils/auth-utils';
 import {AddOnAppService} from './services/add-on-app.service';
 import {ServiceErrorComponent} from './shared/service-error/service-error.component';
+import {CommentService} from "./services/comment.service";
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -72,6 +73,19 @@ export function init_app(userService: UserService) {
       });
   });
 }
+
+export function getGATrackingStatus(configService: ConfigurationService) {
+  return () => new Promise((resolve, reject) => {
+    configService.getGAProperties()
+      .subscribe((gaProperties:any) => {
+        AuthUtils.setGATrackingStatus(gaProperties.enabled);
+        resolve(true)
+      }, (error) => {
+        resolve(false)
+      });
+  });
+}
+
 
 @NgModule({
   imports: [
@@ -111,6 +125,7 @@ export function init_app(userService: UserService) {
     LakeService,
     LocationService,
     ClusterService,
+    CommentService,
     IdentityService,
     ConfigurationService,
     AssetService,
@@ -119,6 +134,12 @@ export function init_app(userService: UserService) {
       provide: APP_INITIALIZER,
       useFactory: init_app,
       deps: [UserService],
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: getGATrackingStatus,
+      deps: [ConfigurationService],
       multi: true
     },
     CollapsibleNavService,

@@ -37,7 +37,7 @@ class KnoxConfig @Inject()(
   val logger = Logger(classOf[KnoxConfig])
 
   def handleErrors(errors: Errors) = {
-    if (errors.errors.exists(_.code == "400"))
+    if (errors.errors.exists(_.status == 400))
       BadRequest(Json.toJson(errors.errors))
     else
       InternalServerError(Json.toJson(errors.errors))
@@ -142,12 +142,12 @@ class KnoxConfig @Inject()(
             case None =>
               handleErrors(
                 Errors(
-                  Seq(Error("Exception", "No ldap configuration found"))))
+                  Seq(Error(500, "No ldap configuration found"))))
             case Some(ldapConfig) => {
 
               val userDnTemplate =
                 s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
-              val password=ldapService.getPassword(ldapConfig.bindDn.get)
+              val password=ldapService.getPassword()
               val knoxLdapConfig =
                 KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl.get,
                                   bindDn = ldapConfig.bindDn,

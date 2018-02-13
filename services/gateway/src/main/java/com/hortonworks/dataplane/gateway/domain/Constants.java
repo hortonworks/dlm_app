@@ -13,6 +13,7 @@ package com.hortonworks.dataplane.gateway.domain;
 public interface Constants {
   String DPAPP = "core";
   String DLMAPP = "dlm";
+  String DSSAPP = "dss";
   String CLOUDBREAK = "cloudbreak";
   String HDP_PROXY = "hdp_proxy";
 
@@ -30,6 +31,7 @@ public interface Constants {
   String DPAPP_BASE_PATH="/service/core";
   String KNOX_CONFIG_PATH = DPAPP_BASE_PATH + "/api/knox/configuration";
   String PERMS_POLICY_ENTRY_POINT = DPAPP_BASE_PATH + "/access/policies";
+  String GA_PROPERTIES_PATH = DPAPP_BASE_PATH + "/api/ga/properties";
 
   String LOCAL_SIGNIN_PATH = "sign-in";
 

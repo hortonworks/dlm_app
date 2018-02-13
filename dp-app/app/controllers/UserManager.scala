@@ -19,7 +19,7 @@ import com.hortonworks.dataplane.commons.domain.Ldap.LdapSearchResult.ldapConfig
 import com.hortonworks.dataplane.commons.domain.{Entities, RoleType}
 import com.hortonworks.dataplane.db.Webservice.{GroupService, UserService}
 import com.typesafe.scalalogging.Logger
-import models.{UserListInput, UsersAndRolesListInput}
+import models.{JsonResponses, UserListInput, UsersAndRolesListInput}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.LdapService
@@ -36,13 +36,13 @@ class UserManager @Inject()(val ldapService: LdapService,
   val logger = Logger(classOf[UserManager])
 
   private def handleErrors(errors: Errors) = {
-    if (errors.errors.exists(_.code == "400"))
+    if (errors.errors.exists(_.status == "400"))
       BadRequest(Json.toJson(errors))
-    else if (errors.errors.exists(_.code == "403"))
+    else if (errors.errors.exists(_.status == "403"))
       Forbidden(Json.toJson(errors))
-    else if (errors.errors.exists(_.code == "404"))
+    else if (errors.errors.exists(_.status == "404"))
       NotFound(Json.toJson(errors))
-    else if (errors.errors.exists(_.code == "409"))
+    else if (errors.errors.exists(_.status == "409"))
       Conflict(Json.toJson(errors))
     else
       InternalServerError(Json.toJson(errors))
@@ -140,6 +140,13 @@ class UserManager @Inject()(val ldapService: LdapService,
     }
   }
 
+  def getUser(userId: String) = Action.async {
+    userService.loadUserById(userId).map{
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(user) => Ok(Json.toJson(user))
+    }
+  }
+
   def getUserDetail = Action.async { req =>
     val userNameOpt: Option[String] = req.getQueryString("userName");
     userNameOpt
@@ -222,7 +229,7 @@ class UserManager @Inject()(val ldapService: LdapService,
       case Left(errors)=>Future.successful(Left(errors))
       case Right(userGroups)=>{
         if (userGroups.groups.length<1){
-          Future.successful(Left(Errors(Seq(Error("403","NO_ALLOWED_GROUPS:The user doesnt have valid groups configured")))))
+          Future.successful(Left(Errors(Seq(Error(403,"NO_ALLOWED_GROUPS:The user doesnt have valid groups configured")))))
         }else{
           val groupIds=userGroups.groups.map(grp=>grp.id.get)
           val userGroupInfo=UserGroupInfo(id=None,userName=userGroups.username,displayName=userGroups.username,groupIds = groupIds )

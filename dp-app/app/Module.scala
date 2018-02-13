@@ -44,7 +44,6 @@ class Module extends AbstractModule {
     new GroupServiceImpl(configuration.underlying)
   }
 
-
   @Provides
   @Singleton
   @Named("dataSetService")

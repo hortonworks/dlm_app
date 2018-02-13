@@ -17,11 +17,8 @@ import {WorkspaceService} from '../../../../services/workspace.service';
 import {WorkspaceDTO} from '../../../../models/workspace-dto';
 import {ClusterService} from '../../../../services/cluster.service';
 import {Cluster} from '../../../../models/cluster';
-import {AssetSetQueryModel} from '../../../dataset/views/ds-assets-list/ds-assets-list.component';
 import {WorkspaceAssetsService} from '../../../../services/workspace-assets.service';
 import {WorkspaceAsset} from '../../../../models/workspace-assets';
-import {DsAssetsService} from '../../../dataset/services/dsAssetsService';
-import {DsAssetModel} from '../../../dataset/models/dsAssetModel';
 import {CollapsibleNavService} from '../../../../services/collapsible-nav.service';
 import {PersonaTabs} from '../../../../models/header-data';
 
@@ -45,12 +42,12 @@ export class AssetsComponent implements OnInit {
   assetViewState = AssetViewState;
   viewState = AssetViewState.ADD_ASSETS;
   workspaceDTO: WorkspaceDTO = new WorkspaceDTO();
-  assetSetQueryModelsForAddition: AssetSetQueryModel[] = [];
+  // assetSetQueryModelsForAddition: AssetSetQueryModel[] = [];
   workspaceAssetServiceObservable: Observable<WorkspaceAsset[]>;
 
   constructor(private workspaceService: WorkspaceService,
               private workspaceAssetsService: WorkspaceAssetsService,
-              private dsAssetsService: DsAssetsService,
+              // private dsAssetsService: DsAssetsService,
               private clusterService: ClusterService,
               private collapsibleNavService: CollapsibleNavService,
               private activatedRoute: ActivatedRoute) { }
@@ -98,8 +95,8 @@ export class AssetsComponent implements OnInit {
     this.collapsibleNavService.setTabs(tabs, tabs[1]);
   }
 
-  saveSelectedAssets(asqm: AssetSetQueryModel) {
-    this.assetSetQueryModelsForAddition.push(asqm);
+  saveSelectedAssets(asqm: any) {
+    // this.assetSetQueryModelsForAddition.push(asqm);
     this.showAssets = false;
     this.viewState = AssetViewState.EDIT_ASSETS;
     this.saveWorkspaceAsset();
@@ -111,7 +108,8 @@ export class AssetsComponent implements OnInit {
     workspaceAsset.clusterId = this.cluster.id;
 
     /* This is tmp solution till filters in basic search returns query models*/
-    let filters = [{"atlasFilters": DsAssetsService.prototype.getAtlasFilters(this.assetSetQueryModelsForAddition)}];
+    // let filters = [{"atlasFilters": DsAssetsService.prototype.getAtlasFilters(this.assetSetQueryModelsForAddition)}];
+    let filters = [];
     if (!filters || filters.length === 0 || !filters[0].atlasFilters || filters[0].atlasFilters.length === 0) {
       workspaceAsset.assetQueryModels = [
         {

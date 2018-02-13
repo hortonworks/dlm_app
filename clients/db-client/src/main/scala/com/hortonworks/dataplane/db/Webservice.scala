@@ -11,13 +11,16 @@
 
 package com.hortonworks.dataplane.db
 
+import com.google.common.base.Strings
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, EntityDatasetRelationship}
-import play.api.libs.json.{JsObject, JsResult, Json}
+import play.api.Logger
+import play.api.libs.json.{JsObject, JsResult, JsSuccess, Json}
 import play.api.libs.ws.WSResponse
 
 import scala.concurrent.Future
+import scala.util.{Success, Try}
 
 object Webservice {
 
@@ -26,7 +29,7 @@ object Webservice {
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
     protected  def createEmptyErrorResponse = {
-      Left(Errors(Seq(Error(code="404",message = "No response from server"))))
+      Left(Errors(Seq(Error(status=404, message = "No response from server"))))
     }
     
     protected def extractEntity[T](res: WSResponse,
@@ -38,13 +41,34 @@ object Webservice {
                                f: WSResponse => JsResult[Errors]): Errors = {
       if (res.body.isEmpty)
         Errors()
-      f(res).map(r => r).getOrElse(Errors())
+      else f(res).map(r => r).getOrElse(Errors())
     }
 
     protected def mapErrors(res: WSResponse) = {
       Left(extractError(res, r => r.json.validate[Errors]))
     }
 
+    protected def mapResponseToError(res: WSResponse, loggerMsg: Option[String]= None) = {
+      val errorsObj = Try(res.json.validate[Errors])
+
+      errorsObj match {
+        case Success(e :JsSuccess[Errors]) =>
+          printLogs(res,loggerMsg)
+          throw new WrappedErrorException(e.get.errors.head)
+        case _ =>
+          val msg = if(Strings.isNullOrEmpty(res.body)) res.statusText else  res.body
+          val logMsg = loggerMsg.map { lmsg =>
+            s"""$lmsg | $msg""".stripMargin
+          }.getOrElse(s"In db-client: Failed with $msg")
+          printLogs(res,Option(logMsg))
+          throw new WrappedErrorException(Error(res.status, msg, ErrorType.General.toString))
+      }
+    }
+
+    private def printLogs(res: WSResponse,msg: Option[String]) ={
+      val logMsg = msg.getOrElse(s"Could not get expected response status from service. Response status ${res.statusText}")
+      Logger.warn(logMsg)
+    }
   }
 
   trait UserService extends DbClientService {
@@ -100,23 +124,29 @@ object Webservice {
 
     def list(name: Option[String]): Future[Either[Errors, Seq[Dataset]]]
 
-    def create(dataSetAndCatIds: DatasetAndCategoryIds)
-    : Future[Either[Errors, DatasetAndCategories]]
+    def create(dataSetAndTags: DatasetAndTags): Future[RichDataset]
 
     def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]]
 
-    def listRichDataset(queryString : String): Future[Either[Errors, Seq[RichDataset]]]
+    def update(dataSetAndTags: DatasetAndTags): Future[RichDataset]
 
-    def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]]
+    def addAssets(id: Long, dataAssets: Seq[DataAsset]) : Future[RichDataset]
 
-    def listRichDatasetByTag(tagName: String, queryString : String): Future[Either[Errors, Seq[RichDataset]]]
+    def removeAssets(datasetId: Long, queryString: String) : Future[RichDataset]
+
+    def removeAllAssets(id: Long) : Future[RichDataset]
+
+    def listRichDataset(queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
+
+    def getRichDatasetById(id: Long,userId:Long): Future[Either[Errors, RichDataset]]
+
+    def listRichDatasetByTag(tagName: String, queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 
     def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long): Future[Either[Errors, Seq[DataAsset]]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
-    def update(dataSetAndCatIds: DatasetAndCategoryIds)
-    : Future[Either[Errors, DatasetAndCategories]]
+    def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset]
 
     def delete(dataSetId: String): Future[Either[Errors, Long]]
   }
@@ -182,6 +212,35 @@ object Webservice {
     def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
 
     def retrieve(locationId: Long): Future[Either[Errors, Location]]
+
+  }
+
+  trait CommentService extends DbClientService {
+
+    def add(comment: Comment): Future[CommentWithUser]
+
+    def getByObjectRef(queryString: String): Future[Seq[CommentWithUser]]
+
+    def deleteById(commentId: String,userId: Long): Future[String]
+
+    def update(commentText: String, commentId: String): Future[CommentWithUser]
+
+    def deleteByObjectRef(objectId: String, objectType: String): Future[String]
+
+
+  }
+
+  trait RatingService extends DbClientService {
+
+    def add(rating: Rating): Future[Rating]
+
+    def get(queryString: String, userId: Long): Future[Rating]
+
+    def getAverage(queryString: String): Future[JsObject]
+
+    def update(ratingId: String, ratingUserTuple: (Float, Long)): Future[Rating]
+
+    def deleteByObjectRef(objectId: String, objectType: String): Future[String]
 
   }
 

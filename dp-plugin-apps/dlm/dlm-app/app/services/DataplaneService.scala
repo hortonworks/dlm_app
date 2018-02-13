@@ -152,13 +152,13 @@ class DataplaneService @Inject()(
 
       allLocations.onFailure {
         case e: Exception =>
-          p.trySuccess(Left(Errors(Seq(Error("500", e.getMessage)))))
+          p.trySuccess(Left(Errors(Seq(Error(500, e.getMessage)))))
       }
     }
 
     beaconClusters.onFailure {
       case e: Exception =>
-        p.trySuccess(Left(Errors(Seq(Error("500", e.getMessage)))))
+        p.trySuccess(Left(Errors(Seq(Error(500, e.getMessage)))))
     }
 
     p.future

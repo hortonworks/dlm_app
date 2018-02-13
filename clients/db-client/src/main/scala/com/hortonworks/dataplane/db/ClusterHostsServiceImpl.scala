@@ -46,12 +46,12 @@ class ClusterHostsServiceImpl(config: Config)(implicit ws: WSClient)
       .map { res =>
         res.status match {
           case 200 => None
-          case x => Some(Errors(Seq(Error(x.toString, "Cannot update host"))))
+          case x => Some(Errors(Seq(Error(x, "Cannot update host"))))
         }
       }
       .recoverWith {
         case e: Exception =>
-          Future.successful(Some(Errors(Seq(Error("500", e.getMessage)))))
+          Future.successful(Some(Errors(Seq(Error(500, e.getMessage)))))
       }
 
   }

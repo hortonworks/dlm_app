@@ -34,7 +34,7 @@ update_secrets() {
             echo "Please enter Ambari password:"
             read -s AMBARI_PASSWORD
         fi
-        local AMBARI_ALIAS="dp.credential.ambari"
+        local AMBARI_ALIAS="DPSPlatform.credential.ambari"
         update_call "$AMBARI_ALIAS" "$AMBARI_USERNAME" "$AMBARI_PASSWORD"
     fi
 
@@ -45,7 +45,7 @@ update_secrets() {
             echo "Please enter Atlas password:"
             read -s ATLAS_PASSWORD
         fi
-        local ATLAS_ALIAS="dp.credential.atlas"
+        local ATLAS_ALIAS="DPSPlatform.credential.atlas"
         update_call "$ATLAS_ALIAS" "$ATLAS_USERNAME" "$ATLAS_PASSWORD"
     fi
 
@@ -56,7 +56,7 @@ update_secrets() {
             echo "Please enter Ranger password:"
             read -s RANGER_PASSWORD
         fi
-        local RANGER_ALIAS="dp.credential.ranger"
+        local RANGER_ALIAS="DPSPlatform.credential.ranger"
         update_call "$RANGER_ALIAS" "$RANGER_USERNAME" "$RANGER_PASSWORD"
     fi
 }

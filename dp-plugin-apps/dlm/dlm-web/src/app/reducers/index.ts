@@ -29,6 +29,9 @@ import * as fromLog from './log.reducer';
 import * as fromBeaconAdminStatus from './beacon-admin-status.reducer';
 import * as fromUnreachableBeacon from './unreachable-beacon.reducer';
 import * as fromYarnQueues from './yarn-queues.reducer';
+import * as fromCloudAccount from './cloud-account.reducer';
+import * as fromCloudContainer from './cloud-container.reducer';
+import * as fromCloudContainerItem from './cloud-container-item.reducer';
 
 export interface State {
   router: RouterReducerState;
@@ -46,6 +49,9 @@ export interface State {
   beaconAdminStatus: fromBeaconAdminStatus.State;
   unreachableBeacon: fromUnreachableBeacon.State;
   yarnQueues: fromYarnQueues.State;
+  cloudAccounts: fromCloudAccount.State;
+  cloudContainers: fromCloudContainer.State;
+  cloudContainerItems: fromCloudContainerItem.State;
 }
 
 export const reducers: ActionReducerMap<State> = {
@@ -63,7 +69,10 @@ export const reducers: ActionReducerMap<State> = {
   logs: fromLog.reducer,
   beaconAdminStatus: fromBeaconAdminStatus.reducer,
   unreachableBeacon: fromUnreachableBeacon.reducer,
-  yarnQueues: fromYarnQueues.reducer
+  yarnQueues: fromYarnQueues.reducer,
+  cloudAccounts: fromCloudAccount.reducer,
+  cloudContainers: fromCloudContainer.reducer,
+  cloudContainerItems: fromCloudContainerItem.reducer
 };
 
 export const logger = (reducer: ActionReducer<State>) => {

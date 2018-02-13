@@ -1,0 +1,39 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<dlm-table
+  [theme]="tableTheme"
+  [columns]="columns"
+  [columnMode]="columnMode"
+  [footerHeight]="footerHeight"
+  [showFooter]="showFooter"
+  [rows]="accounts">
+</dlm-table>
+
+<ng-template #providerCell let-account="row" let-index="rowIndex">
+  <div>
+    <span class="provider" [attr.qe-attr]="'cloud-account-provider-' + index">{{account.accountDetails.provider}}</span>
+    <span class="left-arrow">&#9664;</span>
+  </div>
+</ng-template>
+
+<ng-template #nameCell let-account="row" let-index="rowIndex">
+  <div class="userName" [attr.qe-attr]="'cloud-account-username-' + index" *ngIf="account.accountDetails.userName">{{account.accountDetails.userName}}</div>
+  <div class="accountName" [attr.qe-attr]="'cloud-account-account-name-' + index" *ngIf="account.accountDetails.accountName">{{account.accountDetails.accountName}}</div>
+</ng-template>
+
+<ng-template #actionsCell let-account="row" let-index="rowIndex">
+  <dlm-cloud-account-actions
+    [attr.qe-attr]="'cloud-account-actions-' + index"
+    [rowId]="account.id"
+    [cloudAccount]="account"
+    [cloudAccountActions]="cloudAccountActions"
+    (handler)="handleSelectedAction($event)">
+  </dlm-cloud-account-actions>
+</ng-template>

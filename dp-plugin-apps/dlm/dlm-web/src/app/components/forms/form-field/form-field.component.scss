@@ -7,3 +7,15 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+.inline-error-label {
+  padding: 5px 0;
+}
+
+.inline-error-message {
+  padding-bottom: 5px;
+  .dlm-field-error {
+    .alert {
+      margin: 0;
+    }
+  }
+}

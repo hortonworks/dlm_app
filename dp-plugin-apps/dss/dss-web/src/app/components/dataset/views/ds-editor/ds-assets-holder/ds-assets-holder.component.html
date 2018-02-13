@@ -1,0 +1,42 @@
+
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="hwx-title">{{"pages.dataset.ds-editor.assets" | translate}}</div>
+
+<div class="hwx-desc">{{"pages.dataset.ds-editor.asset-description" | translate}}</div>
+
+<ds-assets-list *ngIf="showList && !showPopup"
+                [dsModel]="dsModel"
+                [applicableActions]="applicableListActions"
+                [selectionAllowed]="true"
+                [queryModels]="assetSetQueryModelsForAddition"
+                [clusterId]="dsModel.clusterId"
+                (onAction)="onListAction($event)"
+                [allowAssetNavigation]="false"
+                [showBelongsToColumn]="true"
+#dsAssetList ></ds-assets-list>
+
+<div class="button-container">
+  <button *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;" data-se="ds_editor_asset_holder_add">{{"pages.dataset.ds-editor.action.addAssets" | translate}}</button>
+</div>
+
+
+<div *ngIf="showPopup" class="popup borderBox">
+  <div class="opaque">
+    <asset-search [showBelongsToColumn]="true" [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
+  </div>
+</div>
+
+<div class="button-container" *ngIf="assetSetQueryModelsForAddition.length > 0">
+  <button class="mdl-button btn-hwx-primary" (click)="onNext()" data-se="ds_editor_asset_holder_next">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
+  <button class="mdl-button btn-hwx-default" (click)="onCancel()" data-se="ds_editor_asset_holder_cancle">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
+</div>

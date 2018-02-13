@@ -52,8 +52,6 @@
   [title]="'page.policies.subpage.review.error.create_policy'"
   [showCancel]="false">
   <dlm-modal-dialog-body>
-    <pre>
-      {{creationState?.errorMessage?.message}}
-    </pre>
+    <pre>{{errorBody}}</pre>
   </dlm-modal-dialog-body>
 </dlm-modal-dialog>

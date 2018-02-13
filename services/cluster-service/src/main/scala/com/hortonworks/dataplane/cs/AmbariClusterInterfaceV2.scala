@@ -11,11 +11,8 @@
 
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Cluster,
-  DataplaneCluster,
-  HJwtToken
-}
+import com.hortonworks.dataplane.CSConstants
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.knox.Knox.KnoxApiRequest
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
@@ -36,7 +33,7 @@ class AmbariClusterInterfaceV2(
 
   val logger = Logger(classOf[AmbariClusterInterfaceV2])
 
-  val credentials: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
+  val credentials: Future[Credentials] = credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
 
   override def getAtlas(implicit hJwtToken: Option[HJwtToken])
     : Future[Either[Throwable, Atlas]] = {

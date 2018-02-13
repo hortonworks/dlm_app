@@ -11,4 +11,4 @@
 
 package models
 
-case class CredentialEntry(alias: String, password: String)
+case class CredentialEntry(bindDn: String, password: String)

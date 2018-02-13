@@ -1,0 +1,88 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="componentCont borderBox" #outerCont >
+  <div *ngIf="!hideTabs" class="tabCont">
+    <div *ngIf="dsModel.counts" class="tab firstTab {{(typeFilter == tab.ALL)?'active':''}}" (click)="typeFilter = tab.ALL;setFirstPage();fetchAssets()">
+      <div class="tabName">Total</div>
+      <div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span></div>
+    </div>
+
+    <!--<div class="tab {{(typeFilter == tab.HIVE)?'active':''}}" (click)="typeFilter = tab.HIVE;setFirstPage();fetchAssets()">-->
+      <!--<div class="tabName">Hive</div>-->
+      <!--<div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount}}</span></div>-->
+    <!--</div>-->
+    <!--<div class="tab {{(typeFilter == tab.HDFS)?'active':''}}" (click)="typeFilter = tab.HDFS;setFirstPage();fetchAssets()">-->
+      <!--<div class="tabName">Files</div>-->
+      <!--<div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.filesCount}}</span></div>-->
+    <!--</div>-->
+
+    <span class="actionButtonCont">
+      <button *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionRemove()">{{"pages.dataset.ds-editor.action.removeAll" | translate}}</button>
+      <button *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-button btn-hwx-secondary" (click)="actionAddMore()">{{"pages.dataset.ds-editor.action.addMoreAssets" | translate}}</button>
+      <button *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-button btn-hwx-primary" (click)="actionEdit()">{{"pages.dataset.ds-editor.action.edit" | translate}}</button>
+    </span>
+
+    <div *ngIf="!hideSearch" class="search-input">
+      <input #searchBox type="text" placeholder="Search" (keyup.enter)="searchText=searchBox.value;setFirstPage(); fetchAssets()"/>
+      <i _ngcontent-c13="" aria-hidden="true" class="fa fa-search dp-input__icon"></i>
+    </div>
+
+    <div style="clear: both;"></div>
+  </div>
+  <div class="listCont" #listCont>
+    <div class="list" [class.unLoaded]="!dsAssets.length" [class.withDsNameCom]="showBelongsToColumn">
+      <div class="listRow listHead">
+        <div *ngIf="dsAssets.length">
+          <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox" (change)="onCheckAllChange($event)" 
+            [checked]="checkedAllState()"/></div>
+          <div class="col starCol" *ngIf="showBelongsToColumn">&nbsp;</div>
+          <div class="col sourceCol">{{"pages.dataset.labels.source" | translate}}</div>
+          <div class="col nameCol">{{"pages.dataset.labels.name" | translate}}</div>
+          <div class="col dbNameCol">{{"pages.dataset.labels.dbName" | translate}}</div>
+          <div class="col descCol">{{"pages.dataset.labels.description" | translate}}</div>
+          <div class="col ownerCol">{{"pages.dataset.labels.owner" | translate}}</div>
+          <div class="col dsNameCol" *ngIf="showBelongsToColumn">{{"pages.dataset.labels.belongsTo" | translate}}</div>
+
+        </div>
+      </div>
+      <div class="justList" #table>
+        <div class="list displayAtCenter"  *ngIf="resultState == resultStates.NOMORE"><span>{{"pages.dataset.asset-search.noMoreResultsMsg" | translate}}</span></div>
+        <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>{{"pages.dataset.asset-search.noResultsMsg" | translate}}</span></div>
+        <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>{{"common.loading" | translate}} ...</span></div>
+        <div *ngIf="dsAssets.length">
+          <div class="listRow"  *ngFor="let asset of dsAssets;">
+            <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox" [checked]="showChecked(asset)"
+              (change)="onAssetSelectionChange(asset)"/></div>
+            <div class="col starCol" *ngIf="showBelongsToColumn">{{asset.dsName?"*":"&nbsp;"}}</div>
+            <div class="col sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
+              <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
+            </div>
+            <div class="col nameCol" [class.hlink]="allowAssetNavigation" (click)="onAssetClick(asset.id, asset.clusterId)" title="{{asset.name}}" [attr.data-se]="asset.dsName?null:'ds_asset_list_itm_selectable'">{{asset.name}}</div>
+            <div class="col dbNameCol">{{asset.dbName}}</div>
+            <div class="col descCol" title="{{asset.description}}">{{asset.description}}</div>
+            <div class="col ownerCol" title="{{asset.owner}}">{{asset.owner}}</div>
+            <div class="col dsNameCol" *ngIf="showBelongsToColumn">{{asset.dsName || "-"}}</div>
+          </div>
+        </div>
+      </div>
+      <simple-pagination data-se="asset_list_pagination"
+        [pageSize]="pageSize"
+        [pageStartIndex]="pageStartIndex"
+        [count]="assetsCount"
+        (onPageSizeChange)="onPageSizeChange($event)"
+        (onPageChange)="onPageChange($event)"
+      ></simple-pagination>
+      <span class="starExplanation" *ngIf="showBelongsToColumn && showStarMessage" >* {{"pages.dataset.asset-list.starAssetmessage" | translate}}</span>
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+</div>

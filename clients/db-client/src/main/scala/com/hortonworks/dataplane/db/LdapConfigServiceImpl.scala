@@ -36,7 +36,7 @@ class LdapConfigServiceImpl(config: Config)(implicit ws: WSClient)
       .map { res =>
         res.status match {
           case 200 => Right((res.json \ "results").validate[LdapConfiguration].get)
-          case 404 => Left(Errors(Seq(Error("404", "API not found"))))
+          case 404 => Left(Errors(Seq(Error(404, "API not found"))))
           case _ => mapErrors(res)
         }
       }
@@ -50,7 +50,7 @@ class LdapConfigServiceImpl(config: Config)(implicit ws: WSClient)
       .map { res =>
         res.status match {
           case 200 => Right(true)
-          case 404 => Left(Errors(Seq(Error("404", "API not found"))))
+          case 404 => Left(Errors(Seq(Error(404, "API not found"))))
           case _ => mapErrors(res)
         }
       }
@@ -63,7 +63,7 @@ class LdapConfigServiceImpl(config: Config)(implicit ws: WSClient)
       .map { res =>
         res.status match {
           case 200 => Right((res.json \ "results").validate[Seq[LdapConfiguration]].get)
-          case 404 => Left(Errors(Seq(Error("404", "API not found"))))
+          case 404 => Left(Errors(Seq(Error(404, "API not found"))))
           case _ => mapErrors(res)
         }
       }

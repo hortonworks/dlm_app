@@ -48,12 +48,12 @@ public class AuthorizationPreFilter  extends ZuulFilter {
     }
     String serviceId = context.get(SERVICE_ID_KEY).toString();
 
-    if (serviceId.equals(Constants.DPAPP) && context.getRequest().getServletPath().endsWith(Constants.KNOX_CONFIG_PATH)){
+    if ((serviceId.equals(Constants.DPAPP) && context.getRequest().getServletPath().endsWith(Constants.KNOX_CONFIG_PATH)) || context.getRequest().getServletPath().endsWith(Constants.GA_PROPERTIES_PATH)){
       // FIXME: possible security risk
       return false;
     }
 
-    return serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP) || serviceId.equals(Constants.CLOUDBREAK);
+    return serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP) || serviceId.equals(Constants.DSSAPP) || serviceId.equals(Constants.CLOUDBREAK);
   }
 
   @Override

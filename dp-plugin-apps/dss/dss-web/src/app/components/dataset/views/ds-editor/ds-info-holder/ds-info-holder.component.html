@@ -1,0 +1,49 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="hwx-title">{{"pages.dataset.ds-editor.information" | translate}}</div>
+<div class="form-group">
+  <label for="name" class="required">{{"common.name" | translate}}</label>
+  <div class="dp-input-and-message-wrapper">
+    <input type="text" placeholder="Name" #datasetName name="name" id="name" [(ngModel)]="dsModel.name" required dpUniqueDatasetName [ngClass]="{'validation-error': datasetName.invalid && datasetName.errors.unique}" data-se="ds_editor_info_name"/>
+    <div *ngIf="datasetName.invalid && datasetName.errors.unique" class="error-message">
+      {{"pages.dataset.ds-editor.errors.unique" | translate}}
+    </div>
+  </div>
+</div>
+<div class="form-group">
+  <label for="description" class="required">{{"common.description" | translate}}</label>
+  <textarea type="text" placeholder="Description" name="description" id="description" [(ngModel)]="dsModel.description" required data-se="ds_editor_info_description"></textarea>
+</div>
+<div class="form-group">
+  <label class="required">{{"common.datalake" | translate}}</label>
+  <select [(ngModel)]="dsModel.datalakeId" (change)="onLakeSelectionChange()" data-se="ds_editor_info_lake">
+    <option value="0">Select Datalake</option>
+    <option *ngFor="let lake of lakes; let i=index" value="{{lake.id}}" [attr.data-se]="'ds_editor_lake_optn_'+(1+i)">{{lake.name}}, {{lake.dcName}}</option>
+  </select>
+</div>
+<div class="form-group">
+  <label for="tags">{{"common.tags" | translate}}</label>
+  <div class="hwx-inline-desc">{{"pages.dataset.ds-editor.tagDescription" | translate}}</div>
+  <tagging-widget id="tags" [tags]="tags"
+                  [availableTags]="availableTags"
+                  [clearOnSearch]="true"
+                  (textChange)="onTagSearchChange($event)"
+                  (onNewSearch)="onNewTagAddition($event)"
+  ></tagging-widget>
+</div>
+
+
+<div class="button-container">
+  <button class="mdl-button btn-hwx-primary" (click)="onNext()" [disabled]="datasetName.invalid && datasetName.errors.unique" data-se="ds_editor_info_next">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
+  <button class="mdl-button btn-hwx-default" (click)="onCancel()" data-se="ds_editor_info_cancle">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
+</div>
+

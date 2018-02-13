@@ -6,11 +6,15 @@
     "back": "Back",
     "ok": "Ok",
     "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
     "copy": "Copy",
     "copied": "Copied",
     "review": "Review",
     "submit": "Submit",
     "show": "Show",
+    "save": "Save",
+    "saving": "Saving",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "duration": "Duration",
@@ -57,7 +61,10 @@
     "not_applicable": "Not Applicable",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
-      "unknown": "Something went wrong."
+      "unknown": "Something went wrong.",
+      "add_cloud": {
+        "unexpected": "Error: Unexpected response"
+      }
     },
     "time": {
       "hourly": "Hourly",
@@ -196,11 +203,20 @@
     "menuItem": {
       "overview": "Overview",
       "clusters": "Clusters",
+      "cloud_stores": "Cloud Accounts",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
       "help": "Help",
       "header": "DATA LIFECYCLE MANAGER"
+    }
+  },
+  "data_stores": {
+    "clusters": "Clusters",
+    "cloud": {
+      "aws": "S3",
+      "wasb": "WASB",
+      "adls": "ADLS"
     }
   },
   "jobs": {
@@ -232,7 +248,8 @@
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
       "not_exist_directory": "Specified path does not exist",
       "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'.",
-      "invalid_date": "\"{{fieldLabel}}\" should be a valid date"
+      "invalid_date": "\"{{fieldLabel}}\" should be a valid date",
+      "invalid_credentials": "Wrong Credentials"
     }
   },
   "page": {
@@ -380,6 +397,34 @@
         "stats": "Once this cluster is paired, you will be able to browse HDFS from here"
       }
     },
+    "cloud_stores": {
+      "header": "Cloud Accounts",
+      "content": {
+        "no_accounts": "No Accounts",
+        "no_containers": "No Containers",
+        "table": {
+          "actions": "Actions",
+          "user_details": "Account"
+        },
+        "accounts": {
+          "add": {
+            "title": "Add Cloud Account",
+            "provider": "Cloud Service Provider",
+            "access_key": "Access Key",
+            "secret_key": "Secret Key",
+            "username": "IAM USERNAME",
+            "account_id": "ACCOUNT ID",
+            "validate": "Validate",
+            "validating": "Validating",
+            "invalid_form": "Error: Cannot save cloud account since form is in invalid state",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud Account added successfully!"
+            }
+          }
+        }
+      }
+    },
     "policies": {
       "header": "Replication Policies",
       "header_note": "You must create a cluster pairing before you can create a replication policy.",
@@ -417,7 +462,8 @@
         "read_write": "Read / Write",
         "read_only": "Read Only",
         "read_write_abbrev": "RW",
-        "read_only_abbrev": "RO"
+        "read_only_abbrev": "RO",
+        "ranger_disabled_tooltip": "Ranger is not enabled on this cluster. Accidental writes might occur on the replicated data. Enable Ranger to prevent this issue"
       },
       "success": {
         "title": "Policy Creation Successful",
@@ -436,6 +482,7 @@
       },
       "form": {
         "selected": "Selected",
+        "validateBtn": "validate",
         "sections": {
           "general": "General",
           "database": "Select Database",
@@ -447,6 +494,7 @@
           "snapshot_text": "Enable snapshot based replication",
           "snapshot_url": "http://horton.works/dlm100_h0006a"
         },
+        "no_containers": "No containers",
         "fields": {
           "policy_name": "Policy Name",
           "policy_description": "Description",
@@ -458,6 +506,20 @@
             "default": "Select a Source Cluster first",
             "noPair": "No paired cluster available for the selected source cluster"
           },
+          "destination_type": "Destination Type",
+          "source_type": "Source Type",
+          "cloud_account": "Account",
+          "s3": {
+            "account": "IAM Account",
+            "endpoint": "S3 Endpoint"
+          },
+          "wasb": {
+            "container": "Container",
+            "container_placeholder": "Enter Container Name",
+            "blockPath": "Block Path",
+            "blockPath_placeholder": "Enter Block Path"
+          },
+          "container": "Container",
           "sourceDataCenter": "Source Data Center",
           "destinationDataCenter": "Destination Data Center",
           "service": "Service",

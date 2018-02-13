@@ -17,10 +17,10 @@
   [rows]="clusters">
 </dlm-table>
 
-<ng-template #statusCell let-status="value" let-cluster="row">
+<ng-template #statusCell let-status="value" let-cluster="row" let-index="rowIndex">
   <span>
-    <dlm-cluster-status-icon [cluster]="cluster" [attr.qe-attr]="'cluster-status-icon-' + cluster.$$index" ></dlm-cluster-status-icon>
-    <span [innerHtml]="status" [attr.qe-attr]="'cluster-status-' + cluster.$$index" ></span>
+    <dlm-cluster-status-icon [cluster]="cluster" [attr.qe-attr]="'cluster-status-icon-' + index" ></dlm-cluster-status-icon>
+    <span [innerHtml]="status" [attr.qe-attr]="'cluster-status-' + index" ></span>
   </span>
 </ng-template>
 
@@ -28,40 +28,40 @@
   <span class="slash">&#47;</span>
 </ng-template>
 
-<ng-template #nameCell let-name="value" let-cluster="row">
-  <span class="cluster-name" [attr.qe-attr]="'cluster-name-' + cluster.$$index">{{name}}</span>
+<ng-template #nameCell let-name="value" let-cluster="row" let-index="rowIndex">
+  <span class="cluster-name" [attr.qe-attr]="'cluster-name-' + index">{{name}}</span>
 </ng-template>
 
-<ng-template #dcCell let-name="value" let-cluster="row">
-  <span class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + cluster.$$index" >{{name}}</span>
+<ng-template #dcCell let-name="value" let-cluster="row" let-index="rowIndex">
+  <span class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + index" >{{name}}</span>
 </ng-template>
 
-<ng-template let-stats="value" let-cluster="row" #usageCell let-expanded="expanded">
+<ng-template let-stats="value" let-cluster="row" #usageCell let-expanded="expanded" let-index="rowIndex">
   <div class="cell-content"
        [ngClass]="setStatsClass(cluster)"
        [tooltip]="getStatsTooltip(cluster)"
-       [attr.qe-attr]="'cluster-details-' + cluster.$$index" (click)="toggleClusterDetails(cluster)">
+       [attr.qe-attr]="'cluster-details-' + index" (click)="toggleClusterDetails(cluster)">
     <span [innerHTML]="getCapacityUsed(stats)"></span> / <span [innerHTML]="getCapacityTotal(stats)"></span>
     <i *ngIf="!isHDFSDisabled(cluster)" [ngClass]="{fa: true, 'fa-chevron-down': !expanded, 'fa-chevron-up': expanded}"></i>
   </div>
 </ng-template>
 
-<ng-template let-value="value" let-column="column" let-row="row" #plainCell>
-  <span *ngIf="value || value === 0; else emptyValue" class="cell-content" [attr.qe-attr]="column['qeAttrName'] + '-' + row.$$index">{{value}}</span>
+<ng-template let-value="value" let-column="column" let-row="row" let-index="rowIndex" #plainCell>
+  <span *ngIf="value || value === 0; else emptyValue" class="cell-content" [attr.qe-attr]="column['qeAttrName'] + '-' + index">{{value}}</span>
   <ng-template #emptyValue>
-    <span [attr.qe-attr]="column['qeAttrName'] + '-' + row.$$index">
+    <span [attr.qe-attr]="column['qeAttrName'] + '-' + index">
       <i class="fa fa-minus"></i>
     </span>
   </ng-template>
 </ng-template>
 
-<ng-template let-location="value" let-cluster="row" #locationCell>
-  <span [attr.qe-attr]="'cluster-location-' + cluster.$$index" >{{location.city}}, {{location.country}}</span>
+<ng-template let-location="value" let-cluster="row" let-index="rowIndex" #locationCell>
+  <span [attr.qe-attr]="'cluster-location-' + index" >{{location.city}}, {{location.country}}</span>
 </ng-template>
 
-<ng-template let-cluster="row" #addActionsCell>
+<ng-template let-cluster="row" let-index="rowIndex" #addActionsCell>
   <dlm-cluster-actions
-    [attr.qe-attr]="'cluster-actions-' + cluster.$$index"
+    [attr.qe-attr]="'cluster-actions-' + index"
     [rowId]="cluster.id"
     [cluster]="cluster"
     [clusterActions]="clusterActions"
@@ -70,11 +70,11 @@
   </dlm-cluster-actions>
 </ng-template>
 
-<ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
+<ng-template let-cluster="row" let-index="rowIndex" ngx-datatable-row-detail-template #rowDetailRef>
   <div class="row">
     <div class="col col-xs-12">
       <dlm-hdfs-browser
-        [attr.qe-attr]="'cluster-actions-hdfs-browser' + cluster.$$index"
+        [attr.qe-attr]="'cluster-actions-hdfs-browser' + index"
         [rootPath]="hdfsRootPath"
         [clusterId]="cluster.id"
         [page]="getFileBrowserPageForRow(cluster.id)"

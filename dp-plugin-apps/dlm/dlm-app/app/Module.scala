@@ -8,7 +8,6 @@
  */
 
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
-import java.time.Clock
 import java.util
 import java.util.Optional
 
@@ -17,13 +16,14 @@ import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
+import com.hortonworks.dataplane.commons.service.api.KeyStoreManager
 import com.hortonworks.dlm.beacon._
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient, KnoxProxyWsClient}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
-import utils.EndpointService
+import com.typesafe.config.ConfigFactory
 
 
 /**
@@ -39,8 +39,10 @@ import utils.EndpointService
 class Module extends AbstractModule {
 
   def configure() = {
+    val config = new Configuration(ConfigFactory.load())
     bind(classOf[ConsulInitializer]).asEagerSingleton()
-
+    bind(classOf[KeyStoreManager]).toInstance(KeyStoreManager(config.getString("dp.keystore.path").get,
+      config.getString("dp.keystore.password").get))
     bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("dlm-app"))
   }
 
@@ -137,6 +139,14 @@ class Module extends AbstractModule {
     new BeaconAdminServiceImpl()
   }
 
+  @Provides
+  @Singleton
+  @Named("beaconCloudCredService")
+  def provideBeaconCloudCredService(implicit ws: WSClient,configuration: Configuration):BeaconCloudCredService = {
+    implicit val knoxProxyWsClient:KnoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
+    new BeaconCloudCredServiceImpl()
+  }
+
 
   @Provides
   @Singleton
@@ -145,7 +155,6 @@ class Module extends AbstractModule {
     implicit val clusterWsClient:ClusterWsClient = ClusterWsClient(ws)
     new AmbariWebServiceImpl(configuration.underlying)
   }
-
 }
 
 @Singleton

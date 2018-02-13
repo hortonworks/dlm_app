@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 
 import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
 import org.apache.commons.lang3.exception.ExceptionUtils
-import play.api.libs.json.{JsValue, Json, Reads}
+import play.api.libs.json._
 
 /**
   * Data plane main domain entities
@@ -36,22 +36,37 @@ object Entities {
     val General, Network, Database, Cluster, Ambari,Url = Value
 
     implicit class WrappedThrowable(th: Throwable) {
-      def asError(code: String, errorType: ErrorType):Errors =
+      def asError(status: Int, errorType: ErrorType):Errors =
         Errors(
           Seq(
-            Error(code, ExceptionUtils.getStackTrace(th), errorType.toString)))
+            Error(status, ExceptionUtils.getStackTrace(th), errorType.toString)))
     }
+  }
+
+  object SharingStatus extends Enumeration {
+    val PUBLIC = Value(1)
+    val PRIVATE = Value(2)
   }
 
   case class HJwtToken(token: String)
 
-  case class Error(code: String,
+  case class InnerError(code: String, trace: Option[String] = None, innererror: Option[InnerError] = None)
+
+  case class Error(status: Int,
                    message: String,
-                   errorType: String = ErrorType.General.toString)
+                   errorType: String = ErrorType.General.toString,
+                   code: String = "generic",
+                   target: Option[String] = None,
+                   trace: Option[String] = None,
+                   details: Option[Seq[Error]] = None,
+                   innererror: Option[InnerError] = None)
+
+  case class WrappedErrorException(error: Error)
+      extends Exception(error.message)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
-    def firstMessage = errors.headOption.map(_.code).getOrElse("Unknown Error")
+    def firstMessage: Int = errors.headOption.map(_.status).getOrElse(500)
   }
 
   // Pagination
@@ -280,6 +295,7 @@ object Entities {
                      lastModified: LocalDateTime = LocalDateTime.now(),
                      active: Boolean = true,
                      version: Int = 1,
+                     sharedStatus: Int = SharingStatus.PUBLIC.id,
                      customProps: Option[JsValue] = None)
 
   case class DatasetCategory(categoryId: Long, datasetId: Long)
@@ -330,7 +346,7 @@ object Entities {
 
   case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
 
-  case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
+  case class DatasetAndTags(dataset: Dataset, tags: Seq[String])
 
   case class CategoryCount(name: String, count: Int)
 
@@ -341,6 +357,17 @@ object Entities {
                                   tags: Seq[String],
                                   assetQueryModels: Seq[AtlasSearchQuery],
                                   dataAssets: Seq[DataAsset] = Nil)
+
+  case class AddToBoxPrams( datasetId:Long,
+                            clusterId: Long,
+                            assetQueryModel: AtlasSearchQuery,
+                            exceptions : Seq[String])
+
+  case class BoxSelectionPrams( datasetId:Long,
+                            clusterId: Long,
+                            guids : Seq[String])
+
+
   case class LdapConfiguration(
       id: Option[Long],
       ldapUrl: Option[String]=None,
@@ -368,6 +395,25 @@ object Entities {
                                    dataAssets: Seq[DataAsset] = Nil)
 
   case class BlacklistedToken(id: Option[Long], token: String, expiry: LocalDateTime)
+
+  case class Comment(id: Option[Long] = None,
+                      comment: Option[String],
+                      objectType: String,
+                      objectId: Long,
+                      createdBy: Long,
+                      createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      editVersion: Option[Int] = Some(0))
+
+  case class CommentWithUser(comment:Comment,
+                             userName: String)
+
+  case class Rating(id: Option[Long] = None,
+                    rating: Float,
+                    objectType: String,
+                    objectId: Long,
+                    createdBy: Long)
+
 }
 
 object JsonFormatters {
@@ -376,11 +422,15 @@ object JsonFormatters {
 
   val defaultJson = Json.using[Json.WithDefaultValues]
 
+  implicit val innerErrorFormat = Json.format[InnerError]
+
   implicit val errorWrites = Json.writes[Error]
   implicit val errorReads = Json.reads[Error]
 
   implicit val errorsWrites = Json.writes[Errors]
   implicit val errorsReads = Json.reads[Errors]
+
+  implicit val wrappedErrorExceptionFormat = Json.format[WrappedErrorException]
 
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]
@@ -471,8 +521,8 @@ object JsonFormatters {
   implicit val datasetResponseReads = Json.reads[DatasetAndCategories]
   implicit val datasetResponseWrites = Json.writes[DatasetAndCategories]
 
-  implicit val datasetRequestReads = Json.reads[DatasetAndCategoryIds]
-  implicit val datasetRequestWrites = Json.writes[DatasetAndCategoryIds]
+  implicit val datasetRequestReads = Json.reads[DatasetAndTags]
+  implicit val datasetRequestWrites = Json.writes[DatasetAndTags]
 
   implicit val configReads = Json.reads[DpConfig]
   implicit val configWrites = Json.writes[DpConfig]
@@ -482,9 +532,14 @@ object JsonFormatters {
   implicit val categoriesCountAndTotalWrites =
     Json.writes[CategoriesCountAndTotal]
 
-  implicit val datasetCreateRequestReads =
-    defaultJson.reads[DatasetCreateRequest]
+  implicit val datasetCreateRequestReads = defaultJson.reads[DatasetCreateRequest]
   implicit val datasetCreateRequestWrites = Json.writes[DatasetCreateRequest]
+
+  implicit val addToBoxPramsReads = defaultJson.reads[AddToBoxPrams]
+  implicit val addToBoxPramsWrites = Json.writes[AddToBoxPrams]
+
+  implicit val BoxSelectionPramsReads = defaultJson.reads[BoxSelectionPrams]
+  implicit val BoxSelectionPramsWrites = Json.writes[BoxSelectionPrams]
 
   implicit val richDatasetReads = defaultJson.reads[RichDataset]
   implicit val richDatasetWrites = Json.writes[RichDataset]
@@ -539,6 +594,15 @@ object JsonFormatters {
 
   implicit val serviceDependencyWrites = Json.writes[ServiceDependency]
   implicit val serviceDependencyReads = Json.reads[ServiceDependency]
+
+  implicit val commentWrites = Json.writes[Comment]
+  implicit val commentReads = Json.reads[Comment]
+
+  implicit val commentWithUserWrites = Json.writes[CommentWithUser]
+  implicit val commentWithUserReads = Json.reads[CommentWithUser]
+
+  implicit val ratingWrites = Json.writes[Rating]
+  implicit val ratingReads = Json.reads[Rating]
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 

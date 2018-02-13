@@ -9,5 +9,5 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-sbt ";project clusterService;run"
 
+sbt ";project clusterService;run"

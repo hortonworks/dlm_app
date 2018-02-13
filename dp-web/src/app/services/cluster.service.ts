@@ -24,7 +24,7 @@ export class ClusterService {
 
   syncCluster(lakeId): Observable<any> {
     return this.http
-      .post(`${this.uri}/sync/${lakeId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .post(`/api/lakes/${lakeId}/sync`, new RequestOptions(HttpUtil.getHeaders()))
       .catch(HttpUtil.handleError);
   }
 

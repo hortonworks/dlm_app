@@ -11,7 +11,7 @@
 
 package com.hortonworks.dataplane.commons.domain
 
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 object Atlas {
 
@@ -43,6 +43,18 @@ object Atlas {
                              version: Option[Long],
                              classifications: Option[Seq[JsObject]]
                             )
+  {
+    private val requiredKeySet = Set("createTime", "name", "owner", "qualifiedName")
+
+    def getEntity() = {
+      val entityAttr: Map[String,String] = attributes.fields
+        .filter(e => requiredKeySet.contains(e._1))
+        .map(e => (e._1, try e._2.as[String] catch{case a: Throwable => e._2.toString()})).toMap
+      Entity(typeName,
+        Some(entityAttr),
+        guid, status, entityAttr.get("name"), None, None, None)
+    }
+  }
 
   /**
     *
