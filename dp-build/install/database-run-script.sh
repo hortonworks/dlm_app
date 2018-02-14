@@ -34,6 +34,10 @@ update_config(){
     run_db_command /scripts/config-update.sh "$@"
 }
 
+get_config(){
+    run_db_command /scripts/config-get.sh "$@"
+}
+
 main() {
 
     # initialize with defaults
@@ -68,6 +72,10 @@ main() {
             ;;
         ENABLE_CONFIG|DISABLE_CONFIG)
             update_config "$@"
+            ;;
+        GET_CONFIG)
+            shift
+            get_config "$@"
             ;;
         *)
             echo "Error: Invalid database command $DB_CMD."
