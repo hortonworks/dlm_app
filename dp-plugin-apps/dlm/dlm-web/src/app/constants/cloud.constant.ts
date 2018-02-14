@@ -14,6 +14,10 @@ export const ADLS = 'ADLS';
 
 export const CREDENTIAL_TYPE_VALUES = [S3_TOKEN];
 
+export const IAM_ROLE = 'IAM_ROLE';
+export const ACCESS_KEY = 'ACCESS_KEY';
+export const S3_AUTH_TYPES = [ACCESS_KEY, IAM_ROLE];
+
 export const PROVIDERS = [S3, ADLS, WASB];
 
 export const CREDENTIAL_TYPE_LABELS = {

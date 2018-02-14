@@ -28,4 +28,16 @@
     color: $grey-color;
     background-color: $lighter-grey;
   }
+
+  .ui-switch {
+    p {
+      line-height: 34px;
+      &:first-child {
+        padding-right: 15px;
+      }
+      &:last-child {
+        padding-left: 15px;
+      }
+    }
+  }
 }

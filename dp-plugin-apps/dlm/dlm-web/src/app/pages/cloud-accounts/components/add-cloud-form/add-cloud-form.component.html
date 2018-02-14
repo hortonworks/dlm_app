@@ -33,6 +33,29 @@
             [required]="true">
             <input type="text" class="form-control"  [placeholder]="'page.cloud_stores.content.accounts.add.name.placeholder' | translate"
                    qe-attr="add-cloud-store-credential-name" formField formControlName="credentialName" maxlength="32"/>
+            <dlm-field-error *ngIf="addCloudForm.get('credentialName').hasError('uniqValidator')">
+              {{'forms.validation_errors.credValidator' | translate}}
+            </dlm-field-error>
+          </dlm-form-field>
+          <dlm-form-field
+            [label]="'page.cloud_stores.content.accounts.add.auth_type.label' | translate"
+            [fieldClass]="fieldClass"
+            [errorClass]="fieldClass"
+            [inlineError]="true"
+            [required]="true">
+            <div class="ui-switch">
+              <p class="pull-left">{{"page.cloud_stores.content.accounts.add.auth_type.keys" | translate}}</p>
+              <ui-switch
+                class="pull-left"
+                qe-attr="cloud-store-auth-type"
+                formField
+                reverse
+                [disabled]="uiSwitchDisabled"
+                [defaultBgColor]="'#64bd63'"
+                (change)="onChangeAuthType($event)"
+                formControlName="authTypeFlag"></ui-switch>
+              <p class="pull-left">{{"page.cloud_stores.content.accounts.add.auth_type.role" | translate}}</p>
+            </div>
           </dlm-form-field>
           <dlm-form-field
             [label]="'page.cloud_stores.content.accounts.add.access_key.label' | translate"
@@ -54,10 +77,25 @@
             [errorClass]="fieldClass"
             [inlineError]="true"
             [required]="true">
-            <input type="password" class="form-control" [placeholder]="'page.cloud_stores.content.accounts.add.secret_key.placeholder' | translate"
-                   [attr.disabled]="isInputDisabled()" qe-attr="cloud-store-secret-key" formField formControlName="secretKey" />
-            <span *ngIf="isValidationSuccess" class="glyphicon glyphicon-ok text-success status-icon form-control-feedback"></span>
-            <span *ngIf="addCloudForm.get('secretKey').hasError('wrongCredentials')" class="glyphicon glyphicon-remove status-icon form-control-feedback"></span>
+            <div class="row">
+              <div class="col-md-9">
+                <input
+                  class="form-control"
+                  [type]="secretKeyInputType"
+                  [placeholder]="'page.cloud_stores.content.accounts.add.secret_key.placeholder' | translate"
+                  [attr.disabled]="isInputDisabled()"
+                  qe-attr="cloud-store-secret-key"
+                  formField
+                  formControlName="secretKey"/>
+                <span *ngIf="isValidationSuccess"
+                      class="glyphicon glyphicon-ok text-success status-icon form-control-feedback"></span>
+                <span *ngIf="addCloudForm.get('secretKey').hasError('wrongCredentials')"
+                      class="glyphicon glyphicon-remove status-icon form-control-feedback"></span>
+              </div>
+              <div class="col-md-3">
+                <button class="btn btn-default pull-right" type="button" (click)="toggleSecretKeyInputType()"><i class="fa fa-eye"></i></button>
+              </div>
+            </div>
             <dlm-field-error *ngIf="addCloudForm.get('secretKey').hasError('wrongCredentials')">
               {{'forms.validation_errors.invalid_credentials' | translate}}
             </dlm-field-error>
