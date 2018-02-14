@@ -15,7 +15,12 @@ get_config() {
 
     local KEY="$1"
     local GET_QUERY="SELECT config_value from dataplane.configs WHERE config_key = '$KEY'"
-    psql -c "$GET_QUERY"
+    local RESULT=`psql -c "$GET_QUERY" | grep "true"`
+    if [ -z ${RESULT} ]; then
+        echo "$KEY: Disabled"
+    else
+        echo "$KEY: Enabled"
+    fi
 }
 
 main() {
