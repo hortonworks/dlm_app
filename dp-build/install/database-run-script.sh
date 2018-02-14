@@ -74,6 +74,7 @@ main() {
             update_config "$@"
             ;;
         GET_CONFIG)
+            shift
             get_config "$@"
             ;;
         *)

@@ -19,7 +19,7 @@ get_config() {
 }
 
 main() {
-   get_config "$2"
+   get_config "$@"
 }
 
 main "$@"

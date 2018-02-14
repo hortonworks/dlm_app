@@ -556,6 +556,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "Commands"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "utils get-config <key>" "Gets config value for the given config key"
     printf "%-${tabspace}s:%s\n" "utils enable-config <key>" "Sets config value to true for the given config key"
     printf "%-${tabspace}s:%s\n" "utils disable-config <key>" "Sets config value to false for the given config key"
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that DataPlane will use to connect to clusters."
