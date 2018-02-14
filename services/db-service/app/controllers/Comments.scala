@@ -61,7 +61,6 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     Logger.info("Comments Controller: Received get comment by object-reference request")
     commentRepo.findByObjectRef(objectId,objectType,getPaginatedQuery(req))
       .map{ commentswithuser =>
-        val abc  = commentswithuser
         success(commentswithuser)
       }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Getting Comments with object Id $objectId and object Type $objectType failed with message ${e.getMessage}", e)))
   }
