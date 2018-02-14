@@ -104,6 +104,15 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     }
   }
 
+  def getByParentId(parentId: String) = Action.async { req =>
+    Logger.info("Comments-Controller: Received get comment by parent Id request")
+    commentService.getByParentId(parentId,req.rawQueryString)
+      .map { comments =>
+        Ok(Json.toJson(comments))
+      }
+      .recover(apiErrorWithLog(e => Logger.error(s"Comments-Controller: Getting Comments with parent Id $parentId failed with message ${e.getMessage}", e)))
+  }
+
   private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
 
   def deleteCommentById(commentId: String) = AuthenticatedAction.async { req =>

@@ -61,8 +61,17 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     Logger.info("Comments Controller: Received get comment by object-reference request")
     commentRepo.findByObjectRef(objectId,objectType,getPaginatedQuery(req))
       .map{ commentswithuser =>
+        val abc  = commentswithuser
         success(commentswithuser)
       }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Getting Comments with object Id $objectId and object Type $objectType failed with message ${e.getMessage}", e)))
+  }
+
+  def getByParentId(parentId: Long) = Action.async { req =>
+    Logger.info("Comments Controller: Received get comment by parent Id request")
+    commentRepo.findByParentId(parentId)
+      .map{ commentswithuser =>
+        success(commentswithuser)
+      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Getting Comments with parent Id $parentId failed with message ${e.getMessage}", e)))
   }
 
   def delete(objectId: Long, objectType: String) = Action.async { req =>
@@ -80,8 +89,15 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
     }
     else{
       val commentId = id.toLong
-      val futureId = commentRepo.deleteById(commentId, userId)
-      futureId.map(i => success(s"Success: ${i} row/rows deleted"))
+      val comment = commentRepo.getById(commentId, userId)
+      val numDel = comment.flatMap { cmnt =>
+        if(cmnt.parentCommentId.isDefined){
+          commentRepo.deleteReplyCommentById(commentId,userId, cmnt.parentCommentId.get)
+        }else {
+          commentRepo.deleteCommentById(commentId,userId)
+        }
+      }
+      numDel.map(i => success(s"Success: ${i} row/rows deleted"))
         .recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Deleting Comment with comment Id $commentId failed with message ${e.getMessage}",e)))
     }
   }

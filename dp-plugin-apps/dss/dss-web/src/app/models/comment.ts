@@ -18,6 +18,7 @@ export class Comment {
   createdOn: string;
   parentCommentId: number;
   lastModified: string;
+  numberOfReplies: number;
   editVersion: string;
 }
 
@@ -25,4 +26,12 @@ export class CommentWithUser {
   comment: Comment;
   userName: string;
   isCommentExpanded?: boolean = false;
+  replies: CommentWithUser[] = [];
+  isReplyVisible?: boolean = false;
+}
+
+export class ReplyTo {
+  commentText: string;
+  username: string;
+  parentId: number;
 }

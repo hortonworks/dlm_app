@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS dataplane.comments (
   createdby    BIGINT REFERENCES dataplane.users (id)                 NOT NULL,
   createdon    TIMESTAMP DEFAULT now(),
   lastmodified TIMESTAMP DEFAULT now(),
+  parent_comment_id  BIGINT REFERENCES dataplane.comments(id)         ON DELETE CASCADE DEFAULT NULL,
+  number_of_replies BIGINT DEFAULT 0,
   edit_version BIGINT DEFAULT 0
 );
 
@@ -20,6 +22,9 @@ CREATE TABLE IF NOT EXISTS dataplane.ratings (
 
   CONSTRAINT unique_creator_objId_objType_constraint UNIQUE (createdby, object_id,object_type)
 );
+
+--Index on comments table
+CREATE INDEX idx_dp_comments_parent_id on dataplane.comments(parent_comment_id);
 
 -- currently not using this table. If we want to use it then we will need to have some mechanism to swap the contents of this table at regular intervals to external store.
 /*CREATE TABLE IF NOT EXISTS dataplane.comment_edits (

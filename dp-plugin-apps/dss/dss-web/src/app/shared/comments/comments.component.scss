@@ -186,6 +186,7 @@ ol, ul {
 }
 .comment {
   padding: 0 10px;
+  margin-left: 14px;
 }
 .response-group {
   margin-top: 10px;
@@ -199,9 +200,6 @@ ol, ul {
   margin-top: 5px;
 }
 
-.comment {
-  margin-left: 14px;
-}
 .comment.online-user:before {
   margin-left: -50px;
 }
@@ -268,6 +266,11 @@ ol, ul {
   cursor: pointer;
 }
 
+.view-replies{
+  cursor: pointer;
+  color: #444444;
+}
+
 textarea{
   display:block;
 }
@@ -305,3 +308,36 @@ textarea{
   color: #999;
 }
 
+.comment-reply {
+  margin-top: -7px;
+  line-height: 1.2;
+  margin-top: -7px;
+  line-height: 1.2;
+  display: inline-block;
+  padding-top: 10px;
+  vertical-align: top;
+  float: left ;
+}
+.comment-reply + .comment {
+  margin-left: 14px;
+}
+.comment-reply + .comment.online-user:before {
+  margin-left: -50px;
+}
+.comment-reply-to-placeholder {
+  position: absolute;
+  bottom: 67px;
+  left: 2px;
+  right: 2px;
+  background: #eee;
+  border-radius: 4px;
+  border-left-width: 5px;
+  border-left-style: solid;
+  padding: 10px;
+}
+.close-icon.close-reply{
+  color: #808080;
+  padding-left: 5px;
+  padding-bottom: 5px;
+  margin-top: 0px;
+}
