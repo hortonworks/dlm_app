@@ -416,6 +416,10 @@ utils_disable_config_value() {
   source $(pwd)/database-run-script.sh "DISABLE_CONFIG" "$@"
 }
 
+utils_get_config_value(){
+  source $(pwd)/database-run-script.sh "GET_CONFIG" "$@"
+}
+
 
 init_all() {
     read_admin_password_safely
@@ -603,6 +607,10 @@ else
                 update-user)
                     shift
                     utils_update_user_secret "$@"
+                    ;;
+                get-config)
+                    shift
+                    utils_get_config_value "$@"
                     ;;
                 enable-config)
                     shift
