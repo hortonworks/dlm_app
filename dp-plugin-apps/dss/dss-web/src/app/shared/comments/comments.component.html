@@ -78,7 +78,7 @@
               <div><a class="expandable-view" (click)=" commentWithUser.isCommentExpanded = !commentWithUser.isCommentExpanded"><i>view
                 {{commentWithUser.isCommentExpanded? 'less':'more'}}</i></a></div>
             </div>
-            <div class="comment-text" *ngIf="commentWithUser.comment.numberOfReplies > 0"><a class="view-replies" (click)="getReplies(commentWithUser)">{{commentWithUser.isReplyVisible? 'Hide ':'View '}} all {{commentWithUser.comment.numberOfReplies}} {{commentWithUser.comment.numberOfReplies > 1 ? 'replies' : 'reply'}}</a></div>
+            <div class="comment-text" *ngIf="commentWithUser.comment.numberOfReplies > 0"><a class="view-replies" (click)="toggleAndGetReplies(commentWithUser)">{{commentWithUser.isReplyVisible? 'Hide ':'View '}} all {{commentWithUser.comment.numberOfReplies}} {{commentWithUser.comment.numberOfReplies > 1 ? 'replies' : 'reply'}}</a></div>
             <div>
               <ul [ngClass]="{'response-group': commentWithUser.replies && (commentWithUser.replies.length > 0) }" *ngIf="commentWithUser.isReplyVisible">
                 <li *ngFor="let reply of commentWithUser.replies">

@@ -25,7 +25,7 @@ export class Comment {
 export class CommentWithUser {
   comment: Comment;
   userName: string;
-  isCommentExpanded?: boolean = false;
+  isCommentExpanded?: boolean = false;   // tells whether the comment is fully expanded or not for long comments. Helps to enable 'view more' option
   replies: CommentWithUser[] = [];
   isReplyVisible?: boolean = false;
 }

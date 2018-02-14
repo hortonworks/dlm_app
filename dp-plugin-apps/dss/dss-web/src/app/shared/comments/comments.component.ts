@@ -34,8 +34,9 @@ export class CommentsComponent implements OnInit {
   isRatingEnabled: boolean = false;
   objectType: string;
   objectId: string;
+
   commentWithUsers: CommentWithUser[]= [];
-  commentWithUsersMap = {};
+  commentWithUsersMap = {}; // introduced to avoid making call to server on delete of a root/parent comment.
   fetchInProgress: boolean =true;
   newCommentText: string;
   fetchError: boolean= false;
@@ -44,15 +45,20 @@ export class CommentsComponent implements OnInit {
   userRating: Rating = new Rating();
   averageRating: number =0;
   userRatingLabel: string = "";
+
+  // pagination params to fetch parent comments
   offset:number = 0;
   size:number = 10;
+
   allCommentsLoaded: boolean = false;
   timer = null;
-  newCommentsAvailable:boolean = false;
+  newCommentsAvailable:boolean = false; // this keeps track of those new parent comments which are added but are not visible (because edge is not in viewport) and as allCommentsLoaded was made true in previous call these new parent comments were never loaded.
 
+  //below variables are needed to show replyTo box over textarea while replying
   replyTo: ReplyTo;
   isReply: boolean = false;
   parentCommentWithUser: CommentWithUser = new CommentWithUser();
+
   @ViewChild('newComment') newCommentTextArea : ElementRef;
   @ViewChild('edge') edgeElement: ElementRef;
   @ViewChild('replyToCommentArea') replyToCommentArea: ElementRef;
@@ -108,11 +114,11 @@ export class CommentsComponent implements OnInit {
     }
   }
 
-  onHoverRatingChange(){
+  onHoverRatingChange(){ // onHoverRatingChange on Rating Component
     this.userRatingLabel = "RATE THIS COLLECTION";
   }
 
-  onMouseLeave(){
+  onMouseLeave(){ // onMouseLeave on Rating Component
     if(this.userRating.rating !== 0){
       this.userRatingLabel = "YOU RATED";
     }
@@ -133,7 +139,7 @@ export class CommentsComponent implements OnInit {
         let resetMap = (this.offset === 0);
         this.offset = this.offset + comments.length;
         this.fetchInProgress = false;
-        this.makeCommentWithUsersMap(comments, resetMap);
+        this.updateCommentWithUsersMap(comments, resetMap);
         setTimeout(() => {
           this.loadNext();       // required in case 'edge' is already in viewport (without scrolling). setTimeout is needed as window takes some time to adjust with newly loaded comments.
         },50);
@@ -144,7 +150,7 @@ export class CommentsComponent implements OnInit {
     );
   }
 
-  makeCommentWithUsersMap(comments: CommentWithUser[], resetMap: boolean){
+  updateCommentWithUsersMap(comments: CommentWithUser[], resetMap: boolean){
     let that = this;
     if(resetMap) this.commentWithUsersMap = {};
     this.commentWithUsers.forEach(function(cWU){
@@ -158,7 +164,7 @@ export class CommentsComponent implements OnInit {
     this.commentWithUsers =  keys.map(function(v) { return that.commentWithUsersMap[v]; });
   }
 
-  getReplies(commentWithUser: CommentWithUser){
+  toggleAndGetReplies(commentWithUser: CommentWithUser){
     if(!commentWithUser.isReplyVisible){
       commentWithUser.isReplyVisible = true;
       let comment = commentWithUser.comment;
@@ -184,7 +190,7 @@ export class CommentsComponent implements OnInit {
         newCommentObject.parentCommentId = this.parentCommentWithUser.comment.id;
         this.parentCommentWithUser.isReplyVisible = false;
         this.commentService.add(newCommentObject).subscribe(_ => {
-          this.getReplies(this.parentCommentWithUser);
+          this.toggleAndGetReplies(this.parentCommentWithUser);
           this.removeReply();
         });
       }else {
@@ -211,13 +217,15 @@ export class CommentsComponent implements OnInit {
     }
   }
 
+  // on delete of reply, a new call is made to fetch all replies after deleting the reply
   deleteReply(commentToDelete: CommentWithUser, parentCommentWu:CommentWithUser){
     this.commentService.deleteComment(commentToDelete.comment.id).subscribe(_ => {
       parentCommentWu.isReplyVisible = false;
-      this.getReplies(parentCommentWu);
+      this.toggleAndGetReplies(parentCommentWu);
     });
   }
 
+  // no new call to server to fetch comments when a comment is deleted. Using commentWithUsersMap instead
   deleteRootComment(commentToDelete: CommentWithUser){
     this.commentService.deleteComment(commentToDelete.comment.id).subscribe();
     delete this.commentWithUsersMap[commentToDelete.comment.id];
