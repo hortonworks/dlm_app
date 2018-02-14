@@ -37,9 +37,9 @@
   * Update `dataplane/services/gateway/src/main/resources/application-zuul.properties` to set the values for following properties:
   ```
   # configuration for JWT signing keys. Need to be overridden
-  jwt.public.key.path=
-  jwt.private.key.path=
-  jwt.private.key.password=
+  jwt.public.key.path=/some/where/on/your/local/path/ssl-cert.pem
+  jwt.private.key.path=/some/where/on/your/local/path/ssl-key.pem
+  jwt.private.key.password=changeit
   ```
   * Navigate to `<project_parent>/dataplane/services/gateway`
   * Run command `gradle bootRun`
