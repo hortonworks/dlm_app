@@ -17,6 +17,7 @@ import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { ACTION_TYPES } from 'pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
+import {S3_TOKEN} from 'constants/cloud.constant';
 
 @Component({
   selector: 'dlm-cloud-accounts-list',
@@ -26,6 +27,8 @@ import { ACTION_TYPES } from 'pages/cloud-accounts/components/cloud-account-acti
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CloudAccountsListComponent implements OnInit {
+
+  S3_TOKEN = S3_TOKEN;
 
   @Input() accounts: CloudAccount[] = [];
 

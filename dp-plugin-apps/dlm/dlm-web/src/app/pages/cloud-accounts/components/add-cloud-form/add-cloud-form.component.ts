@@ -88,7 +88,6 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   public initForm() {
     this.store.dispatch(resetAddCloudProgressState(ADD_CLOUD_FORM_REQUEST_ID));
     const names = this.accounts.map(a => a.accountDetails.userName);
-    console.error(names);
     this.resetErrors();
     this.addCloudForm = this.formBuilder.group({
       credentialType: [this.defaultCredentialType, Validators.required],
