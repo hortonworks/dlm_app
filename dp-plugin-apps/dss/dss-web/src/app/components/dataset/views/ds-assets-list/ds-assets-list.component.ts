@@ -20,7 +20,7 @@ export enum AssetTypeEnum { ALL, HIVE, HDFS}
 export enum AssetSelectionStateEnum { CHECKALL, CHECKALLWITHEXCEPTION, CHECKSOME}
 
 export let AssetTypeEnumString = ["all", "hive", "file"];
-export enum AssetListActionsEnum {EDIT, REMOVE, ADD, RELOADED, STARTRELOAD, SELECTIONCHANGE}
+export enum AssetListActionsEnum {EDIT, REMOVE, ADD, RELOADED, STARTRELOAD, SELECTIONCHANGE, DELETE, DONE}
 export class AssetSetQueryFilterModel {
   constructor(public column: string, public operator: string, public value: (string | number | boolean), public dataType: string) {
   }
@@ -145,9 +145,13 @@ export class DsAssetList implements OnInit {
     //TODO there must be a separate count query with all filters instead of hard coding assetsCount
     asqms = this.getQueryModelsForAssetService(false);
     this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize, this.clusterId)
-      .subscribe(assets => {
-        this.dsAssets = assets;
-        this.pageEndIndex = this.pageStartIndex-1+assets.length;
+      .subscribe(assetsNcounts => {
+        this.dsAssets = assetsNcounts.assets;
+        if(assetsNcounts.count !== null) {
+          this.assetsCount = assetsNcounts.count;
+          this.totalPages = Math.ceil(this.assetsCount / this.pageSize);
+        }
+        this.pageEndIndex = this.pageStartIndex-1+assetsNcounts.assets.length;
         setTimeout(() => {
           this.setTableHeight();
           this.actionReload();
@@ -227,8 +231,14 @@ export class DsAssetList implements OnInit {
     this.actionEmitter.emit(this.actionEnum.EDIT);
   }
 
-  actionReload() {
+  actionReload () {
     this.actionEmitter.emit(this.actionEnum.RELOADED);
+  }
+  actionDelete () {
+    this.actionEmitter.emit(this.actionEnum.DELETE);
+  }
+  actionDone () {
+    this.actionEmitter.emit(this.actionEnum.DONE);
   }
 
   updateQueryModels() {

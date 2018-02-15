@@ -149,7 +149,13 @@ class DataSets @Inject()(
         case Right(assets) =>  assets.size match {
           case 0 =>
             Logger.info("Effectively no asset to add.")
-            Future.successful(Conflict)
+            dataSetService
+              .getRichDatasetById(params.datasetId,req.user.id.get)
+              .map {
+                case Left(errors) => InternalServerError(Json.toJson(errors))
+                case Right(richDataset) => Ok(Json.toJson(richDataset))
+              }
+//            Future.successful(Conflict)
           case _ => dataSetService
             .addAssets(params.datasetId, assets)
             .map(rDataset =>

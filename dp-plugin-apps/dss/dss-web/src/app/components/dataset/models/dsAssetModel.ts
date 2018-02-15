@@ -21,3 +21,8 @@ export class DsAssetModel {
   dsName?: string;
   dbName?: string;
 }
+
+export class AssetsAndCount {
+  assets: DsAssetModel[];
+  count:number;
+}

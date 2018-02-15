@@ -11,24 +11,15 @@
 
 <div class="componentCont borderBox" #outerCont >
   <div *ngIf="!hideTabs" class="tabCont">
-    <div *ngIf="dsModel.counts" class="tab firstTab {{(typeFilter == tab.ALL)?'active':''}}" (click)="typeFilter = tab.ALL;setFirstPage();fetchAssets()">
-      <div class="tabName">Total</div>
-      <div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span></div>
-    </div>
-
-    <!--<div class="tab {{(typeFilter == tab.HIVE)?'active':''}}" (click)="typeFilter = tab.HIVE;setFirstPage();fetchAssets()">-->
-      <!--<div class="tabName">Hive</div>-->
-      <!--<div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount}}</span></div>-->
-    <!--</div>-->
-    <!--<div class="tab {{(typeFilter == tab.HDFS)?'active':''}}" (click)="typeFilter = tab.HDFS;setFirstPage();fetchAssets()">-->
-      <!--<div class="tabName">Files</div>-->
-      <!--<div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.filesCount}}</span></div>-->
-    <!--</div>-->
-
-    <span class="actionButtonCont">
+    <span *ngIf="assetsCount" style="line-height:2;">
+      <span>{{assetsCount}}</span> <span>{{(assetsCount == 1)?"Asset":"Assets"}}</span>
+    </span>
+    <span *ngIf="applicableActions.length" class="actionButtonCont">
       <button *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionRemove()">{{"pages.dataset.ds-editor.action.removeAll" | translate}}</button>
       <button *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-button btn-hwx-secondary" (click)="actionAddMore()">{{"pages.dataset.ds-editor.action.addMoreAssets" | translate}}</button>
-      <button *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-button btn-hwx-primary" (click)="actionEdit()">{{"pages.dataset.ds-editor.action.edit" | translate}}</button>
+      <button *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-button btn-hwx-secondary" (click)="actionEdit()">{{"pages.dataset.ds-editor.action.edit" | translate}}</button>
+      <button *ngIf="applicableActions.indexOf(actionEnum.DELETE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionDelete()">{{"pages.dataset.ds-editor.action.delete" | translate}}</button>
+      <button *ngIf="applicableActions.indexOf(actionEnum.DONE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionDone()">{{"pages.dataset.ds-editor.action.done" | translate}}</button>
     </span>
 
     <div *ngIf="!hideSearch" class="search-input">
@@ -48,8 +39,8 @@
           <div class="col sourceCol">{{"pages.dataset.labels.source" | translate}}</div>
           <div class="col nameCol">{{"pages.dataset.labels.name" | translate}}</div>
           <div class="col dbNameCol">{{"pages.dataset.labels.dbName" | translate}}</div>
-          <div class="col descCol">{{"pages.dataset.labels.description" | translate}}</div>
           <div class="col ownerCol">{{"pages.dataset.labels.owner" | translate}}</div>
+          <div class="col descCol">{{"pages.dataset.labels.description" | translate}}</div>
           <div class="col dsNameCol" *ngIf="showBelongsToColumn">{{"pages.dataset.labels.belongsTo" | translate}}</div>
 
         </div>
@@ -68,8 +59,8 @@
             </div>
             <div class="col nameCol" [class.hlink]="allowAssetNavigation" (click)="onAssetClick(asset.id, asset.clusterId)" title="{{asset.name}}" [attr.data-se]="asset.dsName?null:'ds_asset_list_itm_selectable'">{{asset.name}}</div>
             <div class="col dbNameCol">{{asset.dbName}}</div>
-            <div class="col descCol" title="{{asset.description}}">{{asset.description}}</div>
             <div class="col ownerCol" title="{{asset.owner}}">{{asset.owner}}</div>
+            <div class="col descCol" title="{{asset.description}}">{{asset.description}}</div>
             <div class="col dsNameCol" *ngIf="showBelongsToColumn">{{asset.dsName || "-"}}</div>
           </div>
         </div>

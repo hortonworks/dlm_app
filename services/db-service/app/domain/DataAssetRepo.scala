@@ -13,11 +13,12 @@ package domain
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.DataAsset
+import com.hortonworks.dataplane.commons.domain.Entities.{AssetsAndCounts, DataAsset}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class DataAssetRepo @Inject()(
@@ -28,9 +29,16 @@ class DataAssetRepo @Inject()(
 
   val DatasetAssets = TableQuery[DatasetAssetTable]
 
-  def allWithDatasetId(datasetId: Long, queryName: String, offset: Long, limit: Long): Future[List[DataAsset]] = db.run {
-    DatasetAssets.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).drop(offset).take(limit).to[List].result
+  def allWithDatasetId(datasetId: Long, queryName: String, offset: Long, limit: Long): Future[AssetsAndCounts] = {
+    db.run(for {
+      count <- DatasetAssets.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).length.result
+      assets <- DatasetAssets.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).drop(offset).take(limit).to[List].result
+    } yield (assets, count)).map {
+      case (assets, count) => AssetsAndCounts(assets, count)
+    }
   }
+
+
 
   def insert(dataAsset: DataAsset): Future[DataAsset] = {
     db.run {
