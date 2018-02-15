@@ -116,7 +116,7 @@
                            (blur)="setLocationValidity(location)"
                            (focus)="resetLocationValidity()"
                            [min-chars]=3
-                           [(ngModel)]="location"
+                           [(ngModel)]="locationStr"
                            [source]="getLocations.bind(this)"
                            [value-formatter]="locationFormatter"
                            [list-formatter]="locationFormatter"
