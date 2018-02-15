@@ -227,6 +227,7 @@ object Webservice {
 
     def deleteByObjectRef(objectId: String, objectType: String): Future[String]
 
+    def getByParentId(parentId: String, queryString: String): Future[Seq[CommentWithUser]]
 
   }
 

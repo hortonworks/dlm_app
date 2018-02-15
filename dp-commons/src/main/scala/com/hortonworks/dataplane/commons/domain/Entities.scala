@@ -403,6 +403,8 @@ object Entities {
                       createdBy: Long,
                       createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
                       lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      parentCommentId: Option[Long],
+                      numberOfReplies: Option[Long],
                       editVersion: Option[Int] = Some(0))
 
   case class CommentWithUser(comment:Comment,
