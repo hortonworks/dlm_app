@@ -12,6 +12,7 @@ import { CloudAccount, CloudAccountDetails } from './cloud-account.model';
 export interface AwsAccountDetails extends CloudAccountDetails {
   accountId: string;
   userName: string;
+  credentialType: string;
 }
 
 export interface AwsAccount extends CloudAccount {

@@ -26,6 +26,7 @@ import {ActionColumnComponent} from 'components/table-columns/action-column';
 import {CheckboxComponent} from 'common/checkbox/checkbox.component';
 import {CloudAccountService} from 'services/cloud-account.service';
 import {NavbarService} from 'services/navbar.service';
+import {TooltipModule} from 'ngx-bootstrap';
 
 describe('CloudAccountsListComponent', () => {
   let component: CloudAccountsListComponent;
@@ -35,6 +36,7 @@ describe('CloudAccountsListComponent', () => {
     configureComponentTest({
       imports: [
         RouterTestingModule,
+        TooltipModule,
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),

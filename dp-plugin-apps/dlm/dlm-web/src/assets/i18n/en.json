@@ -408,6 +408,7 @@
           "user_details": "CREDENTIAL"
         },
         "accounts": {
+          "iam_role": "IAM Role",
           "add": {
             "title": "Add Cloud Account",
             "provider": "Cloud Provider",
