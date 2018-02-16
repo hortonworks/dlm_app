@@ -23,8 +23,14 @@
     </div>
   </div>
   <div class="div50Percent dataset-view__action-wrapper">
-    <div class="comment-icon" (click)='viewComments()'>
+    <div class="view-icon" (click)='viewComments()'>
       <i class="fa fa-comments"></i>
+    </div>
+    <div  class="view-icon"  (click)='onFavIconClick()'>
+      <i class="fa fa-heart" [ngClass] = "{'marked': dsModel.favouriteId}"></i> {{getFavCount(dsModel.favouriteCount)}}
+    </div>
+    <div class="view-icon" (click)='onBookmarkIconClick()'>
+      <i class="fa fa-bookmark" [ngClass] = "{'marked': dsModel.bookmarkId}"></i>
     </div>
     <div class="dataset-item__action">
       <button class="mdl-button mdl-js-button btn-hwx-primary" (click)="onDeleteDataset()">

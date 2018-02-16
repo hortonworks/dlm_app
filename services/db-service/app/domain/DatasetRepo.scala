@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
+import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities._
 import domain.API.AlreadyExistsError
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -31,6 +32,8 @@ class DatasetRepo @Inject()(
                              protected val dataAssetRepo: DataAssetRepo,
                              protected val userRepo: UserRepo,
                              protected val clusterRepo: ClusterRepo,
+                             protected val favouriteRepo: FavouriteRepo,
+                             protected val bookmarkRepo: BookmarkRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
@@ -174,6 +177,26 @@ class DatasetRepo @Inject()(
     } yield (datasetCategory.datasetId, category.name)
   }
 
+  private def getFavIds(datasetIds: Seq[Long], userId: Long) = {
+    for {
+      ((datasetId, favId),res) <- favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => (a.objectId, a.id))
+    } yield (datasetId, favId)
+  }
+
+  private def getBookmarkIds(datasetIds: Seq[Long], userId: Long) = {
+    for {
+      ((datasetId, bmId),res) <- bookmarkRepo.Bookmarks.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => (a.objectId, a.id))
+    } yield (datasetId, bmId)
+  }
+
+  private def getFavCounts(datasetIds: Seq[Long], userId: Long) = {
+    for {
+      (datasetId, favs) <- {
+        favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => a.objectId)
+      }
+    } yield (datasetId, favs.length)
+  }
+
   def sortByDataset(paginationQuery: Option[PaginatedQuery],
                     query: Query[(DatasetsTable, Rep[String], Rep[String], Rep[Option[Long]]), (Dataset, String, String, Option[Long]), Seq]) = {
     paginationQuery.map {
@@ -196,7 +219,17 @@ class DatasetRepo @Inject()(
   }
 
   private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq],
-                             paginatedQuery: Option[PaginatedQuery], searchText: Option[String]): Future[Seq[RichDataset]] = {
+                             paginatedQuery: Option[PaginatedQuery], searchText: Option[String], userId: Option[Long] = None): Future[Seq[RichDataset]] = {
+    if(userId.isDefined){
+      getRichDatasetWithFavInfo(inputQuery,paginatedQuery,searchText,userId.get)
+    }else {
+      getRichDatasetFromQuery(inputQuery,paginatedQuery, searchText)
+    }
+
+  }
+
+  private def getRichDatasetFromQuery(inputQuery: Query[DatasetsTable, Dataset, Seq],
+                                      paginatedQuery: Option[PaginatedQuery], searchText: Option[String]) = {
     val query = for {
       datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery,searchText)).to[List].result
       datasetAssetCount <- {
@@ -230,13 +263,73 @@ class DatasetRepo @Inject()(
         }.toSeq
     }
   }
+  private def getRichDatasetWithFavInfo(inputQuery: Query[DatasetsTable, Dataset, Seq],
+    paginatedQuery: Option[PaginatedQuery], searchText: Option[String], userId: Long): Future[Seq[RichDataset]] = {
+    val query = for {
+      datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery,searchText)).to[List].result
+      datasetAssetCount <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getDatasetAssetCount(datasetIds).to[List].result
+      }
 
-  def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId:Long): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id)), paginatedQuery, searchText)
+      datasetCategories <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getDatasetCategories(datasetIds).to[List].result
+      }
+
+      favId <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getFavIds(datasetIds,userId).to[List].result
+      }
+
+      bmId <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getBookmarkIds(datasetIds,userId).to[List].result
+      }
+
+      favCount <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getFavCounts(datasetIds,userId).to[List].result
+      }
+
+    } yield (datasetWithUsername, datasetAssetCount, datasetCategories, favId, favCount, bmId)
+
+    db.run(query).map {
+      result =>
+        val datasetWithAssetCountMap = result._2.groupBy(_._1.get).mapValues { e =>
+          e.map {
+            v => DataAssetCount(v._2, v._3)
+          }
+        }
+        val datasetWithCategoriesMap = result._3.groupBy(_._1).mapValues(_.map(_._2))
+        val favIdMap: Map[Long, Option[Long]] = result._4.groupBy(_._1).mapValues(_.map(_._2).head)
+        val favCountMap = result._5.groupBy(_._1).mapValues(_.map(_._2).head)
+        val bmIdMap: Map[Long, Option[Long]] = result._6.groupBy(_._1).mapValues(_.map(_._2).head)
+
+        result._1.map {
+          case (dataset, user, cluster, clusterId) =>
+            RichDataset(
+              dataset,
+              datasetWithCategoriesMap.getOrElse(dataset.id.get, Nil),
+              user,
+              cluster,
+              clusterId.get,
+              datasetWithAssetCountMap.getOrElse(dataset.id.get, Nil),
+              favIdMap.get(dataset.id.get).flatten,
+              favCountMap.get(dataset.id.get),
+              bmIdMap.get(dataset.id.get).flatten
+            )
+        }.toSeq
+    }
+  }
+
+
+  def getRichDataSet(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId:Long): Future[Seq[RichDataset]] = {
+    getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id)), paginatedQuery, searchText, Some(userId))
   }
 
   def getRichDatasetById(id: Long,userId:Long): Future[Option[RichDataset]] = {
-    getRichDataset(Datasets.filter(m => (m.id === id && m.createdBy === userId) || (m.id === id && m.sharedStatus === SharingStatus.PUBLIC.id)), None, None).map(_.headOption)
+    getRichDataset(Datasets.filter(m => (m.id === id && m.createdBy === userId) || (m.id === id && m.sharedStatus === SharingStatus.PUBLIC.id)), None, None, Some(userId)).map(_.headOption)
   }
 
   def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None,userId:Long): Future[Seq[RichDataset]] = {
@@ -244,7 +337,7 @@ class DatasetRepo @Inject()(
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
       .map(_._2).filter(m=>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
-    getRichDataset(query, paginatedQuery, searchText)
+    getRichDataset(query, paginatedQuery, searchText, Some(userId))
   }
 
   def insertWithCategories(dsNtags: DatasetAndTags): Future[RichDataset] = {
@@ -383,4 +476,5 @@ class DatasetRepo @Inject()(
   }
 
 }
+
 
