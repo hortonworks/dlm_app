@@ -42,9 +42,8 @@ trait KnoxApiExecutor {
   def execute(knoxApiRequest: KnoxApiRequest): Future[WSResponse] = {
 
     for {
-    // First get the token
-      tokenResponse <- getKnoxApiToken(
-        wrapTokenIfUnwrapped(knoxApiRequest.token.get))
+      // First get the token
+      tokenResponse <- getKnoxApiToken(wrapTokenIfUnwrapped(knoxApiRequest.token.get))
       // Use token to issue the complete request
       response <- makeApiCall(tokenResponse, knoxApiRequest)
     } yield response

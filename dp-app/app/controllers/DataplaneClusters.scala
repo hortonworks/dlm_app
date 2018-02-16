@@ -155,8 +155,7 @@ class DataplaneClusters @Inject()(
           Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(checkResponse) =>{
           dpClusterService.checkExistenceByIp(checkResponse.ambariIpAddress).map{
-            case Left(errors) => InternalServerError(
-              JsonResponses.statusError(errors.errors.head.message))
+            case Left(errors) => InternalServerError(JsonResponses.statusError(errors.errors.head.message))
             case Right(status) =>
               if(status){
                 Ok(Json.obj("alreadyExists" -> true))
