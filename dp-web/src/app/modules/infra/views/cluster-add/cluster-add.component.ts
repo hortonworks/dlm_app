@@ -155,8 +155,7 @@ export class ClusterAddComponent implements OnInit {
           this.showConfig = true;
         } else if (response.requestKnoxURL) {
           this.showConfig = true;
-        }
-        else {
+        } else {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
