@@ -12,7 +12,7 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {CommentService} from "../../services/comment.service";
-import {Comment, CommentWithUser} from "../../models/comment";
+import {Comment, CommentWithUser, ReplyTo} from "../../models/comment";
 import {AuthUtils} from "../utils/auth-utils";
 import * as moment from 'moment';
 import {RatingService} from "../../services/rating.service";
@@ -34,7 +34,9 @@ export class CommentsComponent implements OnInit {
   isRatingEnabled: boolean = false;
   objectType: string;
   objectId: string;
+
   commentWithUsers: CommentWithUser[]= [];
+  commentWithUsersMap = {}; // introduced to avoid making call to server on delete of a root/parent comment.
   fetchInProgress: boolean =true;
   newCommentText: string;
   fetchError: boolean= false;
@@ -43,13 +45,23 @@ export class CommentsComponent implements OnInit {
   userRating: Rating = new Rating();
   averageRating: number =0;
   userRatingLabel: string = "";
+
+  // pagination params to fetch parent comments
   offset:number = 0;
   size:number = 10;
+
   allCommentsLoaded: boolean = false;
   timer = null;
-  newCommentsAvailable:boolean = false;
+  newCommentsAvailable:boolean = false; // this keeps track of those new parent comments which are added but are not visible (because edge is not in viewport) and as allCommentsLoaded was made true in previous call these new parent comments were never loaded.
+
+  //below variables are needed to show replyTo box over textarea while replying
+  replyTo: ReplyTo;
+  isReply: boolean = false;
+  parentCommentWithUser: CommentWithUser = new CommentWithUser();
+
   @ViewChild('newComment') newCommentTextArea : ElementRef;
   @ViewChild('edge') edgeElement: ElementRef;
+  @ViewChild('replyToCommentArea') replyToCommentArea: ElementRef;
 
   ngOnInit() {
     this.objectType = this.route.snapshot.params['objectType'];
@@ -102,11 +114,11 @@ export class CommentsComponent implements OnInit {
     }
   }
 
-  onHoverRatingChange(){
+  onHoverRatingChange(){ // onHoverRatingChange on Rating Component
     this.userRatingLabel = "RATE THIS COLLECTION";
   }
 
-  onMouseLeave(){
+  onMouseLeave(){ // onMouseLeave on Rating Component
     if(this.userRating.rating !== 0){
       this.userRatingLabel = "YOU RATED";
     }
@@ -125,8 +137,10 @@ export class CommentsComponent implements OnInit {
     this.commentService.getByObjectRef(this.objectId,this.objectType,offset,size).subscribe(comments =>{
         this.commentWithUsers = this.offset === 0 ? comments : this.commentWithUsers.concat(comments);
         this.allCommentsLoaded = comments.length < this.size ? true : false;
+        let resetMap = (this.offset === 0);
         this.offset = this.offset + comments.length;
         this.fetchInProgress = false;
+        this.updateCommentWithUsersMap(comments, resetMap);
         setTimeout(() => {
           this.loadNext();       // required in case 'edge' is already in viewport (without scrolling). setTimeout is needed as window takes some time to adjust with newly loaded comments.
         },50);
@@ -137,6 +151,32 @@ export class CommentsComponent implements OnInit {
     );
   }
 
+  updateCommentWithUsersMap(comments: CommentWithUser[], resetMap: boolean){
+    let that = this;
+    if(resetMap) this.commentWithUsersMap = {};
+    this.commentWithUsers.forEach(function(cWU){
+      that.commentWithUsersMap[cWU.comment.id] = cWU;
+    });
+  }
+
+  getCommentWithUsersFromMap(){
+    let keys = Object.keys(this.commentWithUsersMap);
+    let that = this;
+    this.commentWithUsers =  keys.map(function(v) { return that.commentWithUsersMap[v]; });
+  }
+
+  toggleAndGetReplies(commentWithUser: CommentWithUser){
+    if(!commentWithUser.isReplyVisible){
+      commentWithUser.isReplyVisible = true;
+      let comment = commentWithUser.comment;
+      this.commentService.getByParentId(comment.id).subscribe(comments => {
+        commentWithUser.replies = comments;
+        commentWithUser.comment.numberOfReplies = comments.length;
+      });
+    }else{
+      commentWithUser.isReplyVisible = false;
+    }
+  }
   onPostComment() {
     if(this.newCommentText && this.newCommentText.trim()){
       let newCommentText = this.newCommentText;
@@ -147,13 +187,22 @@ export class CommentsComponent implements OnInit {
       newCommentObject.objectId = Number(this.objectId);
       newCommentObject.comment = newCommentText;
       newCommentObject.createdBy = Number(AuthUtils.getUser().id);
-      this.commentService.add(newCommentObject).subscribe(_ => {
-        if(this.isEdgeInViewport()){
-          this.getComments(false,this.offset,this.size);
-        }else{
-          this.newCommentsAvailable = true;
-        }
-      });
+      if(this.isReply) {
+        newCommentObject.parentCommentId = this.parentCommentWithUser.comment.id;
+        this.parentCommentWithUser.isReplyVisible = false;
+        this.commentService.add(newCommentObject).subscribe(_ => {
+          this.toggleAndGetReplies(this.parentCommentWithUser);
+          this.removeReply();
+        });
+      }else {
+        this.commentService.add(newCommentObject).subscribe(_ => {
+          if(this.isEdgeInViewport()){
+            this.getComments(false,this.offset,this.size);
+          }else{
+            this.newCommentsAvailable = true;
+          }
+        });
+      }
     }
   }
 
@@ -161,12 +210,45 @@ export class CommentsComponent implements OnInit {
     this.offset =0;
     this.allCommentsLoaded = false;
   }
-  onDeleteComment(commentWU: CommentWithUser) {
-    this.commentService.deleteComment(commentWU.comment.id).subscribe(_ => {
-      let size = this.offset;
-      this.resetOffset();
-      this.getComments(false,this.offset,size);
+  onDeleteComment(commentToDelete: CommentWithUser, parentCommentWu:CommentWithUser) {
+    if(!commentToDelete.comment.parentCommentId){
+      this.deleteRootComment(commentToDelete)
+    }else {
+      this.deleteReply(commentToDelete, parentCommentWu)
+    }
+  }
+
+  // on delete of reply, a new call is made to fetch all replies after deleting the reply
+  deleteReply(commentToDelete: CommentWithUser, parentCommentWu:CommentWithUser){
+    this.commentService.deleteComment(commentToDelete.comment.id).subscribe(_ => {
+      parentCommentWu.isReplyVisible = false;
+      this.toggleAndGetReplies(parentCommentWu);
     });
+  }
+
+  // no new call to server to fetch comments when a comment is deleted. Using commentWithUsersMap instead
+  deleteRootComment(commentToDelete: CommentWithUser){
+    this.commentService.deleteComment(commentToDelete.comment.id).subscribe();
+    delete this.commentWithUsersMap[commentToDelete.comment.id];
+    this.offset = this.offset - 1;
+    this.getCommentWithUsersFromMap();
+
+  }
+
+  onReplyToComment(replyToComment: CommentWithUser, parentCommentWithUser: CommentWithUser){
+    this.replyTo = new ReplyTo();
+    let replyToCmnt = replyToComment.comment;
+    this.replyTo.parentId = parentCommentWithUser.comment.id;
+    this.parentCommentWithUser = parentCommentWithUser;
+    this.replyTo.commentText = replyToCmnt.comment;
+    this.replyTo.username = replyToComment.userName;
+    this.isReply = true;
+  }
+
+  removeReply(){
+    this.replyTo = new ReplyTo();
+    this.isReply = false;
+    this.parentCommentWithUser = new CommentWithUser();
   }
 
   isLoggedInUser(commentWu: CommentWithUser){
@@ -187,9 +269,13 @@ export class CommentsComponent implements OnInit {
 
   resizeTextArea(){
     let textArea = this.newCommentTextArea.nativeElement;
+    let that = this;
     setTimeout(function() {
       textArea.style.cssText = 'height:auto';
       textArea.style.cssText = 'height:'+Math.min(textArea.scrollHeight, 100) + "px";
+      if(that.replyToCommentArea){
+        that.replyToCommentArea.nativeElement.style.cssText = 'bottom:'+Math.min(textArea.scrollHeight+7, 107) + "px";
+      }
     },0);
   }
 

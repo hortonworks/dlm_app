@@ -247,6 +247,7 @@
       "greaterThanEndTime": "End time must be later than start time.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
       "not_exist_directory": "Specified path does not exist",
+      "credValidator": "Name must be unique",
       "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'.",
       "invalid_date": "\"{{fieldLabel}}\" should be a valid date",
       "invalid_credentials": "Wrong Credentials"
@@ -407,9 +408,10 @@
           "user_details": "CREDENTIAL"
         },
         "accounts": {
+          "iam_role": "IAM Role",
           "add": {
             "title": "Add Cloud Account",
-            "provider": "Cloud Service Provider",
+            "provider": "Cloud Provider",
             "name" : {
               "label" : "Name",
               "placeholder": "Enter a unique name for the cloud credential"
@@ -421,6 +423,11 @@
             "secret_key" : {
               "label" : "Secret Key",
               "placeholder": "Enter S3 secret key"
+            },
+            "auth_type": {
+              "label": "Authentication Type",
+              "keys": "Access & Secret Key",
+              "role": "IAM Role"
             },
             "username": "IAM USERNAME",
             "account_id": "ACCOUNT ID",

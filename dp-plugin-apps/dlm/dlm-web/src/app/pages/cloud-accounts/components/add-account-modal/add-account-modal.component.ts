@@ -16,9 +16,10 @@ import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers';
-import { getCloudStoreProgress } from 'selectors/cloud-account.selector';
-import { Progress } from 'models/cloud-account.model';
+import { getAllAccounts, getCloudStoreProgress } from 'selectors/cloud-account.selector';
+import { CloudAccount, Progress } from 'models/cloud-account.model';
 import { Observable } from 'rxjs/Observable';
+import { loadAccounts } from 'actions/cloud-account.action';
 
 @Component({
   selector: 'dlm-add-account-modal',
@@ -31,9 +32,11 @@ import { Observable } from 'rxjs/Observable';
       [showOk]="false"
       [showCancel]="false"
       (onClose)="initForm()">
-      <dlm-modal-dialog-body>
-        <dlm-add-cloud-form #addCloudForm
-        [progress]="progress$ | async">
+      <dlm-modal-dialog-body *ngIf="addAccountModalDialog.childModal.isShown">
+        <dlm-add-cloud-form
+          #addCloudForm
+          [accounts]="accounts$ | async"
+          [progress]="progress$ | async">
         </dlm-add-cloud-form>
       </dlm-modal-dialog-body>
     </dlm-modal-dialog>
@@ -44,6 +47,7 @@ export class AddAccountModalComponent implements OnInit, OnDestroy {
   @ViewChild('addCloudForm') addCloudFormComponent: AddCloudFormComponent;
 
   progress$: Observable<Progress>;
+  accounts$: Observable<CloudAccount[]>;
   private listener$: Subscription;
   modalSize = ModalSize.FIXED400;
 
@@ -54,6 +58,8 @@ export class AddAccountModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Listen for changes in the service
+    this.store.dispatch(loadAccounts());
+    this.accounts$ = this.store.select(getAllAccounts);
     this.listener$ = this.cloudAccountService.showAddAccountModal$
       .subscribe(action => {
         if (action === 'show') {

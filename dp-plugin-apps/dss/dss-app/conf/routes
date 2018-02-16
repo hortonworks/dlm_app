@@ -82,6 +82,7 @@ POST          /api/comments                                           controller
 GET           /api/comments                                           controllers.Comments.getByObjectRef(objectId: String, objectType: String)
 DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
 PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
+GET           /api/comments/:parentId/replies                         controllers.Comments.getByParentId(parentId: String)
 
 # ratings
 # ===========================================
