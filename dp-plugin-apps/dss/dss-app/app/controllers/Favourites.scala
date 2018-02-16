@@ -29,29 +29,36 @@ class Favourites @Inject()(@Named("favouriteService") val favouriteService: Favo
                          private val config: Configuration)
   extends Controller with JsonAPI {
 
-  def add(userId: Long, datasetId: Long) = AuthenticatedAction.async(parse.json) { request =>
+  def add(userId: Long, objectType: String, objectId: Long) = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Favourites-Controller: Received add favourite request")
     val loggedinUser = request.user.id.get
     request.body
       .validate[Favourite]
       .map { fav =>
+        val objectTypes = config.getStringSeq("dss.favourites.object.types").getOrElse(Nil)
+        if(!objectTypes.contains(fav.objectType)) {
+          Logger.warn(s"Favourite-Controller: Favourites for object type ${fav.objectType} is not supported")
+          Future.successful(BadRequest(s"Favourites for object type ${fav.objectType} is not supported"))
+        }else {
           favouriteService
-            .add(loggedinUser, fav.datasetId)
+            .add(loggedinUser, fav.objectId, fav.objectType)
             .map { favc =>
               Created(Json.toJson(favc))
             }
             .recover(apiErrorWithLog(e => Logger.error(s"Favourites-Controller: Adding of favourite $fav failed with message ${e.getMessage}",e)))
         }
+
+      }
       .getOrElse{
         Logger.warn("Favourites-Controller: Failed to map request to Favourite entity")
         Future.successful(BadRequest)
       }
   }
 
-  def deleteById(userId: Long, favId: Long, datasetId: Long) = AuthenticatedAction.async { req =>
+  def deleteById(userId: Long, objectType: String, objectId:Long, favId: Long) = AuthenticatedAction.async { req =>
     Logger.info("Favourites-Controller: Received delete favourite request")
     val loggedinUser = req.user.id.get
-    favouriteService.deleteById(loggedinUser,favId,datasetId)
+    favouriteService.deleteById(loggedinUser,favId,objectId, objectType)
       .map{ msg =>
         Ok(Json.toJson(msg))
       }

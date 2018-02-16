@@ -230,9 +230,9 @@ PATCH       /ratings/:id                                                    cont
 DELETE      /ratings                                                        controllers.Ratings.delete(objectId: Long, objectType: String)
 
 #favourites api
-POST        /:userId/favourites/:datasetId                                  controllers.Favourites.add(userId: Long, datasetId: Long)
-DELETE      /:userId/favourites/:favId                                      controllers.Favourites.deleteById(userId: Long, favId: Long, datasetId: Long)
+POST        /:userId/favourites/:objectType/:objectId                       controllers.Favourites.add(userId: Long, objectType: String, objectId: Long)
+DELETE      /:userId/favourites/:objectType/:objectId/:favId                controllers.Favourites.deleteById(userId: Long, objectType: String, objectId: Long, favId: Long)
 
 #bookmarks api
-POST        /:userId/bookmarks/:datasetId                                   controllers.Bookmarks.add(userId: Long, datasetId: Long)
-DELETE      /:userId/bookmarks/:bmId                                        controllers.Bookmarks.deleteById(userId: Long, bmId: Long)
+POST        /:userId/bookmarks/:objectType/:objectId                        controllers.Bookmarks.add(userId: Long, objectType: String, objectId: Long)
+DELETE      /:userId/bookmarks/:objectType/:objectId/:bmId                  controllers.Bookmarks.deleteById(userId: Long, objectType: String, objectId: Long, bmId: Long)

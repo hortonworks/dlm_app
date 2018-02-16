@@ -36,6 +36,7 @@ export class DsFullView implements OnInit {
   applicableListActions: AssetListActionsEnum[] = [];//[AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
   clusterId: any;
+  objectType = "assetCollection";
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
@@ -94,13 +95,14 @@ export class DsFullView implements OnInit {
     if(!this.dsModel.favouriteId){
       let favourite = new Favourite();
       favourite.userId = userId;
-      favourite.datasetId = this.dsModel.id;
+      favourite.objectId = this.dsModel.id;
+      favourite.objectType = this.objectType;
       this.favouriteService.add(favourite).subscribe(favWithTotal => {
         this.dsModel.favouriteId = favWithTotal.favourite.id;
         this.dsModel.favouriteCount = favWithTotal.totalFavCount;
       })
     }else{
-      this.favouriteService.delete(userId, this.dsModel.favouriteId, this.dsModel.id).subscribe(msg => {
+      this.favouriteService.delete(userId, this.dsModel.favouriteId, this.dsModel.id, this.objectType).subscribe(msg => {
         this.dsModel.favouriteId = null;
         this.dsModel.favouriteCount = msg.totalFavCount;
       })
@@ -112,12 +114,13 @@ export class DsFullView implements OnInit {
     if(!this.dsModel.bookmarkId){
       let bookmark = new Bookmark();
       bookmark.userId = userId;
-      bookmark.datasetId = this.dsModel.id;
+      bookmark.objectType = this.objectType;
+      bookmark.objectId = this.dsModel.id;
       this.bookmarkService.add(bookmark).subscribe(bm => {
         this.dsModel.bookmarkId = bm.id;
       })
     }else{
-      this.bookmarkService.delete(userId,this.dsModel.bookmarkId).subscribe(_ => {
+      this.bookmarkService.delete(userId,this.dsModel.bookmarkId, this.objectType, this.dsModel.id).subscribe(_ => {
         this.dsModel.bookmarkId = null;
       })
     }

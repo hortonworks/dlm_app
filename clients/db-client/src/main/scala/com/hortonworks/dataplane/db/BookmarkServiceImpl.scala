@@ -32,18 +32,18 @@ class BookmarkServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def add(userId: Long, datasetId: Long): Future[Bookmark] = {
-    ws.url(s"$url/$userId/bookmarks/$datasetId")
+  override def add(userId: Long, objectId: Long, objectType: String): Future[Bookmark] = {
+    ws.url(s"$url/$userId/bookmarks/$objectType/$objectId")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .post(Json.toJson(Bookmark(userId = userId, datasetId = datasetId)))
+      .post(Json.toJson(Bookmark(userId = userId, objectType = objectType ,objectId = objectId)))
       .map(mapToBookmark)
   }
 
-  override def deleteById(userId: Long, bmId:Long): Future[String] = {
-    ws.url(s"$url/$userId/bookmarks/$bmId")
+  override def deleteById(userId: Long, bmId:Long, objectId: Long, objectType: String): Future[String] = {
+    ws.url(s"$url/$userId/bookmarks/$objectType/$objectId/$bmId")
       .withHeaders("Accept" -> "application/json")
       .delete()
       .map{ res =>

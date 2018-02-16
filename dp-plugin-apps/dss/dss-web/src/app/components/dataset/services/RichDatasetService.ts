@@ -136,6 +136,7 @@ export class RichDatasetService {
         return accumulator;
       }, {}),
       tags:data.tags,
+      sharedStatus: data.dataset.sharedStatus,
       favouriteId: data.favouriteId,
       favouriteCount: data.favouriteCount,
       bookmarkId: data.bookmarkId,

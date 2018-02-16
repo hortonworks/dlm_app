@@ -21,14 +21,14 @@ export class BookmarkService {
 
   add(bookmark: Bookmark): Observable<Bookmark> {
     return this.http
-      .post(`api/${bookmark.userId}/bookmarks/${bookmark.datasetId}`, bookmark, new RequestOptions(HttpUtil.getHeaders()))
+      .post(`api/${bookmark.userId}/bookmarks/${bookmark.objectType}/${bookmark.objectId}`, bookmark, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
 
-  delete(userId: number, bmId: number) : Observable<any> {
+  delete(userId: number, bmId: number, objectType: String, objectId: number) : Observable<any> {
     return this.http
-      .delete(`api/${userId}/bookmarks/${bmId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .delete(`api/${userId}/bookmarks/${objectType}/${objectId}/${bmId}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

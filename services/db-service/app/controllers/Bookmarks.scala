@@ -25,33 +25,25 @@ class Bookmarks @Inject()(bookmarkRepo: BookmarkRepo)(implicit exec: ExecutionCo
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def add(userId: Long, datatsetId: Long) = Action.async(parse.json) { req =>
+  def add(userId: Long, objectType: String, objectId: Long) = Action.async(parse.json) { req =>
     Logger.info("Bookmarks Controller: Received add bookmark request")
     bookmarkRepo
-      .add(userId, datatsetId)
+      .add(userId, objectId, objectType)
       .map { bm =>
         success(bm)
-      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Adding of bookmark with user Id $userId and dataset Id $datatsetId failed with message ${e.getMessage}",e)))
+      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Adding of bookmark with user Id $userId , object type $objectType and object Id $objectId failed with message ${e.getMessage}",e)))
   }
 
-  def deleteById(userId: Long, bmId: Long) = Action.async { req =>
+  def deleteById(userId: Long, objectType: String, objectId: Long, bmId: Long) = Action.async { req =>
     Logger.info("Bookmarks Controller: Received delete bookmark by id request")
     val numOfRowsDel = bookmarkRepo.deleteById(userId,bmId)
     numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmark with bookmark Id $bmId failed with message ${e.getMessage}",e)))
   }
 
-  def deleteByDatasetId(datasetId: Long) = Action.async { req =>
-    Logger.info("Bookmarks Controller: Received delete bookmark by dataset Id request")
-    val numOfRowsDel = bookmarkRepo.deleteByDatasetId(datasetId)
-    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmarks with dataset Id $datasetId failed with message ${e.getMessage}",e)))
-  }
-
-  def findByUserAndDatasetId(userId: Long, datasetId: Long) =  Action.async { req =>
-    Logger.info("Bookmarks Controller: Received get bookmark by user Id request and dataset Id")
-    bookmarkRepo.findByUserAndDatasetId(userId, datasetId)
-      .map{ bm =>
-        success(bm)
-      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Getting bookmark with user Id $userId and $datasetId failed with message ${e.getMessage}", e)))
+  def deleteByObjectRef(objectId: Long, objectType: String)= Action.async { req =>
+    Logger.info("Bookmarks Controller: Received delete bookmark by object reference request")
+    val numOfRowsDel = bookmarkRepo.deleteByobjectRef(objectId, objectType)
+    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmarks with ojbect Id $objectId and object type $objectType failed with message ${e.getMessage}",e)))
   }
 
 }

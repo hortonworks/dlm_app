@@ -29,18 +29,24 @@ class Bookmarks @Inject()(@Named("bookmarkService") val bookmarkService: Bookmar
                            private val config: Configuration)
   extends Controller with JsonAPI {
 
-  def add(userId: Long, datasetId: Long) = AuthenticatedAction.async(parse.json) { request =>
+  def add(userId: Long, objectType: String, objectId: Long) = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Bookmarks-Controller: Received add bookmark request")
     val loggedinUser = request.user.id.get
     request.body
       .validate[Bookmark]
       .map { bm =>
-        bookmarkService
-          .add(loggedinUser, bm.datasetId)
-          .map { bookmark =>
-            Created(Json.toJson(bookmark))
-          }
-          .recover(apiErrorWithLog(e => Logger.error(s"Bookmarks-Controller: Adding of bookmark $bm failed with message ${e.getMessage}",e)))
+        val objectTypes = config.getStringSeq("dss.bookmarks.object.types").getOrElse(Nil)
+        if(!objectTypes.contains(bm.objectType)) {
+          Logger.warn(s"Bookmarks-Controller: Bookmarks for object type ${bm.objectType} is not supported")
+          Future.successful(BadRequest(s"Bookmarks for object type ${bm.objectType} is not supported"))
+        }else {
+          bookmarkService
+            .add(loggedinUser, bm.objectId, bm.objectType)
+            .map { bookmark =>
+              Created(Json.toJson(bookmark))
+            }
+            .recover(apiErrorWithLog(e => Logger.error(s"Bookmarks-Controller: Adding of bookmark $bm failed with message ${e.getMessage}",e)))
+        }
       }
       .getOrElse{
         Logger.warn("Bookmarks-Controller: Failed to map request to Bookmark entity")
@@ -48,10 +54,10 @@ class Bookmarks @Inject()(@Named("bookmarkService") val bookmarkService: Bookmar
       }
   }
 
-  def deleteById(userId: Long, bmId: Long) = AuthenticatedAction.async { req =>
+  def deleteById(userId: Long, objectType: String, objectId:Long, bmId: Long) = AuthenticatedAction.async { req =>
     Logger.info("Bookmarks-Controller: Received delete bookmark request")
     val loggedinUser = req.user.id.get
-    bookmarkService.deleteById(loggedinUser,bmId)
+    bookmarkService.deleteById(userId: Long, bmId:Long, objectId: Long, objectType: String)
       .map{ msg =>
         Ok(Json.toJson(msg))
       }

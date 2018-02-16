@@ -26,8 +26,8 @@ class BookmarkRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
 
   val Bookmarks = TableQuery[BookmarksTable]
 
-  def add(userid: Long, datasetid: Long): Future[Bookmark] ={
-    val bookmark = Bookmark(userId = userid, datasetId = datasetid)
+  def add(userid: Long, objectId: Long, objectType: String): Future[Bookmark] ={
+    val bookmark = Bookmark(userId = userid, objectType = objectType,objectId = objectId)
     db.run(Bookmarks returning Bookmarks += bookmark)
   }
 
@@ -35,12 +35,8 @@ class BookmarkRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     db.run(Bookmarks.filter(t => (t.id === bmId && t.userId === userId)).delete)
   }
 
-  def deleteByDatasetId(datasetId: Long): Future[Int] = {
-    db.run(Bookmarks.filter(_.datasetId === datasetId).delete)
-  }
-
-  def findByUserAndDatasetId(userId: Long, datasetId: Long): Future[Option[Long]] = {
-    db.run(Bookmarks.filter( t => (t.userId === userId && t.datasetId === datasetId)).map(_.datasetId).result.headOption)
+  def deleteByobjectRef(objectId: Long, objectType: String): Future[Int] = {
+    db.run(Bookmarks.filter(t => (t.objectId === objectId && t.objectType === objectType)).delete)
   }
 
   final class BookmarksTable(tag: Tag) extends Table[Bookmark](tag, Some("dataplane"), "bookmarks") {
@@ -48,9 +44,11 @@ class BookmarkRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
 
     def userId = column[Long]("user_id")
 
-    def datasetId = column[Long]("dataset_id")
+    def objectType = column[String]("object_type")
 
-    def * = (id, userId, datasetId) <> ((Bookmark.apply _).tupled, Bookmark.unapply)
+    def objectId = column[Long]("object_id")
+
+    def * = (id, userId, objectType, objectId) <> ((Bookmark.apply _).tupled, Bookmark.unapply)
   }
 
 }

@@ -178,20 +178,20 @@ class DatasetRepo @Inject()(
 
   private def getFavIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, favId),res) <- favouriteRepo.Favourites.filter(t => (t.datasetId.inSet(datasetIds) && t.userId === userId)).groupBy(a => (a.datasetId, a.id))
+      ((datasetId, favId),res) <- favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === "assetCollection")).groupBy(a => (a.objectId, a.id))
     } yield (datasetId, favId)
   }
 
   private def getBookmarkIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, bmId),res) <- bookmarkRepo.Bookmarks.filter(t => (t.datasetId.inSet(datasetIds) && t.userId === userId)).groupBy(a => (a.datasetId, a.id))
+      ((datasetId, bmId),res) <- bookmarkRepo.Bookmarks.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === "assetCollection")).groupBy(a => (a.objectId, a.id))
     } yield (datasetId, bmId)
   }
 
   private def getFavCounts(datasetIds: Seq[Long], userId: Long) = {
     for {
       (datasetId, favs) <- {
-        favouriteRepo.Favourites.filter(t => (t.datasetId.inSet(datasetIds))).groupBy(a => a.datasetId)
+        favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.objectType === "assetCollection")).groupBy(a => a.objectId)
       }
     } yield (datasetId, favs.length)
   }

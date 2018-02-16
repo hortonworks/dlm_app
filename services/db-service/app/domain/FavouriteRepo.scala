@@ -26,8 +26,8 @@ class FavouriteRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
   val Favourites = TableQuery[FavouritesTable]
 
-  def add(userid: Long, datasetid: Long): Future[Favourite] ={
-    val favourite = Favourite(userId = userid, datasetId = datasetid)
+  def add(userid: Long, objectId: Long, objectType: String): Future[Favourite] ={
+    val favourite = Favourite(userId = userid, objectType = objectType,objectId = objectId)
     db.run(Favourites returning Favourites += favourite)
   }
 
@@ -35,16 +35,12 @@ class FavouriteRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
     db.run(Favourites.filter( t => (t.id === favId && t.userId === userId)).delete)
   }
 
-  def deleteByDatasetId(datasetId: Long): Future[Int] = {
-    db.run(Favourites.filter(_.datasetId === datasetId).delete)
+  def deleteByobjectRef(objectId: Long, objectType: String): Future[Int] = {
+    db.run(Favourites.filter(t => (t.objectId === objectId && t.objectType === objectType)).delete)
   }
 
-  def findByUserAndDatasetId(userId: Long, datasetId: Long): Future[Option[Long]] = {
-    db.run(Favourites.filter( t => (t.userId === userId && t.datasetId === datasetId)).map(_.datasetId).result.headOption)
-  }
-
-  def getTotal(datasetId: Long) = {
-    db.run(Favourites.filter(_.datasetId === datasetId).length.result)
+  def getTotal(objectId: Long, objectType: String) = {
+    db.run(Favourites.filter(t => (t.objectId === objectId && t.objectType === objectType)).length.result)
   }
 
   final class FavouritesTable(tag: Tag) extends Table[Favourite](tag, Some("dataplane"), "favourites") {
@@ -52,9 +48,11 @@ class FavouriteRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
     def userId = column[Long]("user_id")
 
-    def datasetId = column[Long]("dataset_id")
+    def objectType = column[String]("object_type")
 
-    def * = (id, userId, datasetId) <> ((Favourite.apply _).tupled, Favourite.unapply)
+    def objectId = column[Long]("object_id")
+
+    def * = (id, userId, objectType, objectId) <> ((Favourite.apply _).tupled, Favourite.unapply)
   }
 
 }

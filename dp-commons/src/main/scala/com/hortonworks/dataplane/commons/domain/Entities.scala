@@ -295,7 +295,7 @@ object Entities {
                      lastModified: LocalDateTime = LocalDateTime.now(),
                      active: Boolean = true,
                      version: Int = 1,
-                     sharedStatus: Int = SharingStatus.PUBLIC.id,
+                     sharedStatus: Int = SharingStatus.PUBLIC.id, // 1 - Public, 2 - Private
                      customProps: Option[JsValue] = None)
 
   case class DatasetCategory(categoryId: Long, datasetId: Long)
@@ -421,14 +421,16 @@ object Entities {
 
   case class Favourite(id: Option[Long] = None,
                        userId: Long,
-                       datasetId: Long)
+                       objectType: String,
+                       objectId: Long)
 
   case class FavouriteWithTotal(favourite: Favourite,
                                 totalFavCount: Int)
 
   case class Bookmark(id: Option[Long] = None,
-                       userId: Long,
-                       datasetId: Long)
+                      userId: Long,
+                      objectType: String,
+                      objectId: Long)
 
 }
 

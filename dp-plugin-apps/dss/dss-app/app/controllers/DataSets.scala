@@ -344,7 +344,7 @@ class DataSets @Inject()(
   }
 
   def updateDataset(datasetId : String) = AuthenticatedAction.async(parse.json) { request =>
-    Logger.info("Received update dataSet shredStatus request")
+    Logger.info("Received update dataSet request")
     request.body
       .validate[Dataset]
       .map { dataset =>

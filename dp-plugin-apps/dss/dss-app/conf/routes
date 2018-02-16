@@ -91,15 +91,13 @@ GET          /api/ratings                                             controller
 GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
-# favourites
-# ===========================================
-POST        /api/:userId/favourites/:datasetId                        controllers.Favourites.add(userId: Long, datasetId: Long)
-DELETE      /api/:userId/favourites/:favId                            controllers.Favourites.deleteById(userId: Long, favId: Long, datasetId: Long)
+#favourites api
+POST        /api/:userId/favourites/:objectType/:objectId             controllers.Favourites.add(userId: Long, objectType: String, objectId: Long)
+DELETE      /api/:userId/favourites/:objectType/:objectId/:favId      controllers.Favourites.deleteById(userId: Long, objectType: String, objectId: Long, favId: Long)
 
-# bookmarks
-# ===========================================
-POST        /api/:userId/bookmarks/:datasetId                         controllers.Bookmarks.add(userId: Long, datasetId: Long)
-DELETE      /api/:userId/bookmarks/:bmId                              controllers.Bookmarks.deleteById(userId: Long, bmId: Long)
+#bookmarks api
+POST        /api/:userId/bookmarks/:objectType/:objectId              controllers.Bookmarks.add(userId: Long, objectType: String, objectId: Long)
+DELETE      /api/:userId/bookmarks/:objectType/:objectId/:bmId        controllers.Bookmarks.deleteById(userId: Long, objectType: String, objectId: Long, bmId: Long)
 
 
 # others
