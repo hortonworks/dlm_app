@@ -305,7 +305,7 @@ class StatusRoute @Inject()(val ws: WSClient,
         }
       }
     }
-  
+
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   val sync =
