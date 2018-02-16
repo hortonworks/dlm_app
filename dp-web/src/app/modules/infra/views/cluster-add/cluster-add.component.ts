@@ -62,6 +62,7 @@ export class ClusterAddComponent implements OnInit {
   cluster: Cluster = new Cluster();
   searchTerm: string;
   dcName: string;
+  location: Location;
   isLocationValid: boolean;
 
   dpRequiredServices = ['ATLAS'];
@@ -292,7 +293,7 @@ export class ClusterAddComponent implements OnInit {
 
   onCreate() {
     this.showError = false;
-    if (!this.isLocationValid || !this.isFormValid()) {
+    if (!this.isFormValid() || !this.isLocationValid ) {
       return;
     }
     this.createCluster()
