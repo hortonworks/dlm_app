@@ -120,6 +120,10 @@ class StatusRoute @Inject()(val ws: WSClient,
     ws.url(endpoint)
       .withRequestTimeout(NETWORK_TIMEOUT seconds)
       .get()
+      .recoverWith {
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
+        case ex: Exception => throw WrappedErrorException(Error(500, "Unable to connect to remote address.", "cluster.ambari.check.connection-error"))
+      }
       .map {response =>
         response.status match {
           case 403 => {
@@ -167,6 +171,10 @@ class StatusRoute @Inject()(val ws: WSClient,
         .execute(KnoxApiRequest(delegatedRequest, (req => req.get), Some(token)))
 
     response
+      .recoverWith {
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
+        case ex: Exception => throw WrappedErrorException(Error(500, "Unable to connect to remote address.", "cluster.ambari.check.connection-error"))
+      }
       .map { res =>
         res.status match {
           case 200 => res.json
@@ -201,6 +209,10 @@ class StatusRoute @Inject()(val ws: WSClient,
           .withAuth(username, password, WSAuthScheme.BASIC)
           .withRequestTimeout(NETWORK_TIMEOUT seconds)
           .get()
+      }
+      .recoverWith {
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
+        case ex: Exception => throw WrappedErrorException(Error(500, "Unable to connect to remote address.", "cluster.ambari.check.connection-error"))
       }
       .map{ response =>
         response.status match {
@@ -294,11 +306,12 @@ class StatusRoute @Inject()(val ws: WSClient,
               case Success(res) =>
                 context.stop()
                 complete(success(Json.toJson(res)))
-              case Failure(e) =>
+              case Failure(ex) =>
                 context.stop()
-                e match {
+                logger.info("ex", ex)
+                ex match {
                   case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(ex.error))
-                  case _: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "Generic error while communicating with Ambari.", e))
+                  case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "Generic error while communicating with Ambari.", e))
                 }
 
             }
