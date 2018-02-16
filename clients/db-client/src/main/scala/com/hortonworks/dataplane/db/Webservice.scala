@@ -244,6 +244,22 @@ object Webservice {
 
   }
 
+  trait FavouriteService extends DbClientService {
+
+    def add(userId: Long, datasetId: Long): Future[FavouriteWithTotal]
+
+    def deleteById(userId: Long,id: Long,datasetId: Long): Future[JsObject]
+
+  }
+
+  trait BookmarkService extends DbClientService {
+
+    def add(userId: Long, datasetId: Long): Future[Bookmark]
+
+    def deleteById(userId: Long, bmId: Long): Future[String]
+
+  }
+
   trait ClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]

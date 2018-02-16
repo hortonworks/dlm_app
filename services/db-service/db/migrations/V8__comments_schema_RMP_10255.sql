@@ -46,3 +46,25 @@ CREATE TABLE IF NOT EXISTS dataplane.ratings (
   object_id    BIGINT,
   UNIQUE(type,object_id)
 );*/
+
+CREATE TABLE IF NOT EXISTS dataplane.favourites (
+  id           BIGSERIAL PRIMARY KEY,
+  user_id    BIGINT REFERENCES dataplane.users (id)                 NOT NULL,
+  dataset_id BIGINT REFERENCES dataplane.datasets(id)             NOT NULL,
+
+  CONSTRAINT fav_unique_userId_datasetId_constraint UNIQUE (user_id, dataset_id)
+);
+
+--Index on favourites table
+CREATE INDEX idx_dp_favourites_user_id on dataplane.favourites(user_id);
+
+CREATE TABLE IF NOT EXISTS dataplane.bookmarks (
+  id         BIGSERIAL PRIMARY KEY,
+  user_id    BIGINT REFERENCES dataplane.users (id)                 NOT NULL,
+  dataset_id BIGINT REFERENCES dataplane.datasets(id)             NOT NULL,
+
+  CONSTRAINT bm_unique_userId_datasetId_constraint UNIQUE (user_id, dataset_id)
+);
+
+--Index on bookmarks table
+CREATE INDEX idx_dp_bookmarks_user_id on dataplane.bookmarks(user_id);

@@ -29,4 +29,24 @@ export class RichDatasetModel {
   tags?: string[];
   createdOn?: string;
   lastModified?: string;
+  favouriteId?: number;
+  favouriteCount?: number;
+  bookmarkId?: number;
+}
+
+export class Favourite {
+  id: number;
+  userId: number;
+  datasetId: number;
+}
+
+export class FavouriteWithTotal {
+  favourite: Favourite;
+  totalFavCount: number;
+}
+
+export class Bookmark {
+  id: number;
+  userId: number;
+  datasetId: number;
 }

@@ -78,10 +78,10 @@ GET           /api/ranger/:clusterId/policies                         controller
 
 # comments
 # ===========================================
-POST          /api/comments                                         controllers.Comments.addComments
-GET           /api/comments                                         controllers.Comments.getByObjectRef(objectId: String, objectType: String)
-DELETE        /api/comments/:id                                     controllers.Comments.deleteCommentById(id: String)
-PATCH         /api/comments/:id                                     controllers.Comments.updateComments(id: String)
+POST          /api/comments                                           controllers.Comments.addComments
+GET           /api/comments                                           controllers.Comments.getByObjectRef(objectId: String, objectType: String)
+DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
+PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
 
 # ratings
 # ===========================================
@@ -90,6 +90,15 @@ GET          /api/ratings                                             controller
 GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
+# favourites
+# ===========================================
+POST        /api/:userId/favourites/:datasetId                        controllers.Favourites.add(userId: Long, datasetId: Long)
+DELETE      /api/:userId/favourites/:favId                            controllers.Favourites.deleteById(userId: Long, favId: Long, datasetId: Long)
+
+# bookmarks
+# ===========================================
+POST        /api/:userId/bookmarks/:datasetId                         controllers.Bookmarks.add(userId: Long, datasetId: Long)
+DELETE      /api/:userId/bookmarks/:bmId                              controllers.Bookmarks.deleteById(userId: Long, bmId: Long)
 
 
 # others
