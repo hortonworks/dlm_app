@@ -62,7 +62,7 @@ export class ClusterAddComponent implements OnInit {
   cluster: Cluster = new Cluster();
   searchTerm: string;
   dcName: string;
-  locationStr: string;
+  location: Location;
   isLocationValid: boolean;
 
   dpRequiredServices = ['ATLAS'];
@@ -270,7 +270,7 @@ export class ClusterAddComponent implements OnInit {
 
   setLocationValidity(location : Location){
     this.isLocationValid = true;
-    if(this.locationStr.length > 0 && (!location || !location.id)){
+    if(!location || !location.id){
       this.isLocationValid = false;
     }
   }
