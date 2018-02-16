@@ -16,5 +16,5 @@ import com.hortonworks.dataplane.commons.domain.Entities.{Error, WrappedErrorExc
 case class ServiceNotFound(message:String) extends Exception(message)
 case class ServiceException(message:String) extends Exception(message)
 
-case class CredentialNotFoundInKeystoreException(credentialError: Error) extends WrappedErrorException(credentialError)
+case class CredentialNotFoundInKeystoreException(message: String = "Credentials not found") extends Exception(message)
 

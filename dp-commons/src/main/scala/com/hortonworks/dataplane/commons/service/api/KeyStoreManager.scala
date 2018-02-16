@@ -42,7 +42,7 @@ class KeyStoreManager(private val storePath: String, private val storePassword: 
       (for {
         key <- keys
         value = if (!keystore.containsAlias(s"$alias.$key")) {
-            throw CredentialNotFoundInKeystoreException(Error(500, s"Credential not found for key $key of $alias", "commons.keystore.credentials-not-found"))
+            throw CredentialNotFoundInKeystoreException(s"Credential not found for key $key of $alias")
           } else {
             keystore.getKey(s"$alias.$key", storePassword.toCharArray).getEncoded
           }
