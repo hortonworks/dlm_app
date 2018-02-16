@@ -23,6 +23,7 @@ import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
@@ -224,7 +225,7 @@ class StatusRoute @Inject()(val ws: WSClient,
 
         for{
           url <- Future.fromTry(constructUrl(knoxUrl))
-          inet <- probeNetwork(url)
+          inet <- Future.fromTry(probeNetwork(url))
           knoxUrl <- Future.successful(getKnoxUrlWithGatewaySuffix(url))
           token <- Future.fromTry(tokenTryable)
           json <- probeKnox(endpoint, knoxUrl, token)
@@ -239,7 +240,7 @@ class StatusRoute @Inject()(val ws: WSClient,
 //        ambari
         for {
           url <- Future.fromTry(constructUrl(endpoint))
-          inet <- probeNetwork(url)
+          inet <- Future.fromTry(probeNetwork(url))
           json <- probeAmbari(endpoint)
         } yield AmbariCheckResponse(ambariApiCheck = true,
           knoxDetected = false,
@@ -273,7 +274,7 @@ class StatusRoute @Inject()(val ws: WSClient,
   private def probe(urlString: String, request: HttpRequest): Future[AmbariCheckResponse] = {
     for {
       url <- Future.fromTry(constructUrl(urlString))
-      inet <- probeNetwork(url)
+      inet <- Future.fromTry(probeNetwork(url))
       endpoint <- Future.successful(s"${url.toString}$API_ENDPOINT")
       knoxUrlAsOptional <- probeCluster(endpoint)
       response <- probeStatus(knoxUrlAsOptional, endpoint, request)
@@ -296,7 +297,7 @@ class StatusRoute @Inject()(val ws: WSClient,
               case Failure(e) =>
                 context.stop()
                 e match {
-                  case ex: WrappedErrorException => complete(ex.error.status, Json.toJson(ex.error))
+                  case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(ex.error))
                   case _: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "Generic error while communicating with Ambari.", e))
                 }
 
