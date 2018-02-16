@@ -120,10 +120,6 @@ class StatusRoute @Inject()(val ws: WSClient,
     ws.url(endpoint)
       .withRequestTimeout(NETWORK_TIMEOUT seconds)
       .get()
-      .recoverWith {
-        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
-        case ex: Exception => throw WrappedErrorException(Error(500, "Unable to connect to remote address.", "cluster.ambari.check.connection-error"))
-      }
       .map {response =>
         response.status match {
           case 403 => {
@@ -149,6 +145,9 @@ class StatusRoute @Inject()(val ws: WSClient,
           case _ => throw WrappedErrorException(Error(500, s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}", "cluster.ambari.unexpected-response-for-prereq-call"))
         }
       }
+      .recoverWith {
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
+      }
   }
 
   /**
@@ -167,23 +166,22 @@ class StatusRoute @Inject()(val ws: WSClient,
     val delegatedRequest = ws.url(endpoint).withRequestTimeout(NETWORK_TIMEOUT seconds)
 
     val response =
-      KnoxApiExecutor(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)
+      KnoxApiExecutor.withExceptionHandling(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)
         .execute(KnoxApiRequest(delegatedRequest, (req => req.get), Some(token)))
 
     response
-      .recoverWith {
-        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
-        case ex: Exception => throw WrappedErrorException(Error(500, "Unable to connect to remote address.", "cluster.ambari.check.connection-error"))
-      }
       .map { res =>
         res.status match {
           case 200 => res.json
-          case 302 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.knox.public-key-corrupted"))
+          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.knox.public-key-corrupted"))
           case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.knox.ranger-rights-unavailable"))
           case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.knox.configuration-error"))
           case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.knox.public-key-corrupted"))
           case _ => throw WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.knox.genric"))
         }
+      }
+      .recoverWith {
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.knox.connection-refused"))
       }
   }
 
@@ -210,10 +208,6 @@ class StatusRoute @Inject()(val ws: WSClient,
           .withRequestTimeout(NETWORK_TIMEOUT seconds)
           .get()
       }
-      .recoverWith {
-        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
-        case ex: Exception => throw WrappedErrorException(Error(500, "Unable to connect to remote address.", "cluster.ambari.check.connection-error"))
-      }
       .map{ response =>
         response.status match {
           case 200 => response.json
@@ -223,6 +217,9 @@ class StatusRoute @Inject()(val ws: WSClient,
           case 500 => throw WrappedErrorException(Error(500, "An internal server error occurred.", "cluster.ambari.check.server-error"))
           case _ => throw WrappedErrorException(Error(500, "Unknown error.", "cluster.ambari.check.generic"))
         }
+    }
+    .recoverWith {
+      case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
     }
   }
 
@@ -242,9 +239,9 @@ class StatusRoute @Inject()(val ws: WSClient,
           token <- Future.fromTry(tokenTryable)
           json <- probeKnox(endpoint, knoxUrl, token)
         } yield AmbariCheckResponse(ambariApiCheck = true,
-          knoxDetected = false,
+          knoxDetected = true,
           ambariApiStatus = 200,
-          knoxUrl = None,
+          knoxUrl = Some(knoxUrl),
           ambariIpAddress = inet.getHostAddress,
           ambariApiResponseBody = json)
       }
@@ -310,8 +307,8 @@ class StatusRoute @Inject()(val ws: WSClient,
                 context.stop()
                 logger.info("ex", ex)
                 ex match {
-                  case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(ex.error))
-                  case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "Generic error while communicating with Ambari.", e))
+                  case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
+                  case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "Generic error while communicating with Ambari.", ex))
                 }
 
             }

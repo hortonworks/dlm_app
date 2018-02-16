@@ -55,6 +55,7 @@ trait KnoxApiExecutor {
 
 object KnoxApiExecutor {
   def apply(c: KnoxConfig, w: WSClient) = new DefaultKnoxApiExecutor(c,w)
+  def withExceptionHandling(c: KnoxConfig, w: WSClient) = new BasicKnoxApiExecutor(c, w)
   def withTokenCaching(c: KnoxConfig, w: WSClient) = new TokenCachingKnoxApiExecutor(c,w)
   def withTokenDisabled(c: KnoxConfig, w: WSClient) = new TokenDisabledKnoxApiExecutor(c,w)
 }
