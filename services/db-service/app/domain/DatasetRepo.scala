@@ -222,7 +222,7 @@ class DatasetRepo @Inject()(
     if(userId.isDefined){
       getRichDatasetWithFavInfo(inputQuery,paginatedQuery,searchText,userId.get)
     }else {
-      getRichDatasetFromQuery(inputQuery: Query[DatasetsTable, Dataset, Seq],paginatedQuery: Option[PaginatedQuery], searchText: Option[String])
+      getRichDatasetFromQuery(inputQuery,paginatedQuery, searchText)
     }
 
   }

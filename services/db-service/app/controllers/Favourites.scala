@@ -13,13 +13,13 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.FavouriteWithTotal
+import com.hortonworks.dataplane.commons.domain.Entities.{Favourite, FavouriteWithTotal}
 import domain.FavouriteRepo
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Favourites @Inject()(favouriteRepo: FavouriteRepo)(implicit exec: ExecutionContext)
@@ -27,18 +27,26 @@ class Favourites @Inject()(favouriteRepo: FavouriteRepo)(implicit exec: Executio
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def add(userId: Long, objectType: String, objectId: Long) = Action.async(parse.json) { req =>
+  def add = Action.async(parse.json) { req =>
     Logger.info("Favourites Controller: Received add favourite request")
-    favouriteRepo
-      .add(userId, objectId,objectType)
-      .flatMap { fav =>
-        favouriteRepo.getTotal(objectId, objectType).map { total =>
-          success(FavouriteWithTotal(fav,total))
-        }.recoverWith(apiErrorWithLog(e => Logger.error(s"Favourite Controller: Getting total favourites with object Id $objectId and object type $objectType failed with message ${e.getMessage}",e)))
-      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Favourite Controller: Adding of favourite with user Id $userId , object type $objectType and object Id $objectType failed with message ${e.getMessage}",e)))
+    req.body
+      .validate[Favourite]
+      .map{ favourite =>
+        favouriteRepo
+          .add(favourite)
+          .flatMap { fav =>
+            favouriteRepo.getTotal(fav.objectId, fav.objectType).map { total =>
+              success(FavouriteWithTotal(fav,total))
+            }.recoverWith(apiErrorWithLog(e => Logger.error(s"Favourite Controller: Getting total favourites with object Id ${fav.objectId} and object type ${fav.objectType} failed with message ${e.getMessage}",e)))
+          }.recoverWith(apiErrorWithLog(e => Logger.error(s"Favourite Controller: Adding of favourite with user Id ${favourite.userId} , object type ${favourite.objectType} and object Id ${favourite.objectId} failed with message ${e.getMessage}",e)))
+      }
+      .getOrElse{
+        Logger.warn("Favourites Controller: Failed to map request to Favourite entity")
+        Future.successful(BadRequest("Favourites Controller: Failed to map request to Favourite entity"))
+      }
   }
 
-  def deleteById(userId: Long, objectType: String, objectId: Long, favId: Long) = Action.async { req =>
+  def deleteById(favId: Long, userId: Long, objectType: String, objectId: Long) = Action.async { req =>
     Logger.info("Favourites Controller: Received delete favourite by id request")
     val numOfRowsDel = favouriteRepo.deleteById(userId,favId)
     numOfRowsDel.flatMap { i =>

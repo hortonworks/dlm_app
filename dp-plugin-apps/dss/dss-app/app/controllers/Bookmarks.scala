@@ -29,7 +29,7 @@ class Bookmarks @Inject()(@Named("bookmarkService") val bookmarkService: Bookmar
                            private val config: Configuration)
   extends Controller with JsonAPI {
 
-  def add(userId: Long, objectType: String, objectId: Long) = AuthenticatedAction.async(parse.json) { request =>
+  def add = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Bookmarks-Controller: Received add bookmark request")
     val loggedinUser = request.user.id.get
     request.body
@@ -41,7 +41,7 @@ class Bookmarks @Inject()(@Named("bookmarkService") val bookmarkService: Bookmar
           Future.successful(BadRequest(s"Bookmarks for object type ${bm.objectType} is not supported"))
         }else {
           bookmarkService
-            .add(loggedinUser, bm.objectId, bm.objectType)
+            .add(bm.copy(userId = loggedinUser))
             .map { bookmark =>
               Created(Json.toJson(bookmark))
             }
@@ -54,10 +54,10 @@ class Bookmarks @Inject()(@Named("bookmarkService") val bookmarkService: Bookmar
       }
   }
 
-  def deleteById(userId: Long, objectType: String, objectId:Long, bmId: Long) = AuthenticatedAction.async { req =>
+  def deleteById(bmId: Long) = AuthenticatedAction.async { req =>
     Logger.info("Bookmarks-Controller: Received delete bookmark request")
     val loggedinUser = req.user.id.get
-    bookmarkService.deleteById(userId: Long, bmId:Long, objectId: Long, objectType: String)
+    bookmarkService.deleteById(loggedinUser, bmId)
       .map{ msg =>
         Ok(Json.toJson(msg))
       }

@@ -21,14 +21,14 @@ export class FavouriteService {
 
   add(favourite: Favourite): Observable<FavouriteWithTotal> {
     return this.http
-      .post(`api/${favourite.userId}/favourites/${favourite.objectType}/${favourite.objectId}`, favourite, new RequestOptions(HttpUtil.getHeaders()))
+      .post(`api/favourites`, favourite, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
 
-  delete(userId: number, favId: number, objectId: number, objectType: String) : Observable<any> {
+  delete(favId: number, objectId: number, objectType: String) : Observable<any> {
     return this.http
-      .delete(`api/${userId}/favourites/${objectType}/${objectId}/${favId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .delete(`api/favourites/${favId}?objectType=${objectType}&objectId=${objectId}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

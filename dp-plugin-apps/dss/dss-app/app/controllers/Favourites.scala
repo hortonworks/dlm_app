@@ -29,7 +29,7 @@ class Favourites @Inject()(@Named("favouriteService") val favouriteService: Favo
                          private val config: Configuration)
   extends Controller with JsonAPI {
 
-  def add(userId: Long, objectType: String, objectId: Long) = AuthenticatedAction.async(parse.json) { request =>
+  def add = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Favourites-Controller: Received add favourite request")
     val loggedinUser = request.user.id.get
     request.body
@@ -41,7 +41,7 @@ class Favourites @Inject()(@Named("favouriteService") val favouriteService: Favo
           Future.successful(BadRequest(s"Favourites for object type ${fav.objectType} is not supported"))
         }else {
           favouriteService
-            .add(loggedinUser, fav.objectId, fav.objectType)
+            .add(fav.copy(userId = loggedinUser))
             .map { favc =>
               Created(Json.toJson(favc))
             }
@@ -55,7 +55,7 @@ class Favourites @Inject()(@Named("favouriteService") val favouriteService: Favo
       }
   }
 
-  def deleteById(userId: Long, objectType: String, objectId:Long, favId: Long) = AuthenticatedAction.async { req =>
+  def deleteById(favId: Long, objectType: String, objectId:Long) = AuthenticatedAction.async { req =>
     Logger.info("Favourites-Controller: Received delete favourite request")
     val loggedinUser = req.user.id.get
     favouriteService.deleteById(loggedinUser,favId,objectId, objectType)

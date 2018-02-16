@@ -13,11 +13,12 @@ package controllers
 
 import javax.inject._
 
+import com.hortonworks.dataplane.commons.domain.Entities.Bookmark
 import domain.BookmarkRepo
 import play.api.Logger
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Bookmarks @Inject()(bookmarkRepo: BookmarkRepo)(implicit exec: ExecutionContext)
@@ -25,16 +26,24 @@ class Bookmarks @Inject()(bookmarkRepo: BookmarkRepo)(implicit exec: ExecutionCo
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def add(userId: Long, objectType: String, objectId: Long) = Action.async(parse.json) { req =>
+  def add = Action.async(parse.json) { req =>
     Logger.info("Bookmarks Controller: Received add bookmark request")
-    bookmarkRepo
-      .add(userId, objectId, objectType)
-      .map { bm =>
-        success(bm)
-      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Adding of bookmark with user Id $userId , object type $objectType and object Id $objectId failed with message ${e.getMessage}",e)))
+    req.body
+      .validate[Bookmark]
+      .map { bookmark =>
+        bookmarkRepo
+          .add(bookmark)
+          .map { bm =>
+            success(bm)
+          }.recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Adding of bookmark with user Id ${bookmark.userId} , object type ${bookmark.objectType} and object Id ${bookmark.objectId} failed with message ${e.getMessage}",e)))
+      }
+      .getOrElse{
+        Logger.warn("Bookmarks Controller: Failed to map request to Bookmark entity")
+        Future.successful(BadRequest("Bookmarks Controller: Failed to map request to Bookmarks entity"))
+      }
   }
 
-  def deleteById(userId: Long, objectType: String, objectId: Long, bmId: Long) = Action.async { req =>
+  def deleteById(bmId: Long, userId: Long) = Action.async { req =>
     Logger.info("Bookmarks Controller: Received delete bookmark by id request")
     val numOfRowsDel = bookmarkRepo.deleteById(userId,bmId)
     numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmark with bookmark Id $bmId failed with message ${e.getMessage}",e)))

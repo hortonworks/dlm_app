@@ -26,8 +26,7 @@ class BookmarkRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
 
   val Bookmarks = TableQuery[BookmarksTable]
 
-  def add(userid: Long, objectId: Long, objectType: String): Future[Bookmark] ={
-    val bookmark = Bookmark(userId = userid, objectType = objectType,objectId = objectId)
+  def add(bookmark: Bookmark): Future[Bookmark] ={
     db.run(Bookmarks returning Bookmarks += bookmark)
   }
 

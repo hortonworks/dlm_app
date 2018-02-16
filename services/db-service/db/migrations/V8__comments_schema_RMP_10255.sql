@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS dataplane.favourites (
 
 --Index on favourites table
 CREATE INDEX idx_dp_favourites_user_id on dataplane.favourites(user_id);
+CREATE INDEX idx_dp_favourites_objId_objType on dataplane.favourites(object_id, object_type);
 
 CREATE TABLE IF NOT EXISTS dataplane.bookmarks (
   id         BIGSERIAL PRIMARY KEY,
@@ -49,3 +50,4 @@ CREATE TABLE IF NOT EXISTS dataplane.bookmarks (
 
 --Index on bookmarks table
 CREATE INDEX idx_dp_bookmarks_user_id on dataplane.bookmarks(user_id);
+CREATE INDEX idx_dp_bookmarks_objId_objType on dataplane.bookmarks(object_id, object_type);

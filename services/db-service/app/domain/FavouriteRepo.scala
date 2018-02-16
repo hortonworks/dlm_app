@@ -26,8 +26,7 @@ class FavouriteRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
   val Favourites = TableQuery[FavouritesTable]
 
-  def add(userid: Long, objectId: Long, objectType: String): Future[Favourite] ={
-    val favourite = Favourite(userId = userid, objectType = objectType,objectId = objectId)
+  def add(favourite: Favourite): Future[Favourite] ={
     db.run(Favourites returning Favourites += favourite)
   }
 

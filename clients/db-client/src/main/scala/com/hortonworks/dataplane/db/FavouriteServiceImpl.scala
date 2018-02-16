@@ -32,18 +32,18 @@ class FavouriteServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def add(userId: Long, objectId: Long, objectType: String): Future[FavouriteWithTotal] = {
-    ws.url(s"$url/$userId/favourites/$objectType/$objectId")
+  override def add(favourite: Favourite): Future[FavouriteWithTotal] = {
+    ws.url(s"$url/favourites")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .post(Json.toJson(Favourite(userId = userId, objectType = objectType, objectId = objectId)))
+      .post(Json.toJson(favourite))
       .map(mapToFavouriteWithTotal)
   }
 
   override def deleteById(userId: Long, id:Long, objectId: Long, objectType: String): Future[JsObject] = {
-    ws.url(s"$url/$userId/favourites/$objectType/$objectId/$id")
+    ws.url(s"$url/favourites/$id?userId=$userId&objectType=$objectType&objectId=$objectId")
       .withHeaders("Accept" -> "application/json")
       .delete()
       .map(mapResultsGeneric)

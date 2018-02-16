@@ -247,7 +247,7 @@ object Webservice {
 
   trait FavouriteService extends DbClientService {
 
-    def add(userId: Long, objectId: Long, objectType: String): Future[FavouriteWithTotal]
+    def add(favourite: Favourite): Future[FavouriteWithTotal]
 
     def deleteById(userId: Long,id: Long,objectId: Long, objectType: String): Future[JsObject]
 
@@ -255,9 +255,9 @@ object Webservice {
 
   trait BookmarkService extends DbClientService {
 
-    def add(userId: Long, objectId: Long, objectType: String): Future[Bookmark]
+    def add(bookmark: Bookmark): Future[Bookmark]
 
-    def deleteById(userId: Long, bmId:Long, objectId: Long, objectType: String): Future[String]
+    def deleteById(userId: Long, bmId:Long): Future[String]
 
   }
 

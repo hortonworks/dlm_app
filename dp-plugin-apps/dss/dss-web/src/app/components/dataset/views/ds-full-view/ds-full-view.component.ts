@@ -102,7 +102,7 @@ export class DsFullView implements OnInit {
         this.dsModel.favouriteCount = favWithTotal.totalFavCount;
       })
     }else{
-      this.favouriteService.delete(userId, this.dsModel.favouriteId, this.dsModel.id, this.objectType).subscribe(msg => {
+      this.favouriteService.delete(this.dsModel.favouriteId, this.dsModel.id, this.objectType).subscribe(msg => {
         this.dsModel.favouriteId = null;
         this.dsModel.favouriteCount = msg.totalFavCount;
       })
@@ -120,7 +120,7 @@ export class DsFullView implements OnInit {
         this.dsModel.bookmarkId = bm.id;
       })
     }else{
-      this.bookmarkService.delete(userId,this.dsModel.bookmarkId, this.objectType, this.dsModel.id).subscribe(_ => {
+      this.bookmarkService.delete(this.dsModel.bookmarkId).subscribe(_ => {
         this.dsModel.bookmarkId = null;
       })
     }
