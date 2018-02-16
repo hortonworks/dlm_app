@@ -32,7 +32,7 @@ export const parsePolicyId = (policyId: string): ParsedPolicyId => {
   if (splits.length <= 5) {
     return null;
   }
-  const policyName = splits[5];
+  const policyName = splits[5] || '';
   const timeStamp = parseInt(splits[7], 10);
   const idSplits = (splits[9] || '').split('@');
   const dataCenter = splits[3];

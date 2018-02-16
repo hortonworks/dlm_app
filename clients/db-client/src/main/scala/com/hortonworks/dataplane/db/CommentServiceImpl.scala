@@ -17,10 +17,10 @@ import javax.inject.Singleton
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webservice.CommentService
 import com.typesafe.config.Config
+import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
-import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -51,8 +51,24 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map{ res =>
         res.status match {
           case 200 => (res.json \ "results").validate[String].get
+          case _ =>{
+            val logMsg = s"Db-Client CommentServiceImpl: In deleletById method , result status ${res.status} with comment Id $commentId and userId $userId"
+            mapResponseToError(res, Option(logMsg))
+          }
+        }
+      }
+  }
+
+  override def deleteByObjectRef(objectId: String, objectType: String): Future[String] = {
+    ws.url(s"$url/comments?objectId=${objectId}&objectType=${objectType}")
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map{ res =>
+        res.status match {
+          case 200 => (res.json \ "results").validate[String].get
           case _ =>
-            mapResponseToError(res)
+            val logMsg = s"Db-Client CommentServiceImpl: In deleteByObjectRef, result status ${res.status} with object Id $objectId and object type $objectType"
+            mapResponseToError(res,Option(logMsg))
         }
       }
   }
@@ -74,11 +90,21 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUsers)
   }
 
+  override def getByParentId(parentId: String, queryString: String): Future[Seq[CommentWithUser]] = {
+    ws.url(s"$url/comments/$parentId/replies?$queryString")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToCommentWithUsers)
+  }
+
 
   private def mapToCommentWithUser(res: WSResponse) = {
     res.status match {
       case 200 => (res.json \ "results").validate[CommentWithUser].get
-      case _ => mapResponseToError(res)
+      case _ => {
+        val logMsg = s"Db-Client CommentServiceImpl: In mapToCommentWithUser method, result status ${res.status}"
+        mapResponseToError(res,Option(logMsg))
+      }
     }
   }
 
@@ -86,7 +112,10 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 =>
         (res.json \ "results").validate[Seq[CommentWithUser]].getOrElse(Seq())
-      case _ => mapResponseToError(res)
+      case _ => {
+        val logMsg = s"Db-Client CommentServiceImpl: In mapToCommentWithUsers method, result status ${res.status}"
+        mapResponseToError(res,Option(logMsg))
+      }
     }
   }
 

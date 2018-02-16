@@ -22,11 +22,34 @@ export class RichDatasetModel {
   description: string;
   datalakeId: number; // datalakeId and dpClusterId are same thing
   datalakeName: string;
-  favourite: boolean;
+  favourite: boolean; // not related to favourite and bookmark (below)
   id: number;
   name: string;
   clusterId?: number;  // cluster id as discovered_cluster id
   tags?: string[];
   createdOn?: string;
   lastModified?: string;
+  sharedStatus: number; // 1 public, 2 private
+  favouriteId?: number;
+  favouriteCount?: number;
+  bookmarkId?: number;
+}
+
+export class Favourite {
+  id: number;
+  userId: number;
+  objectType: string;
+  objectId: number;
+}
+
+export class FavouriteWithTotal {
+  favourite: Favourite;
+  totalFavCount: number;
+}
+
+export class Bookmark {
+  id: number;
+  userId: number;
+  objectType: string;
+  objectId: number;
 }

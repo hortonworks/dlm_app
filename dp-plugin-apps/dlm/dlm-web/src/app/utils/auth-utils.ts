@@ -16,11 +16,6 @@ export class AuthUtils {
   public static loggedIn = new Subject<boolean>();
   public static loggedIn$ =  AuthUtils.loggedIn.asObservable();
 
-  public static get signinURL() {
-    const currentLocation = window.location.href.split('/');
-    return `/login?landingPage=${currentLocation[0]}//${currentLocation[2]}`;
-  }
-
   public static isUserLoggedIn() {
     return !!AuthUtils.getUser();
   }

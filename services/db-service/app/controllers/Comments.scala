@@ -27,7 +27,9 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
+  //val Logger = Logger(this.getClass)
   def addComment = Action.async(parse.json) { req =>
+    Logger.info("Comments Controller: Received add Comment request")
     req.body
       .validate[Comment]
       .map { comment =>
@@ -35,9 +37,12 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
           .add(comment)
           .map { cmnt =>
             success(cmnt)
-          }.recoverWith(apiError)
+          }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Adding of Comment $comment failed with message ${e.getMessage}",e)))
       }
-      .getOrElse(Future.successful(BadRequest))
+      .getOrElse{
+        Logger.warn("Comments Controller: Failed to map request to Comment entity")
+        Future.successful(BadRequest)
+      }
   }
 
   private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
@@ -52,32 +57,52 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
 
   }
 
-  def getCommentByObjectRef = Action.async { req =>
-    val objectId = req.getQueryString("objectId")
-    val objectType  = req.getQueryString("objectType")
-    Logger.info("dp-service Comments Controller: Received get comment request")
-    if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
-    else{
-      commentRepo.findByObjectRef(objectId.get.toLong,objectType.get,getPaginatedQuery(req))
-        .map{ commentswithuser =>
-          success(commentswithuser)
-        }.recoverWith(apiError)
-    }
+  def getCommentByObjectRef(objectId: Long, objectType: String) = Action.async { req =>
+    Logger.info("Comments Controller: Received get comment by object-reference request")
+    commentRepo.findByObjectRef(objectId,objectType,getPaginatedQuery(req))
+      .map{ commentswithuser =>
+        success(commentswithuser)
+      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Getting Comments with object Id $objectId and object Type $objectType failed with message ${e.getMessage}", e)))
   }
 
-  def deleteById(id: String) = Action.async { req =>
-    Logger.info("db-service Comments controller:  Received delete comment request")
-    val userId = req.getQueryString("userId")
-    if(userId.isEmpty || !isNumeric(userId.get) || !isNumeric(id)) Future.successful(BadRequest)
+  def getByParentId(parentId: Long) = Action.async { req =>
+    Logger.info("Comments Controller: Received get comment by parent Id request")
+    commentRepo.findByParentId(parentId)
+      .map{ commentswithuser =>
+        success(commentswithuser)
+      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Getting Comments with parent Id $parentId failed with message ${e.getMessage}", e)))
+  }
+
+  def delete(objectId: Long, objectType: String) = Action.async { req =>
+    Logger.info("Comments Controller: Received delete comment by object-reference request")
+    val numOfRowsDel = commentRepo.deleteByObjectRef(objectId,objectType)
+    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted"))
+      .recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Deleting Comments with object Id $objectId and object Type $objectType failed with message ${e.getMessage}",e)))
+  }
+
+  def deleteById(id: String, userId: Long) = Action.async { req =>
+    Logger.info("Comments Controller: Received delete comment by id request")
+    if(!isNumeric(id)) {
+      Logger.warn(s"Comments Controller: Not a valid Comment Id $id")
+      Future.successful(BadRequest)
+    }
     else{
       val commentId = id.toLong
-      val futureId = commentRepo.deleteById(commentId, userId.get.toLong)
-      futureId.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
+      val comment = commentRepo.getById(commentId, userId)
+      val numDel = comment.flatMap { cmnt =>
+        if(cmnt.parentCommentId.isDefined){
+          commentRepo.deleteReplyCommentById(commentId,userId, cmnt.parentCommentId.get)
+        }else {
+          commentRepo.deleteCommentById(commentId,userId)
+        }
+      }
+      numDel.map(i => success(s"Success: ${i} row/rows deleted"))
+        .recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Deleting Comment with comment Id $commentId failed with message ${e.getMessage}",e)))
     }
   }
 
   def update(id: String) = Action.async(parse.json) { req =>
-    Logger.info("db-service Comments controller:  Received update comment request")
+    Logger.info("Comments Controller: Received update comment request")
     req.body
       .validate[(String)]
       .map { case (commentText) =>
@@ -85,9 +110,12 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
           .update(commentText,id.toLong)
           .map { cmnt =>
             success(cmnt)
-          }.recoverWith(apiError)
+          }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Updating comment with comment id $id to $commentText failed with message ${e.getMessage}", e)))
       }
-      .getOrElse(Future.successful(BadRequest))
+      .getOrElse{
+        Logger.warn("Comments Controller: Failed to map request to Comment Text")
+        Future.successful(BadRequest)
+      }
   }
 
   implicit val tupledCommentTextReads = ((__ \ 'commentText).read[String])

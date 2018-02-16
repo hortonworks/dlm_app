@@ -18,11 +18,20 @@ export class Comment {
   createdOn: string;
   parentCommentId: number;
   lastModified: string;
+  numberOfReplies: number;
   editVersion: string;
 }
 
 export class CommentWithUser {
   comment: Comment;
   userName: string;
-  isCommentExpanded?: boolean = false;
+  isCommentExpanded?: boolean = false;   // tells whether the comment is fully expanded or not for long comments. Helps to enable 'view more' option
+  replies: CommentWithUser[] = [];
+  isReplyVisible?: boolean = false;
+}
+
+export class ReplyTo {
+  commentText: string;
+  username: string;
+  parentId: number;
 }

@@ -24,4 +24,5 @@ public interface ConfigurationServiceInterface {
 
   @RequestMapping(method = RequestMethod.GET, value = "/api/config/{key}")
   String getTokenValidity(@PathVariable("key") String key);
+
 }

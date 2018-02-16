@@ -43,6 +43,8 @@ class DataSets @Inject()(
     @Named("atlasService") val atlasService: AtlasService,
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
+    @Named("ratingService") val ratingService: RatingService,
+    @Named("commentService") val commentService: CommentService,
     val utilityService: UtilityService)
     extends Controller with JsonAPI {
 
@@ -342,7 +344,7 @@ class DataSets @Inject()(
   }
 
   def updateDataset(datasetId : String) = AuthenticatedAction.async(parse.json) { request =>
-    Logger.info("Received update dataSet shredStatus request")
+    Logger.info("Received update dataSet request")
     request.body
       .validate[Dataset]
       .map { dataset =>
@@ -365,12 +367,14 @@ class DataSets @Inject()(
     Logger.info("Received delete dataSet request")
     (for {
       dataset <- doGetDataset(dataSetId,request.user.id.get)
+      cmntDelMsg <- commentService.deleteByObjectRef(dataSetId, "assetCollection")
       clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toString)
+      _ <- ratingService.deleteByObjectRef(dataSetId, "assetCollection")
       deleted <- doDeleteDataset(dataset.id.get.toString)
       jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
       _ <- doDeleteProfilers(clusterId, jobName)
     }  yield {
-      Ok(Json.obj("deleted" -> deleted))
+      Ok(Json.obj("datasetsDeleted" -> deleted,"commentsDeleted" -> cmntDelMsg))
     })
     .recover{
       case ex: WrappedErrorsException => InternalServerError(Json.toJson(ex.errors))

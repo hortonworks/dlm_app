@@ -65,6 +65,19 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRating)
   }
 
+  override def deleteByObjectRef(objectId: String, objectType: String): Future[String] = {
+    ws.url(s"$url/ratings?objectId=${objectId}&objectType=${objectType}")
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map{ res =>
+        res.status match {
+          case 200 => (res.json \ "results").as[String]
+          case _ =>
+            mapResponseToError(res)
+        }
+      }
+  }
+
   import play.api.libs.functional.syntax._
 
   implicit val tupledRatingWithUserWrite = (

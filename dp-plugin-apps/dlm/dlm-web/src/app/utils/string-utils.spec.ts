@@ -31,4 +31,20 @@ describe('StringUtils', () => {
 
   });
 
+  describe('#simpleSearch', () => {
+    it('should (not) find string by substring', () => {
+      const str = 'some Mixed str1ng!';
+      const tests = [
+        {search: 'any', expected: false},
+        {search: 'some', expected: true},
+        {search: '!', expected: true},
+        {search: '1', expected: true},
+        {search: 'str1ng!\$', expected: true}
+      ];
+      tests.forEach(t => {
+        expect(StringUtils.simpleSearch(str, t.search)).toBe(t.expected, `find by ${t.search}`);
+      });
+    });
+  });
+
 });

@@ -82,7 +82,7 @@ body {
 }
 
 .dp-login-controls form {
-  padding: 49px 90px 0px 100px;
+  padding: 36px 90px 0px 100px;
 }
 
 .dp-login-controls .group-title {
@@ -129,6 +129,15 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
+}
+
+.tracking-message {
+    line-height: 1.3;
+    font-size: 11px;
+    font-weight: 100;
+    color: #EEEEEE;
+    margin-top: 10px;
+    max-width: 540px;
 }
 
 input[type="text"], input[type="password"], input[type="email"], input:not([type]), input[type=""], textarea, select {
@@ -197,4 +206,10 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
+}
+
+a, a:focus {
+    color: #1491C1;
+    text-decoration: none;
+    font-weight: normal;
 }

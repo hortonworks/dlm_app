@@ -44,17 +44,12 @@ class Ratings @Inject()(ratingRepo: RatingRepo)(implicit exec: ExecutionContext)
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def getAverage = Action.async { req =>
-    val objectId = req.getQueryString("objectId")
-    val objectType  = req.getQueryString("objectType")
+  def getAverage(objectId: Long, objectType: String) = Action.async { req =>
     Logger.info("dp-service Ratings Controller: Received get average rating request")
-    if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get)) Future.successful(BadRequest)
-    else{
-      ratingRepo.getAverage(objectId.get.toLong,objectType.get)
-        .map{ avgAndTotalVotes =>
-          success(Json.obj("average" -> avgAndTotalVotes._1, "votes" -> avgAndTotalVotes._2))
-        }.recoverWith(apiError)
-    }
+    ratingRepo.getAverage(objectId,objectType)
+      .map{ avgAndTotalVotes =>
+        success(Json.obj("average" -> avgAndTotalVotes._1, "votes" -> avgAndTotalVotes._2))
+      }.recoverWith(apiError)
   }
 
   def update(id: String) = Action.async(parse.json) { req =>
@@ -73,18 +68,18 @@ class Ratings @Inject()(ratingRepo: RatingRepo)(implicit exec: ExecutionContext)
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def get = Action.async { req =>
-    val objectId = req.getQueryString("objectId")
-    val objectType  = req.getQueryString("objectType")
-    val userId  = req.getQueryString("userId")
+  def get(objectId: Long, objectType: String, userId: Long) = Action.async { req =>
     Logger.info("dp-service Ratings Controller: Received get rating request")
-    if(objectId.isEmpty || objectType.isEmpty || !isNumeric(objectId.get) || userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
-    else{
-      ratingRepo.get(userId.get.toLong,objectId.get.toLong,objectType.get)
-        .map{ rt =>
-          success(rt)
-        }.recoverWith(apiError)
-    }
+    ratingRepo.get(userId,objectId,objectType)
+      .map{ rt =>
+        success(rt)
+      }.recoverWith(apiError)
+  }
+
+  def delete(objectId: Long, objectType: String) = Action.async { req =>
+    Logger.info("db-service Ratings Controller: Received delete ratings by object reference request")
+    val numOfRowsDel = ratingRepo.deleteByObjectRef(objectId,objectType)
+    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
   }
 
   implicit val tupledRatingWithUserReads = (

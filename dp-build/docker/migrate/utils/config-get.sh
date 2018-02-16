@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # /*
 #  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
@@ -8,10 +9,22 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
+set -e
 
-#Sat May 06 15:13:21 CEST 2017
-distributionBase=GRADLE_USER_HOME
-distributionPath=wrapper/dists
-zipStoreBase=GRADLE_USER_HOME
-zipStorePath=wrapper/dists
-distributionUrl=https\://services.gradle.org/distributions/gradle-3.1-all.zip
+get_config() {
+
+    local KEY="$1"
+    local GET_QUERY="SELECT config_value from dataplane.configs WHERE config_key = '$KEY'"
+    local RESULT=`psql -c "$GET_QUERY" | grep "true"`
+    if [ -z ${RESULT} ]; then
+        echo "$KEY: Disabled"
+    else
+        echo "$KEY: Enabled"
+    fi
+}
+
+main() {
+   get_config "$@"
+}
+
+main "$@"

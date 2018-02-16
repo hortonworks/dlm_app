@@ -61,5 +61,8 @@ export const routes: MockRoute[] = [
   new MockRoute('beacon/admin/status', 'admin_status.json'),
 
   // Yarn queues
-  new MockRoute('clusters/:clusterId/yarn/queues', 'yarn_queues.json')
+  new MockRoute('clusters/:clusterId/yarn/queues', 'yarn_queues.json'),
+
+  // cloud accounts
+  new MockRoute('store/credentials', 'cloud_credentials.json')
 ];

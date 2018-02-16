@@ -216,12 +216,23 @@ POST         /blacklisted-tokens                                            cont
 
 #comments api
 POST        /comments                                                       controllers.Comments.addComment
-GET         /comments                                                       controllers.Comments.getCommentByObjectRef
-DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String)
+GET         /comments                                                       controllers.Comments.getCommentByObjectRef(objectId: Long, objectType: String)
+GET         /comments/:parentId/replies                                     controllers.Comments.getByParentId(parentId: Long)
+DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String, userId: Long)
+DELETE      /comments                                                       controllers.Comments.delete(objectId: Long, objectType: String)
 PATCH       /comments/:id                                                   controllers.Comments.update(id: String)
 
 #ratings api
 POST        /ratings                                                        controllers.Ratings.add
-GET         /ratings                                                        controllers.Ratings.get
-GET         /ratings/actions/average                                        controllers.Ratings.getAverage
+GET         /ratings                                                        controllers.Ratings.get(objectId: Long, objectType: String, userId: Long)
+GET         /ratings/actions/average                                        controllers.Ratings.getAverage(objectId: Long, objectType: String)
 PATCH       /ratings/:id                                                    controllers.Ratings.update(id: String)
+DELETE      /ratings                                                        controllers.Ratings.delete(objectId: Long, objectType: String)
+
+#favourites api
+POST        /favourites                                                     controllers.Favourites.add
+DELETE      /favourites/:favId                                              controllers.Favourites.deleteById(favId: Long, userId: Long, objectType: String, objectId: Long)
+
+#bookmarks api
+POST        /bookmarks                                                      controllers.Bookmarks.add
+DELETE      /bookmarks/:bmId                                                controllers.Bookmarks.deleteById(bmId: Long, userId: Long)

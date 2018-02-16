@@ -29,6 +29,15 @@ export class CommentService {
       .catch(HttpUtil.handleError);
   }
 
+  getByParentId(parentCommentId): Observable<CommentWithUser[]>  {
+    const uri = `${this.uri}/${parentCommentId}/replies`;
+
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   add(comment: Comment): Observable<Comment> {
     return this.http
       .post(`${this.uri}`, comment, new RequestOptions(HttpUtil.getHeaders()))

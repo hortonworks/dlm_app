@@ -9,7 +9,7 @@
 
 import { FormGroup, FormControl } from '@angular/forms';
 
-export const markAllTouched = (form: FormGroup) => {
+export const markAllTouched = (form: FormGroup): void => {
   if (!form.controls) {
     return;
   }

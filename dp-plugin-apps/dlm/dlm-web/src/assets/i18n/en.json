@@ -247,6 +247,7 @@
       "greaterThanEndTime": "End time must be later than start time.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
       "not_exist_directory": "Specified path does not exist",
+      "credValidator": "Name must be unique",
       "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'.",
       "invalid_date": "\"{{fieldLabel}}\" should be a valid date",
       "invalid_credentials": "Wrong Credentials"
@@ -403,15 +404,31 @@
         "no_accounts": "No Accounts",
         "no_containers": "No Containers",
         "table": {
-          "actions": "Actions",
-          "user_details": "Account"
+          "actions": "ACTIONS",
+          "user_details": "CREDENTIAL"
         },
         "accounts": {
+          "iam_role": "IAM Role",
           "add": {
             "title": "Add Cloud Account",
-            "provider": "Cloud Service Provider",
-            "access_key": "Access Key",
-            "secret_key": "Secret Key",
+            "provider": "Cloud Provider",
+            "name" : {
+              "label" : "Name",
+              "placeholder": "Enter a unique name for the cloud credential"
+            },
+            "access_key": {
+              "label" : "Access Key",
+              "placeholder": "Enter S3 access key"
+            },
+            "secret_key" : {
+              "label" : "Secret Key",
+              "placeholder": "Enter S3 secret key"
+            },
+            "auth_type": {
+              "label": "Authentication Type",
+              "keys": "Access & Secret Key",
+              "role": "IAM Role"
+            },
             "username": "IAM USERNAME",
             "account_id": "ACCOUNT ID",
             "validate": "Validate",
@@ -462,7 +479,8 @@
         "read_write": "Read / Write",
         "read_only": "Read Only",
         "read_write_abbrev": "RW",
-        "read_only_abbrev": "RO"
+        "read_only_abbrev": "RO",
+        "ranger_disabled_tooltip": "Ranger is not enabled on this cluster. Accidental writes might occur on the replicated data. Enable Ranger to prevent this issue"
       },
       "success": {
         "title": "Policy Creation Successful",

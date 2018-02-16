@@ -13,6 +13,7 @@
   [columnMode]="columnMode"
   [footerHeight]="footerHeight"
   [showFooter]="showFooter"
+  [limit]="1000"
   [rows]="accounts">
 </dlm-table>
 
@@ -24,8 +25,35 @@
 </ng-template>
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
-  <div class="userName" [attr.qe-attr]="'cloud-account-username-' + index" *ngIf="account.accountDetails.userName">{{account.accountDetails.userName}}</div>
-  <div class="accountName" [attr.qe-attr]="'cloud-account-account-name-' + index" *ngIf="account.accountDetails.accountName">{{account.accountDetails.accountName}}</div>
+  <ng-template #accountTemplate>
+        <span *ngIf="account.accountDetails.credentialType === S3_TOKEN; else iamRole">
+       {{account.accountDetails.userName}}<br>{{account.accountDetails.accountName}}
+     </span>
+    <ng-template #iamRole>
+      {{'page.cloud_stores.content.accounts.iam_role' | translate}}<br>{{account.accountDetails.accountName}}
+    </ng-template>
+  </ng-template>
+  <div
+    class="userName"
+    [tooltip]="accountTemplate"
+    [attr.qe-attr]="'cloud-account-id-' + index">
+    {{account.id}}
+  </div>
+  <div class="userDetails">
+    <span
+      class="userName"
+      [attr.qe-attr]="'cloud-account-account-userName-' + index"
+      [tooltip]="accountTemplate"
+      *ngIf="account.accountDetails.userName">
+      {{account.accountDetails.userName}}
+    </span>
+    <span
+      class="accountName"
+      [attr.qe-attr]="'cloud-account-account-name-' + index"
+      *ngIf="account.accountDetails.accountName">
+      | {{account.accountDetails.accountName}}
+    </span>
+  </div>
 </ng-template>
 
 <ng-template #actionsCell let-account="row" let-index="rowIndex">

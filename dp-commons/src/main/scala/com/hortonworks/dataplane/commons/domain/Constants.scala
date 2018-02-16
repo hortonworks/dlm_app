@@ -22,4 +22,6 @@ object Constants {
   val BEACON = "BEACON"
   val DPTOKEN = "X-DP-Token-Info"
 
+  val AssetCollectionObjectType = "assetCollection"
 }
+

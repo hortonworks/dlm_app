@@ -17,7 +17,7 @@ export class ApiInterceptor implements HttpInterceptor {
 
   buildUrl(url: string): string {
     let apiPrefix = API_PREFIX;
-    // Proccess static assets without the api prefix
+    // Process static assets without the api prefix
     if (url.indexOf('assets/') > -1 || url.indexOf('http') > -1) {
       apiPrefix = '';
     }

@@ -282,7 +282,7 @@ object Entities {
                      lastModified: LocalDateTime = LocalDateTime.now(),
                      active: Boolean = true,
                      version: Int = 1,
-                     sharedStatus: Int = SharingStatus.PUBLIC.id,
+                     sharedStatus: Int = SharingStatus.PUBLIC.id, // 1 - Public, 2 - Private
                      customProps: Option[JsValue] = None)
 
   case class DatasetCategory(categoryId: Long, datasetId: Long)
@@ -329,7 +329,10 @@ object Entities {
                          user: String,
                          cluster: String,
                          clusterId: Long,
-                         counts: Seq[DataAssetCount])
+                         counts: Seq[DataAssetCount],
+                         favouriteId: Option[Long]= None,
+                         favouriteCount: Option[Int] = None,
+                         bookmarkId: Option[Long]= None)
 
   case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
 
@@ -390,6 +393,8 @@ object Entities {
                       createdBy: Long,
                       createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
                       lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                      parentCommentId: Option[Long],
+                      numberOfReplies: Option[Long],
                       editVersion: Option[Int] = Some(0))
 
   case class CommentWithUser(comment:Comment,
@@ -400,6 +405,19 @@ object Entities {
                     objectType: String,
                     objectId: Long,
                     createdBy: Long)
+
+  case class Favourite(id: Option[Long] = None,
+                       userId: Long,
+                       objectType: String,
+                       objectId: Long)
+
+  case class FavouriteWithTotal(favourite: Favourite,
+                                totalFavCount: Int)
+
+  case class Bookmark(id: Option[Long] = None,
+                      userId: Long,
+                      objectType: String,
+                      objectId: Long)
 
 }
 
@@ -590,6 +608,15 @@ object JsonFormatters {
 
   implicit val ratingWrites = Json.writes[Rating]
   implicit val ratingReads = Json.reads[Rating]
+
+  implicit val favouriteWrites = Json.writes[Favourite]
+  implicit val favouriteReads = Json.reads[Favourite]
+
+  implicit val favouriteWithTotalWrites = Json.writes[FavouriteWithTotal]
+  implicit val favouriteWithTotalReads = Json.reads[FavouriteWithTotal]
+
+  implicit val bookmarkWrites = Json.writes[Bookmark]
+  implicit val bookmarkReads = Json.reads[Bookmark]
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 

@@ -12,7 +12,7 @@
 import {Component, OnInit, ViewChild,ElementRef} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as DialogPolyfill from 'dialog-polyfill';
-import {RichDatasetModel} from "../../models/richDatasetModel";
+import {Bookmark, Favourite, RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
 import {DataSetService} from "../../../../services/dataset.service";
 import {
@@ -20,6 +20,9 @@ import {
   AssetSetQueryFilterModel,
   AssetSetQueryModel
 } from "../ds-assets-list/ds-assets-list.component";
+import {AuthUtils} from "../../../../shared/utils/auth-utils";
+import {FavouriteService} from "../../../../services/favourite.service";
+import {BookmarkService} from "../../../../services/bookmark.service";
 
 @Component({
   selector: "ds-full-view",
@@ -33,9 +36,12 @@ export class DsFullView implements OnInit {
   applicableListActions: AssetListActionsEnum[] = [];//[AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
   clusterId: any;
+  objectType = "assetCollection";
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
+              private favouriteService: FavouriteService,
+              private bookmarkService: BookmarkService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -75,6 +81,49 @@ export class DsFullView implements OnInit {
 
   doCancelDelete() {
     this.dialogConfirm.nativeElement.close();
+  }
+
+  getFavCount(id){
+    if(this.dsModel.favouriteCount){
+      return this.dsModel.favouriteCount;
+    }
+    return 0;
+  }
+
+  onFavIconClick(){
+    let userId = Number(AuthUtils.getUser().id)
+    if(!this.dsModel.favouriteId){
+      let favourite = new Favourite();
+      favourite.userId = userId;
+      favourite.objectId = this.dsModel.id;
+      favourite.objectType = this.objectType;
+      this.favouriteService.add(favourite).subscribe(favWithTotal => {
+        this.dsModel.favouriteId = favWithTotal.favourite.id;
+        this.dsModel.favouriteCount = favWithTotal.totalFavCount;
+      })
+    }else{
+      this.favouriteService.delete(this.dsModel.favouriteId, this.dsModel.id, this.objectType).subscribe(msg => {
+        this.dsModel.favouriteId = null;
+        this.dsModel.favouriteCount = msg.totalFavCount;
+      })
+    }
+  }
+
+  onBookmarkIconClick(){
+    let userId = Number(AuthUtils.getUser().id)
+    if(!this.dsModel.bookmarkId){
+      let bookmark = new Bookmark();
+      bookmark.userId = userId;
+      bookmark.objectType = this.objectType;
+      bookmark.objectId = this.dsModel.id;
+      this.bookmarkService.add(bookmark).subscribe(bm => {
+        this.dsModel.bookmarkId = bm.id;
+      })
+    }else{
+      this.bookmarkService.delete(this.dsModel.bookmarkId).subscribe(_ => {
+        this.dsModel.bookmarkId = null;
+      })
+    }
   }
 
   viewComments(){

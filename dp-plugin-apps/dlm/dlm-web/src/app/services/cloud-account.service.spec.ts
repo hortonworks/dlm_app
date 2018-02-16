@@ -43,6 +43,7 @@ describe('CloudAccountService', () => {
 
   describe('#addCloudAccount', () => {
     const cloudStore: AddCloudStoreRequestBody = {
+      id: 'S3Credential',
       accountDetails: {
         provider: 'S3',
         accountName: 'adffadff',
