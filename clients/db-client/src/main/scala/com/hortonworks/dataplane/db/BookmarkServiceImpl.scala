@@ -14,9 +14,9 @@ package com.hortonworks.dataplane.db
 import javax.inject.Singleton
 
 import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.db.Webservice.{BookmarkService}
+import com.hortonworks.dataplane.db.Webservice.BookmarkService
 import com.typesafe.config.Config
-import play.api.libs.json.{Json}
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,13 +42,13 @@ class BookmarkServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToBookmark)
   }
 
-  override def deleteById(userId: Long, bmId:Long): Future[String] = {
+  override def deleteById(userId: Long, bmId:Long): Future[JsObject] = {
     ws.url(s"$url/bookmarks/$bmId?userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .delete()
       .map{ res =>
         res.status match {
-          case 200 => (res.json \ "results").validate[String].get
+          case 200 => (res.json \ "results").validate[JsObject].get
           case _ =>
             val logMsg = s"Db-Client BookmarkServiceImpl: In deleteById, result status ${res.status} with user Id $userId and bookmark id $bmId"
             mapResponseToError(res,Option(logMsg))

@@ -16,6 +16,7 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities.Bookmark
 import domain.BookmarkRepo
 import play.api.Logger
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,13 +47,13 @@ class Bookmarks @Inject()(bookmarkRepo: BookmarkRepo)(implicit exec: ExecutionCo
   def deleteById(bmId: Long, userId: Long) = Action.async { req =>
     Logger.info("Bookmarks Controller: Received delete bookmark by id request")
     val numOfRowsDel = bookmarkRepo.deleteById(userId,bmId)
-    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmark with bookmark Id $bmId failed with message ${e.getMessage}",e)))
+    numOfRowsDel.map(i => success(Json.obj("rows Deleted"->i))).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmark with bookmark Id $bmId failed with message ${e.getMessage}",e)))
   }
 
   def deleteByObjectRef(objectId: Long, objectType: String)= Action.async { req =>
     Logger.info("Bookmarks Controller: Received delete bookmark by object reference request")
     val numOfRowsDel = bookmarkRepo.deleteByobjectRef(objectId, objectType)
-    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmarks with ojbect Id $objectId and object type $objectType failed with message ${e.getMessage}",e)))
+    numOfRowsDel.map(i => success(Json.obj("rows Deleted"->i))).recoverWith(apiErrorWithLog(e => Logger.error(s"Bookmarks Controller: Deleting bookmarks with ojbect Id $objectId and object type $objectType failed with message ${e.getMessage}",e)))
   }
 
 }

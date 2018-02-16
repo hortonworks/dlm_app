@@ -59,7 +59,7 @@ class Favourites @Inject()(favouriteRepo: FavouriteRepo)(implicit exec: Executio
   def deleteByObjectRef(objectId: Long, objectType: String) = Action.async { req =>
     Logger.info("Favourites Controller: Received delete favourite by object Id request")
     val numOfRowsDel = favouriteRepo.deleteByobjectRef(objectId, objectType)
-    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiErrorWithLog(e => Logger.error(s"Favourites Controller: Deleting favourites with object Id $objectId  and object Type $objectType failed with message ${e.getMessage}",e)))
+    numOfRowsDel.map(i => success(Json.obj("rows Deleted"->i))).recoverWith(apiErrorWithLog(e => Logger.error(s"Favourites Controller: Deleting favourites with object Id $objectId  and object Type $objectType failed with message ${e.getMessage}",e)))
   }
 
 }

@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
+import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities._
 import domain.API.AlreadyExistsError
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -178,20 +179,20 @@ class DatasetRepo @Inject()(
 
   private def getFavIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, favId),res) <- favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === "assetCollection")).groupBy(a => (a.objectId, a.id))
+      ((datasetId, favId),res) <- favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => (a.objectId, a.id))
     } yield (datasetId, favId)
   }
 
   private def getBookmarkIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, bmId),res) <- bookmarkRepo.Bookmarks.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === "assetCollection")).groupBy(a => (a.objectId, a.id))
+      ((datasetId, bmId),res) <- bookmarkRepo.Bookmarks.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => (a.objectId, a.id))
     } yield (datasetId, bmId)
   }
 
   private def getFavCounts(datasetIds: Seq[Long], userId: Long) = {
     for {
       (datasetId, favs) <- {
-        favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.objectType === "assetCollection")).groupBy(a => a.objectId)
+        favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => a.objectId)
       }
     } yield (datasetId, favs.length)
   }
@@ -301,9 +302,9 @@ class DatasetRepo @Inject()(
           }
         }
         val datasetWithCategoriesMap = result._3.groupBy(_._1).mapValues(_.map(_._2))
-        val favIdMap: Map[Long, List[Option[Long]]] = result._4.groupBy(_._1).mapValues(_.map(_._2))
-        val favCountMap = result._5.groupBy(_._1).mapValues(_.map(_._2))
-        val bmIdMap: Map[Long, List[Option[Long]]] = result._6.groupBy(_._1).mapValues(_.map(_._2))
+        val favIdMap: Map[Long, Option[Long]] = result._4.groupBy(_._1).mapValues(_.map(_._2).head)
+        val favCountMap = result._5.groupBy(_._1).mapValues(_.map(_._2).head)
+        val bmIdMap: Map[Long, Option[Long]] = result._6.groupBy(_._1).mapValues(_.map(_._2).head)
 
         result._1.map {
           case (dataset, user, cluster, clusterId) =>
@@ -314,25 +315,14 @@ class DatasetRepo @Inject()(
               cluster,
               clusterId.get,
               datasetWithAssetCountMap.getOrElse(dataset.id.get, Nil),
-              getIdValueFromMap(favIdMap,dataset.id.get),
-              getCountValueFromMap(favCountMap,dataset.id.get),
-              getIdValueFromMap(bmIdMap,dataset.id.get)
+              favIdMap.get(dataset.id.get).flatten,
+              favCountMap.get(dataset.id.get),
+              bmIdMap.get(dataset.id.get).flatten
             )
         }.toSeq
     }
   }
 
-  private def getIdValueFromMap(objectMap: Map[Long, List[Option[Long]]], datasetId: Long): Option[Long] ={
-    objectMap.get(datasetId).map { valList =>
-      valList(0)
-    }.getOrElse(None)
-  }
-
-  private def getCountValueFromMap(objectMap: Map[Long, List[Int]], datasetId: Long): Option[Int] ={
-    objectMap.get(datasetId).map { valList =>
-      Some(valList(0))
-    }.getOrElse(None)
-  }
 
   def getRichDataSet(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId:Long): Future[Seq[RichDataset]] = {
     getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id)), paginatedQuery, searchText, Some(userId))

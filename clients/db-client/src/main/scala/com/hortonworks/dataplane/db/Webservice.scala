@@ -257,7 +257,7 @@ object Webservice {
 
     def add(bookmark: Bookmark): Future[Bookmark]
 
-    def deleteById(userId: Long, bmId:Long): Future[String]
+    def deleteById(userId: Long, bmId:Long): Future[JsObject]
 
   }
 
