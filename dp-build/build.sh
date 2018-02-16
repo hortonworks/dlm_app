@@ -125,6 +125,17 @@ build_cluster_service() {
 	popd
 }
 
+replace_ga_tracking_id(){
+   # $GA_TRACKING_ID read from ENV VAR
+   sed -i.bak -e "s/TRACKING_ID/$DP_GA_TRACKING_ID/g" ../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql
+   if ! diff "../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql" "../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql.bak" &> /dev/null; then
+     echo "Replaced Google Analytics Tracking ID"
+   else
+    echo "Failed. Could not replace Google Analytics Tracking ID"
+   fi
+   rm ../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql.bak
+}
+
 build_migrate() {
 	log "Building dp-migrate"
 
@@ -204,6 +215,7 @@ build_dp_web
 build_knox_agent
 build_dp_knox
 build_cluster_service
+replace_ga_tracking_id
 build_migrate
 build_legalese
 build_installer

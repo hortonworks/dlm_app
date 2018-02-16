@@ -22,7 +22,7 @@ import {LDAPProperties, LDAPUpdateProperties} from '../models/ldap-properties';
 export class ConfigurationService {
   uri = 'api/init';
   knowConfigUri = 'api/knox';
-  gaConfigUri = 'api/ga/properties';
+  gaConfigUri = 'api/config/dps.ga.tracking.enabled';
 
   constructor(private http:Http) { }
 
@@ -66,7 +66,7 @@ export class ConfigurationService {
       .catch(HttpUtil.handleError);
   }
 
-  getGAProperties() : Observable<boolean>{
+  getGATrackingStatus() : Observable<boolean>{
     return this.http.get(`${this.gaConfigUri}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);

@@ -21,9 +21,9 @@ var userAgent = navigator.userAgent.toLowerCase();
 
 $(document).ready(function () {
     var originalUrl = get("originalUrl");
-    var url = originalUrl + (originalUrl.substr(-1) === '/'? '':'/') + 'api/ga/properties';
+    var url = originalUrl + (originalUrl.substr(-1) === '/'? '':'/') + 'api/config/dps.ga.tracking.enabled';
     $.get(url, function (res) {
-        if(res.enabled === true){
+        if(res.value === "true"){
             $("#tracking-message").html("Hortonworks DataPlane Service uses cookies and other telemetry mechanisms to improve the product and your experience. By logging in, you give consent to Hortonworks to use cookies. To learn more, please review our <a href='https://hortonworks.com/privacy-policy/' target='_blank'>Privacy Policy</a>");
         }else{
             $("#tracking-message").html("")
