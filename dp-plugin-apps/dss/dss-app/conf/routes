@@ -11,10 +11,12 @@ GET     /metrics                                              controllers.Status
 POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String)
 GET           /api/query-attributes                                  controllers.QueryAttributes.list(clusterId: String)
 
+
 # DatasetTags
 # ===========================================
 GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search: Option[String])
 GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName: String)
+GET           /api/dataset/:datasetId/atlas-tags                     controllers.DataSets.getUniqueTagsFromAssetsOfDataset(datasetId: String)
 
 GET           /api/assets/auditMockStatus                            controllers.QueryAttributes.checkAuditMockStatus
 GET           /api/assets/details/:clusterId/:atlasGuid              controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)

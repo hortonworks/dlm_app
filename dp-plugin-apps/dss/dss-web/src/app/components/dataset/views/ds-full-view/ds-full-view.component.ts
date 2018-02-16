@@ -14,6 +14,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import * as DialogPolyfill from 'dialog-polyfill';
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
+import {DsTagsService} from "../../services/dsTagsService";
 import {DataSetService} from "../../../../services/dataset.service";
 import {
   AssetListActionsEnum,
@@ -38,9 +39,11 @@ export class DsFullView implements OnInit {
   showSummary : boolean = true;
   selectionAllowed : boolean = false;
   showPopup: boolean = false;
+  systemTags: string[] = [];
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
+              private tagService: DsTagsService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -55,7 +58,12 @@ export class DsFullView implements OnInit {
         this.dsAssetQueryModel = new AssetSetQueryModel([
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
+        this.tagService.listAtlasTags(+params["id"]).subscribe(tags => this.systemTags=tags)
       });
+  }
+  updateDsModel = (rData) => {
+    this.dsModel = rData;
+    this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
   }
 
   private onAction(action: AssetListActionsEnum) {
@@ -85,18 +93,14 @@ export class DsFullView implements OnInit {
     console.log("Remove all called!!!")
     this.richDatasetService
       .deleteAllAssets(this.dsModel.id)
-      .subscribe(rData => {
-        this.dsModel = rData;
-      })
+      .subscribe(this.updateDsModel)
   }
   actionRemoveSelected (ids:string[]) {
     console.log("Remove selected called!!!")
     if(!ids.length) return console.log("cannot remove without selection")
     this.richDatasetService
       .deleteSelectedAssets(this.dsModel.id, ids)
-      .subscribe(rData => {
-        this.dsModel = rData;
-      })
+      .subscribe(this.updateDsModel)
   }
 
 
@@ -140,7 +144,7 @@ export class DsFullView implements OnInit {
       futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
     
     futureRdataSet.subscribe(rData => {
-        this.dsModel = rData;
+        this.updateDsModel(rData)
         // this.assetSetQueryModelsForAddition.push(asqm);
         this.showPopup = false;
       })

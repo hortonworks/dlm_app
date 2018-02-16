@@ -262,10 +262,15 @@
     margin-bottom: 5px;
 }
 
+.value {
+  display: flex;
+  flex-wrap: wrap;  
+}
+
 .color-tag {
     padding: 2px 3px;
     border-radius: 2px;
-    margin-right: 5px;
+    margin: 0px 5px 5px 0px;
 }
 
 .color-b {
@@ -273,4 +278,8 @@
     background: #a089b7;
 }
 
+.color-c {
+    color: #fff;
+    background: #e17361;
+}
 

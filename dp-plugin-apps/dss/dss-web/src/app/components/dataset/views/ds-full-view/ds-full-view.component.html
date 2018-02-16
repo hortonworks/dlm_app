@@ -25,7 +25,7 @@
     <div class="flex-side flex-side-right hwx-white-bg" >
 
         <div class="grapic-holder" style="height: 83px;">
-            <img src="http://uxmocks.eng.hortonworks.com/mocks/dss/assets/datasets/fortune_100_companies.png" alt="Fortune 100 Companies">
+            <img src="assets/images/collection-banners/red1.png" alt="Fortune 100 Companies">
             <span class="rating">4.1 <i class="fa fa-star"></i></span>
         </div>
         <div class="flex-grid flex-summary">
@@ -55,6 +55,12 @@
                 <span class="value">
                     <span class="color-tag color-b" *ngFor="let tag of dsModel.tags">{{tag}}</span>
                 </span>
+            </div>
+            <div class="flex-summary-item" *ngIf="systemTags.length">
+                <span class="key">System Tags</span>
+                <div class="value">
+                    <span class="color-tag color-c" *ngFor="let tag of systemTags">{{tag}}</span>
+                </div>
             </div>
             <div class="flex-summary-item">
                 <span class="key">Created On</span>
