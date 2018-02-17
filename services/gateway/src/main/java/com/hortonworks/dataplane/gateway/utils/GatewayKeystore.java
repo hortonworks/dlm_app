@@ -11,6 +11,7 @@
 package com.hortonworks.dataplane.gateway.utils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -63,9 +64,10 @@ public class GatewayKeystore {
   }
 
   private PrivateKey readPrivate() {
+    PEMParser pemParser = null;
     try {
       Security.addProvider(new BouncyCastleProvider());
-      PEMParser pemParser = new PEMParser(new StringReader(getKeyFileAsString(this.privateKeyPath)));
+      pemParser = new PEMParser(new StringReader(getKeyFileAsString(this.privateKeyPath)));
       PKCS8EncryptedPrivateKeyInfo encryptedKeyInfo = (PKCS8EncryptedPrivateKeyInfo) pemParser.readObject();
 
       JceOpenSSLPKCS8DecryptorProviderBuilder jce = new JceOpenSSLPKCS8DecryptorProviderBuilder();
@@ -84,6 +86,8 @@ public class GatewayKeystore {
     } catch (PKCSException e) {
       logger.error("Exception", e);
       throw new RuntimeException(e);
+    } finally {
+      IOUtils.closeQuietly(pemParser);
     }
   }
 
