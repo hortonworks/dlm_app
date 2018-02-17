@@ -221,7 +221,7 @@ export class ClusterAddComponent implements OnInit {
     if(!err){
       this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
     }else{
-      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.' + err.code);
     }
   }
 
