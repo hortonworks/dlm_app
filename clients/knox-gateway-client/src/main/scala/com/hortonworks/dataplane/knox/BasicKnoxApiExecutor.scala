@@ -11,6 +11,8 @@
 
 package com.hortonworks.dataplane.knox
 
+import java.net.ConnectException
+
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, WrappedErrorException}
 import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
 import play.api.libs.ws.WSClient
@@ -33,12 +35,15 @@ class BasicKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExecutor{
       .map { res =>
         res.status match {
           case 200 => res.json.validate[TokenResponse].get
-          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.knox.public-key-corrupted"))
-          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.knox.ranger-rights-unavailable"))
-          case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.knox.configuration-error"))
-          case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.knox.public-key-corrupted"))
-          case _ => throw WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.knox.genric"))
+          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
+          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.status.knox.ranger-rights-unavailable"))
+          case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.status.knox.configuration-error"))
+          case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
+          case _ => throw WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.status.knox.genric"))
         }
+      }
+      .recoverWith {
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.knox.connection-refused"))
       }
   }
 

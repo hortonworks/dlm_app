@@ -88,7 +88,7 @@ class StatusRoute @Inject()(val ws: WSClient,
   private def constructUrl(urlString: String): Try[URL] =
     Try(new URL(urlString))
       .recoverWith {
-        case ex: MalformedURLException => Failure(WrappedErrorException(Error(500, "Host is unreachable.", "cluster.ambari.unreachable-host-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
+        case ex: MalformedURLException => Failure(WrappedErrorException(Error(500, "Host is unreachable.", "cluster.ambari.status.unreachable-host-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
       }
 
   /**
@@ -103,8 +103,8 @@ class StatusRoute @Inject()(val ws: WSClient,
   private def probeNetwork(url: URL): Try[InetAddress] = {
     Try(InetAddress.getByName(url.getHost))
       .recoverWith {
-        case ex: UnknownHostException => Failure(WrappedErrorException(Error(500, "Unable to resolve host.", "cluster.ambari.dns", trace = Some(ExceptionUtils.getStackTrace(ex)))))
-        case ex: IOException => Failure(WrappedErrorException(Error(500, "Host is unreachable.", "cluster.ambari.unreachable-host-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
+        case ex: UnknownHostException => Failure(WrappedErrorException(Error(500, "Unable to resolve host.", "cluster.ambari.status.dns-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
+        case ex: IOException => Failure(WrappedErrorException(Error(500, "Host is unreachable.", "cluster.ambari.status.unreachable-host-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
       }
   }
 
@@ -126,7 +126,7 @@ class StatusRoute @Inject()(val ws: WSClient,
             // This could be Knox or Ambari
             response.json.validate[AmbariForbiddenResponse] match {
               case ambariResponse: JsSuccess[AmbariForbiddenResponse] => ambariResponse.get.jwtProviderUrl
-              case _: JsError => throw WrappedErrorException(Error(500, "Unable to deserialize JSON. Is there a non-transparent proxy in front of Ambari/Knox?.", "cluster.ambari.invalid-json-response"))
+              case _: JsError => throw WrappedErrorException(Error(500, "Unable to deserialize JSON. Is there a non-transparent proxy in front of Ambari/Knox?.", "cluster.ambari.status.invalid-json-response"))
             }
           }
           case 401 => {
@@ -139,14 +139,14 @@ class StatusRoute @Inject()(val ws: WSClient,
                 logger.info(s"$endpoint is an HD Insight cluster. We would be using basic authentication with this.")
                 None
               }
-              case _ => throw WrappedErrorException(Error(500, "We recieved an unexpected response from cluster. The cluster returned a 401 and hence should have been an HD Insight cluster, but was not.", "cluster.ambari.unexpected-response-hd-insight"))
+              case _ => throw WrappedErrorException(Error(500, "We recieved an unexpected response from cluster. The cluster returned a 401 and hence should have been an HD Insight cluster, but was not.", "cluster.ambari.status.unexpected-response-hd-insight"))
             }
           }
-          case _ => throw WrappedErrorException(Error(500, s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}", "cluster.ambari.unexpected-response-for-prereq-call"))
+          case _ => throw WrappedErrorException(Error(500, s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}", "cluster.ambari.status.unexpected-response-for-prereq-call"))
         }
       }
       .recoverWith {
-        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.connection-refused"))
       }
   }
 
@@ -173,15 +173,15 @@ class StatusRoute @Inject()(val ws: WSClient,
       .map { res =>
         res.status match {
           case 200 => res.json
-          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.knox.public-key-corrupted"))
-          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.knox.ranger-rights-unavailable"))
-          case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.knox.configuration-error"))
-          case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.knox.public-key-corrupted"))
-          case _ => throw WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.knox.genric"))
+          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
+          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.status.knox.ranger-rights-unavailable"))
+          case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.status.knox.configuration-error"))
+          case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
+          case _ => throw WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.status.knox.genric"))
         }
       }
       .recoverWith {
-        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.knox.connection-refused"))
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.knox.connection-refused"))
       }
   }
 
@@ -199,7 +199,7 @@ class StatusRoute @Inject()(val ws: WSClient,
         .map { credential =>
           (credential.user, credential.pass) match {
             case (Some(username), Some(password)) => (username, password)
-            case _ => throw new WrappedErrorException(Error(500, "There is no credential configured for Ambari default user", "cluster.ambari.credential-not-found"))
+            case _ => throw new WrappedErrorException(Error(500, "There is no credential configured for Ambari default user", "cluster.ambari.status.raw.credential-not-found"))
           }
         }
       .flatMap { case (username, password) =>
@@ -211,15 +211,15 @@ class StatusRoute @Inject()(val ws: WSClient,
       .map{ response =>
         response.status match {
           case 200 => response.json
-          case 401 => throw WrappedErrorException(Error(401, "User needs to be authenticated.", "cluster.ambari.check.unauthorized"))
-          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please log-in as another user.", "cluster.ambari.knox.check.forbidden"))
-          case 404 => throw WrappedErrorException(Error(404, "We were unable to find the enpoint you were querying.", "cluster.ambari.check.not-found"))
-          case 500 => throw WrappedErrorException(Error(500, "An internal server error occurred.", "cluster.ambari.check.server-error"))
-          case _ => throw WrappedErrorException(Error(500, "Unknown error.", "cluster.ambari.check.generic"))
+          case 401 => throw WrappedErrorException(Error(401, "User needs to be authenticated.", "cluster.ambari.status.raw.unauthorized"))
+          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please log-in as another user.", "cluster.ambari.status.raw.forbidden"))
+          case 404 => throw WrappedErrorException(Error(404, "We were unable to find the enpoint you were querying.", "cluster.ambari.status.raw.not-found"))
+          case 500 => throw WrappedErrorException(Error(500, "An internal server error occurred.", "cluster.ambari.status.raw.server-error"))
+          case _ => throw WrappedErrorException(Error(500, "Unknown error.", "cluster.ambari.status.raw.generic"))
         }
     }
     .recoverWith {
-      case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.check.connection-refused"))
+      case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.raw.connection-refused"))
     }
   }
 
@@ -229,7 +229,7 @@ class StatusRoute @Inject()(val ws: WSClient,
 //        knox
         val tokenTryable = Try(request.getHeader(Constants.DPTOKEN).get.value)
           .recoverWith {
-            case ex: NoSuchElementException => throw WrappedErrorException(Error(400, "Ambari was Knox protected but no JWT token was sent with request", "cluster.ambari.jwt-token-missing"))
+            case ex: NoSuchElementException => throw WrappedErrorException(Error(400, "Ambari was Knox protected but no JWT token was sent with request", "cluster.ambari.status.knox.jwt-token-missing"))
           }
 
         for{
