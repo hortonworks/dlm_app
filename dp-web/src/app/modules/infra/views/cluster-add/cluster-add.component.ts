@@ -218,9 +218,11 @@ export class ClusterAddComponent implements OnInit {
     this._isClusterValidateSuccessful = false;
     this._isClusterValidateInProgress = false;
     this.showError = true;
-    if(!err){
+    if(!err) {
       this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
-    }else{
+    } else if(err.code === 'generic' && err.message) {
+      this.errorMessage = err.message;
+    } else {
       this.errorMessage = this.translateService.instant(`error.${err.code}`);
     }
   }

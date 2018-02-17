@@ -32,24 +32,15 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
   import domain.API._
 
   def all = Action.async { request =>
-    if (!request.getQueryString("ambariIp").isEmpty) {
-      val amabariIp = request.getQueryString("ambariIp").get
+    if (!request.getQueryString("ambariUrl").isEmpty) {
+      val ambariUrl = request.getQueryString("ambariUrl").get
       dpClusterRepo
-        .findByAmbariIp(amabariIp)
-        .map { dlo =>
-          dlo
-            .map { dl =>
-              success(linkData(dl, makeLink(dl)))
-            }
-            .getOrElse(NotFound)
-        }
+        .findByAmbariUrl(ambariUrl)
+        .map { _.map { dl => success(linkData(dl, makeLink(dl)))}.getOrElse(NotFound) }
         .recoverWith(apiError)
     } else {
       dpClusterRepo.all
-        .map { dl =>
-          val datums = dl.map(d => linkData(d, makeLink(d)))
-          success(datums)
-        }
+        .map { dl => success(dl.map(d => linkData(d, makeLink(d)))) }
         .recoverWith(apiError)
     }
   }

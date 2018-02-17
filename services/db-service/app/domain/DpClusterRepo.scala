@@ -78,10 +78,10 @@ class DpClusterRepo @Inject()(
     db.run(DataplaneClusters.filter(_.id === dpClusterId).result.headOption)
   }
 
-  def findByAmbariIp(ambariIp: String): Future[Option[DataplaneCluster]] = {
+  def findByAmbariUrl(ambariUrl: String): Future[Option[DataplaneCluster]] = {
     db.run(
       DataplaneClusters
-        .filter(_.ambariIpAddress === ambariIp)
+        .filter(_.ambariUrl === ambariUrl)
         .result
         .headOption)
   }

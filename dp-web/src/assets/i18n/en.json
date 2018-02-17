@@ -450,6 +450,10 @@
     "cluster.ambari.status.raw.connection-refused": "Connection to remote address was refused.",
     "cluster.ambari.status.raw.generic": "Unknown error while communicating with Ambari.",
 
-    "cluster.ambari.status.generic": "Generic error while communicating to Ambari."
+    "cluster.ambari.status.generic": "Generic error while communicating to Ambari.",
+
+    "core.ambari.status.already-added": "This Ambari cluster has already been added.",
+
+    "generic": "An unexpected error occured"
   }
 }

@@ -193,7 +193,7 @@ object Webservice {
 
     def retrieveServiceInfo(dpClusterId: String): Future[Either[Errors, Seq[ClusterData]]]
 
-    def checkExistenceByIp(ambariIp: String): Future[Either[Errors, Boolean]]
+    def checkExistenceByUrl(ambariUrl: String): Future[Either[Errors, Boolean]]
 
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]

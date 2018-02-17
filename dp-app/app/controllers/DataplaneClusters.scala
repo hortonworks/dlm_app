@@ -146,13 +146,23 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def ambariCheck = AuthenticatedAction.async { request =>
+  def ambariCheck(url: String) = AuthenticatedAction.async { request =>
     implicit val token = request.token
     ambariService
-      .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
-      .map {
-        case Left(errors) => InternalServerError(Json.toJson(errors))
-        case Right(checkResponse) => Ok(Json.toJson(checkResponse))
+      .statusCheck(AmbariEndpoint(url))
+      .flatMap {
+        case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
+        case Right(checkResponse) => {
+          dpClusterService.checkExistenceByUrl(url).map {
+            case Left(errors) => InternalServerError(Json.toJson(errors))
+            case Right(status) =>
+              if(status){
+                InternalServerError(Json.toJson(Errors(Seq(Error(500, "This Ambari cluster has already been added.", "core.ambari.status.already-added")))))
+              } else {
+                Ok(Json.toJson(checkResponse))
+              }
+          }
+        }
       }
   }
 
