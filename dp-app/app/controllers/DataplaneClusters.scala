@@ -150,20 +150,9 @@ class DataplaneClusters @Inject()(
     implicit val token = request.token
     ambariService
       .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
-      .flatMap {
-        case Left(errors) =>
-          Future.successful(InternalServerError(Json.toJson(errors)))
-        case Right(checkResponse) =>{
-          dpClusterService.checkExistenceByIp(checkResponse.ambariIpAddress).map{
-            case Left(errors) => InternalServerError(JsonResponses.statusError(errors.errors.head.message))
-            case Right(status) =>
-              if(status){
-                Ok(Json.obj("alreadyExists" -> true))
-              }else{
-                Ok(Json.toJson(checkResponse))
-              }
-          }
-        }
+      .map {
+        case Left(errors) => InternalServerError(Json.toJson(errors))
+        case Right(checkResponse) => Ok(Json.toJson(checkResponse))
       }
   }
 
