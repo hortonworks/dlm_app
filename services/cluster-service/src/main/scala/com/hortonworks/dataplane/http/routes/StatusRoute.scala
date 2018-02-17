@@ -173,7 +173,7 @@ class StatusRoute @Inject()(val ws: WSClient,
       .map { res =>
         res.status match {
           case 200 => res.json
-          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
+          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth"))
           case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.status.knox.ranger-rights-unavailable"))
           case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.status.knox.configuration-error"))
           case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
@@ -308,7 +308,7 @@ class StatusRoute @Inject()(val ws: WSClient,
                 logger.info("ex", ex)
                 ex match {
                   case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
-                  case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "Generic error while communicating with Ambari.", ex))
+                  case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.status.generic", "Generic error while communicating with Ambari.", ex))
                 }
 
             }

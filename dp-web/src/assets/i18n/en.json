@@ -425,5 +425,31 @@
   "titles": {
     "core": "DataPlane Service",
     "dss": "Data Steward Studio"
+  },
+  "error": {
+    "cluster.ambari.status.unreachable-host-error": "Host is unreachable.",
+    "cluster.ambari.status.dns-error": "Unable to resolve host.",
+    "cluster.ambari.status.invalid-json-response": "Unable to deserialize JSON. Is there a non-transparent proxy in front of Ambari/Knox?.",
+    "cluster.ambari.status.unexpected-response-hd-insight": "We recieved an unexpected response from cluster. The cluster returned a 401 and hence should have been an HD Insight cluster, but was not.",
+    "cluster.ambari.status.unexpected-response-for-prereq-call": "Unexpected Response from Ambari, expected 403 or 401.",
+    "cluster.ambari.status.connection-refused": "Connection to remote address was refused.",
+
+    "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth": "Knox token or the certificate on cluster might be corrupted.",
+    "cluster.ambari.status.knox.ranger-rights-unavailable": "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.",
+    "cluster.ambari.status.knox.configuration-error": "Knox token topology is not validated and deployment descriptor is not created.",
+    "cluster.ambari.status.knox.public-key-corrupted": "Knox certificate on cluster might be corrupted.",
+    "cluster.ambari.status.knox.connection-refused": "Connection to remote address was refused.",
+    "cluster.ambari.status.knox.jwt-token-missing": "Ambari was Knox protected but no JWT token was sent with request.",
+    "cluster.ambari.status.knox.genric": "Unknown error. Server returned an expected response",
+
+    "cluster.ambari.status.raw.credential-not-found": "There is no credential configured for Ambari default user",
+    "cluster.ambari.status.raw.unauthorized": "User needs to be authenticated.",
+    "cluster.ambari.status.raw.forbidden": "User does not have required rights. Please log-in as another user.",
+    "cluster.ambari.status.raw.not-found": "We were unable to find the enpoint you were querying.",
+    "cluster.ambari.status.raw.server-error": "An internal server error occurred.",
+    "cluster.ambari.status.raw.connection-refused": "Connection to remote address was refused.",
+    "cluster.ambari.status.raw.generic": "Unknown error while communicating with Ambari.",
+
+    "cluster.ambari.status.generic": "Generic error while communicating to Ambari."
   }
 }

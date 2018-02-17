@@ -35,7 +35,7 @@ class BasicKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExecutor{
       .map { res =>
         res.status match {
           case 200 => res.json.validate[TokenResponse].get
-          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
+          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth"))
           case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.status.knox.ranger-rights-unavailable"))
           case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.status.knox.configuration-error"))
           case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
