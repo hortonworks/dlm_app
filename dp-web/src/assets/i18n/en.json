@@ -259,9 +259,6 @@
         "invalidGroupInput": "One or more group names are invalid. You must select a name from the dropdown options that appear as you type in the Group Names field.",
         "loadServiceError": "Could not fetch Data Plane Services information from Ambari",
         "backenderrors":{
-          "Url": "This is not a valid Ambari URL. Please enter a valid Ambari URL.",
-          "Ambari": "There was an error fetching information from Ambari.",
-          "Network": "There was a network error when connecting to Ambari.",
           "General": "DataPlane could not connect to the Ambari cluster. Information may not be up to date."
         },
         "rolesOverrideWarning":"This will override any roles the user acquired as part of groups",
