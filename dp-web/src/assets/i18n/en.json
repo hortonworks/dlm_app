@@ -454,6 +454,8 @@
 
     "core.ambari.status.already-added": "This Ambari cluster has already been added.",
 
-    "generic": "An unexpected error occured"
+    "database.generic": "An expected error occured with database.",
+
+    "generic": "An unexpected error occured."
   }
 }

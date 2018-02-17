@@ -220,10 +220,13 @@ export class ClusterAddComponent implements OnInit {
     this.showError = true;
     if(!err) {
       this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
-    } else if(err.code === 'generic' && err.message) {
-      this.errorMessage = err.message;
     } else {
-      this.errorMessage = this.translateService.instant(`error.${err.code}`);
+      let message = this.translateService.instant(`error.${err.code}`);
+      if(message === `error.${err.code}` || (err.code === 'generic' && err.message)) {
+        // no localized message configured
+        message = err.message;
+      }
+      this.errorMessage = message;
     }
   }
 
