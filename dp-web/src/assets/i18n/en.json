@@ -440,6 +440,7 @@
     "cluster.ambari.status.knox.public-key-corrupted": "Knox certificate on cluster might be corrupted.",
     "cluster.ambari.status.knox.connection-refused": "Connection to remote address was refused.",
     "cluster.ambari.status.knox.jwt-token-missing": "Ambari was Knox protected but no JWT token was sent with request.",
+    "cluster.ambari.status.knox.tls-error": "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.",
     "cluster.ambari.status.knox.genric": "Unknown error. Server returned an expected response",
 
     "cluster.ambari.status.raw.credential-not-found": "There is no credential configured for Ambari default user",
@@ -448,6 +449,7 @@
     "cluster.ambari.status.raw.not-found": "We were unable to find the enpoint you were querying.",
     "cluster.ambari.status.raw.server-error": "An internal server error occurred.",
     "cluster.ambari.status.raw.connection-refused": "Connection to remote address was refused.",
+    "cluster.ambari.status.raw.tls-error": "TLS error. Please ensure your Ambari server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.",
     "cluster.ambari.status.raw.generic": "Unknown error while communicating with Ambari.",
 
     "cluster.ambari.status.generic": "Generic error while communicating to Ambari.",

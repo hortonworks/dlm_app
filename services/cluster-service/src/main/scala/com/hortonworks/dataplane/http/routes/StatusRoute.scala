@@ -15,6 +15,7 @@ import java.io.IOException
 import java.net._
 import java.util.Collections
 import javax.inject.Inject
+import javax.net.ssl.SSLException
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
@@ -181,6 +182,7 @@ class StatusRoute @Inject()(val ws: WSClient,
         }
       }
       .recoverWith {
+        case ex: SSLException => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.knox.tls-error"))
         case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.knox.connection-refused"))
       }
   }
@@ -219,6 +221,7 @@ class StatusRoute @Inject()(val ws: WSClient,
         }
     }
     .recoverWith {
+      case ex: SSLException => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Ambari server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.raw.tls-error"))
       case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.raw.connection-refused"))
     }
   }
