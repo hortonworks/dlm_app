@@ -22,7 +22,7 @@ import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
 import com.hortonworks.dataplane.db.Webservice._
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
-import play.api.libs.json.{Json, __}
+import play.api.libs.json.{Json, Reads, __}
 import services.UtilityService
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataAssetService, DataSetCategoryService, DataSetService}
@@ -349,7 +349,7 @@ class DataSets @Inject()(
       .validate[Dataset]
       .map { dataset =>
         val loggedinUser = request.user.id.get
-        if(loggedinUser != dataset.createdBy) Future.successful(Unauthorized("this user is not authorized to perform this action"))
+        if(loggedinUser != dataset.createdBy.get) Future.successful(Unauthorized("this user is not authorized to perform this action"))
         else{
           dataSetService
             .updateDataset(datasetId, dataset)
@@ -420,14 +420,14 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def listCategoriesCount(search: Option[String]) =  Action.async {
-      categoryService
-        .listWithCount(search)
-        .map {
-          case Left(errors) =>
-            InternalServerError(Json.toJson(errors))
-          case Right(categories) => Ok(Json.toJson(categories))
-        }
+  def listCategoriesCount(search: Option[String]) =  AuthenticatedAction.async { req =>
+    categoryService
+      .listWithCount(search, req.user.id.get)
+      .map {
+        case Left(errors) =>
+          InternalServerError(Json.toJson(errors))
+        case Right(categories) => Ok(Json.toJson(categories))
+      }
   }
 
   def getCategoryCount(categoryId: String) = Action.async {

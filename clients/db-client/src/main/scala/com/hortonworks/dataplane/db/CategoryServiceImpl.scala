@@ -44,9 +44,9 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCategories)
   }
 
-  def listWithCount(search: Option[String]): Future[Either[Errors, Seq[CategoryCount]]] = {
-    val countUrl = s"$url/categoriescount"
-    val countUrlWithSearch = search.map(s => s"$countUrl?search=$s").getOrElse(countUrl)
+  def listWithCount(search: Option[String], userId: Long): Future[Either[Errors, Seq[CategoryCount]]] = {
+    val countUrl = s"$url/categoriescount?userId=$userId"
+    val countUrlWithSearch = search.map(s => s"$countUrl&search=$s").getOrElse(countUrl)
     ws.url(countUrlWithSearch)
       .withHeaders("Accept" -> "application/json")
       .get()

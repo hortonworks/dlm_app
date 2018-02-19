@@ -22,7 +22,8 @@ export class DataSet {
   lastModified?: any;
   active?: Boolean;
   version?: number;
-
+  customProps?: any;
+  sharedStatus?: number = 1;
 }
 
 export class DataSetAndCategories {
