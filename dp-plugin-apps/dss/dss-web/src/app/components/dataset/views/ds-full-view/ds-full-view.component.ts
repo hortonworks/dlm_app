@@ -96,8 +96,7 @@ export class DsFullView implements OnInit {
       .subscribe(this.updateDsModel)
   }
   actionRemoveSelected (ids:string[]) {
-    console.log("Remove selected called!!!")
-    if(!ids.length) return console.log("cannot remove without selection")
+    if(!ids.length) return;
     this.richDatasetService
       .deleteSelectedAssets(this.dsModel.id, ids)
       .subscribe(this.updateDsModel)
