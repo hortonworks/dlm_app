@@ -127,13 +127,22 @@ build_cluster_service() {
 
 replace_ga_tracking_id(){
    # $GA_TRACKING_ID read from ENV VAR
-   sed -i.bak -e "s/TRACKING_ID/$DP_GA_TRACKING_ID/g" ../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql
-   if ! diff "../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql" "../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql.bak" &> /dev/null; then
-     echo "Replaced Google Analytics Tracking ID"
+   # do nothing if not defined
+   if [ -z "$DP_GA_TRACKING_ID" ]; then
+	echo "Google Analytics Tracking ID was not available in ENV. Please update to ensure GA works."
    else
-    echo "Failed. Could not replace Google Analytics Tracking ID"
+	sed \
+		-i.bak \
+		-e "s/TRACKING_ID/$DP_GA_TRACKING_ID/g" \
+		${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/migrations/V9__dataplane_insert_config_ga_tracking.sql
+
+	if ! diff "${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/migrations/V9__dataplane_insert_config_ga_tracking.sql" "${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/migrations/V9__dataplane_insert_config_ga_tracking.sql.bak" &> /dev/null; then
+		echo "Replaced Google Analytics Tracking ID"
+	else
+		echo "Failed. Could not replace Google Analytics Tracking ID"
+	fi
+	rm ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/migrations/V9__dataplane_insert_config_ga_tracking.sql.bak
    fi
-   rm ../services/db-service/db/migrations/V10__dataplane_insert_config_ga_tracking_id.sql.bak
 }
 
 build_migrate() {
@@ -207,18 +216,18 @@ else
 	echo "Running regular build, IS_JENKINS=${IS_JENKINS}"
 fi
 clean_build
-build_dp
-build_dp_gateway
-build_db_service
-build_dp_app
-build_dp_web
-build_knox_agent
-build_dp_knox
-build_cluster_service
-replace_ga_tracking_id
+# build_dp
+# build_dp_gateway
+# build_db_service
+# build_dp_app
+# build_dp_web
+# build_knox_agent
+# build_dp_knox
+# build_cluster_service
 build_migrate
+replace_ga_tracking_id
 build_legalese
 build_installer
-zip_dp_binaries
+# zip_dp_binaries
 log "All done"
 
