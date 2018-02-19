@@ -227,6 +227,7 @@ object Webservice {
 
     def deleteByObjectRef(objectId: String, objectType: String): Future[String]
 
+    def getByParentId(parentId: String, queryString: String): Future[Seq[CommentWithUser]]
 
   }
 
@@ -241,6 +242,22 @@ object Webservice {
     def update(ratingId: String, ratingUserTuple: (Float, Long)): Future[Rating]
 
     def deleteByObjectRef(objectId: String, objectType: String): Future[String]
+
+  }
+
+  trait FavouriteService extends DbClientService {
+
+    def add(favourite: Favourite): Future[FavouriteWithTotal]
+
+    def deleteById(userId: Long,id: Long,objectId: Long, objectType: String): Future[JsObject]
+
+  }
+
+  trait BookmarkService extends DbClientService {
+
+    def add(bookmark: Bookmark): Future[Bookmark]
+
+    def deleteById(userId: Long, bmId:Long): Future[JsObject]
 
   }
 

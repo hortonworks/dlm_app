@@ -59,11 +59,12 @@
   width: 500px;
 }
 
-.comment-icon {
+.view-icon {
   margin-right: 25px;
   font-size: x-large;
   cursor: pointer;
 }
+
 
 
 /***********************************************/
@@ -281,5 +282,10 @@
 .color-c {
     color: #fff;
     background: #e17361;
+}
+
+
+.marked {
+  color: red;
 }
 

@@ -135,7 +135,11 @@ export class RichDatasetService {
         accumulator[cAssetType.label] = tAssetType ? tAssetType.count : 0;
         return accumulator;
       }, {}),
-      tags:data.tags
+      tags:data.tags,
+      sharedStatus: data.dataset.sharedStatus,
+      favouriteId: data.favouriteId,
+      favouriteCount: data.favouriteCount,
+      bookmarkId: data.bookmarkId,
     } as RichDatasetModel;
   }
 

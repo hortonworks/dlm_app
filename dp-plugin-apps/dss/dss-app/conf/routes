@@ -80,10 +80,11 @@ GET           /api/ranger/:clusterId/policies                         controller
 
 # comments
 # ===========================================
-POST          /api/comments                                         controllers.Comments.addComments
-GET           /api/comments                                         controllers.Comments.getByObjectRef(objectId: String, objectType: String)
-DELETE        /api/comments/:id                                     controllers.Comments.deleteCommentById(id: String)
-PATCH         /api/comments/:id                                     controllers.Comments.updateComments(id: String)
+POST          /api/comments                                           controllers.Comments.addComments
+GET           /api/comments                                           controllers.Comments.getByObjectRef(objectId: String, objectType: String)
+DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
+PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
+GET           /api/comments/:parentId/replies                         controllers.Comments.getByParentId(parentId: String)
 
 # ratings
 # ===========================================
@@ -92,6 +93,13 @@ GET          /api/ratings                                             controller
 GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
+#favourites api
+POST        /api/favourites                                           controllers.Favourites.add
+DELETE      /api/favourites/:favId                                    controllers.Favourites.deleteById(favId: Long, objectType: String, objectId: Long)
+
+#bookmarks api
+POST        /api/bookmarks                                            controllers.Bookmarks.add
+DELETE      /api/bookmarks/:bmId                                      controllers.Bookmarks.deleteById(bmId: Long)
 
 
 # others
