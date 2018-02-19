@@ -26,3 +26,33 @@ if [ -n "$DATABASE_PASS" ]; then
 fi
 
 flyway $FLYWAY_ARGS "$@"
+
+if [[ "$@" = *"migrate"* ]]; then
+     # initialize with defaults
+    DB_NAME="dataplane"
+    DB_HOST="dp-database"
+    DB_PORT="5432"
+    DB_USER="dp_admin"
+    DB_PASS="dp_admin"
+
+    # update if required
+    if [ -n "$DATABASE_URI" ]; then
+        local T_SOCKET=$(echo $DATABASE_URI | awk -F/ '{print $3}')
+        DB_NAME=$(echo $DATABASE_URI | awk -F/ '{print $4}')
+        DB_HOST=$(echo $T_SOCKET | awk -F: '{print $1}')
+        DB_PORT=$(echo $T_SOCKET | awk -F: '{print $2}')
+        if [ -z "$DB_PORT" ]; then
+            DB_PORT="80"
+        fi
+    fi
+
+    if [ -n "$DATABASE_USER" ]; then
+        DB_USER="$DATABASE_USER"
+    fi
+
+    if [ -n "$DATABASE_PASS" ]; then
+        DB_PASS="$DATABASE_PASS"
+    fi
+    local UPDATE_QUERY="UPDATE dataplane.configs SET config_value = '$GA_TRACKING_ID', active = true WHERE config_key = 'dps.ga.tracking.id'"
+    psql -c "$UPDATE_QUERY"
+fi
