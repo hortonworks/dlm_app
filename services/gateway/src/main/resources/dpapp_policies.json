@@ -12,7 +12,7 @@
 
     },
     {
-      "path":"/config/ga-tracking-status",
+      "path":"/api/config/dps.ga.tracking.enabled",
       "roles": ["*"]
     },
     {

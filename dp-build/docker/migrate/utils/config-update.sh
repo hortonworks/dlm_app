@@ -24,8 +24,7 @@ update_config() {
 main() {
     local ACTION="$1"
     local KEY="$2"
-    if [ "$ACTION" == "ENABLE_CONFIG" ]
-    then
+    if [ "$ACTION" == "ENABLE_CONFIG" ]; then
        update_config "$KEY" "true"
     else
        update_config "$KEY" "false"

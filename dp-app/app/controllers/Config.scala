@@ -71,20 +71,28 @@ class Config @Inject()(
   def getConfig(key: String) = Action.async {
     configService
       .getConfig(key).map {
-        case None => Ok("")
-        case Some(config) => Ok(config.configValue)
+        case None => Ok(Json.obj("value" -> ""))
+        case Some(config) => Ok(Json.obj("value" -> config.configValue))
       }
   }
 
   def getGAProperties() = Action.async {
-    configService.getConfig("dps.ga.tracking.enabled").map {
-      case None => Ok(Json.obj("enabled" -> false))
-      case Some(config) => config.configValue match {
-        case "true" => Ok(Json.obj("enabled" -> true))
-        case "false" => Ok(Json.obj("enabled" -> false))
-        case _ => {
-          logger.warn("Config value for GA is not present/not a boolean. Returning false instead.")
-          Ok(Json.obj("enabled" -> false))
+    for {
+      trackingStatus <- configService.getConfig("dps.ga.tracking.enabled")
+      trackingId <- configService.getConfig("dps.ga.tracking.id")
+    } yield {
+      trackingStatus match {
+        case None => Ok(Json.obj("enabled" -> false))
+        case Some(config) => config.configValue match {
+          case "true" => trackingId match {
+            case None => Ok(Json.obj("enabled" -> true))
+            case Some(idConfig) => Ok(Json.obj("enabled" -> true,"trackingId" -> idConfig.configValue))
+          }
+          case "false" => Ok(Json.obj("enabled" -> false))
+          case _ => {
+            logger.warn("Config value for GA is not present/not a boolean. Returning false instead.")
+            Ok(Json.obj("enabled" -> false))
+          }
         }
       }
     }

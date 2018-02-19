@@ -12,6 +12,7 @@ FROM openjdk:8-jre-alpine
 
 ENV FLYWAY_VERSION 4.2.0
 ENV FLYWAY_SQL_DIR /dbscripts
+ENV GA_TRACKING_ID GA_TRACKING_ID_VALUE_TO_REPLACE
 
 RUN mkdir -p /opt $FLYWAY_SQL_DIR \
     && apk --no-cache add bash wget ca-certificates openssl postgresql-client \
