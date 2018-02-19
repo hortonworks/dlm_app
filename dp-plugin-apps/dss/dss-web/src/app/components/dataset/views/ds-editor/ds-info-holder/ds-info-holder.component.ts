@@ -44,6 +44,7 @@ export class DsInfoHolder implements OnInit {
         this.lakes.push(obj.data as Lake);
       })
     });
+    this.dsModel.sharedStatus = 1;
   }
 
   onTagSearchChange(text: string) {
@@ -61,6 +62,9 @@ export class DsInfoHolder implements OnInit {
     this.dsModel.clusterId = (selectedLake)?selectedLake.clusterId:null;
   }
 
+  onStatusChange(){
+    this.dsModel.sharedStatus = (this.dsModel.sharedStatus % 2) + 1;
+  }
   onNext() {
     this.nextEE.emit();
   }

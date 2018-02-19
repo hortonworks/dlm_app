@@ -110,6 +110,12 @@
     </ul>
 
   <div class="div50Percent dataset-view__action-wrapper">
+    <div class="view-icon" (click)='onLockClick()' *ngIf="isLoggedInUser(dsModel.creatorId) && dsModel.sharedStatus && (dsModel.sharedStatus === 2)">
+      <i class="fa fa-lock"></i>
+    </div>
+    <div class="view-icon" (click)='onLockClick()' *ngIf="isLoggedInUser(dsModel.creatorId) && dsModel.sharedStatus && (dsModel.sharedStatus === 1)">
+      <i class="fa fa-unlock-alt"></i>
+    </div>
     <div class="view-icon" (click)='viewComments()'>
       <i class="fa fa-comments"></i>
     </div>

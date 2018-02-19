@@ -29,7 +29,10 @@ export class RichDatasetModel {
   tags?: string[];
   createdOn?: string;
   lastModified?: string;
-  sharedStatus: number; // 1 public, 2 private
+  active?: boolean;
+  version?: number;
+  customProps?: any;
+  sharedStatus?: number; // 1 public, 2 private
   favouriteId?: number;
   favouriteCount?: number;
   bookmarkId?: number;

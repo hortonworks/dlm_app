@@ -108,7 +108,8 @@ export class DsEditor implements OnInit {
         "createdOn": rData.createdOn,
         "lastModified": rData.lastModified,
         "active": true,
-        "version": 1
+        "version": 1,
+        "sharedStatus": rData.sharedStatus
       },
       tags : tags
     } as DataSetAndTags;
