@@ -216,18 +216,18 @@ else
 	echo "Running regular build, IS_JENKINS=${IS_JENKINS}"
 fi
 clean_build
-# build_dp
-# build_dp_gateway
-# build_db_service
-# build_dp_app
-# build_dp_web
-# build_knox_agent
-# build_dp_knox
-# build_cluster_service
+build_dp
+build_dp_gateway
+build_db_service
+build_dp_app
+build_dp_web
+build_knox_agent
+build_dp_knox
+build_cluster_service
 build_migrate
 replace_ga_tracking_id
 build_legalese
 build_installer
-# zip_dp_binaries
+zip_dp_binaries
 log "All done"
 
