@@ -87,8 +87,8 @@ GET           /api/comments/:parentId/replies                         controller
 # ratings
 # ===========================================
 POST         /api/ratings                                             controllers.Ratings.add
-GET          /api/ratings                                             controllers.Ratings.get
-GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
+GET          /api/ratings                                             controllers.Ratings.get(objectId: String, objectType: String)
+GET          /api/ratings/actions/average                             controllers.Ratings.getAverage(objectId: String, objectType: String)
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
 #favourites api
