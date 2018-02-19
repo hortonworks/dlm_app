@@ -11,17 +11,104 @@
 
 <router-outlet name="sidebar"></router-outlet>
 <div *ngIf="!dsModel">Loading ... </div>
-<div *ngIf="dsModel" class="dsFullView borderBox">
-  <div class="div50Percent">
-    <div class="dsTitle hwx-title">
-      <span>{{dsModel.name}}</span>
-      <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
+<div *ngIf="dsModel" class="dsFullView borderBox" [class.showSummry]="showSummary">
+
+
+
+
+
+
+
+
+  <div class="summaryWidgetCont" [class.showSummry]="showSummary">
+
+    <div class="flex-side flex-side-right hwx-white-bg" >
+
+        <div class="grapic-holder" style="height: 83px;">
+            <img src="assets/images/collection-banners/red1.png" alt="Fortune 100 Companies">
+            <span class="rating">4.1 <i class="fa fa-star"></i></span>
+        </div>
+        <div class="flex-grid flex-summary">
+            <div class="flex-summary-item" onclick="onDataCollectionLikes()">
+                <i class="fa fa-heart" style="color: #fe69a1;"></i> <span>122</span></div>
+            <div class="flex-summary-item" (click)='viewComments()' style="cursor: pointer; position: relative;">
+                <i class="fa fa-comments"></i>
+                <i class="fa fa-circle hwx-error" style="position:absolute; margin-left: -10px; font-size: .6em;"></i> 44</div>
+            <div class="flex-summary-item" onclick="onDataCollectionSettings()"><i class="fa fa-cog"></i> <i class="fa fa-angle-down"></i></div>
+        </div>
+        <div class="flex-summary-vertical">
+            <div class="flex-summary-item flex-grid">
+                <div class="utility-space flex-side-left">
+                    <i class="fa fa-user-circle-o fa-2x"></i>
+                </div>
+                <div class="primary-space">
+                    <span class="key">Created By</span>
+                    <span class="value">{{dsModel.creatorName}}</span>
+                </div>
+            </div>
+            <div class="flex-summary-item">
+                <span class="key">Datalake</span>
+                <span class="value">{{dsModel.datalakeName}}</span>
+            </div>
+            <div class="flex-summary-item">
+                <span class="key">Tags</span>
+                <span class="value">
+                    <span class="color-tag color-b" *ngFor="let tag of dsModel.tags">{{tag}}</span>
+                </span>
+            </div>
+            <div class="flex-summary-item" *ngIf="systemTags.length">
+                <span class="key">System Tags</span>
+                <div class="value">
+                    <span class="color-tag color-c" *ngFor="let tag of systemTags">{{tag}}</span>
+                </div>
+            </div>
+            <div class="flex-summary-item">
+                <span class="key">Created On</span>
+                <span class="value">{{dsModel.createdOn}}</span>
+            </div>
+            <div class="flex-summary-item">
+                <span class="key">Last Modified</span>
+                <span class="value">{{dsModel.lastModified}}</span>
+            </div>
+        </div>
     </div>
-    <div class="metaInfo">
-      <div><span class="label">Datalake:</span><span>{{dsModel.datalakeName}}</span></div>
-      <div><span class="label">Creator:</span><span>{{dsModel.creatorName}}</span></div>
-    </div>
+
   </div>
+
+
+
+
+
+
+
+
+  <div style="float:left; width:100%;">
+  <div class="hwx-white-bg" style="padding: 15px; height: 83px;">
+      <div class="flex-grid">
+          <div class="primary-space">
+              <div class="hwx-subtitle">
+                  <span class="hwx-secondary">{{dsModel.name}}</span> <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
+              </div>
+          </div>
+          <div class="utility-space">
+              <!-- <button class="btn btn-circle" type="button"><i class="fa fa-ellipsis-v"></i></button> -->
+              <button class="btn btn-circle" type="button" (click)="toggleSummaryWidget()" style="position: relative;">
+                      <i class="fa fa-circle-thin" style="position: absolute; top: 6px; right: 4px; font-size: .8em"></i>
+                      <i class="fa fa-circle-thin" style="position: absolute; top: 10px; left: -3px; font-size: .8em"></i>
+                      <i class="fa fa-circle-thin" style="position: absolute; top: 5px; font-size: .8em; left: -5px;"></i>
+                      <i class="fa fa-circle hwx-error" style="position: absolute; font-size: .6em; top: 2px; left: 2px;"></i></button>
+          </div>
+      </div>
+      <div class="hwx-description">{{dsModel.description}}</div>
+  </div>
+  
+  <div style="margin-top: 15px;" class="tabs menu">
+    <ul onclick="function(){}">
+        <li data-tab="Dashboard" class="">Dashboard</li>
+        <li data-tab="Assets" class="active">Assets</li>
+        <li data-tab="Profile and Schedule" class="">Profile &amp; Schedule</li>
+    </ul>
+
   <div class="div50Percent dataset-view__action-wrapper">
     <div class="view-icon" (click)='viewComments()'>
       <i class="fa fa-comments"></i>
@@ -37,17 +124,17 @@
         {{'common.delete' | translate}}
       </button>
     </div>
+
   </div>
-  <div style="clear: both;"></div>
 
   <div>
-    <ds-assets-list [dsModel]="dsModel"
+    <ds-assets-list-style1 [dsModel]="dsModel"
                     [applicableActions]="applicableListActions"
                     [queryModels]="dsAssetQueryModel"
-                    [hideTabs]=true
-                    [selectionAllowed]=false
-                    (onAction)="onEdit($event)"
-    ></ds-assets-list>
+                    [hideTabs]=false
+                    [selectionAllowed]=selectionAllowed
+                    (onAction)="onAction($event)"
+    #dsAssetList ></ds-assets-list-style1>
   </div>
 
   <dialog #dialogConfirm class="mdl-dialog dataset-delete-dialog">
@@ -63,6 +150,14 @@
           {{'common.cancel' | translate}}
         </button>
       </div>
-    </dialog>
+  </dialog>
+  </div>
+  <div style="clear: both;"></div>
+  
+</div>
 
+<div *ngIf="showPopup" class="popup borderBox">
+  <div class="opaque">
+    <asset-search [showBelongsToColumn]="true" [clusterId]="dsModel.clusterId" (doneNotification)="popupActionDone($event)" (cancelNotification)="popupActionCancel()"></asset-search>
+  </div>
 </div>

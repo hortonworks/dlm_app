@@ -14,11 +14,13 @@ import {ActivatedRoute, Router} from "@angular/router";
 import * as DialogPolyfill from 'dialog-polyfill';
 import {Bookmark, Favourite, RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
+import {DsTagsService} from "../../services/dsTagsService";
 import {DataSetService} from "../../../../services/dataset.service";
 import {
   AssetListActionsEnum,
   AssetSetQueryFilterModel,
-  AssetSetQueryModel
+  AssetSetQueryModel,
+  DsAssetList
 } from "../ds-assets-list/ds-assets-list.component";
 import {AuthUtils} from "../../../../shared/utils/auth-utils";
 import {FavouriteService} from "../../../../services/favourite.service";
@@ -32,14 +34,20 @@ import {BookmarkService} from "../../../../services/bookmark.service";
 export class DsFullView implements OnInit {
 
   @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
+  @ViewChild("dsAssetList") dsAssetList: DsAssetList;
   dsModel: RichDatasetModel = null;
-  applicableListActions: AssetListActionsEnum[] = [];//[AssetListActionsEnum.EDIT];
+  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT, AssetListActionsEnum.DELETE];
   dsAssetQueryModel: AssetSetQueryModel;
   clusterId: any;
-  objectType = "assetCollection";
+  showSummary : boolean = true;
+  selectionAllowed : boolean = false;
+  showPopup: boolean = false;
+  systemTags: string[] = [];
+  objectType: string = "assetCollection";
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
+              private tagService: DsTagsService,
               private favouriteService: FavouriteService,
               private bookmarkService: BookmarkService,
               private router: Router,
@@ -56,13 +64,50 @@ export class DsFullView implements OnInit {
         this.dsAssetQueryModel = new AssetSetQueryModel([
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
+        this.tagService.listAtlasTags(+params["id"]).subscribe(tags => this.systemTags=tags)
       });
   }
-
-  private onEdit(action: AssetListActionsEnum) {
-    if(action !== AssetListActionsEnum.EDIT) return;
-    this.router.navigate(['dss/collections', this.dsModel.id, 'edit']);
+  updateDsModel = (rData) => {
+    this.dsModel = rData;
+    this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
   }
+
+  private onAction(action: AssetListActionsEnum) {
+    if(action === AssetListActionsEnum.DELETE) 
+      return this.onDeleteDataset();
+    if(action === AssetListActionsEnum.EDIT){
+      this.applicableListActions = [AssetListActionsEnum.REMOVE, AssetListActionsEnum.ADD, AssetListActionsEnum.DONE];
+      return this.selectionAllowed = true;
+    }
+    if(action === AssetListActionsEnum.DONE){
+      this.applicableListActions = [AssetListActionsEnum.EDIT, AssetListActionsEnum.DELETE];
+      return this.selectionAllowed = false;
+    }
+    if (action == AssetListActionsEnum.REMOVE) {
+      if(this.dsAssetList.checkedAllState())
+        this.actionRemoveAll();
+      else 
+        this.actionRemoveSelected(this.dsAssetList.selExcepList);
+    }
+    if (action == AssetListActionsEnum.ADD) {
+      this.showPopup = true;
+    }
+//    this.router.navigate(['dss/collections', this.dsModel.id, 'edit']);
+  }
+
+  actionRemoveAll() {
+    console.log("Remove all called!!!")
+    this.richDatasetService
+      .deleteAllAssets(this.dsModel.id)
+      .subscribe(this.updateDsModel)
+  }
+  actionRemoveSelected (ids:string[]) {
+    if(!ids.length) return;
+    this.richDatasetService
+      .deleteSelectedAssets(this.dsModel.id, ids)
+      .subscribe(this.updateDsModel)
+  }
+
 
   onDeleteDataset() {
     DialogPolyfill.registerDialog(this.dialogConfirm.nativeElement);
@@ -128,6 +173,29 @@ export class DsFullView implements OnInit {
 
   viewComments(){
     this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true, queryParams: { returnURl: this.router.url }});
+  }
+
+  toggleSummaryWidget () {
+    this.showSummary = !this.showSummary;
+  }
+
+  popupActionCancel() {
+    this.showPopup = false;
+  }
+
+  popupActionDone(asqm: AssetSetQueryModel) {
+    let futureRdataSet;
+
+    if(asqm.selectionList.length) 
+      futureRdataSet = this.richDatasetService.addSelectedAssets(this.dsModel.id, this.dsModel.clusterId, asqm.selectionList);
+    else
+      futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
+    
+    futureRdataSet.subscribe(rData => {
+        this.updateDsModel(rData)
+        // this.assetSetQueryModelsForAddition.push(asqm);
+        this.showPopup = false;
+      })
   }
 
 }

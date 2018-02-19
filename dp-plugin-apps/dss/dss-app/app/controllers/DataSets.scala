@@ -91,6 +91,21 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
+  private def getListOfUniqueTags(clusterId: Long, guids:Seq[String])
+                                 (implicit token: Option[HJwtToken])
+  : Future[Seq[String]] = {
+    atlasService
+      .getAssetsDetails(clusterId.toString, guids)
+      .map {
+        case Left(errors) => throw WrappedErrorsException(errors)
+        case Right(atlasEntities) => {
+          val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
+          entities.filter(_.tags.nonEmpty) flatMap  (_.tags.get) distinct
+        }
+      }
+  }
+
+
   private def getAssetsFromGuids(clusterId: Long, guids:Seq[String], filterDatasetId:Long = 0)
                                 (implicit token: Option[HJwtToken])
   : Future[Either[Errors, Seq[DataAsset]]]= {
@@ -149,7 +164,13 @@ class DataSets @Inject()(
         case Right(assets) =>  assets.size match {
           case 0 =>
             Logger.info("Effectively no asset to add.")
-            Future.successful(Conflict)
+            dataSetService
+              .getRichDatasetById(params.datasetId,req.user.id.get)
+              .map {
+                case Left(errors) => InternalServerError(Json.toJson(errors))
+                case Right(richDataset) => Ok(Json.toJson(richDataset))
+              }
+//            Future.successful(Conflict)
           case _ => dataSetService
             .addAssets(params.datasetId, assets)
             .map(rDataset =>
@@ -326,6 +347,24 @@ class DataSets @Inject()(
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
         case Right(dataSets) => Ok(Json.toJson(dataSets))
+      }
+  }
+
+  def getUniqueTagsFromAssetsOfDataset (datasetId: String) =  AuthenticatedAction.async { req =>
+    implicit val token = req.token
+    dataSetService
+      .getDataAssetByDatasetId(datasetId.toLong, "", 0, 10000000)
+      .flatMap {
+        case Left(errors) =>
+          Future.successful(InternalServerError(Json.toJson(errors)))
+        case Right(assetsNcounts) => assetsNcounts.assets.length match {
+            case 0 => Future.successful(Ok(Json.toJson(Array[String]())))
+            case _ => getListOfUniqueTags(assetsNcounts.assets.head.clusterId, assetsNcounts.assets.map(_.guid))
+              .map (tags => Ok(Json.toJson(tags)))
+              .recover{
+                case e: Exception => InternalServerError(Json.toJson(e.getMessage))
+              }
+        }
       }
   }
 

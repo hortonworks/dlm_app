@@ -31,4 +31,11 @@ export class DsTagsService {
       })
       .catch(HttpUtil.handleError);
   }
+
+  listAtlasTags(dataSetId: number) : Observable<string[]>{
+    return this.http
+      .get(`/api/dataset/${dataSetId}/atlas-tags`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
 }

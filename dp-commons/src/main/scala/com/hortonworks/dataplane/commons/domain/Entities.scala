@@ -321,6 +321,8 @@ object Entities {
                        clusterId: Long,
                        datasetId: Option[Long] = None)
 
+  case class AssetsAndCounts(assets: Seq[DataAsset], count: Long)
+
   case class DatasetDetails(id: Option[Long],
                             details: Option[JsValue],
                             datasetId: Long)
@@ -532,6 +534,9 @@ object JsonFormatters {
   // classes as data conatiner for Rest Api
   implicit val categoriesCountReads = Json.reads[CategoryCount]
   implicit val categoriesCountWrites = Json.writes[CategoryCount]
+
+  implicit val assetsAndCountReads = Json.reads[AssetsAndCounts]
+  implicit val assetsAndCountWrites = Json.writes[AssetsAndCounts]
 
   implicit val dataAssetCountReads = Json.reads[DataAssetCount]
   implicit val dataAssetCountWrites = Json.writes[DataAssetCount]
