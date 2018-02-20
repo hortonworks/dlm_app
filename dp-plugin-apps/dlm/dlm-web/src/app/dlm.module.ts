@@ -54,6 +54,7 @@ import { BeaconEffects } from './effects/beacon.effect';
 import { YarnEffects } from './effects/yarn.effect';
 import { CloudAccountsEffects } from './effects/cloud-accounts.effect';
 import { CloudContainersEffects } from './effects/cloud-containers.effect';
+import { BeaconCloudCredEffects } from './effects/beacon-cloud-creds.effect';
 
 import { FormEffects } from './effects/form.effect';
 import { RouterEffects } from './effects/router.effect';
@@ -116,6 +117,8 @@ import { AddAccountModalComponent } from 'pages/cloud-accounts/components/add-ac
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
 import { CloudContainerBrowserComponent } from 'components/cloud-container-browser/cloud-container-browser.component';
 import { CloudAccountActionsComponent } from './pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
+// tslint:disable-next-line
+import { CloudAccountsPoliciesTableComponent } from './pages/cloud-accounts/components/cloud-account-policies-table/cloud-account-policies-table.component';
 // tslint:disable-next-line
 import { CloudContainerBrowserBreadcrumbComponent } from 'components/cloud-container-browser/breadcrumb/cloud-container-browser-breadcrumb.component';
 
@@ -197,7 +200,8 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
       RouterEffects,
       YarnEffects,
       CloudAccountsEffects,
-      CloudContainersEffects
+      CloudContainersEffects,
+      BeaconCloudCredEffects
     ]),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
@@ -235,6 +239,7 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     CloudAccountsListComponent,
     CloudContainerBrowserComponent,
     CloudAccountActionsComponent,
+    CloudAccountsPoliciesTableComponent,
     CloudContainerBrowserBreadcrumbComponent,
     AddAccountModalComponent,
     PairingsComponent,

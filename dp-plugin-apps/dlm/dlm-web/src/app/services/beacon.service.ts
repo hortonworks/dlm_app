@@ -34,5 +34,9 @@ export class BeaconService {
       .map(response => ({...response, response: this.decorateStatuses(response.response)}));
   }
 
+  fetchBeaconCloudCreds() {
+    return this.httpClient.get<any>('cluster/cloudCredentials');
+  }
+
   constructor(private httpClient: HttpClient) { }
 }

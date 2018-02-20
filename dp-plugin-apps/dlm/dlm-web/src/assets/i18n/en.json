@@ -405,7 +405,8 @@
         "no_containers": "No Containers",
         "table": {
           "actions": "ACTIONS",
-          "user_details": "CREDENTIAL"
+          "user_details": "CREDENTIAL",
+          "policies": "POLICIES"
         },
         "accounts": {
           "iam_role": "IAM Role",
