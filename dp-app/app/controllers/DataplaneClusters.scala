@@ -153,7 +153,8 @@ class DataplaneClusters @Inject()(
       .flatMap {
         case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(checkResponse) => {
-          dpClusterService.checkExistenceByUrl(url).map {
+//          TODO: use url instead of ip address
+          dpClusterService.checkExistenceByUrl(checkResponse.ambariIpAddress).map {
             case Left(errors) => InternalServerError(Json.toJson(errors))
             case Right(status) =>
               if(status){
