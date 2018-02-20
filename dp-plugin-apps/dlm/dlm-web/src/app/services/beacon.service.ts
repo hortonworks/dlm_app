@@ -10,8 +10,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { mapResponse } from 'utils/http-util';
-
 @Injectable()
 export class BeaconService {
 

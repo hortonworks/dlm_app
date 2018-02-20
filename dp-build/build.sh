@@ -150,6 +150,24 @@ build_migrate() {
 	popd
 }
 
+replace_ga_tracking_id() {
+    log "Replacing GA tracking id"
+
+    if [ -z ${GA_TRACKING_ID} ]; then
+        log "GA_TRACKING_ID environment variable not found. Not replacing anything"
+    else
+        MIGRATE_DOCKER_FILE=${DP_DOCKER_ROOT_FOLDER}/dp-migrate/Dockerfile
+        sed -i.bak -e \
+            "s/GA_TRACKING_ID_VALUE_TO_REPLACE/${GA_TRACKING_ID}/g" ${MIGRATE_DOCKER_FILE}
+        if ! diff ${MIGRATE_DOCKER_FILE} ${MIGRATE_DOCKER_FILE}.bak &> /dev/null; then
+            echo "Replaced GA tracking id"
+        else
+            echo "Replacing GA tracking id failed"
+        fi
+        rm ${MIGRATE_DOCKER_FILE}.bak
+    fi
+}
+
 build_legalese() {
 	log "Collecting legalese"
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/legalese
@@ -205,6 +223,7 @@ build_knox_agent
 build_dp_knox
 build_cluster_service
 build_migrate
+replace_ga_tracking_id
 build_legalese
 build_installer
 zip_dp_binaries

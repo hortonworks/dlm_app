@@ -52,7 +52,7 @@ object Atlas {
         .map(e => (e._1, try e._2.as[String] catch{case a: Throwable => e._2.toString()})).toMap
       Entity(typeName,
         Some(entityAttr),
-        guid, status, entityAttr.get("name"), None, None, None)
+        guid, status, entityAttr.get("name"), classifications.map(_.map( j => (j \ "typeName").as[String])), None, None)
     }
   }
 

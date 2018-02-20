@@ -10,12 +10,12 @@
 import { JobTrackingInfo } from 'models/job-tracking-info.model';
 import { getTime } from 'utils/date-util';
 
-const getBytes = (ti: JobTrackingInfo) => ti && ti.progress && ti.progress.bytesCopied || 0;
+const getBytes = (ti: JobTrackingInfo): number => ti && ti.progress && ti.progress.bytesCopied || 0;
 
-export const transferredBytesComparator = (trackingInfoA = <JobTrackingInfo>{}, trackingInfoB = <JobTrackingInfo>{}) => {
+export const transferredBytesComparator = (trackingInfoA = <JobTrackingInfo>{}, trackingInfoB = <JobTrackingInfo>{}): number => {
   return getBytes(trackingInfoA) - getBytes(trackingInfoB);
 };
 
-export const timestampComparator = (timeA: string, timeB: string) => {
+export const timestampComparator = (timeA: string, timeB: string): number => {
   return getTime(timeA) - getTime(timeB);
 };

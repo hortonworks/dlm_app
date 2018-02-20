@@ -12,7 +12,7 @@
 import {Injectable} from "@angular/core";
 import {Http, RequestOptions} from "@angular/http";
 import {Observable} from "rxjs";
-import {DsAssetModel} from "../models/dsAssetModel";
+import {DsAssetModel, AssetsAndCount} from "../models/dsAssetModel";
 import {AssetSetQueryModel} from "../views/ds-assets-list/ds-assets-list.component";
 import {HttpUtil} from "../../../shared/utils/httpUtil";
 
@@ -31,7 +31,7 @@ export class DsAssetsService {
       .catch(HttpUtil.handleError);
   }
 
-  list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number, clusterId:number): Observable<DsAssetModel[]> {
+  list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number, clusterId:number): Observable<AssetsAndCount> {
     console.log(asqms);
     let search:string = "", callDB:boolean|number = false;
     asqms.forEach(asqm => asqm.filters.forEach(filObj =>{
@@ -69,7 +69,7 @@ export class DsAssetsService {
     return atlasFilters;
   }
 
-  dbQuery (id: number, searchText:string, offset:number, limit:number) : Observable<DsAssetModel[]> {
+  dbQuery (id: number, searchText:string, offset:number, limit:number) : Observable<AssetsAndCount> {
     return this.http
       .get(`api/dataset/${id}/assets?queryName=${searchText}&offset=${offset}&limit=${limit}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -77,7 +77,7 @@ export class DsAssetsService {
       .catch(HttpUtil.handleError)
   }
 
-  atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number) : Observable<DsAssetModel[]> {
+  atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number) : Observable<AssetsAndCount> {
     let postParams=this.getAssetServiceQueryParam(asqms, offset, limit);
     return this.http
       .post(`${this.url1}?clusterId=${clusterId}`, postParams, new RequestOptions(HttpUtil.getHeaders()))
@@ -97,8 +97,9 @@ export class DsAssetsService {
 
   }
 
-  extractAssetArrayFromDbData(dataArr: any[]) :DsAssetModel[]{
+  extractAssetArrayFromDbData(assetsNCount: any) :AssetsAndCount{
     let assetModelArr :DsAssetModel[] = [];
+    let dataArr = assetsNCount.assets;
     dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
         creationTime: "-",
@@ -112,10 +113,10 @@ export class DsAssetsService {
         clusterId: ent.clusterId
       })
     });
-    return assetModelArr;
+    return {"assets":assetModelArr, "count": assetsNCount.count} as AssetsAndCount;
   }
 
-  extractAssetArrayFromAtlasData(dataArr: any[]) :DsAssetModel[]{
+  extractAssetArrayFromAtlasData(dataArr: any[]) :AssetsAndCount{
     let assetModelArr :DsAssetModel[] = [];
     dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
@@ -131,6 +132,6 @@ export class DsAssetsService {
         dbName:ent.attributes.qualifiedName.split(".")[0]
       })
     });
-    return assetModelArr;
+    return {"assets":assetModelArr, "count": null} as AssetsAndCount;
   }
 }

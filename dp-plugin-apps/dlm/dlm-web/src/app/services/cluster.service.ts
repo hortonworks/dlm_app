@@ -10,7 +10,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
-import { mapResponse, getUrlDomain } from 'utils/http-util';
+import { getUrlDomain } from 'utils/http-util';
 import { Cluster } from 'models/cluster.model';
 import { PolicyService } from 'services/policy.service';
 

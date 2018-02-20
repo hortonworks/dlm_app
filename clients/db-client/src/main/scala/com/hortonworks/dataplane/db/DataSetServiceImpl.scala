@@ -112,11 +112,11 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDatasets)
   }
 
-  def getDataAssetByDatasetId(id:Long, queryName: String, offset: Long, limit: Long) : Future[Either[Errors, Seq[DataAsset]]] = {
+  def getDataAssetByDatasetId(id:Long, queryName: String, offset: Long, limit: Long) : Future[Either[Errors, AssetsAndCounts]] = {
     ws.url(s"$url/dataassets/$id?queryName=$queryName&offset=$offset&limit=$limit")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToDataAssets)
+      .map(mapToDataAssetsAndCount)
   }
 
 
@@ -206,9 +206,9 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToDataAssets(res: WSResponse): Either[Errors, Seq[DataAsset]] = {
+  private def mapToDataAssetsAndCount(res: WSResponse): Either[Errors, AssetsAndCounts] = {
     res.status match {
-      case 200 => extractEntity[Seq[DataAsset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[DataAsset].get })
+      case 200 => extractEntity[AssetsAndCounts](res, r => (r.json \ "results" \\ "data").head.validate[AssetsAndCounts].get)
       case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case _ => mapErrors(res)
     }

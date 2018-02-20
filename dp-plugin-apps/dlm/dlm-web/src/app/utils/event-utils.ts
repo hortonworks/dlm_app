@@ -15,7 +15,7 @@ import { parsePolicyId } from 'utils/policy-util';
 
 export const getEventPolicyName = (id: string): string => {
   const parsed = parsePolicyId(id);
-  return parsed.policyName || '';
+  return parsed && parsed.policyName || '';
 };
 
 export const getEventEntityName = (event: Event): string => {

@@ -324,9 +324,11 @@
           "save": "Save",
           "cancel": "Cancel",
           "edit": "Edit",
+          "delete": "Delete",
           "addAssets": "Add Assets",
           "removeAll": "Remove Selected",
-          "addMoreAssets": "Add More Assets"
+          "addMoreAssets": "Add More Assets",
+          "done" : "Done"
         },
         "errors": {
           "unique": "An asset collection with this name already exists. Please choose a different name."

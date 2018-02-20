@@ -61,7 +61,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   private footerOpts: TableFooterOptions = this.footerOptsDefault;
 
   actions: ActionItemType[];
-  limit = 10;
+  @Input() limit = 10;
 
   @ViewChild(CheckboxColumnComponent) checkboxColumn: CheckboxColumnComponent;
   @ViewChild(ActionColumnComponent) actionsColumn: ActionColumnComponent;

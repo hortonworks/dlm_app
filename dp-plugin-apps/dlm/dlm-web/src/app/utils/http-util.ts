@@ -7,15 +7,11 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Response, RequestOptionsArgs, Headers, URLSearchParams } from '@angular/http';
 import { HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { User } from 'models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { APIError, APIErrorDetails } from 'models/error.model';
-
-export const toJson = (response: Response) => response.json();
-export const mapResponse = (response$: Observable<Response>) => response$.map(toJson);
 
 export const getHeaders = (): HttpHeaders => {
   const headers = {

@@ -13,7 +13,6 @@ import { HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
 
 import { Policy } from 'models/policy.model';
-import { mapResponse } from 'utils/http-util';
 import { JOB_STATUS } from 'constants/status.constant';
 import { Job } from 'models/job.model';
 import { JobTrackingInfo } from 'models/job-tracking-info.model';

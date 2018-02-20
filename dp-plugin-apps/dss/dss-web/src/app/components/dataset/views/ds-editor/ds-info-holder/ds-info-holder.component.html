@@ -40,6 +40,12 @@
                   (onNewSearch)="onNewTagAddition($event)"
   ></tagging-widget>
 </div>
+<div class="form-group">
+  <label class="mdl-switch mdl-js-switch" [ngClass]="{'is-public': (dsModel.sharedStatus === 1)}" for="status-switch">
+    <input type="checkbox" id="status-switch" class="mdl-switch__input" (change)="onStatusChange()" />
+    <span class="mdl-switch__label">{{dsModel && (dsModel.sharedStatus === 1)? "Public" : "Private"}}</span>
+  </label>
+</div>
 
 
 <div class="button-container">

@@ -62,5 +62,5 @@ export const bytesToSize = (bytes: number = 0, precision: number = 2): string =>
     bytes /= 1024;
     unit++;
   }
-   return bytes.toFixed(+precision) + ' <span class="unit">' + units[unit] + '</span>';
+  return bytes.toFixed(+precision) + ' <span class="unit">' + units[unit] + '</span>';
 };

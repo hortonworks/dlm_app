@@ -20,6 +20,7 @@ import {
   BsDropdownModule,
   ProgressbarModule
 } from 'ngx-bootstrap';
+import { UiSwitchModule } from 'ngx-ui-switch';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -178,6 +179,7 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
       initialState: {},
       metaReducers
     }),
+    UiSwitchModule,
     StoreRouterConnectingModule,
     EffectsModule.forRoot([
       ClusterEffects,

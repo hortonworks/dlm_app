@@ -9,7 +9,6 @@
 
 import { Injectable, isDevMode } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { mapResponse } from 'utils/http-util';
 import { Observable } from 'rxjs/Observable';
 
 declare const L: any;

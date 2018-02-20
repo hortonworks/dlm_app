@@ -17,9 +17,12 @@ export interface CloudAccount {
 
 export interface CloudAccountDetails {
   provider: string;
+  accountName: string;
+  userName: string;
 }
 
 export interface AddCloudStoreRequestBody {
+  id: string;
   accountDetails: AddCloudAccountDetails;
   accountCredentials: ValidateCredentialsRequestBody;
 }

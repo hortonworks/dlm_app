@@ -113,14 +113,6 @@ export class PoliciesComponent implements OnInit, OnDestroy {
       .combineLatest(this.clusters$, pairsCount$)
       .map(AddEntityButtonComponent.availableActions);
 
-    const startPolling = this.overallProgress$
-      .pluck<any, boolean>('isInProgress')
-      .filter(isInProgress => !isInProgress)
-      .first()
-      .subscribe(progress => {
-        this.initPolling();
-      });
-    this.subscriptions.push(startPolling);
   }
 
   ngOnInit() {
@@ -140,6 +132,14 @@ export class PoliciesComponent implements OnInit, OnDestroy {
         this.postLoadPolicyIds = policies.map(policy => policy.id);
         this.store.dispatch(loadLastJobs({policies}));
       });
+    const startPolling = this.overallProgress$
+      .pluck<any, boolean>('isInProgress')
+      .filter(isInProgress => !isInProgress)
+      .take(1)
+      .subscribe(progress => {
+        this.initPolling();
+      });
+    this.subscriptions.push(startPolling);
     this.subscriptions.push(getPairings);
     this.subscriptions.push(lastJobsWorkaroundSubscription);
     this.route.queryParams.subscribe(params => {

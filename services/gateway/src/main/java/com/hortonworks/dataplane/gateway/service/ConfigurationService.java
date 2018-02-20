@@ -10,6 +10,7 @@
  */
 package com.hortonworks.dataplane.gateway.service;
 
+import com.hortonworks.dataplane.gateway.domain.DPConfig;
 import com.hortonworks.dataplane.gateway.domain.KnoxConfigurationResponse;
 import feign.FeignException;
 import org.slf4j.Logger;
@@ -43,11 +44,11 @@ public class ConfigurationService {
 
   public Long getJwtTokenValidity() {
     try {
-      String validityStr = configurationServiceInterface.getTokenValidity(DP_SESSION_TIMEOUT_KEY);
-      if (null == validityStr || validityStr.isEmpty()) {
+      DPConfig validity = configurationServiceInterface.getTokenValidity(DP_SESSION_TIMEOUT_KEY);
+      if (null == validity || validity.getValue().isEmpty()) {
         return defaultJwtValidity;
       }
-      return Long.parseLong(validityStr);
+      return Long.parseLong(validity.getValue());
     } catch (FeignException e) {
       logger.error("error while calling configuration service", e);
       throw new RuntimeException(e);

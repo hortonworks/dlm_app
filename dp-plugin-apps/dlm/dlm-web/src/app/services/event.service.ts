@@ -11,7 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Event } from 'models/event.model';
-import { toSearchParams, mapResponse } from 'utils/http-util';
+import { toSearchParams } from 'utils/http-util';
 import { getTime } from 'utils/date-util';
 
 @Injectable()

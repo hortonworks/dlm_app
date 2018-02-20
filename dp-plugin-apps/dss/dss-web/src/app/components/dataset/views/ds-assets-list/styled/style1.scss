@@ -13,10 +13,16 @@
   border: 0px solid #d0d3d7;
 }
 
+.listCont {
+	border-width:0px;	
+}
 .listCont .list {
 	padding:0px;
 }
 
+.componentCont {
+	background-color:#ffffff;
+}
 .componentCont .justList {
 	margin-bottom: 0px;
 	border-bottom: 1px solid #cfd3d7;
@@ -24,4 +30,15 @@
 
 .starExplanation {
 	margin-left:10px;
+}
+
+.tabCont {
+	padding:15px;
+}
+
+.actionButtonCont .mdl-button {
+	margin-left:5px;
+}
+.componentCont .justList {
+	border-bottom-width:0px;
 }

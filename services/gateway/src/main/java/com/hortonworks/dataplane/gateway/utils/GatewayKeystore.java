@@ -36,6 +36,8 @@ import java.security.cert.X509Certificate;
 public class GatewayKeystore {
   private static final Logger logger = LoggerFactory.getLogger(GatewayKeystore.class);
 
+  private static PrivateKey privateKey;
+  private static PublicKey publicKey;
 
   @Value("${jwt.public.key.path}")
   private String publicKeyPath;
@@ -45,8 +47,23 @@ public class GatewayKeystore {
   private String privateKeyPassword;
 
   public PrivateKey getPrivate(){
-    try {
+    if(privateKey == null) {
+      privateKey = readPrivate();
+    }
 
+    return  privateKey;
+  }
+
+  public PublicKey getPublic(){
+    if(publicKey == null) {
+      publicKey = readPublic();
+    }
+
+    return publicKey;
+  }
+
+  private PrivateKey readPrivate() {
+    try {
       Security.addProvider(new BouncyCastleProvider());
       PEMParser pemParser = new PEMParser(new StringReader(getKeyFileAsString(this.privateKeyPath)));
       PKCS8EncryptedPrivateKeyInfo encryptedKeyInfo = (PKCS8EncryptedPrivateKeyInfo) pemParser.readObject();
@@ -56,7 +73,8 @@ public class GatewayKeystore {
       PrivateKeyInfo keyInfo = encryptedKeyInfo.decryptPrivateKeyInfo(decProv);
       JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
 
-      return converter.getPrivateKey(keyInfo);
+      privateKey = converter.getPrivateKey(keyInfo);
+      return privateKey;
     } catch (IOException e) {
       logger.error("Exception", e);
       throw new RuntimeException(e);
@@ -69,7 +87,7 @@ public class GatewayKeystore {
     }
   }
 
-  public PublicKey getPublic(){
+  private PublicKey readPublic() {
     try {
       CertificateFactory fact = CertificateFactory.getInstance("X.509");
       ByteArrayInputStream is = new ByteArrayInputStream(getKeyFileAsString(this.publicKeyPath).getBytes("UTF-8"));

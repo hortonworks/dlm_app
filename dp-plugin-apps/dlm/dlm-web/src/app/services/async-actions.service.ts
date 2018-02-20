@@ -50,7 +50,7 @@ export class AsyncActionsService {
     const meta = Object.assign({}, action.payload.meta || {}, {requestId});
     this.store.dispatch(Object.assign(action, { payload: { ...action.payload, meta } }));
     return this.onComplete(requestId)
-      .first()
+      .take(1)
       .do(_ => this.store.dispatch(removeProgressState(requestId)));
   }
 }

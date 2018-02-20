@@ -9,6 +9,7 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CommonComponentsModule} from 'components/common-components.module';
+import {UiSwitchModule} from 'ngx-ui-switch';
 import {CloudAccountsComponent} from './cloud-accounts.component';
 import {CloudAccountsListComponent} from './components/cloud-accounts-list/cloud-accounts-list.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
@@ -28,6 +29,7 @@ import {CheckboxColumnComponent} from 'components/table-columns';
 import {ActionColumnComponent} from 'components/table-columns/action-column';
 import {CheckboxComponent} from 'common/checkbox/checkbox.component';
 import {CloudAccountService} from 'services/cloud-account.service';
+import {TooltipModule} from 'ngx-bootstrap';
 
 describe('CloudAccountsComponent', () => {
   let component: CloudAccountsComponent;
@@ -37,6 +39,8 @@ describe('CloudAccountsComponent', () => {
     configureComponentTest({
       imports: [
         RouterTestingModule,
+        UiSwitchModule,
+        TooltipModule,
         ModalModule.forRoot(),
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}

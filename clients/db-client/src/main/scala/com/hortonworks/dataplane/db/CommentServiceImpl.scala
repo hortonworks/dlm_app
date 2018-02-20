@@ -90,6 +90,13 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUsers)
   }
 
+  override def getByParentId(parentId: String, queryString: String): Future[Seq[CommentWithUser]] = {
+    ws.url(s"$url/comments/$parentId/replies?$queryString")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToCommentWithUsers)
+  }
+
 
   private def mapToCommentWithUser(res: WSResponse) = {
     res.status match {

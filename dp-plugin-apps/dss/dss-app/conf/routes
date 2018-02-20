@@ -11,10 +11,12 @@ GET     /metrics                                              controllers.Status
 POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String)
 GET           /api/query-attributes                                  controllers.QueryAttributes.list(clusterId: String)
 
+
 # DatasetTags
 # ===========================================
 GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search: Option[String])
 GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName: String)
+GET           /api/dataset/:datasetId/atlas-tags                     controllers.DataSets.getUniqueTagsFromAssetsOfDataset(datasetId: String)
 
 GET           /api/assets/auditMockStatus                            controllers.QueryAttributes.checkAuditMockStatus
 GET           /api/assets/details/:clusterId/:atlasGuid              controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)
@@ -35,6 +37,8 @@ PUT           /api/datasets                                          controllers
 GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId: String)
 DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId: String)
 
+PATCH         /api/datasets/:datasetId                                controllers.DataSets.updateDataset(datasetId : String)
+
 #GET           /api/clusters/:clusterId/hosts                        controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
 
 # DatasetCategories
@@ -47,7 +51,6 @@ POST          /api/datasets/categories                               controllers
 # Datasets ?
 # ===========================================
 GET           /api/dataset/:datasetId                                controllers.DataSets.getRichDatasetById(datasetId : String)
-PATCH         /api/datasets/:datasetId                               controllers.DataSets.updateDataset(datasetId : String)
 GET           /api/dataset/list                                      controllers.DataSets.getRichDataset
 GET           /api/dataset/list/tag/:tagName                         controllers.DataSets.getRichDatasetByTag(tagName : String)
 
@@ -78,10 +81,11 @@ GET           /api/ranger/:clusterId/policies                         controller
 
 # comments
 # ===========================================
-POST          /api/comments                                         controllers.Comments.addComments
-GET           /api/comments                                         controllers.Comments.getByObjectRef(objectId: String, objectType: String)
-DELETE        /api/comments/:id                                     controllers.Comments.deleteCommentById(id: String)
-PATCH         /api/comments/:id                                     controllers.Comments.updateComments(id: String)
+POST          /api/comments                                           controllers.Comments.addComments
+GET           /api/comments                                           controllers.Comments.getByObjectRef(objectId: String, objectType: String)
+DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
+PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
+GET           /api/comments/:parentId/replies                         controllers.Comments.getByParentId(parentId: String)
 
 # ratings
 # ===========================================
@@ -90,6 +94,13 @@ GET          /api/ratings                                             controller
 GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
+#favourites api
+POST        /api/favourites                                           controllers.Favourites.add
+DELETE      /api/favourites/:favId                                    controllers.Favourites.deleteById(favId: Long, objectType: String, objectId: Long)
+
+#bookmarks api
+POST        /api/bookmarks                                            controllers.Bookmarks.add
+DELETE      /api/bookmarks/:bmId                                      controllers.Bookmarks.deleteById(bmId: Long)
 
 
 # others

@@ -132,6 +132,20 @@ class Module extends AbstractModule {
   def provideRatingService(implicit ws: WSClient, configuration: Configuration): RatingService = {
     new RatingServiceImpl(configuration.underlying)
   }
+
+  @Provides
+  @Singleton
+  @Named("favouriteService")
+  def provideFavouriteService(implicit ws: WSClient, configuration: Configuration): FavouriteService = {
+    new FavouriteServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("bookmarkService")
+  def provideBookmarkService(implicit ws: WSClient, configuration: Configuration): BookmarkService = {
+    new BookmarkServiceImpl(configuration.underlying)
+  }
 }
 
 @Singleton

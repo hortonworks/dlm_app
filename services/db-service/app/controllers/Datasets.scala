@@ -53,7 +53,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     val userId = req.getQueryString("userId")
     if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
     else{
-      datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
+      datasetRepo.getRichDataSet(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
         .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
         .recoverWith(apiError)
     }

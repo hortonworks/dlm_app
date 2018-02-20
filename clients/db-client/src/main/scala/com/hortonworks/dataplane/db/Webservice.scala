@@ -142,7 +142,7 @@ object Webservice {
 
     def listRichDatasetByTag(tagName: String, queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 
-    def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long): Future[Either[Errors, Seq[DataAsset]]]
+    def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long): Future[Either[Errors, AssetsAndCounts]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
@@ -157,7 +157,7 @@ object Webservice {
 
     def search(searchText: String, size: Option[Long]): Future[Either[Errors, Seq[Category]]]
 
-    def listWithCount(search:Option[String]): Future[Either[Errors, Seq[CategoryCount]]]
+    def listWithCount(search:Option[String], userId: Long): Future[Either[Errors, Seq[CategoryCount]]]
 
     def listWithCount(categoryName: String): Future[Either[Errors, CategoryCount]]
 
@@ -227,6 +227,7 @@ object Webservice {
 
     def deleteByObjectRef(objectId: String, objectType: String): Future[String]
 
+    def getByParentId(parentId: String, queryString: String): Future[Seq[CommentWithUser]]
 
   }
 
@@ -241,6 +242,22 @@ object Webservice {
     def update(ratingId: String, ratingUserTuple: (Float, Long)): Future[Rating]
 
     def deleteByObjectRef(objectId: String, objectType: String): Future[String]
+
+  }
+
+  trait FavouriteService extends DbClientService {
+
+    def add(favourite: Favourite): Future[FavouriteWithTotal]
+
+    def deleteById(userId: Long,id: Long,objectId: Long, objectType: String): Future[JsObject]
+
+  }
+
+  trait BookmarkService extends DbClientService {
+
+    def add(bookmark: Bookmark): Future[Bookmark]
+
+    def deleteById(userId: Long, bmId:Long): Future[JsObject]
 
   }
 

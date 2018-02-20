@@ -18,7 +18,7 @@ import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails
 import models.CloudAccountProvider.CloudAccountProvider
 import models.CloudCredentialType.CloudCredentialType
 import models.CloudResponseEntities.{FileListItem, FileListResponse}
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, Writes}
 
 object AmazonS3Entities {
   sealed trait Error
@@ -26,9 +26,8 @@ object AmazonS3Entities {
     final case class AmazonS3Error(message: String) extends Error
   }
   @SerialVersionUID(124)
-  case class S3AccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String, userName: String) extends Serializable with CloudAccountDetails {
-    override def getAccountId: String = s"${accountName}_$userName"
-  }
+  case class S3AccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String, userName: String) extends Serializable with CloudAccountDetails
+
   @SerialVersionUID(123)
   case class S3AccountCredential (credentialType: String, accessKeyId: String, secretAccessKey: String) extends Serializable with CloudAccountCredentials
 
@@ -50,6 +49,12 @@ object AmazonS3Entities {
   implicit val bucketPolicyFmt = Json.format[BucketPolicy]
 
   implicit val amazonS3ErrorReads = Json.reads[AmazonS3Error]
-  implicit val amazonS3ErrorWrites = Json.writes[AmazonS3Error]
+  implicit val amazonS3ErrorWrites = new Writes[AmazonS3Error] {
+    override def writes(o: AmazonS3Error): JsValue = {
+      Json.obj(
+        "error" -> Json.obj("message" -> o.message)
+      )
+    }
+  }
 
 }

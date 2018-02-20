@@ -63,6 +63,8 @@ import {DataSetService} from '../../services/dataset.service';
 import {LakeService} from '../../services/lake.service';
 import {CommentService} from '../../services/comment.service';
 import {RatingService} from "../../services/rating.service";
+import {FavouriteService} from "../../services/favourite.service";
+import {BookmarkService} from "../../services/bookmark.service";
 
 @NgModule({
   declarations: [
@@ -141,7 +143,9 @@ import {RatingService} from "../../services/rating.service";
     DataSetService,
     LakeService,
     CommentService,
-    RatingService
+    RatingService,
+    FavouriteService,
+    BookmarkService
   ]
 })
 export class DatasetSharedModule {

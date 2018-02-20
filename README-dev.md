@@ -3,7 +3,7 @@
 ## Requirements
 
 * Git
-* JDK 8
+* JDK 8 with JCE installed and enabled. You can do so with `brew cask reinstall java8` and then updating `/Library/Java/JavaVirtualMachines/<your_version>/Contents/Home/jre/lib/security/java.security` to set the value “crypto.policy=unlimited”. This line should already be there. You just need to uncomment it.
 * SBT 0.13.1 or above. To get SBT on Mac, you can do
   * `brew install sbt`
 * Gradle 3.5 or above. To get Gradle on on Mac, you can do
@@ -23,6 +23,24 @@
   * Use command `consul agent -dev`
   * Consul console can be checked at http://localhost:8500/
 2. Start Zuul
+  * Generate an RSA key-pair with the following command:
+  ```
+  openssl req \
+    -x509 \
+    -newkey rsa:4096 \
+    -subj '/CN=dataplane' \
+    -keyout /some/where/on/your/local/path/ssl-key.pem \
+    -out /some/where/on/your/local/path/ssl-cert.pem \
+    -passout pass:"changeit" \
+    -days 365
+  ```
+  * Update `dataplane/services/gateway/src/main/resources/application-zuul.properties` to set the values for following properties:
+  ```
+  # configuration for JWT signing keys. Need to be overridden
+  jwt.public.key.path=/some/where/on/your/local/path/ssl-cert.pem
+  jwt.private.key.path=/some/where/on/your/local/path/ssl-key.pem
+  jwt.private.key.password=changeit
+  ```
   * Navigate to `<project_parent>/dataplane/services/gateway`
   * Run command `gradle bootRun`
 3. Start and setup DB
