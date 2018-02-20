@@ -249,6 +249,11 @@ export class ClusterAddComponent implements OnInit {
     return true;
   }
 
+  getIPAddress(amabariUrl){
+    let urlParts = amabariUrl.split('/');
+    return urlParts.length ? urlParts[2].substr(0, urlParts[2].lastIndexOf(':')) : '';
+  }
+
   locationFormatter(location: Location): string {
     return `${location.city}${location.province ? ', ' + location.province : ''}, ${location.country}`;
   }

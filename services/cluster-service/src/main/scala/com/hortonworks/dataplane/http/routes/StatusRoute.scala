@@ -290,7 +290,9 @@ class StatusRoute @Inject()(val ws: WSClient,
       endpoint <- Future.successful(s"${url.toString}$API_ENDPOINT")
       knoxUrlAsOptional <- probeCluster(endpoint)
       response <- probeStatus(knoxUrlAsOptional, endpoint, request)
-    } yield response
+//    TODO: remove this hack
+      transformed <- Future.successful(response.copy(ambariIpAddress=new URL(url.getProtocol, inet.getHostAddress, url.getPort, url.getFile).toString))
+    } yield transformed
   }
 
   lazy val ambariConnectTimer =
