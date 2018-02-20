@@ -155,7 +155,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .filter(p => !p.isInProgress)
       .delay(500)
       .map(p => !p.isInProgress)
-      .first();
+      .take(1);
   }
 
   mapTableData(policy: Policy) {

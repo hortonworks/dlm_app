@@ -42,7 +42,7 @@ export class Page {
       return elem.getText().then( function(text) {
         return text === item;
       });
-    }).first();
+    }).take(1);
   }
 
   clickAddDropdownButton(buttonText) {

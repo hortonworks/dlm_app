@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Event } from 'models/event.model';
 import { Cluster } from 'models/cluster.model';
@@ -33,7 +33,7 @@ const EVENTS_REQUEST = '[NOTIFICATION_PAGE] EVENTS_REQUEST';
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
 })
-export class NotificationsPageComponent {
+export class NotificationsPageComponent implements OnInit {
 
   events$: Observable<Event[]>;
   clusters$: Observable<Cluster[]>;
@@ -45,6 +45,9 @@ export class NotificationsPageComponent {
     this.clusters$ = store.select(getAllClusters);
     this.policies$ = store.select(getAllPolicies);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, EVENTS_REQUEST));
+  }
+
+  ngOnInit() {
     this.store.dispatch(loadEvents({numResults: 1000}, {requestId: EVENTS_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT, instanceCount: 10}, {requestId: POLICIES_REQUEST}));

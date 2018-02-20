@@ -43,13 +43,14 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
     return title;
   }
 
-  constructor(private store: Store<State>, private cloudAccountService: CloudAccountService, private t: TranslateService) {}
-
-  ngOnInit() {
-    this.store.dispatch(loadAccounts(ACCOUNTS_REQUEST));
+  constructor(private store: Store<State>, private cloudAccountService: CloudAccountService, private t: TranslateService) {
     this.accounts$ = this.store.select(getAllAccounts);
     this.overallProgress$ = this.store.select(getMergedProgress(ACCOUNTS_REQUEST));
     this.tableData$ = this.accounts$;
+  }
+
+  ngOnInit() {
+    this.store.dispatch(loadAccounts(ACCOUNTS_REQUEST));
     this.accountsSubscription$ = this.accounts$.subscribe(accounts => {
       this._accounts = accounts;
     });
