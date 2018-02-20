@@ -11,8 +11,6 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, WrappedErrorException}
-
 case class ServiceNotFound(message:String) extends Exception(message)
 case class ServiceException(message:String) extends Exception(message)
 

@@ -16,10 +16,8 @@ import java.nio.file.{Path, Paths}
 import java.security.KeyStore
 import javax.crypto.spec.SecretKeySpec
 
-import com.hortonworks.dataplane.commons.domain.Entities.Error
-
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
+import scala.util.{Try}
 
 case class KeystoreReloadEvent()
 
