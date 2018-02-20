@@ -40,15 +40,13 @@ class RatingRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
   }
 
   def getAverage(objectId: Long, objectType: String): Future[(Float, Int)] ={
-    val query = Ratings.filter(m => (m.objectId === objectId && m.objectType === objectType)).map(_.rating).result
+    val queryString = Ratings.filter(m => (m.objectId === objectId && m.objectType === objectType)).map(_.rating)
+    val query = (queryString.avg, queryString.length)
 
-    db.run(query).map { ratingList =>
-      if(ratingList.size > 0){
-        (ratingList.sum/ratingList.size, ratingList.size)
-      }else{
-        (0,0)
-      }
+    db.run(query.result). map { res =>
+      (res._1.getOrElse(0), res._2)
     }
+
   }
 
   def update(id: Long, userId: Long, rating: Float): Future[Rating] = {
