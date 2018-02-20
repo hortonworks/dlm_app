@@ -36,9 +36,7 @@ object Ambari {
                                  ambariApiStatus: Int = -1,
                                  knoxUrl: Option[String],
                                  ambariIpAddress: String,
-                                 ambariApiResponseBody: JsValue,
-                                 requestAmbariCreds: Boolean = false,
-                                 requestKnoxURL: Boolean = false)
+                                 ambariApiResponseBody: JsValue)
 
   case class AmbariDetailRequest(url: String,
                                  knoxDetected: Boolean,

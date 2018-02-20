@@ -61,7 +61,7 @@ object Webservice {
             s"""$lmsg | $msg""".stripMargin
           }.getOrElse(s"In db-client: Failed with $msg")
           printLogs(res,Option(logMsg))
-          throw new WrappedErrorException(Error(res.status, msg, ErrorType.General.toString))
+          throw new WrappedErrorException(Error(res.status, msg, code = "database.generic"))
       }
     }
 
@@ -193,7 +193,7 @@ object Webservice {
 
     def retrieveServiceInfo(dpClusterId: String): Future[Either[Errors, Seq[ClusterData]]]
 
-    def checkExistenceByIp(ambariIp: String): Future[Either[Errors, Boolean]]
+    def checkExistenceByUrl(ambariUrl: String): Future[Either[Errors, Boolean]]
 
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]

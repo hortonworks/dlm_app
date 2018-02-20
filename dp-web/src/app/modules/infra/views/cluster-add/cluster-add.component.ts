@@ -152,12 +152,7 @@ export class ClusterAddComponent implements OnInit {
           this.createDetailRequest(detailRequest, cleanedUri);
           this.requestClusterInfo(detailRequest, cleanedUri);
           this.removeValidationError();
-        } else if (response.requestAmbariCreds) {
-          this.showConfig = true;
-        } else if (response.requestKnoxURL) {
-          this.showConfig = true;
-        }
-        else {
+        } else {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
@@ -223,10 +218,15 @@ export class ClusterAddComponent implements OnInit {
     this._isClusterValidateSuccessful = false;
     this._isClusterValidateInProgress = false;
     this.showError = true;
-    if(!err){
+    if(!err) {
       this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
-    }else{
-      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+    } else {
+      let message = this.translateService.instant(`error.${err.code}`);
+      if(message === `error.${err.code}` || (err.code === 'generic' && err.message)) {
+        // no localized message configured
+        message = err.message;
+      }
+      this.errorMessage = message;
     }
   }
 
@@ -253,6 +253,7 @@ export class ClusterAddComponent implements OnInit {
     let urlParts = amabariUrl.split('/');
     return urlParts.length ? urlParts[2].substr(0, urlParts[2].lastIndexOf(':')) : '';
   }
+
   locationFormatter(location: Location): string {
     return `${location.city}${location.province ? ', ' + location.province : ''}, ${location.country}`;
   }

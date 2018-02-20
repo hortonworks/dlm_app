@@ -79,9 +79,9 @@ class RangerRoute @Inject()(
                   case Failure(th) =>
                     th match {
                       case th: ServiceNotFound =>
-                        complete(StatusCodes.NotFound, errors(th, status = 404))
+                        complete(StatusCodes.NotFound, errors(404, "cluster.ranger.service-not-found", "Unable to find Ranger configured for this cluster.", th))
                       case _ =>
-                        complete(StatusCodes.InternalServerError, errors(th))
+                        complete(StatusCodes.InternalServerError, errors(500, "cluster.ranger.generic", "A generic error occured while communicating to Ranger.", th))
                     }
                 }
               }
@@ -113,9 +113,9 @@ class RangerRoute @Inject()(
                 case Failure(th) =>
                   th match {
                     case th: ServiceNotFound =>
-                      complete(StatusCodes.NotFound, errors(th, status = 404))
+                      complete(StatusCodes.NotFound, errors(404, "cluster.ranger.service-not-found", "Unable to find Ranger configured for this cluster.", th))
                     case _ =>
-                      complete(StatusCodes.InternalServerError, errors(th))
+                      complete(StatusCodes.InternalServerError, errors(500, "cluster.ranger.generic", "A generic error occured while communicating to Ranger.", th))
                   }
               }
             }
