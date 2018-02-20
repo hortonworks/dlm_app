@@ -10,6 +10,7 @@
  */
 package com.hortonworks.dataplane.gateway.service;
 
+import com.hortonworks.dataplane.gateway.domain.DPConfig;
 import com.hortonworks.dataplane.gateway.domain.KnoxConfigurationResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,6 @@ public interface ConfigurationServiceInterface {
   KnoxConfigurationResponse getKnoxStatus();
 
   @RequestMapping(method = RequestMethod.GET, value = "/api/config/{key}")
-  String getTokenValidity(@PathVariable("key") String key);
+  DPConfig getTokenValidity(@PathVariable("key") String key);
 
 }

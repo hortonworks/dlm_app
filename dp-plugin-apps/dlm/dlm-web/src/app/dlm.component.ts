@@ -120,6 +120,13 @@ export class DlmComponent implements OnDestroy, OnInit {
         }
       });
     this.newEventsCount$ = store.select(getNewEventsCount);
+  }
+
+  getUser(): User {
+    return AuthUtils.getUser();
+  }
+
+  ngOnInit() {
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
     this.store.dispatch(loadEvents(null, { requestId: POLL_EVENTS_ID}));
@@ -129,13 +136,6 @@ export class DlmComponent implements OnDestroy, OnInit {
         this.initPolling();
       });
     this.subscriptions.push(clustersRequestSubscription);
-  }
-
-  getUser(): User {
-    return AuthUtils.getUser();
-  }
-
-  ngOnInit() {
     AuthUtils.loggedIn$.subscribe(() => {
       this.setHeaderData();
       const user = this.getUser();

@@ -37,6 +37,8 @@ PUT           /api/datasets                                          controllers
 GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId: String)
 DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId: String)
 
+PATCH         /api/datasets/:datasetId                                controllers.DataSets.updateDataset(datasetId : String)
+
 #GET           /api/clusters/:clusterId/hosts                        controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
 
 # DatasetCategories
@@ -49,7 +51,6 @@ POST          /api/datasets/categories                               controllers
 # Datasets ?
 # ===========================================
 GET           /api/dataset/:datasetId                                controllers.DataSets.getRichDatasetById(datasetId : String)
-PATCH         /api/datasets/:datasetId                               controllers.DataSets.updateDataset(datasetId : String)
 GET           /api/dataset/list                                      controllers.DataSets.getRichDataset
 GET           /api/dataset/list/tag/:tagName                         controllers.DataSets.getRichDatasetByTag(tagName : String)
 

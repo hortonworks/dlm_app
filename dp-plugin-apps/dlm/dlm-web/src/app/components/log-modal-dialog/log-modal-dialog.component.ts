@@ -89,7 +89,7 @@ export class LogModalDialogComponent implements OnInit {
         return this.store.select(getProgressState(INTERNAL_LOG_REQUEST))
           .distinctUntilKeyChanged('isInProgress')
           .filter(p => !p.isInProgress)
-          .first()
+          .take(1)
           .delay(POLL_INTERVAL);
       })
       .repeat()

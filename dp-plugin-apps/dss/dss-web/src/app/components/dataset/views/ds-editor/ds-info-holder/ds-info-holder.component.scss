@@ -60,3 +60,15 @@ footer {
     color: $roman-red;
   }
 }
+
+:host /deep/ .mdl-switch.is-public .mdl-switch__track{
+  background: $forest-green-1;
+}
+
+:host /deep/ .mdl-switch.is-checked .mdl-switch__track{
+  background: $shuttle-gray;
+}
+
+:host /deep/ .mdl-switch.is-checked .mdl-switch__thumb{
+  background: $alabaster;
+}

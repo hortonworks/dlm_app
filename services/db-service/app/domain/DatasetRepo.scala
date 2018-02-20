@@ -58,9 +58,12 @@ class DatasetRepo @Inject()(
     }
   )
 
-  def count(search:Option[String]): Future[Int] = {
+  def count(search:Option[String], userId: Option[Long]): Future[Int] = {
+    val filterQueryOnStatus = userId.map{ uid =>
+      Datasets.filter(t => (t.sharedStatus === SharingStatus.PUBLIC.id) || (t.createdBy === uid))
+    }.getOrElse(Datasets)
     val query = search
-      .map(s => Datasets.join(userRepo.Users).on(_.createdBy === _.id)
+      .map(s => filterQueryOnStatus.join(userRepo.Users).on(_.createdBy === _.id)
         .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
         .filter(m => filterDatasets(m,s)))
       .getOrElse(Datasets)
@@ -377,15 +380,16 @@ class DatasetRepo @Inject()(
   }
 
   def updateDatset(datasetId: Long, dataset: Dataset) = {
+    val datasetCopy = dataset.copy(lastModified = LocalDateTime.now)
     val query = ( for {
-      _ <- Datasets.filter(_.id === datasetId).update(dataset)
+      _ <- Datasets.filter(_.id === datasetId).update(datasetCopy)
       ds <- Datasets.filter(_.id === datasetId).result.headOption
     } yield(ds)).transactionally
 
     db.run(query)
   }
 
-  def getCategoriesCount(searchText: Option[String]): Future[List[CategoryCount]] = {
+  def getCategoriesCount(searchText: Option[String], userId: Long): Future[List[CategoryCount]] = {
     val countQuery = datasetCategoryRepo.DatasetCategories.groupBy(_.categoryId).map {
       case (catId, results) => (catId -> results.length)
     }
@@ -394,7 +398,9 @@ class DatasetRepo @Inject()(
         Datasets.join(userRepo.Users).on(_.createdBy === _.id)
           .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
           .filter(m => filterDatasets(m, st))
-      ) on (_.datasetId === _._1._1.id)).groupBy(_._1.categoryId)).map{
+      ) on ((category, datasetInfo) => {
+        ( category.datasetId === datasetInfo._1._1.id && datasetInfo._1._1.sharedStatus === SharingStatus.PUBLIC.id) || (category.datasetId === datasetInfo._1._1.id && datasetInfo._1._1.createdBy === userId)
+      })).groupBy(_._1.categoryId)).map{
         case(catId, results) => (catId -> results.map(_._2.map(_._1._1.name)).countDefined)
       }
     }
