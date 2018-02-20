@@ -10,7 +10,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MomentModule } from 'angular2-moment';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
-import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TypeaheadModule, TooltipModule, ModalModule, ProgressbarModule } from 'ngx-bootstrap';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -21,9 +20,7 @@ import { CommonComponentsModule } from 'components/common-components.module';
 import { OverviewComponent } from './overview.component';
 import { IssuesListComponent } from './issues-list/issues-list.component';
 import { IssuesListItemComponent } from './issues-list-item/issues-list-item.component';
-import { ResourceChartsComponent } from './resource-charts/';
 import { JobsTableComponent } from 'pages/jobs/jobs-table/jobs-table.component';
-import { JobTransferredGraphComponent } from 'pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableComponent } from 'common/table/table.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from 'components';
 import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
@@ -91,7 +88,6 @@ describe('OverviewComponent', () => {
         TooltipModule,
         MomentModule,
         NgxDatatableModule,
-        ChartsModule,
         FormsModule,
         ReactiveFormsModule,
         CommonComponentsModule,
@@ -103,10 +99,9 @@ describe('OverviewComponent', () => {
         OverviewComponent,
         IssuesListComponent,
         IssuesListItemComponent,
-        ResourceChartsComponent,
         JobsTableComponent,
         TableComponent,
-        JobTransferredGraphComponent,
+        // JobTransferredGraphComponent,
         TableFooterComponent,
         TableFilterComponent,
         CheckboxColumnComponent,

@@ -10,7 +10,7 @@
     "start": "ng serve",
     "dev": "ng serve --host 0.0.0.0 --proxy-config proxy.conf.dev.json",
     "prod": "ng serve --target=production --host 0.0.0.0 --proxy-config proxy.conf.prod.json",
-    "build": "ng build --target=production --base-href \"/dlm/\" --build-optimizer=false",
+    "build": "ng build --target=production --base-href \"/dlm/\"",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "test:watch": "ng test",

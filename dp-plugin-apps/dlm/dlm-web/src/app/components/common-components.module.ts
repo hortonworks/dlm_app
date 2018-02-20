@@ -18,7 +18,6 @@ import {
   AlertModule
 } from 'ngx-bootstrap';
 import { ModalModule } from 'ngx-bootstrap';
-import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
 import { MomentModule } from 'angular2-moment';
@@ -31,7 +30,6 @@ import { DropdownComponent } from './dropdown/dropdown.component';
 import { ClusterCardComponent } from './cluster-card/cluster-card.component';
 import { StatusColumnComponent } from './table-columns/policy-status-column/policy-status-column.component';
 import { IconColumnComponent } from './table-columns/icon-column/icon-column.component';
-import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.component';
 import { FormFieldComponent } from './forms/form-field/form-field.component';
 import { FormFieldDirective } from './forms/form-field/form-field.directive';
 import { FieldErrorComponent } from './forms/field-error/field-error.component';
@@ -77,7 +75,6 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     AlertModule.forRoot(),
     ModalModule.forRoot(),
     SimpleNotificationsModule.forRoot(),
-    ChartsModule,
     TranslateModule,
     HortonStyleModule,
     SelectModule,
@@ -91,7 +88,6 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     ClusterCardComponent,
     StatusColumnComponent,
     IconColumnComponent,
-    DoughnutChartComponent,
     FormFieldComponent,
     FormFieldDirective,
     FieldErrorComponent,
@@ -131,7 +127,6 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     ClusterCardComponent,
     StatusColumnComponent,
     IconColumnComponent,
-    DoughnutChartComponent,
     FormFieldComponent,
     FormFieldDirective,
     FieldErrorComponent,
