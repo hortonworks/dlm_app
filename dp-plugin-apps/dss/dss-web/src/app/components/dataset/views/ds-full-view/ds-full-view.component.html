@@ -25,16 +25,19 @@
     <div class="flex-side flex-side-right hwx-white-bg" >
 
         <div class="grapic-holder" style="height: 83px;">
-            <img src="assets/images/collection-banners/red1.png" alt="Fortune 100 Companies">
-            <span class="rating">4.1 <i class="fa fa-star"></i></span>
+            <img src="assets/images/collection-banners/red1.png">
+            <span class="rating">{{this.avgRating.toFixed(1)}}<i class="fa fa-star"></i></span>
         </div>
         <div class="flex-grid flex-summary">
-            <div class="flex-summary-item" onclick="onDataCollectionLikes()">
-                <i class="fa fa-heart" style="color: #fe69a1;"></i> <span>122</span></div>
+            <div class="flex-summary-item" (click)='onFavIconClick()'>
+                <i class="fa fa-heart" [ngClass] = "{'marked': dsModel.favouriteId}"></i> <span>{{getFavCount(dsModel.favouriteCount)}}</span>
+            </div>
             <div class="flex-summary-item" (click)='viewComments()' style="cursor: pointer; position: relative;">
                 <i class="fa fa-comments"></i>
-                <i class="fa fa-circle hwx-error" style="position:absolute; margin-left: -10px; font-size: .6em;"></i> 44</div>
-            <div class="flex-summary-item" onclick="onDataCollectionSettings()"><i class="fa fa-cog"></i> <i class="fa fa-angle-down"></i></div>
+            </div>
+           <div class="flex-summary-item" (click)='onBookmarkIconClick()' style="cursor: pointer; position: relative;">
+                <i class="fa fa-bookmark" [ngClass] = "{'marked': dsModel.bookmarkId}"></i>
+           </div>
         </div>
         <div class="flex-summary-vertical">
             <div class="flex-summary-item flex-grid">
@@ -101,31 +104,13 @@
       </div>
       <div class="hwx-description">{{dsModel.description}}</div>
   </div>
-  
+
   <div style="margin-top: 15px;" class="tabs menu">
     <ul onclick="function(){}">
         <li data-tab="Dashboard" class="">Dashboard</li>
         <li data-tab="Assets" class="active">Assets</li>
         <li data-tab="Profile and Schedule" class="">Profile &amp; Schedule</li>
     </ul>
-
-  <div class="div50Percent dataset-view__action-wrapper">
-    <div class="view-icon" (click)='viewComments()'>
-      <i class="fa fa-comments"></i>
-    </div>
-    <div  class="view-icon"  (click)='onFavIconClick()'>
-      <i class="fa fa-heart" [ngClass] = "{'marked': dsModel.favouriteId}"></i> {{getFavCount(dsModel.favouriteCount)}}
-    </div>
-    <div class="view-icon" (click)='onBookmarkIconClick()'>
-      <i class="fa fa-bookmark" [ngClass] = "{'marked': dsModel.bookmarkId}"></i>
-    </div>
-    <div class="dataset-item__action">
-      <button class="mdl-button mdl-js-button btn-hwx-primary" (click)="onDeleteDataset()">
-        {{'common.delete' | translate}}
-      </button>
-    </div>
-
-  </div>
 
   <div>
     <ds-assets-list-style1 [dsModel]="dsModel"
@@ -153,7 +138,7 @@
   </dialog>
   </div>
   <div style="clear: both;"></div>
-  
+
 </div>
 
 <div *ngIf="showPopup" class="popup borderBox">

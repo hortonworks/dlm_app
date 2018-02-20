@@ -14,10 +14,14 @@ import {Http, Headers, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {HttpUtil} from '../shared/utils/httpUtil';
 import {Rating} from "../models/rating";
+import {Subject} from "rxjs/Subject";
 
 @Injectable()
 export class RatingService {
   uri = 'api/ratings';
+  dataChanged = new Subject<number>();
+  dataChanged$ = this.dataChanged.asObservable();
+
   constructor(private http:Http) { }
 
   get(objectId: string, objectType: string): Observable<Rating>  {

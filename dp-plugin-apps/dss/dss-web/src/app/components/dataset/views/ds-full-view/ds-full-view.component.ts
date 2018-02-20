@@ -25,6 +25,7 @@ import {
 import {AuthUtils} from "../../../../shared/utils/auth-utils";
 import {FavouriteService} from "../../../../services/favourite.service";
 import {BookmarkService} from "../../../../services/bookmark.service";
+import {RatingService} from "../../../../services/rating.service";
 
 @Component({
   selector: "ds-full-view",
@@ -44,12 +45,14 @@ export class DsFullView implements OnInit {
   showPopup: boolean = false;
   systemTags: string[] = [];
   objectType: string = "assetCollection";
+  avgRating: number = 0;
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
               private tagService: DsTagsService,
               private favouriteService: FavouriteService,
               private bookmarkService: BookmarkService,
+              private ratingService: RatingService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -65,7 +68,11 @@ export class DsFullView implements OnInit {
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
         this.tagService.listAtlasTags(+params["id"]).subscribe(tags => this.systemTags=tags)
+        this.getAverageRating(params["id"]);
       });
+    this.ratingService.dataChanged$.subscribe(avgRating => {
+      this.avgRating = avgRating;
+    });
   }
   updateDsModel = (rData) => {
     this.dsModel = rData;
@@ -73,7 +80,7 @@ export class DsFullView implements OnInit {
   }
 
   private onAction(action: AssetListActionsEnum) {
-    if(action === AssetListActionsEnum.DELETE) 
+    if(action === AssetListActionsEnum.DELETE)
       return this.onDeleteDataset();
     if(action === AssetListActionsEnum.EDIT){
       this.applicableListActions = [AssetListActionsEnum.REMOVE, AssetListActionsEnum.ADD, AssetListActionsEnum.DONE];
@@ -86,7 +93,7 @@ export class DsFullView implements OnInit {
     if (action == AssetListActionsEnum.REMOVE) {
       if(this.dsAssetList.checkedAllState())
         this.actionRemoveAll();
-      else 
+      else
         this.actionRemoveSelected(this.dsAssetList.selExcepList);
     }
     if (action == AssetListActionsEnum.ADD) {
@@ -175,6 +182,11 @@ export class DsFullView implements OnInit {
     this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true, queryParams: { returnURl: this.router.url }});
   }
 
+  getAverageRating(datasetId: string) {
+    this.ratingService.getAverage(datasetId, this.objectType).subscribe( averageAndVotes => {
+      this.avgRating = averageAndVotes.average;
+    });
+  }
   toggleSummaryWidget () {
     this.showSummary = !this.showSummary;
   }
@@ -186,11 +198,11 @@ export class DsFullView implements OnInit {
   popupActionDone(asqm: AssetSetQueryModel) {
     let futureRdataSet;
 
-    if(asqm.selectionList.length) 
+    if(asqm.selectionList.length)
       futureRdataSet = this.richDatasetService.addSelectedAssets(this.dsModel.id, this.dsModel.clusterId, asqm.selectionList);
     else
       futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
-    
+
     futureRdataSet.subscribe(rData => {
         this.updateDsModel(rData)
         // this.assetSetQueryModelsForAddition.push(asqm);
