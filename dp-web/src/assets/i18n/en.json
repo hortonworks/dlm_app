@@ -427,37 +427,37 @@
     "dss": "Data Steward Studio"
   },
   "error": {
-    "cluster.ambari.status.unreachable-host-error": "Host is unreachable.",
-    "cluster.ambari.status.dns-error": "Unable to resolve host.",
-    "cluster.ambari.status.invalid-json-response": "Unable to deserialize JSON. Is there a non-transparent proxy in front of Ambari/Knox?.",
-    "cluster.ambari.status.unexpected-response-hd-insight": "We recieved an unexpected response from cluster. The cluster returned a 401 and hence should have been an HD Insight cluster, but was not.",
-    "cluster.ambari.status.unexpected-response-for-prereq-call": "Unexpected Response from Ambari, expected 403 or 401.",
-    "cluster.ambari.status.connection-refused": "Connection to remote address was refused.",
+    "cluster.ambari.status.unreachable-host-error": "Host is unreachable. Please check if Ambari is up and reachable from DataPlane host.",
+    "cluster.ambari.status.dns-error": "Unable to resolve host. Please verify that the DataPlane host can reach the domain specified in the URL and it is configured correctly in your corporate or public DNS.",
+    "cluster.ambari.status.invalid-json-response": "Unable to deserialize JSON. Please verify the exact errors from DataPlane logs.",
+    "cluster.ambari.status.unexpected-response-hd-insight": "We recieved an unexpected response from cluster. Please verify the exact errors from DataPlane logs.",
+    "cluster.ambari.status.unexpected-response-for-prereq-call": "Unexpected Response from Ambari, expected 403 or 401. Please verify the exact errors from DataPlane logs.",
+    "cluster.ambari.status.connection-refused": "Connection to remote address was refused. Please check if Ambari is up and reachable from DataPlane host.",
 
-    "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth": "Knox token or the certificate on cluster might be corrupted.",
-    "cluster.ambari.status.knox.ranger-rights-unavailable": "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.",
-    "cluster.ambari.status.knox.configuration-error": "Knox token topology is not validated and deployment descriptor is not created.",
-    "cluster.ambari.status.knox.public-key-corrupted": "Knox certificate on cluster might be corrupted.",
-    "cluster.ambari.status.knox.connection-refused": "Connection to remote address was refused.",
-    "cluster.ambari.status.knox.jwt-token-missing": "Ambari was Knox protected but no JWT token was sent with request.",
+    "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that trust between Knox and DataPlane has been setup correctly.",
+    "cluster.ambari.status.knox.ranger-rights-unavailable": "User does not have required rights to access Knox on this HDP cluster. Please ensure that logged-in user has required privileges granted.",
+    "cluster.ambari.status.knox.configuration-error": "Knox has not been setup for DataPlane correctly. Please verify Knox gateway logs on HDP cluster for more information.",
+    "cluster.ambari.status.knox.public-key-corrupted": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify Knox gateway logs on HDP cluster for more information.",
+    "cluster.ambari.status.knox.connection-refused": "Connection to remote address was refused. Please check if Knox is up and reachable from DataPlane host.",
+    "cluster.ambari.status.knox.jwt-token-missing": "This operation is not supported for non-LDAP users. Please log-in as an LDAP user to add this cluster.",
     "cluster.ambari.status.knox.tls-error": "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.",
-    "cluster.ambari.status.knox.genric": "Unknown error. Server returned an expected response",
+    "cluster.ambari.status.knox.genric": "Unknown error. Server returned an unexpected response. Please check DataPlane logs for more information.",
 
     "cluster.ambari.status.raw.credential-not-found": "There is no credential configured for Ambari default user",
-    "cluster.ambari.status.raw.unauthorized": "User needs to be authenticated.",
-    "cluster.ambari.status.raw.forbidden": "User does not have required rights. Please log-in as another user.",
-    "cluster.ambari.status.raw.not-found": "We were unable to find the enpoint you were querying.",
-    "cluster.ambari.status.raw.server-error": "An internal server error occurred.",
-    "cluster.ambari.status.raw.connection-refused": "Connection to remote address was refused.",
+    "cluster.ambari.status.raw.unauthorized": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that Knox has been setup and configured correctly for DataPlane.",
+    "cluster.ambari.status.raw.forbidden": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that Knox has been setup and configured correctly for DataPlane.",
+    "cluster.ambari.status.raw.not-found": "We were unable to find the endpoint you were querying.",
+    "cluster.ambari.status.raw.server-error": "An internal server error occurred. Please check DataPlane logs for more information.",
+    "cluster.ambari.status.raw.connection-refused": "Connection to remote address was refused. Please check if Ambari is up and reachable from DataPlane host.",
     "cluster.ambari.status.raw.tls-error": "TLS error. Please ensure your Ambari server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.",
-    "cluster.ambari.status.raw.generic": "Unknown error while communicating with Ambari.",
+    "cluster.ambari.status.raw.generic": "Unknown error while communicating with Ambari. Please check DataPlane logs for more information.",
 
-    "cluster.ambari.status.generic": "Generic error while communicating to Ambari.",
+    "cluster.ambari.status.generic": "Generic error while communicating to Ambari. Please check DataPlane logs for more information.",
 
     "core.ambari.status.already-added": "This Ambari cluster has already been added.",
 
-    "database.generic": "An unexpected error occured with database.",
+    "database.generic": "An unexpected error occured with database. Please check DataPlane logs for more information.",
 
-    "generic": "An unexpected error occured."
+    "generic": "An unexpected error occured. Please check DataPlane logs for more information."
   }
 }
