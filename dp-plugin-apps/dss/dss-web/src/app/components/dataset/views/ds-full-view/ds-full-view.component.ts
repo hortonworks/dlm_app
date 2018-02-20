@@ -26,6 +26,7 @@ import {AuthUtils} from "../../../../shared/utils/auth-utils";
 import {FavouriteService} from "../../../../services/favourite.service";
 import {BookmarkService} from "../../../../services/bookmark.service";
 import {RatingService} from "../../../../services/rating.service";
+import {DataSet} from "../../../../models/data-set";
 
 @Component({
   selector: "ds-full-view",
@@ -178,6 +179,32 @@ export class DsFullView implements OnInit {
     }
   }
 
+  onLockClick(){
+    if(this.isLoggedInUser(this.dsModel.creatorId)){
+      let dataset = new DataSet();
+      dataset.id = this.dsModel.id;
+      dataset.createdBy = this.dsModel.creatorId;
+      dataset.createdOn = this.dsModel.createdOn;
+      dataset.dpClusterId = this.dsModel.clusterId;
+      dataset.datalakeId = this.dsModel.datalakeId;
+      dataset.description = this.dsModel.description;
+      dataset.lastModified = this.dsModel.lastModified;
+      dataset.name = this.dsModel.name;
+      dataset.active = this.dsModel.active;
+      dataset.version = this.dsModel.version;
+      dataset.customProps = this.dsModel.customProps;
+      dataset.sharedStatus = (this.dsModel.sharedStatus % 2) + 1;
+      this.dataSetService.update(dataset).subscribe( ds => {
+        this.dsModel.sharedStatus = ds.sharedStatus;
+        this.dsModel.lastModified = ds.lastModified;
+      })
+    }
+  }
+
+  isLoggedInUser(datasetUserId: number){
+    return Number(AuthUtils.getUser().id) === datasetUserId;
+  }
+
   viewComments(){
     this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true, queryParams: { returnURl: this.router.url }});
   }
@@ -204,10 +231,10 @@ export class DsFullView implements OnInit {
       futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
 
     futureRdataSet.subscribe(rData => {
-        this.updateDsModel(rData)
-        // this.assetSetQueryModelsForAddition.push(asqm);
-        this.showPopup = false;
-      })
+      this.updateDsModel(rData)
+      // this.assetSetQueryModelsForAddition.push(asqm);
+      this.showPopup = false;
+    })
   }
 
 }
