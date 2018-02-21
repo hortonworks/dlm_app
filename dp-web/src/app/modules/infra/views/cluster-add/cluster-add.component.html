@@ -23,7 +23,7 @@
       <i class="fa fa-times-circle pull-left"></i>
       <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
       <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
-      <div id="error-message" class="text-small-1" data-se="cluster_add__addError">{{errorMessage}} </div>
+      <div id="error-message" class="text-small-1" data-se="cluster_add__addError" [innerHTML]="errorMessage"></div>
     </div>
   </div>
 
