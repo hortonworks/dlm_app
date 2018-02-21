@@ -49,12 +49,7 @@ describe('CloudAccountsListComponent', () => {
       ],
       declarations: [
         CloudAccountsListComponent,
-        TableComponent,
-        TableFooterComponent,
-        CloudAccountActionsComponent,
-        ActionColumnComponent,
-        CheckboxColumnComponent,
-        CheckboxComponent
+        CloudAccountActionsComponent
       ],
       providers: [
         CloudAccountService,

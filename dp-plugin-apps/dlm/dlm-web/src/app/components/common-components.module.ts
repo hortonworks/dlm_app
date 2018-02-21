@@ -15,9 +15,12 @@ import {
   TooltipModule,
   CollapseModule,
   ProgressbarModule,
-  AlertModule
+  AlertModule,
+  TypeaheadModule
 } from 'ngx-bootstrap';
 import { ModalModule } from 'ngx-bootstrap';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
 import { MomentModule } from 'angular2-moment';
@@ -63,6 +66,16 @@ import { NotificationsContainerComponent } from './notifications-container/notif
 import { TransferredObjectsComponent } from './table-columns/transferred-objects/transferred-objects.component';
 import { ServiceStatusIconComponent } from './service-status-icon/service-status-icon.component';
 import { FieldLabelComponent } from './forms/field-label/field-label.component';
+import {TableComponent} from '../common/table/table.component';
+import {CheckboxListComponent} from '../common/checkbox-list/checkbox-list.component';
+import {CheckboxColumnComponent} from './table-columns/checkbox-column/checkbox-column.component';
+import {HdfsBrowserComponent} from './hdfs-browser/hdfs-browser.component';
+import {CheckboxComponent} from '../common/checkbox/checkbox.component';
+import {ActionColumnComponent} from './table-columns/action-column/action-column.component';
+import {TableFilterComponent} from '../common/table/table-filter/table-filter.component';
+import {RadioButtonComponent} from '../common/radio-button/radio-button.component';
+import {TableFooterComponent} from '../common/table/table-footer/table-footer.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   imports: [
@@ -75,11 +88,16 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     AlertModule.forRoot(),
     ModalModule.forRoot(),
     SimpleNotificationsModule.forRoot(),
+    NgxDatatableModule,
+    TypeaheadModule,
+    ChartsModule,
     TranslateModule,
     HortonStyleModule,
     SelectModule,
     MomentModule,
-    PipesModule
+    PipesModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [
     CardComponent,
@@ -118,7 +136,16 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     NotificationsContainerComponent,
     TransferredObjectsComponent,
     ServiceStatusIconComponent,
-    FieldLabelComponent
+    FieldLabelComponent,
+    RadioButtonComponent,
+    CheckboxListComponent,
+    CheckboxComponent,
+    HdfsBrowserComponent,
+    TableComponent,
+    TableFooterComponent,
+    TableFilterComponent,
+    ActionColumnComponent,
+    CheckboxColumnComponent
   ],
   exports: [
     CardComponent,
@@ -157,7 +184,16 @@ import { FieldLabelComponent } from './forms/field-label/field-label.component';
     NotificationsContainerComponent,
     TransferredObjectsComponent,
     ServiceStatusIconComponent,
-    FieldLabelComponent
+    FieldLabelComponent,
+    RadioButtonComponent,
+    CheckboxListComponent,
+    CheckboxComponent,
+    HdfsBrowserComponent,
+    TableComponent,
+    TableFooterComponent,
+    TableFilterComponent,
+    ActionColumnComponent,
+    CheckboxColumnComponent
   ]
 })
 export class CommonComponentsModule {

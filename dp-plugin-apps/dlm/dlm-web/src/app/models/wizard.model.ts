@@ -7,18 +7,12 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export enum ModalSize {
-  SMALL,
-  MEDIUM,
-  LARGE,
-  FULLPAGE,
-  FIXED400
+export interface Step {
+  label: string;
+  id: string;
+  index: number;
+  state: 'active' | 'disabled' | 'completed';
+  value: any;
+  nextStepId: string;
+  previousStepId: string;
 }
-
-export const SIZE_CLASS_MAP = {
-  [ModalSize.FIXED400]: 'fixed-400',
-  [ModalSize.SMALL]: 'small-modal',
-  [ModalSize.MEDIUM]: 'medium-modal',
-  [ModalSize.LARGE]: 'large-modal',
-  [ModalSize.FULLPAGE]: 'full-page'
-};

@@ -48,14 +48,7 @@ describe('PolicyDetailsComponent', () => {
       ],
       declarations: [
         PolicyDetailsComponent,
-        ActionColumnComponent,
-        CheckboxColumnComponent,
-        CheckboxComponent,
-        TableComponent,
-        TableFooterComponent,
-        TableFilterComponent,
-        JobsTableComponent,
-        HdfsBrowserComponent
+        JobsTableComponent
       ],
       providers: [
         NavbarService,

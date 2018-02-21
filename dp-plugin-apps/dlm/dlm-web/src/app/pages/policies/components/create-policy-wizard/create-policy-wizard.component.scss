@@ -1,0 +1,116 @@
+/*!
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
+@import '../../../../styles/variables';
+
+$navigation-menu-width: 300px;
+
+.dlm-radio-group {
+  .dlm-radio-item {
+    float: left;
+
+    &:not(:first-child) {
+      padding-left: 15px;
+    }
+  }
+}
+
+.schedule-group {
+  .new-row {
+    padding-top: 20px;
+  }
+}
+
+.date-time-group {
+  .time-control {
+    display: flex;
+    justify-content: center;
+  }
+
+  .clock-icon {
+    font-size: 20px;
+    align-self: center;
+    margin-right: 15px;
+  }
+}
+
+.hdfs-browser-container {
+  padding: 35px;
+  background-color: #EEE;
+}
+
+.fa {
+  &.text-primary:hover {
+    cursor: pointer;
+  }
+}
+
+.policy-form {
+  label {
+    font-weight: normal;
+    &.btn-primary {
+      color: #FFF;
+    }
+  }
+  .form-section-title {
+    color: $link-color;
+  }
+  .form-footer {
+    border: 0;
+  }
+  .time-field, .timezone-field {
+    float: left;
+    width: 200px;
+    padding: 0 15px;
+  }
+  .timezone-field {
+    width: 300px;
+    .value {
+      padding-top: 7px;
+    }
+  }
+}
+
+#enable_snapshot {
+  .link-text {
+    padding: 0;
+  }
+}
+
+.tab-container {
+  ul.nav {
+    width: $navigation-menu-width;
+    float: left;
+    min-height: 550px;
+    padding-top: 25px;
+    background-color: #323544;
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
+  }
+  .tab-content {
+    margin-left: $navigation-menu-width;
+    height: calc(100vh - 120px);
+  }
+}
+.wizard {
+  .wizard-body {
+    height: calc(100vh - 76px);
+    .wizard-nav {
+      height: calc(100vh - 138px);
+      padding: 0;
+      margin: 0;
+      background-color: transparent;
+    }
+    .wizard-content {
+      padding-left: 25px;
+      padding-right: 25px;
+      float: none !important;
+    }
+  }
+}

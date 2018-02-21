@@ -1,0 +1,79 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<div class="wizard">
+  <div class="wizard-body row">
+    <div class="wizard-nav col-xs-12">
+      <tabset [vertical]="true" type="pills">
+        <tab *ngFor="let step of wizardSteps$ | async; trackBy: trackByFn"
+             (select)="handleSelectTab($event, step)"
+             [active]="activeStepId === step.id"
+             [disabled]="step.state === 'disabled'"
+             [customClass]="step.state">
+          <ng-template tabHeading>
+            <i class="step-marker">
+              <span class="step-index">{{step.index}}</span>
+            </i>
+            <p class="step-name" [attr.qe-attr]="'wizard-step-' + step.id">{{step?.label}}</p>
+          </ng-template>
+          <div [ngSwitch]="step?.id">
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.GENERAL">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  <dlm-step-general #general (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-general>
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SOURCE">
+              <dlm-wizard-content [stepIndex]="step?.index" [stepLabel]="step?.label">
+                <div wizard-content-body>
+                  <dlm-step-source #source [accounts]="accounts" [clusters]="clusters" [pairings]="pairings"
+                                   (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-source>
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.DESTINATION">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  Select Destination
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SCHEDULE">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  Schedule
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.ADVANCED">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  Advanced Settings
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.REVIEW">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  Review
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+          </div>
+        </tab>
+      </tabset>
+    </div>
+    <div class="wizard-footer col-xs-12">
+      <button class="btn btn-default" (click)="handleCancelClick($event)">Cancel</button>
+      <button class="btn btn-success pull-right" (click)="handleNextButtonClick($event)" [disabled]="!isFormValid">{{getNextButtonText}} →</button>
+      <button class="btn btn-default pull-right" (click)="handleBackButtonClick($event)" [disabled]="isBackButtonDisabled">Back</button>
+    </div>
+  </div>
+</div>

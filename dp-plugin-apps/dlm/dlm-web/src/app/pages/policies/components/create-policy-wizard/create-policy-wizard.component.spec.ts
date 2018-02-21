@@ -9,25 +9,21 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
-import { TabsModule} from 'ngx-bootstrap';
-
-import {CommonComponentsModule} from 'components/common-components.module';
-import {CreatePolicyModalComponent} from '../../components/create-policy-modal/create-policy-modal.component';
-import {CreatePolicyWizardComponent} from '../../components/create-policy-wizard/create-policy-wizard.component';
-import {CreatePolicyComponent} from './create-policy.component';
-import {WizardContentComponent} from '../../components/wizard-content/wizard-content.component';
-import {CreatePolicyStepsModule} from '../../components/create-policy-steps/create-policy-steps.module';
-import {NavbarService} from 'services/navbar.service';
-import { RouterTestingModule } from '@angular/router/testing';
-import {TooltipModule} from 'ngx-bootstrap';
 import {configureComponentTest} from 'testing/configure';
+import {CommonComponentsModule} from 'components/common-components.module';
+import {TabsModule, TooltipModule} from 'ngx-bootstrap';
+import {RouterTestingModule} from '@angular/router/testing';
+import {CreatePolicyStepsModule} from '../create-policy-steps/create-policy-steps.module';
 import {HortonStyleModule} from 'common/horton-style.module';
+import {WizardContentComponent} from '../wizard-content/wizard-content.component';
+import {CreatePolicyWizardComponent} from './create-policy-wizard.component';
 import {PolicyService} from 'services/policy.service';
+import {NavbarService} from 'services/navbar.service';
 import {JobService} from 'services/job.service';
 
-describe('CreatePolicyComponent', () => {
-  let component: CreatePolicyComponent;
-  let fixture: ComponentFixture<CreatePolicyComponent>;
+describe('CreatePolicyWizardComponent', () => {
+  let component: CreatePolicyWizardComponent;
+  let fixture: ComponentFixture<CreatePolicyWizardComponent>;
 
   beforeEach(async(() => {
     configureComponentTest({
@@ -42,9 +38,7 @@ describe('CreatePolicyComponent', () => {
         HortonStyleModule
       ],
       declarations: [
-        CreatePolicyComponent,
         CreatePolicyWizardComponent,
-        CreatePolicyModalComponent,
         WizardContentComponent
       ],
       providers: [
@@ -57,7 +51,7 @@ describe('CreatePolicyComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreatePolicyComponent);
+    fixture = TestBed.createComponent(CreatePolicyWizardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

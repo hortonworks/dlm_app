@@ -7,18 +7,9 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export enum ModalSize {
-  SMALL,
-  MEDIUM,
-  LARGE,
-  FULLPAGE,
-  FIXED400
+export interface StepComponent {
+  // Returns value of the form in the step
+  getFormValue(): Object;
+  // Returns if the form is valid or not. This is used to enable or disable the next button.
+  isFormValid(): boolean;
 }
-
-export const SIZE_CLASS_MAP = {
-  [ModalSize.FIXED400]: 'fixed-400',
-  [ModalSize.SMALL]: 'small-modal',
-  [ModalSize.MEDIUM]: 'medium-modal',
-  [ModalSize.LARGE]: 'large-modal',
-  [ModalSize.FULLPAGE]: 'full-page'
-};

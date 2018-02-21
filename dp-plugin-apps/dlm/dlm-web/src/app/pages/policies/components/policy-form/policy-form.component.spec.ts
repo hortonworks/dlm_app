@@ -49,7 +49,7 @@ import { DatabaseTablesCollapsedEvent } from 'components/hive-browser';
 import { ProgressState } from 'models/progress-state.model';
 import { TimeZoneService } from 'services/time-zone.service';
 
-describe('PolicyFormComponent', () => {
+xdescribe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
   let fixture: ComponentFixture<PolicyFormComponent>;
   let store: Store<State>;
@@ -74,15 +74,6 @@ describe('PolicyFormComponent', () => {
       ],
       declarations: [
         PolicyFormComponent,
-        RadioButtonComponent,
-        CheckboxComponent,
-        CheckboxListComponent,
-        CheckboxColumnComponent,
-        HdfsBrowserComponent,
-        TableComponent,
-        TableFooterComponent,
-        TableFilterComponent,
-        ActionColumnComponent,
         SelectCloudDestinationComponent
       ],
       providers: [

@@ -164,6 +164,10 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { AsyncActionsService } from 'services/async-actions.service';
 
 import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-cloud-form/add-cloud-form.component';
+import { CreatePolicyModalComponent } from 'pages/policies/components/create-policy-modal/create-policy-modal.component';
+import { CreatePolicyWizardComponent } from 'pages/policies/components/create-policy-wizard/create-policy-wizard.component';
+import { WizardContentComponent } from 'pages/policies/components/wizard-content/wizard-content.component';
+import { CreatePolicyStepsModule } from './pages/policies/components/create-policy-steps/create-policy-steps.module';
 
 @NgModule({
   imports: [
@@ -217,7 +221,8 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     BrowserAnimationsModule,
     SimpleNotificationsModule.forRoot(),
     PipesModule,
-    OverviewModule
+    OverviewModule,
+    CreatePolicyStepsModule
   ],
   declarations: [
     DlmComponent,
@@ -236,7 +241,6 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,
-    HdfsBrowserComponent,
 
     PoliciesComponent,
     PolicyTableComponent,
@@ -248,7 +252,6 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     PolicyDetailsComponent,
     PolicyServiceFilterComponent,
     PrevJobsComponent,
-    SelectCloudDestinationComponent,
 
     OverviewFilterComponent,
     IssuesListComponent,
@@ -264,25 +267,20 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     NavigationDropdownComponent,
     UserDropdownComponent,
     NotFoundRouteComponent,
-    RadioButtonComponent,
-    CheckboxComponent,
-    CheckboxListComponent,
     CreatePairingCardComponent,
     CreatePairingCardListComponent,
     PairingProgressCardComponent,
     PairingCardComponent,
     PairingCardListComponent,
-    TableComponent,
-    TableFooterComponent,
-    TableFilterComponent,
-    CheckboxColumnComponent,
-    ActionColumnComponent,
     NotificationsComponent,
     EventMessageComponent,
     LogModalDialogComponent,
     PersonaPopupComponent,
     TabsComponent,
-    AddCloudFormComponent
+    AddCloudFormComponent,
+    CreatePolicyModalComponent,
+    CreatePolicyWizardComponent,
+    WizardContentComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

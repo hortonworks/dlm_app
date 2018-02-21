@@ -45,13 +45,7 @@ describe('ClusterListComponent', () => {
         MomentModule
       ],
       declarations: [
-        ClusterListComponent,
-        TableComponent,
-        TableFooterComponent,
-        ActionColumnComponent,
-        CheckboxComponent,
-        CheckboxColumnComponent,
-        HdfsBrowserComponent
+        ClusterListComponent
       ],
       providers: [
         NavbarService,
