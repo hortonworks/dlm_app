@@ -14,13 +14,19 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers';
 import { loadAccounts } from 'actions/cloud-account.action';
-import { getAllAccounts } from 'selectors/cloud-account.selector';
+import { getAllAccountsWithPolicies } from 'selectors/cloud-account.selector';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
 import { CloudAccountService } from 'services/cloud-account.service';
 import { TranslateService } from '@ngx-translate/core';
+import {loadBeaconCloudCreds} from 'actions/beacon-cloud-cred.action';
+import {getAllBeaconCloudCreds} from 'selectors/beacon-cloud-cred.selector';
+import {BeaconCloudCred} from 'models/beacon-cloud-cred.model';
+import {loadPolicies} from 'actions/policy.action';
 
 const ACCOUNTS_REQUEST = '[CLOUD STORES] ACCOUNTS_REQUEST';
+const BEACON_ACCOUNTS_REQUEST = '[CLOUD STORES] BEACON CLOUD CREDS';
+const POLICIES_REQUEST = '[CLOUD STORES] POLICIES_REQUEST';
 
 @Component({
   selector: 'dlm-cloud-stores',
@@ -30,6 +36,7 @@ const ACCOUNTS_REQUEST = '[CLOUD STORES] ACCOUNTS_REQUEST';
 export class CloudAccountsComponent implements OnInit, OnDestroy {
 
   accounts$: Observable<CloudAccount[]>;
+  beaconCloudCreds$: Observable<BeaconCloudCred[]>;
   overallProgress$: Observable<ProgressState>;
   _accounts: CloudAccount[];
   accountsSubscription$: Subscription;
@@ -44,13 +51,16 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
   }
 
   constructor(private store: Store<State>, private cloudAccountService: CloudAccountService, private t: TranslateService) {
-    this.accounts$ = this.store.select(getAllAccounts);
-    this.overallProgress$ = this.store.select(getMergedProgress(ACCOUNTS_REQUEST));
+    this.accounts$ = this.store.select(getAllAccountsWithPolicies);
+    this.beaconCloudCreds$ = this.store.select(getAllBeaconCloudCreds);
+    this.overallProgress$ = this.store.select(getMergedProgress(ACCOUNTS_REQUEST, BEACON_ACCOUNTS_REQUEST));
     this.tableData$ = this.accounts$;
   }
 
   ngOnInit() {
+    this.store.dispatch(loadPolicies({}, {requestId: POLICIES_REQUEST}));
     this.store.dispatch(loadAccounts(ACCOUNTS_REQUEST));
+    this.store.dispatch(loadBeaconCloudCreds({requestId: BEACON_ACCOUNTS_REQUEST}));
     this.accountsSubscription$ = this.accounts$.subscribe(accounts => {
       this._accounts = accounts;
     });

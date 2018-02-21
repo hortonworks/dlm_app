@@ -33,6 +33,7 @@ import * as fromYarnQueues from './yarn-queues.reducer';
 import * as fromCloudAccount from './cloud-account.reducer';
 import * as fromCloudContainer from './cloud-container.reducer';
 import * as fromCloudContainerItem from './cloud-container-item.reducer';
+import * as fromBeaconCloudCred from './beacon-cloud-cred.reducer';
 
 export interface State {
   router: RouterReducerState;
@@ -53,6 +54,7 @@ export interface State {
   cloudAccounts: fromCloudAccount.State;
   cloudContainers: fromCloudContainer.State;
   cloudContainerItems: fromCloudContainerItem.State;
+  beaconCloudCreds: fromBeaconCloudCred.State;
   createPolicyWizard: fromCreatePolicy.State;
 }
 
@@ -75,6 +77,7 @@ export const reducers: ActionReducerMap<State> = {
   cloudAccounts: fromCloudAccount.reducer,
   cloudContainers: fromCloudContainer.reducer,
   cloudContainerItems: fromCloudContainerItem.reducer,
+  beaconCloudCreds: fromBeaconCloudCred.reducer,
   createPolicyWizard: fromCreatePolicy.reducer
 };
 

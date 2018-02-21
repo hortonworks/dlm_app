@@ -34,6 +34,7 @@ export class CloudAccountsListComponent implements OnInit {
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
   @ViewChild('providerCell') providerCellRef: TemplateRef<any>;
+  @ViewChild('policiesCell') policiesCellRef: TemplateRef<any>;
   @ViewChild('nameCell') nameCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
 
@@ -70,6 +71,12 @@ export class CloudAccountsListComponent implements OnInit {
         flexGrow: 10
       },
       {
+        name: this.t.instant('page.cloud_stores.content.table.policies'),
+        cellTemplate: this.policiesCellRef,
+        sortable: false,
+        flexGrow: 3
+      },
+      {
         name: this.t.instant('page.cloud_stores.content.table.actions'),
         cellTemplate: this.actionsCellRef,
         cellClass: 'add-actions-cell',
@@ -78,6 +85,14 @@ export class CloudAccountsListComponent implements OnInit {
         flexGrow: 2
       }
     ];
+  }
+
+  isAccountActive(account) {
+    return this.tableComponent.isRowExpanded(account);
+  }
+
+  toggleRowDetails(account) {
+    this.tableComponent.toggleRowDetail(account);
   }
 
   handleSelectedAction({cluster, action}) {

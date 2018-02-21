@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<h5>{{"common.policies" | translate}}</h5>
+
+<dlm-table
+  [columns]="columns"
+  [columnMode]="columnMode"
+  [rows]="policies"
+  [footerOptions]="tableFooterOptions">
+</dlm-table>
+
+<ng-template #verbStatusCellTemplate let-value="value" let-index="rowIndex" let-policy="row">
+  <dlm-policy-status-column
+    class="inline-block"
+    [showText]="false"
+    [status]="policy.uiStatus">
+  </dlm-policy-status-column>
+  <span [attr.qe-attr]="'policy-status-' + index" class="policy-status">{{value | translate}}</span>
+</ng-template>
+
+<ng-template #policyNameCellTemplate let-row="row" let-name="value">
+  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name" [tooltip]="name">
+   {{name}}
+  </span>
+</ng-template>
+
+<ng-template #prevJobsCellTemplate let-policy="row" let-index="rowIndex">
+  <span [attr.qe-attr]="'policy-jobs-' + index">
+    <dlm-prev-jobs [policy]="policy"></dlm-prev-jobs>
+  </span>
+</ng-template>
+
+<ng-template #endTimeCellTemplate let-policy="row" let-index="rowIndex">
+  <span [attr.qe-attr]="'policy-end-time-' + index" *ngIf="policy?.endTime">{{policy?.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
+</ng-template>
+
+<ng-template #lastJobTimeCellTemplate let-time="value" let-policy="row" let-index="rowIndex">
+  <span *ngIf="time; else noData" [attr.qe-attr]="'policy-last-job-' + index"
+        [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+    {{time | fmtTz | amTimeAgo}}
+  </span>
+  <ng-template #noData>
+    <span [attr.qe-attr]="'policy-last-good-' + index">n/a</span>
+  </ng-template>
+</ng-template>

@@ -14,13 +14,26 @@
   [footerHeight]="footerHeight"
   [showFooter]="showFooter"
   [limit]="1000"
-  [rows]="accounts">
+  [rows]="accounts"
+  [rowDetailHeight]="600"
+  [rowDetailTemplate]="rowDetailRef">
 </dlm-table>
 
 <ng-template #providerCell let-account="row" let-index="rowIndex">
   <div>
     <span class="provider" [attr.qe-attr]="'cloud-account-provider-' + index">{{account.accountDetails.provider}}</span>
     <span class="left-arrow">&#9664;</span>
+  </div>
+</ng-template>
+
+<ng-template #policiesCell let-account="row" let-index="rowIndex">
+  <div [attr.qe-attr]="'cloud-account-policies' + index">
+    <span *ngIf="account.policies?.length; else noPolicies" class="actionable" (click)="toggleRowDetails(account)">
+      {{account.policies.length}}<span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isAccountActive(account), 'fa-caret-down': !isAccountActive(account)}"></span>
+    </span>
+    <ng-template #noPolicies>
+      <span class="fa fa-minus"></span>
+    </ng-template>
   </div>
 </ng-template>
 
@@ -64,4 +77,8 @@
     [cloudAccountActions]="cloudAccountActions"
     (handler)="handleSelectedAction($event)">
   </dlm-cloud-account-actions>
+</ng-template>
+
+<ng-template let-account="row" ngx-datatable-row-detail-template #rowDetailRef>
+  <dlm-cloud-account-policies-table [policies]="account.policies"></dlm-cloud-account-policies-table>
 </ng-template>
