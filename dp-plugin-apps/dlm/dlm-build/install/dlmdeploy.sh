@@ -69,7 +69,7 @@ check_master_password_validity(){
       if keytool \
             -list \
             -storetype jceks \
-            -keystore /Users/ppriya/new_workspace/dataplane/dp-build/build/dp-docker/installer/certs/dp-keystore.jceks \
+            -keystore /dp-shared/dp-keystore.jceks \
             -storepass "$MASTER_PASSWORD" \
             -alias "dummy"  &> /dev/null; then
             echo "Verification Successful. Initialising DLM..."

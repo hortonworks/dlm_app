@@ -24,16 +24,11 @@ case class KeystoreReloadEvent()
 class KeyStoreManager(private val storePath: String, private val storePassword: String) extends mutable.Publisher[KeystoreReloadEvent] {
 
   //  initialize
-  private var keystore = load(storePath, storePassword).recover{
-    case exception: IOException =>
-      throw new Exception(exception.getMessage)
-  }
+  private var keystore = load(storePath, storePassword)
+
   private val watcher = new ThreadFileMonitor(Paths.get(storePath)) {
     override def onChange(path: Path): Unit = {
-      keystore = load(storePath, storePassword).recover{
-        case exception: IOException =>
-          throw new Exception(exception.getMessage)
-      }
+      keystore = load(storePath, storePassword)
       // publishing event
       publish(KeystoreReloadEvent())
     }
@@ -53,9 +48,6 @@ class KeyStoreManager(private val storePath: String, private val storePassword: 
       } yield {
         key -> value
       }).toMap
-    }.recover{
-      case exception: IOException =>
-        throw new Exception(exception.getMessage)
     }
   }
 
@@ -69,9 +61,6 @@ class KeyStoreManager(private val storePath: String, private val storePassword: 
           keystore.setKeyEntry(s"$alias.$key", new SecretKeySpec(value, "AES"), storePassword.toCharArray, null)
       }
       val f = flush(storePath, storePassword, keystore)
-    }.recover{
-      case exception: IOException =>
-        throw new Exception(exception.getMessage)
     }
   }
 
