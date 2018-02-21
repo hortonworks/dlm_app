@@ -11,30 +11,39 @@
 
 package com.hortonworks.dataplane.http
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, ErrorType, Errors}
-import org.apache.commons.lang.exception.ExceptionUtils
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
 
 import scala.concurrent.Future
 
-
-
 trait BaseRoute {
-
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def success(data: JsValueWrapper) = Json.obj("results" -> Json.obj("data" -> data))
+  def success(data: JsValueWrapper) =
+    Json.obj("results" -> Json.obj("data" -> data))
 
-  import com.hortonworks.dataplane.commons.domain.Entities.ErrorType._
+  def errors(status: Int = 500,
+             code: String = "cluster.generic",
+             message: String,
+             exception: Throwable) =
+    Json.toJson(
+      Errors(
+        Seq(
+          Error(status = status,
+                code = code,
+                message = message,
+                trace = Some(ExceptionUtils.getStackTrace(exception))))))
 
-  def errors(e: Throwable,errorType: ErrorType = ErrorType.General, status: Int = 500) = Json.toJson(e.asError(status, errorType))
+  def notFound =
+    Json.obj("error" -> Json.obj("message" -> "Not found", "trace" -> ""))
 
-  def notFound = Json.obj("error" -> Json.obj("message" -> "Not found", "trace" -> ""))
+  def badRequest =
+    Json.obj("error" -> Json.obj("message" -> "BadRequest", "trace" -> ""))
 
-  def badRequest = Json.obj("error" -> Json.obj("message" -> "BadRequest", "trace" -> ""))
-
-  def serverError = Json.obj("error" -> Json.obj("message" -> "ServerError", "trace" -> ""))
+  def serverError =
+    Json.obj("error" -> Json.obj("message" -> "ServerError", "trace" -> ""))
 
 }

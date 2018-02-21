@@ -8,7 +8,6 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TypeaheadModule, TooltipModule, ProgressbarModule } from 'ngx-bootstrap';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { CommonComponentsModule } from 'components/common-components.module';
@@ -17,7 +16,6 @@ import { MomentModule } from 'angular2-moment';
 
 import { PolicyDetailsComponent } from './policy-details.component';
 import { JobsTableComponent } from '../../jobs/jobs-table/jobs-table.component';
-import { JobTransferredGraphComponent } from '../../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
 import { TableComponent } from 'common/table/table.component';
 import { HdfsBrowserComponent } from 'components/hdfs-browser/hdfs-browser.component';
@@ -39,7 +37,6 @@ describe('PolicyDetailsComponent', () => {
   beforeEach(async(() => {
     configureComponentTest({
       imports: [
-        ChartsModule,
         NgxDatatableModule,
         CommonComponentsModule,
         FormsModule,
@@ -51,15 +48,7 @@ describe('PolicyDetailsComponent', () => {
       ],
       declarations: [
         PolicyDetailsComponent,
-        ActionColumnComponent,
-        CheckboxColumnComponent,
-        CheckboxComponent,
-        TableComponent,
-        TableFooterComponent,
-        TableFilterComponent,
-        JobsTableComponent,
-        JobTransferredGraphComponent,
-        HdfsBrowserComponent
+        JobsTableComponent
       ],
       providers: [
         NavbarService,

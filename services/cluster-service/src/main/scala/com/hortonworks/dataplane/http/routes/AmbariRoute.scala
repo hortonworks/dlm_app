@@ -397,7 +397,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
                   case c if c == classOf[ClusterNotFound] =>
                     complete(StatusCodes.NotFound, notFound)
                   case _ =>
-                    complete(StatusCodes.InternalServerError, errors(th))
+                    complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "A generic error occured while communicating with Ambari.", th))
                 }
             }
           }
@@ -418,7 +418,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
                 case c if c == classOf[ClusterNotFound] =>
                   complete(StatusCodes.NotFound, notFound)
                 case _ =>
-                  complete(StatusCodes.InternalServerError, errors(th))
+                  complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "A generic error occured while communicating with Ambari.", th))
               }
           }
         }
@@ -439,7 +439,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
                 case _ => complete(success(clusters))
               }
             case Failure(th) =>
-              complete(StatusCodes.InternalServerError, errors(th))
+              complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "A generic error occured while communicating with Ambari.", th))
           }
         }
       }
@@ -475,7 +475,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
               }
             case Failure(th) =>
               logger.error(s"Failed to get services info ",th)
-              complete(StatusCodes.InternalServerError, errors(th))
+              complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.generic", "A generic error occured while communicating with Ambari.", th))
           }
         }
       }

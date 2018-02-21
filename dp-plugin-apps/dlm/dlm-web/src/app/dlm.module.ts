@@ -104,7 +104,6 @@ import { HdfsBrowserComponent } from './components/hdfs-browser/hdfs-browser.com
 import { PersonaPopupComponent } from 'common/persona-popup/persona-popup.component';
 
 import { OverviewModule } from './pages/overview/overview.module';
-import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
 import { OverviewFilterComponent } from './pages/overview/overview-filter/overview-filter.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
 import { IssuesListItemComponent } from './pages/overview/issues-list-item/issues-list-item.component';
@@ -123,7 +122,6 @@ import { CloudAccountsPoliciesTableComponent } from './pages/cloud-accounts/comp
 import { CloudContainerBrowserBreadcrumbComponent } from 'components/cloud-container-browser/breadcrumb/cloud-container-browser-breadcrumb.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
-import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { JobsStatusFilterComponent } from './pages/jobs/jobs-status-filter/jobs-status-filter.component';
 
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
@@ -149,7 +147,6 @@ import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-d
 
 import { TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
-import { ChartsModule } from 'ng2-charts/ng2-charts';
 
 import { TableComponent } from './common/table/table.component';
 import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
@@ -170,11 +167,14 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { AsyncActionsService } from 'services/async-actions.service';
 
 import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-cloud-form/add-cloud-form.component';
+import { CreatePolicyModalComponent } from 'pages/policies/components/create-policy-modal/create-policy-modal.component';
+import { CreatePolicyWizardComponent } from 'pages/policies/components/create-policy-wizard/create-policy-wizard.component';
+import { WizardContentComponent } from 'pages/policies/components/wizard-content/wizard-content.component';
+import { CreatePolicyStepsModule } from './pages/policies/components/create-policy-steps/create-policy-steps.module';
 
 @NgModule({
   imports: [
     MomentModule,
-    ChartsModule,
     CommonModule,
     HttpClientModule,
     NgxDatatableModule,
@@ -225,7 +225,8 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     BrowserAnimationsModule,
     SimpleNotificationsModule.forRoot(),
     PipesModule,
-    OverviewModule
+    OverviewModule,
+    CreatePolicyStepsModule
   ],
   declarations: [
     DlmComponent,
@@ -245,7 +246,6 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,
-    HdfsBrowserComponent,
 
     PoliciesComponent,
     PolicyTableComponent,
@@ -257,16 +257,13 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     PolicyDetailsComponent,
     PolicyServiceFilterComponent,
     PrevJobsComponent,
-    SelectCloudDestinationComponent,
 
-    ResourceChartsComponent,
     OverviewFilterComponent,
     IssuesListComponent,
     IssuesListItemComponent,
     JobsOverviewTableComponent,
 
     JobsTableComponent,
-    JobTransferredGraphComponent,
     JobsStatusFilterComponent,
 
     JobsComponent,
@@ -275,25 +272,20 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     NavigationDropdownComponent,
     UserDropdownComponent,
     NotFoundRouteComponent,
-    RadioButtonComponent,
-    CheckboxComponent,
-    CheckboxListComponent,
     CreatePairingCardComponent,
     CreatePairingCardListComponent,
     PairingProgressCardComponent,
     PairingCardComponent,
     PairingCardListComponent,
-    TableComponent,
-    TableFooterComponent,
-    TableFilterComponent,
-    CheckboxColumnComponent,
-    ActionColumnComponent,
     NotificationsComponent,
     EventMessageComponent,
     LogModalDialogComponent,
     PersonaPopupComponent,
     TabsComponent,
-    AddCloudFormComponent
+    AddCloudFormComponent,
+    CreatePolicyModalComponent,
+    CreatePolicyWizardComponent,
+    WizardContentComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

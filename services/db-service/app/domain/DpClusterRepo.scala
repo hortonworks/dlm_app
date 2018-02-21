@@ -78,10 +78,11 @@ class DpClusterRepo @Inject()(
     db.run(DataplaneClusters.filter(_.id === dpClusterId).result.headOption)
   }
 
-  def findByAmbariIp(ambariIp: String): Future[Option[DataplaneCluster]] = {
+  def findByAmbariUrl(ambariUrl: String): Future[Option[DataplaneCluster]] = {
+//  TODO: ambari ip address actually is the complete url, just with domain replaced with ip; replace it later to point to ambariUrl
     db.run(
       DataplaneClusters
-        .filter(_.ambariIpAddress === ambariIp)
+        .filter(_.ambariIpAddress === ambariUrl)
         .result
         .headOption)
   }

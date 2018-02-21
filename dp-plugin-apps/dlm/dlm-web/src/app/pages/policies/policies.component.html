@@ -32,7 +32,8 @@
         <button qe-attr="add-policy" type="button"
                 class="btn btn-secondary"
                 [disabled]="!(resourceAvailability$ | async)?.canAddPolicy"
-                (click)="addPolicyClickHandler()">{{"common.add_policy" | translate }}
+                [routerLink]="['/policies/create']">
+          {{"common.add_policy" | translate }}
         </button>
       </div>
     </div>

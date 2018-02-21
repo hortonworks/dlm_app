@@ -54,13 +54,7 @@ describe('ClustersComponent', () => {
       declarations: [
         ClustersComponent,
         ClusterListComponent,
-        ClusterLegendComponent,
-        ActionColumnComponent,
-        TableComponent,
-        CheckboxColumnComponent,
-        CheckboxComponent,
-        TableFooterComponent,
-        HdfsBrowserComponent
+        ClusterLegendComponent
       ],
       providers: [
         BytesSizePipe,

@@ -47,7 +47,7 @@ DELETE        /api/lakes/:dpClusterId                                controllers
 GET           /api/lakes/:dpClusterId/services                       controllers.DataplaneClusters.retrieveServices(dpClusterId: String)
 GET           /api/lakes/:dpClusterId/servicesDetails                controllers.DataplaneClusters.getDependentServicesDetails(dpClusterId: String)
 
-GET           /api/lakes/ambari/status                               controllers.DataplaneClusters.ambariCheck
+GET           /api/lakes/ambari/status                               controllers.DataplaneClusters.ambariCheck(url: String)
 POST          /api/lakes/:dpClusterId/sync                           controllers.Clusters.syncCluster(dpClusterId: String)
 
 # AmbariClusters

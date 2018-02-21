@@ -55,14 +55,9 @@ describe('CloudAccountsComponent', () => {
       declarations: [
         CloudAccountsComponent,
         CloudAccountsListComponent,
-        TableComponent,
-        TableFooterComponent,
         CloudAccountActionsComponent,
         AddCloudFormComponent,
         AddAccountModalComponent,
-        CheckboxColumnComponent,
-        ActionColumnComponent,
-        CheckboxComponent
       ],
       providers: [
         CloudAccountService

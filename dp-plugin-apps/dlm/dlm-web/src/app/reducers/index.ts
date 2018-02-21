@@ -22,6 +22,7 @@ import * as fromJob from './job.reducer';
 import * as fromForm from './form.reducer';
 import * as fromEvent from './event.reducer';
 import * as fromProgress from './progress.reducer';
+import * as fromCreatePolicy from './create-policy.reducer';
 import * as fromOperation from './operation.reducer';
 import * as fromHdfs from './hdfs.reducer';
 import * as fromHive from './hive.reducer';
@@ -54,6 +55,7 @@ export interface State {
   cloudContainers: fromCloudContainer.State;
   cloudContainerItems: fromCloudContainerItem.State;
   beaconCloudCreds: fromBeaconCloudCred.State;
+  createPolicyWizard: fromCreatePolicy.State;
 }
 
 export const reducers: ActionReducerMap<State> = {
@@ -75,7 +77,8 @@ export const reducers: ActionReducerMap<State> = {
   cloudAccounts: fromCloudAccount.reducer,
   cloudContainers: fromCloudContainer.reducer,
   cloudContainerItems: fromCloudContainerItem.reducer,
-  beaconCloudCreds: fromBeaconCloudCred.reducer
+  beaconCloudCreds: fromBeaconCloudCred.reducer,
+  createPolicyWizard: fromCreatePolicy.reducer
 };
 
 export const logger = (reducer: ActionReducer<State>) => {

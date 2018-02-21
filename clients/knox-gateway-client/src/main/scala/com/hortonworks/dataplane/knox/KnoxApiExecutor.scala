@@ -42,9 +42,8 @@ trait KnoxApiExecutor {
   def execute(knoxApiRequest: KnoxApiRequest): Future[WSResponse] = {
 
     for {
-    // First get the token
-      tokenResponse <- getKnoxApiToken(
-        wrapTokenIfUnwrapped(knoxApiRequest.token.get))
+      // First get the token
+      tokenResponse <- getKnoxApiToken(wrapTokenIfUnwrapped(knoxApiRequest.token.get))
       // Use token to issue the complete request
       response <- makeApiCall(tokenResponse, knoxApiRequest)
     } yield response
@@ -56,6 +55,7 @@ trait KnoxApiExecutor {
 
 object KnoxApiExecutor {
   def apply(c: KnoxConfig, w: WSClient) = new DefaultKnoxApiExecutor(c,w)
+  def withExceptionHandling(c: KnoxConfig, w: WSClient) = new BasicKnoxApiExecutor(c, w)
   def withTokenCaching(c: KnoxConfig, w: WSClient) = new TokenCachingKnoxApiExecutor(c,w)
   def withTokenDisabled(c: KnoxConfig, w: WSClient) = new TokenDisabledKnoxApiExecutor(c,w)
 }

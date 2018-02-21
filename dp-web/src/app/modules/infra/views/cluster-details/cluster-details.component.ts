@@ -144,7 +144,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       if(errsWrap && errsWrap.errors && errsWrap.errors.length > 0){
         let err = errsWrap.errors[0] as CustomError;
         this.showError = true;
-        this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+        this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.General');
       }
     }
   }

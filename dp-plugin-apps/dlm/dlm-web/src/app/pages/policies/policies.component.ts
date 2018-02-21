@@ -175,8 +175,4 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   handleDetailsToggle(event) {
     this.lastPolicyToggles = event;
   }
-
-  addPolicyClickHandler() {
-    this.router.navigate(['/policies/create']);
-  }
 }
