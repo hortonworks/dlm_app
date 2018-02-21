@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, OnInit, ViewChild,ElementRef} from "@angular/core";
+import {Component, OnInit, ViewChild, ElementRef, isDevMode} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as DialogPolyfill from 'dialog-polyfill';
 import {Bookmark, Favourite, RichDatasetModel} from "../../models/richDatasetModel";
@@ -47,6 +47,8 @@ export class DsFullView implements OnInit {
   systemTags: string[] = [];
   objectType: string = "assetCollection";
   avgRating: number = 0;
+
+  assetPrefix = isDevMode() ? ' ' : 'dss';
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,

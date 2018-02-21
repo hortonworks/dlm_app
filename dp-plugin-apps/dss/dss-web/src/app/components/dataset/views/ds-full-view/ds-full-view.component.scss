@@ -65,11 +65,12 @@
 
   &.lock {
     font-size: 16px;
+    color: $mine-shaft;
   }
 }
 .view-icon-lock-disabled {
   font-size: 16px;
-  color: #999;
+  color: $mine-shaft;
 }
 
 
@@ -78,7 +79,7 @@
 
 
 .dsFullView {
-  padding:20px;
+  padding:20px 25px;
   -webkit-transition: padding-right 0.5s;
   transition: padding-right 0.5s;
 }
@@ -87,7 +88,7 @@
   padding-right:350px;
 }
 .summaryWidgetCont {
-  width: 0px;
+  width: 304px;
   min-height: 300px;
   float: right;
   margin-right: 0px;
@@ -95,10 +96,7 @@
   -webkit-transition: width 0.5s, margin-right 0.5s;
   transition: width 0.5s, margin-right 0.5s;
 }
-.summaryWidgetCont.showSummry {
-  width: 310px;
-  margin-right: -330px;
-}
+
 
 
 
@@ -175,6 +173,7 @@
 }
 .tabs.menu > ul {
   margin-bottom: 15px;
+  line-height: 1;
 }
 .tabs > ul > li {
   list-style:none;
@@ -294,5 +293,19 @@
 
 .marked {
   color: #fe69a1;
+}
+
+.flex-grid {
+  display: flex;
+}
+.flex-side-left {
+  margin-right: 10px;
+}
+.flex-side-right {
+  margin-left: 10px;
+}
+
+.flex-main {
+  flex-grow: 1;
 }
 
