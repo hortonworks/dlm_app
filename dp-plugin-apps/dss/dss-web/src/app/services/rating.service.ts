@@ -9,7 +9,7 @@
  *
  */
 
-import {Injectable} from '@angular/core';
+import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {Http, Headers, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {HttpUtil} from '../shared/utils/httpUtil';
@@ -17,12 +17,18 @@ import {Rating} from "../models/rating";
 import {Subject} from "rxjs/Subject";
 
 @Injectable()
-export class RatingService {
+export class RatingService implements OnDestroy, OnInit{
   uri = 'api/ratings';
+
   dataChanged = new Subject<number>();
   dataChanged$ = this.dataChanged.asObservable();
 
   constructor(private http:Http) { }
+
+  ngOnInit(): void {
+    this.dataChanged = new Subject<number>();
+    this.dataChanged$ = this.dataChanged.asObservable();
+  }
 
   get(objectId: string, objectType: string): Observable<Rating>  {
     const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}`;
@@ -61,5 +67,10 @@ export class RatingService {
       .patch(`${this.uri}/${ratingId}`, {"rating":rate}, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
+  }
+
+  ngOnDestroy() {
+    this.dataChanged = null;
+    this.dataChanged$ = null;
   }
 }
