@@ -91,10 +91,10 @@
         <div class="primary-space">
           <div class="hwx-subtitle">
             <span class="hwx-secondary">{{dsModel.name}}</span> <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
-            <span class="flex-summary-item view-icon" (click)='onLockClick()' *ngIf="dsModel.sharedStatus && (dsModel.sharedStatus === 2)">
+            <span class="flex-summary-item view-icon lock" (click)='onLockClick()' *ngIf="dsModel.sharedStatus && (dsModel.sharedStatus === 2)">
                   <i class="fa fa-lock"></i>
                 </span>
-            <span class="flex-summary-item" (click)='onLockClick()' *ngIf="dsModel.sharedStatus && (dsModel.sharedStatus === 1)" [ngClass]="{'view-icon': isLoggedInUser(dsModel.creatorId), 'view-icon-disabled': !isLoggedInUser(dsModel.creatorId)}">
+            <span class="flex-summary-item" (click)='onLockClick()' *ngIf="dsModel.sharedStatus && (dsModel.sharedStatus === 1)" [ngClass]="{'view-icon lock': isLoggedInUser(dsModel.creatorId), 'view-icon-lock-disabled': !isLoggedInUser(dsModel.creatorId)}">
                   <i class="fa fa-unlock-alt"></i>
                 </span>
           </div>
