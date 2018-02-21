@@ -28,9 +28,11 @@ import {TableFooterOptions} from 'common/table/table-footer/table-footer.type';
 export class CloudAccountsPoliciesTableComponent implements OnInit {
   @Input() policies: Policy[] = [];
 
-  @ViewChild(TableComponent) tableComponent: TableComponent;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
   @ViewChild('policyNameCellTemplate') policyNameCellTemplate: TemplateRef<any>;
+  @ViewChild('prevJobsCellTemplate') prevJobsCellTemplate: TemplateRef<any>;
+  @ViewChild('endTimeCellTemplate') endTimeCellTemplate: TemplateRef<any>;
+  @ViewChild('lastJobTimeCellTemplate') lastJobTimeCellTemplate: TemplateRef<any>;
   columns = [];
   columnMode = ColumnMode.flex;
 
@@ -57,8 +59,33 @@ export class CloudAccountsPoliciesTableComponent implements OnInit {
         headerClass: 'text-header',
         name: this.t.instant('common.name'),
         cellTemplate: this.policyNameCellTemplate,
-        flexGrow: 8
-      }
+        flexGrow: 4
+      },
+      {
+        cellTemplate: this.prevJobsCellTemplate,
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        name: this.t.instant('page.jobs.prev_jobs'),
+        sortable: false,
+        flexGrow: 3
+      },
+      {
+        cellTemplate: this.lastJobTimeCellTemplate,
+        prop: 'jobs.0.endTime',
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        name: this.t.instant('common.last_job'),
+        sortable: false,
+        flexGrow: 3
+      },
+      {
+        cellTemplate: this.endTimeCellTemplate,
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        name: this.t.instant('common.end_time'),
+        sortable: false,
+        flexGrow: 4
+      },
     ];
   }
 

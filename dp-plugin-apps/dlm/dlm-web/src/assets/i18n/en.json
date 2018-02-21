@@ -59,6 +59,7 @@
     "yes": "Yes",
     "no": "No",
     "not_applicable": "Not Applicable",
+    "last_job": "Last Job",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
       "unknown": "Something went wrong.",

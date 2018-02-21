@@ -30,3 +30,23 @@
    {{name}}
   </span>
 </ng-template>
+
+<ng-template #prevJobsCellTemplate let-policy="row" let-index="rowIndex">
+  <span [attr.qe-attr]="'policy-jobs-' + index">
+    <dlm-prev-jobs [policy]="policy"></dlm-prev-jobs>
+  </span>
+</ng-template>
+
+<ng-template #endTimeCellTemplate let-policy="row" let-index="rowIndex">
+  <span [attr.qe-attr]="'policy-end-time-' + index" *ngIf="policy?.endTime">{{policy?.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
+</ng-template>
+
+<ng-template #lastJobTimeCellTemplate let-time="value" let-policy="row" let-index="rowIndex">
+  <span *ngIf="time; else noData" [attr.qe-attr]="'policy-last-job-' + index"
+        [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+    {{time | fmtTz | amTimeAgo}}
+  </span>
+  <ng-template #noData>
+    <span [attr.qe-attr]="'policy-last-good-' + index">n/a</span>
+  </ng-template>
+</ng-template>
