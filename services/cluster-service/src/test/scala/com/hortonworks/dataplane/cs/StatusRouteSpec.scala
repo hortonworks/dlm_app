@@ -30,7 +30,7 @@ class StatusRouteSpec extends AsyncFlatSpec with AsyncMockFactory {
   "Route" should "correctly construct the knox URL" in {
     (config.getBoolean _).expects("dp.services.knox.infer.gateway.name").returning(true)
     val route = new StatusRoute(null,null,null,config,null,null,null)
-    Future.successful(route.getKnoxUrl(new URL("http://blah:8443/test/a/b/c"))).map { o =>
+    Future.successful(route.getKnoxUrlWithGatewaySuffix(new URL("http://blah:8443/test/a/b/c"))).map { o =>
       assert(o == "http://blah:8443/test")
     }
 
@@ -40,7 +40,7 @@ class StatusRouteSpec extends AsyncFlatSpec with AsyncMockFactory {
   it should "correctly construct the default knox URL" in {
     (config.getBoolean _).expects("dp.services.knox.infer.gateway.name").returning(false)
     val route = new StatusRoute(null,null,null,config,null,null,null)
-    Future.successful(route.getKnoxUrl(new URL("http://blah:8443/test/a/b/c"))).map { o =>
+    Future.successful(route.getKnoxUrlWithGatewaySuffix(new URL("http://blah:8443/test/a/b/c"))).map { o =>
       assert(o == "http://blah:8443/gateway")
     }
 

@@ -11,10 +11,11 @@
 
 package com.hortonworks.dataplane.http.routes
 
-import java.lang.Exception
-import java.net.{URI, URL}
+import java.io.IOException
+import java.net._
 import java.util.Collections
 import javax.inject.Inject
+import javax.net.ssl.SSLException
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
@@ -22,28 +23,23 @@ import com.google.common.annotations.VisibleForTesting
 import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
-import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
+import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
-import play.api.libs.json.Json
-import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
+import org.apache.commons.lang3.exception.ExceptionUtils
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.ws.{WSAuthScheme, WSClient}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-
-private[routes] case class ConnectionError(message: String, cause: Throwable)
-    extends Throwable(message, cause)
-private[routes] case class UrlError(cause: Throwable)
-    extends Throwable("Invalid URL", cause)
-private[routes] case class AmbariError(cause: Throwable)
-    extends Throwable("Cannot contact Ambari", cause)
 
 class StatusRoute @Inject()(val ws: WSClient,
                             storageInterface: StorageInterface,
@@ -60,242 +56,243 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   val logger = Logger(classOf[StatusRoute])
 
-  private lazy val hdInsightErrorContentType =
-    config.getString("dp.service.hdinsight.auth.challenge.contentType")
-  private lazy val hdInsightErrorWwwAuth =
-    config.getString("dp.service.hdinsight.auth.challenge.wwwAuthenticate")
-  private lazy val hdInsightErrorStatus =
-    config.getInt("dp.service.hdinsight.auth.status")
-  private lazy val hdInsightErrorMessage =
-    config.getString("dp.service.hdinsight.auth.response.message")
+  val TOKEN_TOPOLOGY_NAME = Try(config.getString("dp.services.knox.token.topology")).getOrElse("token")
 
-  val tokenTopologyName =
-    Try(config.getString("dp.services.knox.token.topology"))
-      .getOrElse("token")
+  lazy val FLAG_INFER_GATEWAY_SUFFIX_FROM_URL = Try(config.getBoolean("dp.services.knox.infer.gateway.name")).getOrElse(false)
 
-  // If Ambari indicates a JWT URL and cluster service is configured to pick up
-  // expect a separate config group then return with a response which allows
-  // the FE to ask the user for her/his Ambari credentials/Knox URL
-  // Return again with the username/password to complete the flow
+  val DEFAULT_GATEWAY_SUFFIX = "gateway"
 
-  lazy val expectConfigGroup =
-    config.getBoolean("dp.services.knox.token.expect.separate.config")
-  lazy val checkCredentials =
-    config.getBoolean("dp.services.knox.token.infer.endpoint.using.credentials")
+  val API_ENDPOINT = Try(config.getString("dp.service.ambari.cluster.api.prefix")).getOrElse("/api/v1/clusters")
+  val NETWORK_TIMEOUT = Try(config.getInt("dp.service.ambari.status.check.timeout.secs")).getOrElse(20)
 
-  lazy val inferGateway = Try(
-    config.getBoolean("dp.services.knox.infer.gateway.name")).getOrElse(false)
+  val HD_INSIGHT_HTTP_STATUS = config.getInt("dp.service.hdinsight.auth.status")
+  val HD_INSIGHT_CONTENT_TYPE = config.getString("dp.service.hdinsight.auth.challenge.contentType")
+  val HD_INSIGHT_AUTH_CHALLENGE = config.getString("dp.service.hdinsight.auth.challenge.wwwAuthenticate")
 
-  def makeAmbariApiRequest(endpoint: String,
-                           ambariResponse: AmbariForbiddenResponse,
-                           timeout: Int,
-                           request: HttpRequest,
-                           ip: String) = {
-    // Step 3
-    // check if there was a jwtProviderUrl
-    ambariResponse.jwtProviderUrl
-      .map { providerUrl =>
-        logger.info("Ambari expects a jwt token")
-        //Extract the SSO URL hostname
-        val providerAsUrl = new URL(providerUrl)
-        val knoxUrl = getKnoxUrl(providerAsUrl)
 
-        logger.info(s"Knox detected at $knoxUrl")
+  @VisibleForTesting
+  def getKnoxUrlWithGatewaySuffix(uri: URL): String = {
+    val suffix = FLAG_INFER_GATEWAY_SUFFIX_FROM_URL match {
+      case true => Try(uri.getPath.split("/").filterNot(_.trim.isEmpty)(0)).getOrElse(DEFAULT_GATEWAY_SUFFIX)
+      case false => DEFAULT_GATEWAY_SUFFIX
+    }
+    s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}/$suffix"
+  }
 
-        expectConfigGroup match {
-          case true =>
-            Future.successful(
-              AmbariCheckResponse(ambariApiCheck = false,
-                                  knoxDetected = true,
-                                  404,
-                                  Some(knoxUrl),
-                                  ip,
-                                  Json.obj(),
-                                  if (checkCredentials) true else false,
-                                  if (!checkCredentials) true else false))
-          case false =>
-            val delegatedRequest =
-              ws.url(endpoint).withRequestTimeout(timeout seconds)
-            val delegatedApiCall: ApiCall = { req =>
-              req.get()
-            }
-
-            val tokenInfoHeader = request.getHeader(Constants.DPTOKEN)
-            if (!tokenInfoHeader.isPresent) {
-              logger.error(
-                "Knox was detected, but the caller did not send a JWT token with the request header X-DP-Token-Info")
-              throw new RuntimeException(
-                "Ambari was Knox protected but no jwt token was sent with the request")
-            }
-            val tokenHeader = tokenInfoHeader.get.value
-            val response =
-              KnoxApiExecutor(KnoxConfig(tokenTopologyName, Some(knoxUrl)), ws)
-                .execute(
-                  KnoxApiRequest(delegatedRequest,
-                                 delegatedApiCall,
-                                 Some(tokenHeader)))
-            response.map { res =>
-              res.status match {
-                case 200 =>
-                  AmbariCheckResponse(ambariApiCheck = true,
-                                      knoxDetected = true,
-                                      res.status,
-                                      Some(knoxUrl),
-                                      ip,
-                                      res.json)
-                case _ =>
-                  AmbariCheckResponse(ambariApiCheck = false,
-                                      knoxDetected = true,
-                                      res.status,
-                                      Some(knoxUrl),
-                                      ip,
-                                      res.json)
-              }
-            }
-        }
+  /**
+    *
+    * @param urlString
+    * @return
+    *
+    *  1. check if is valid uri
+    */
+  private def constructUrl(urlString: String): Try[URL] =
+    Try(new URL(urlString))
+      .recoverWith {
+        case ex: MalformedURLException => Failure(WrappedErrorException(Error(500, "Host is unreachable.", "cluster.ambari.status.unreachable-host-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
       }
-      .getOrElse {
-        // Fallback to local user
-        // Step 4
-        for {
-          credential <- credentialInterface.getCredential(
-            CSConstants.AMBARI_CREDENTIAL_KEY)
-          response <- ws
-            .url(endpoint)
-            .withAuth(credential.user.get,
-                      credential.pass.get,
-                      WSAuthScheme.BASIC)
-            .withRequestTimeout(timeout seconds)
-            .get()
-        } yield {
-          response.status match {
-            case 200 =>
-              AmbariCheckResponse(ambariApiCheck = true,
-                                  knoxDetected = false,
-                                  response.status,
-                                  None,
-                                  ip,
-                                  response.json)
-            case _ =>
-              AmbariCheckResponse(ambariApiCheck = false,
-                                  knoxDetected = false,
-                                  response.status,
-                                  None,
-                                  ip,
-                                  response.json)
-          }
-        }
+
+  /**
+    * Method to check network for a host
+    * @param url
+    * @return true if reachable, exception otherwise
+    *
+    *  2. get machine address object
+    *  3. check if dns resolves
+    *  4. check if address is reachable
+    */
+  private def probeNetwork(url: URL): Try[InetAddress] = {
+    Try(InetAddress.getByName(url.getHost))
+      .recoverWith {
+        case ex: UnknownHostException => Failure(WrappedErrorException(Error(500, "Unable to resolve host.", "cluster.ambari.status.dns-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
+        case ex: IOException => Failure(WrappedErrorException(Error(500, "Host is unreachable.", "cluster.ambari.status.unreachable-host-error", trace = Some(ExceptionUtils.getStackTrace(ex)))))
       }
   }
 
-  @VisibleForTesting
-  def getKnoxUrl(uri: URL) = {
-    if (inferGateway) {
-      Try {
-        val firstPart = {
-          val parts = uri.getPath.split("/").filterNot(_.trim.isEmpty)
-          parts(0)
+  /**
+    *
+    * @param endpoint
+    * @return knox login url if available
+    *
+    * 5. make initial call without auth to probe if cluster is secured by Knox
+    *
+    */
+  private def probeCluster(endpoint: String): Future[Option[String]] = {
+    ws.url(endpoint)
+      .withRequestTimeout(NETWORK_TIMEOUT seconds)
+      .get()
+      .map {response =>
+        response.status match {
+          case 403 => {
+            // This could be Knox or Ambari
+            response.json.validate[AmbariForbiddenResponse] match {
+              case ambariResponse: JsSuccess[AmbariForbiddenResponse] => ambariResponse.get.jwtProviderUrl
+              case _: JsError => throw WrappedErrorException(Error(500, "Unable to deserialize JSON. Is there a non-transparent proxy in front of Ambari/Knox?.", "cluster.ambari.status.invalid-json-response"))
+            }
+          }
+          case 401 => {
+            // this could be HD Insight
+            val authChallenge = response.header(HttpHeaders.WWW_AUTHENTICATE)
+            val contentType = response.header(HttpHeaders.CONTENT_TYPE)
+
+            (contentType, authChallenge) match {
+              case (Some(HD_INSIGHT_CONTENT_TYPE), Some(HD_INSIGHT_AUTH_CHALLENGE)) => {
+                logger.info(s"$endpoint is an HD Insight cluster. We would be using basic authentication with this.")
+                None
+              }
+              case _ => throw WrappedErrorException(Error(500, "We recieved an unexpected response from cluster. The cluster returned a 401 and hence should have been an HD Insight cluster, but was not.", "cluster.ambari.status.unexpected-response-hd-insight"))
+            }
+          }
+          case _ => throw WrappedErrorException(Error(500, s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}", "cluster.ambari.status.unexpected-response-for-prereq-call"))
         }
-        s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}/$firstPart"
-      }.getOrElse(
-        s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}/gateway")
-    } else {
-      s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}/gateway"
+      }
+      .recoverWith {
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.connection-refused"))
+      }
+  }
+
+  /**
+    *
+    * @param endpoint
+    * @param knoxUrl
+    * @param token
+    * @return
+    *
+    * 6A. if response indicates Knox
+    * *A7. repeat steps 1-4 to confirm reachability
+    * *A8. make Knox calls to check condition of Knox
+    *
+    */
+  private def probeKnox(endpoint: String, knoxUrl: String, token: String): Future[JsValue] = {
+    val delegatedRequest = ws.url(endpoint).withRequestTimeout(NETWORK_TIMEOUT seconds)
+
+    val response =
+      KnoxApiExecutor.withExceptionHandling(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)
+        .execute(KnoxApiRequest(delegatedRequest, (req => req.get), Some(token)))
+
+    response
+      .map { res =>
+        res.status match {
+          case 200 => res.json
+          case 302 => throw WrappedErrorException(Error(500, "Knox token or the certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth"))
+          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.status.knox.ranger-rights-unavailable"))
+          case 404 => throw WrappedErrorException(Error(500, "Knox token topology is not validated and deployment descriptor is not created.", "cluster.ambari.status.knox.configuration-error"))
+          case 500 => throw WrappedErrorException(Error(500, "Knox certificate on cluster might be corrupted.", "cluster.ambari.status.knox.public-key-corrupted"))
+          case _ => throw WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.status.knox.genric"))
+        }
+      }
+      .recoverWith {
+        case ex: SSLException => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.knox.tls-error"))
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.knox.connection-refused"))
+      }
+  }
+
+  /**
+    *
+    * @param endpoint
+    * @return
+    *
+    * 6B. if response indicates absence of Knox (naked Ambari)
+    * *B7. check keystore for seeded user credentials
+    * *B8. attempt ambari connection
+    */
+  private def probeAmbari(endpoint: String): Future[JsValue] = {
+    credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
+        .map { credential =>
+          (credential.user, credential.pass) match {
+            case (Some(username), Some(password)) => (username, password)
+            case _ => throw new WrappedErrorException(Error(500, "There is no credential configured for Ambari default user", "cluster.ambari.status.raw.credential-not-found"))
+          }
+        }
+      .flatMap { case (username, password) =>
+        ws.url(endpoint)
+          .withAuth(username, password, WSAuthScheme.BASIC)
+          .withRequestTimeout(NETWORK_TIMEOUT seconds)
+          .get()
+      }
+      .map{ response =>
+        response.status match {
+          case 200 => response.json
+          case 401 => throw WrappedErrorException(Error(401, "User needs to be authenticated.", "cluster.ambari.status.raw.unauthorized"))
+          case 403 => throw WrappedErrorException(Error(403, "User does not have required rights. Please log-in as another user.", "cluster.ambari.status.raw.forbidden"))
+          case 404 => throw WrappedErrorException(Error(404, "We were unable to find the enpoint you were querying.", "cluster.ambari.status.raw.not-found"))
+          case 500 => throw WrappedErrorException(Error(500, "An internal server error occurred.", "cluster.ambari.status.raw.server-error"))
+          case _ => throw WrappedErrorException(Error(500, "Unknown error.", "cluster.ambari.status.raw.generic"))
+        }
+    }
+    .recoverWith {
+      case ex: SSLException => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Ambari server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.raw.tls-error"))
+      case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.raw.connection-refused"))
+    }
+  }
+
+  private def probeStatus(knoxUrlAsOptional: Option[String], endpoint: String, request: HttpRequest): Future[AmbariCheckResponse] = {
+    knoxUrlAsOptional match {
+      case Some(knoxUrl) => {
+//        knox
+        val tokenTryable = Try(request.getHeader(Constants.DPTOKEN).get.value)
+          .recoverWith {
+            case ex: NoSuchElementException => throw WrappedErrorException(Error(400, "Ambari was Knox protected but no JWT token was sent with request", "cluster.ambari.status.knox.jwt-token-missing"))
+          }
+
+        for{
+          url <- Future.fromTry(constructUrl(knoxUrl))
+          inet <- Future.fromTry(probeNetwork(url))
+          knoxUrl <- Future.successful(getKnoxUrlWithGatewaySuffix(url))
+          token <- Future.fromTry(tokenTryable)
+          json <- probeKnox(endpoint, knoxUrl, token)
+        } yield AmbariCheckResponse(ambariApiCheck = true,
+          knoxDetected = true,
+          ambariApiStatus = 200,
+          knoxUrl = Some(knoxUrl),
+          ambariIpAddress = inet.getHostAddress,
+          ambariApiResponseBody = json)
+      }
+      case None => {
+//        ambari
+        for {
+          url <- Future.fromTry(constructUrl(endpoint))
+          inet <- Future.fromTry(probeNetwork(url))
+          json <- probeAmbari(endpoint)
+        } yield AmbariCheckResponse(ambariApiCheck = true,
+          knoxDetected = false,
+          ambariApiStatus = 200,
+          knoxUrl = None,
+          ambariIpAddress = inet.getHostAddress,
+          ambariApiResponseBody = json)
+      }
     }
   }
 
   /**
-    * A routine to check ambari availability
-    * Step 1 - Make a call without any Authentication
-    * Step 2 - The response should be a 403 with/without a jwtProviderUrl in the response body
-    * Step 3 - If there is a jwtProviderUrl present, assume knox and try to use the HJwt token to connect
-    * Step 4 - if no jwtProviderUrl in the response body , try to connect using the seeded user
     *
-    * @param ep
+    * @param urlString
     * @return
+    *
+    *  1. check if is valid uri
+    *  2. get machine address object
+    *  3. check if dns resolves
+    *  4. check if address is reachable
+    *  5. make initial call without auth
+    *  6.
+    *  6A. if response indicates Knox
+    *  *A7. repeat steps 1-4 to confirm reachability
+    *  *A8. make Knox calls to check condition of Knox
+    *  6B. if response indicates absence of Knox (naked Ambari)
+    *  *B7. check keystore for seeded user credentials
+    *  *B8. attempt ambari connection
+    *
     */
-  def checkAmbariAvailability(
-      ep: AmbariEndpoint,
-      request: HttpRequest): Future[AmbariCheckResponse] = {
-    val endpoint = { u: String =>
-      s"$u${Try(config.getString("dp.service.ambari.cluster.api.prefix")).getOrElse("/api/v1/clusters")}"
-    }
-    val timeout =
-      Try(config.getInt("dp.service.ambari.status.check.timeout.secs"))
-        .getOrElse(20)
-
-    //Step 1
-    val initialRequest = { eps: String =>
-      ws.url(eps)
-        .withRequestTimeout(timeout seconds)
-        .get()
-        .map(mapAsUnauthenticatedResponse)
-        .recoverWith {
-          case th: Exception =>
-            Future.failed(
-              ConnectionError(
-                s"Cannot connect to Ambari url at ${endpoint(ep.url)}",
-                th))
-        }
-
-    }
-
+  private def probe(urlString: String, request: HttpRequest): Future[AmbariCheckResponse] = {
     for {
-      ip <- getAmbariUrl(ep.url)
-      ambariResponse <- initialRequest(endpoint(ep.url))
-      //Step 3
-      ambariApiResponse <- makeAmbariApiRequest(endpoint(ep.url),
-                                                ambariResponse,
-                                                timeout,
-                                                request,
-                                                ip).recoverWith {
-        case th: Throwable => Future.failed(AmbariError(th))
-      }
-    } yield ambariApiResponse
-
-  }
-
-  private def mapAsUnauthenticatedResponse(
-      response: WSResponse): AmbariForbiddenResponse = {
-    response.status match {
-      case 403                            => response.json.validate[AmbariForbiddenResponse].get
-      case x if x == hdInsightErrorStatus =>
-        // Check for HD insight
-        val auth = response.header(HttpHeaders.WWW_AUTHENTICATE)
-        val contentType = response.header(HttpHeaders.CONTENT_TYPE)
-        if (contentType.isDefined && contentType.get == hdInsightErrorContentType && auth.isDefined && auth.get == hdInsightErrorWwwAuth) {
-          AmbariForbiddenResponse(hdInsightErrorStatus,
-                                  hdInsightErrorMessage,
-                                  None)
-        } else {
-          throw AmbariError(new Exception(
-            s"Received 401 from Ambari but response does not match any known cluster, tried HD insight"))
-        }
-      case _ =>
-        throw AmbariError(new Exception(
-          s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}"))
-
-    }
-
-  }
-
-  import java.net.InetAddress
-  private def getAmbariUrlWithIp(url: String): Try[URL] = {
-    Try(new URL(url))
-      .map { ambariUrl =>
-        val hostAddressIp = InetAddress.getByName(ambariUrl.getHost)
-        new URL(ambariUrl.getProtocol,
-                hostAddressIp.getHostAddress,
-                ambariUrl.getPort,
-                ambariUrl.getFile)
-      }
-  }
-
-  private def getAmbariUrl(url: String) = {
-    getAmbariUrlWithIp(url) match {
-      case Success(u) => Future.successful(u.toString)
-      case Failure(f) => Future.failed(UrlError(f))
-    }
+      url <- Future.fromTry(constructUrl(urlString))
+      inet <- Future.fromTry(probeNetwork(url))
+      endpoint <- Future.successful(s"${url.toString}$API_ENDPOINT")
+      knoxUrlAsOptional <- probeCluster(endpoint)
+      response <- probeStatus(knoxUrlAsOptional, endpoint, request)
+//    TODO: remove this hack
+      transformed <- Future.successful(response.copy(ambariIpAddress=new URL(url.getProtocol, inet.getHostAddress, url.getPort, url.getFile).toString))
+    } yield transformed
   }
 
   lazy val ambariConnectTimer =
@@ -307,24 +304,16 @@ class StatusRoute @Inject()(val ws: WSClient,
       extractRequest { request =>
         post {
           entity(as[AmbariEndpoint]) { ep =>
-            onComplete(checkAmbariAvailability(ep, request)) {
+            onComplete(probe(ep.url, request)) {
               case Success(res) =>
                 context.stop()
-                complete(success(res))
-              case Failure(e) =>
+                complete(success(Json.toJson(res)))
+              case Failure(ex) =>
                 context.stop()
-                e match {
-                  case c: ConnectionError =>
-                    complete(StatusCodes.InternalServerError,
-                             errors(c, ErrorType.Network))
-                  case c: UrlError =>
-                    complete(StatusCodes.InternalServerError,
-                             errors(c, ErrorType.Url))
-                  case c: AmbariError =>
-                    complete(StatusCodes.InternalServerError,
-                             errors(c, ErrorType.Ambari))
-                  case _ =>
-                    complete(StatusCodes.InternalServerError, errors(e))
+                logger.info("ex", ex)
+                ex match {
+                  case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
+                  case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.status.generic", "Generic error while communicating with Ambari.", ex))
                 }
 
             }
@@ -333,7 +322,6 @@ class StatusRoute @Inject()(val ws: WSClient,
       }
     }
 
-  import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   val sync =

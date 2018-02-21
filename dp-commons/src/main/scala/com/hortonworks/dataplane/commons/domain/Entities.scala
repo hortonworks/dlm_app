@@ -31,18 +31,6 @@ object Entities {
       case m: MethodSymbol if m.isCaseAccessor => m.fullName
     }.toSet
 
-  object ErrorType extends Enumeration {
-    type ErrorType = Value
-    val General, Network, Database, Cluster, Ambari,Url = Value
-
-    implicit class WrappedThrowable(th: Throwable) {
-      def asError(status: Int, errorType: ErrorType):Errors =
-        Errors(
-          Seq(
-            Error(status, ExceptionUtils.getStackTrace(th), errorType.toString)))
-    }
-  }
-
   object SharingStatus extends Enumeration {
     val PUBLIC = Value(1)
     val PRIVATE = Value(2)
@@ -54,7 +42,6 @@ object Entities {
 
   case class Error(status: Int,
                    message: String,
-                   errorType: String = ErrorType.General.toString,
                    code: String = "generic",
                    target: Option[String] = None,
                    trace: Option[String] = None,

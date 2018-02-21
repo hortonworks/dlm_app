@@ -17,7 +17,7 @@ import java.security.KeyStore
 import javax.crypto.spec.SecretKeySpec
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 case class KeystoreReloadEvent()
 
