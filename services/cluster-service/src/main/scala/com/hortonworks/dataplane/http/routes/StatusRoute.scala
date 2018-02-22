@@ -226,6 +226,32 @@ class StatusRoute @Inject()(val ws: WSClient,
     }
   }
 
+
+  private def probeAccess(clusterHrefs: Seq[String], knoxUrl: String, token: String): Future[Unit] = {
+    Future
+      .fromTry(clusterHrefs.size match {
+        case 0 => Failure(WrappedErrorException(Error(404, "There are no clusters attached to this Ambari instance.", "cluster.ambari.status.knox.detail.0-clusters-on-ambari")))
+        case 1 => Success(clusterHrefs.head)
+        case _ => Failure(WrappedErrorException(Error(404, "There are more than one clusters attached to this Ambari instance. This should not happen.", "cluster.ambari.status.knox.detail.more-than-1-clusters-on-ambari")))
+      })
+      .flatMap { href =>
+        val delegatedRequest = ws.url(href).withRequestTimeout(NETWORK_TIMEOUT seconds)
+
+        KnoxApiExecutor.withExceptionHandling(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)
+          .execute(KnoxApiRequest(delegatedRequest, (req => req.get), Some(token)))
+      }
+      .flatMap { res =>
+        res.status match {
+          case 200 => Future.successful()
+          case 403 => Future.failed(WrappedErrorException(Error(403, "User does not have required rights to access this cluster. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.status.knox.access-detail-rights-unavailable")))
+          case _ => Future.failed(WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.status.knox.genric")))
+        }
+      }
+      .recoverWith {
+        case ex: Exception => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.knox.connection-refused"))
+      }
+  }
+
   private def probeStatus(knoxUrlAsOptional: Option[String], endpoint: String, request: HttpRequest): Future[AmbariCheckResponse] = {
     knoxUrlAsOptional match {
       case Some(knoxUrl) => {
@@ -241,6 +267,8 @@ class StatusRoute @Inject()(val ws: WSClient,
           knoxUrl <- Future.successful(getKnoxUrlWithGatewaySuffix(url))
           token <- Future.fromTry(tokenTryable)
           json <- probeKnox(endpoint, knoxUrl, token)
+          hrefs <- Future.successful((json \ "items" \\ "href").map(_.asOpt[String]).toList.filter(_.isDefined).map(_.get))
+          _ <- probeAccess(hrefs, knoxUrl, token)
         } yield AmbariCheckResponse(ambariApiCheck = true,
           knoxDetected = true,
           ambariApiStatus = 200,
