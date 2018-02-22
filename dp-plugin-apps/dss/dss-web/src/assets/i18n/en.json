@@ -320,8 +320,10 @@
           "edit": "Edit",
           "delete": "Delete",
           "addAssets": "Add Assets",
-          "removeAll": "Remove Selected",
+          "removeAll": "Remove All",
+          "remove": "Remove",
           "addMoreAssets": "Add More Assets",
+          "add": "Add",
           "done" : "Done"
         },
         "errors": {
@@ -338,7 +340,8 @@
         "noResultsMsg": "No Results!!",
         "noMoreResultsMsg": "No More Results!!",
         "cancel": "Cancel",
-        "done": "Done"
+        "done": "Done",
+        "add": "Add"
       },
       "asset-list": {
         "starAssetmessage": "Few assets listed above already belong to other asset collections."

@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, OnInit, ViewChild,ElementRef} from "@angular/core";
+import {Component, OnInit, ViewChild, ElementRef, isDevMode} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as DialogPolyfill from 'dialog-polyfill';
 import {Bookmark, Favourite, RichDatasetModel} from "../../models/richDatasetModel";
@@ -25,6 +25,7 @@ import {
 import {AuthUtils} from "../../../../shared/utils/auth-utils";
 import {FavouriteService} from "../../../../services/favourite.service";
 import {BookmarkService} from "../../../../services/bookmark.service";
+import {RatingService} from "../../../../services/rating.service";
 import {DataSet} from "../../../../models/data-set";
 
 @Component({
@@ -45,12 +46,16 @@ export class DsFullView implements OnInit {
   showPopup: boolean = false;
   systemTags: string[] = [];
   objectType: string = "assetCollection";
+  avgRating: number = 0;
+
+  assetPrefix = isDevMode() ? ' ' : 'dss';
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
               private tagService: DsTagsService,
               private favouriteService: FavouriteService,
               private bookmarkService: BookmarkService,
+              private ratingService: RatingService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -66,15 +71,20 @@ export class DsFullView implements OnInit {
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
         this.tagService.listAtlasTags(+params["id"]).subscribe(tags => this.systemTags=tags)
+        this.getAverageRating(params["id"]);
       });
+    this.ratingService.dataChanged$.subscribe(avgRating => {
+      this.avgRating = avgRating;
+    });
   }
   updateDsModel = (rData) => {
     this.dsModel = rData;
+    this.dsAssetList.clearSelection();
     this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
   }
 
   private onAction(action: AssetListActionsEnum) {
-    if(action === AssetListActionsEnum.DELETE) 
+    if(action === AssetListActionsEnum.DELETE)
       return this.onDeleteDataset();
     if(action === AssetListActionsEnum.EDIT){
       this.applicableListActions = [AssetListActionsEnum.REMOVE, AssetListActionsEnum.ADD, AssetListActionsEnum.DONE];
@@ -87,7 +97,7 @@ export class DsFullView implements OnInit {
     if (action == AssetListActionsEnum.REMOVE) {
       if(this.dsAssetList.checkedAllState())
         this.actionRemoveAll();
-      else 
+      else
         this.actionRemoveSelected(this.dsAssetList.selExcepList);
     }
     if (action == AssetListActionsEnum.ADD) {
@@ -173,23 +183,25 @@ export class DsFullView implements OnInit {
   }
 
   onLockClick(){
-    let dataset = new DataSet();
-    dataset.id = this.dsModel.id;
-    dataset.createdBy = this.dsModel.creatorId;
-    dataset.createdOn = this.dsModel.createdOn;
-    dataset.dpClusterId = this.dsModel.clusterId;
-    dataset.datalakeId = this.dsModel.datalakeId;
-    dataset.description = this.dsModel.description;
-    dataset.lastModified = this.dsModel.lastModified;
-    dataset.name = this.dsModel.name;
-    dataset.active = this.dsModel.active;
-    dataset.version = this.dsModel.version;
-    dataset.customProps = this.dsModel.customProps;
-    dataset.sharedStatus = (this.dsModel.sharedStatus % 2) + 1;
-    this.dataSetService.update(dataset).subscribe( ds => {
-      this.dsModel.sharedStatus = ds.sharedStatus;
-      this.dsModel.lastModified = ds.lastModified;
-    })
+    if(this.isLoggedInUser(this.dsModel.creatorId)){
+      let dataset = new DataSet();
+      dataset.id = this.dsModel.id;
+      dataset.createdBy = this.dsModel.creatorId;
+      dataset.createdOn = this.dsModel.createdOn;
+      dataset.dpClusterId = this.dsModel.datalakeId; // this datalakeId is actually dpClusterId of dataset
+      dataset.datalakeId = this.dsModel.datalakeId;
+      dataset.description = this.dsModel.description;
+      dataset.lastModified = this.dsModel.lastModified;
+      dataset.name = this.dsModel.name;
+      dataset.active = this.dsModel.active;
+      dataset.version = this.dsModel.version;
+      dataset.customProps = this.dsModel.customProps;
+      dataset.sharedStatus = (this.dsModel.sharedStatus % 2) + 1;
+      this.dataSetService.update(dataset).subscribe( ds => {
+        this.dsModel.sharedStatus = ds.sharedStatus;
+        this.dsModel.lastModified = ds.lastModified;
+      })
+    }
   }
 
   isLoggedInUser(datasetUserId: number){
@@ -200,6 +212,11 @@ export class DsFullView implements OnInit {
     this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true, queryParams: { returnURl: this.router.url }});
   }
 
+  getAverageRating(datasetId: string) {
+    this.ratingService.getAverage(datasetId, this.objectType).subscribe( averageAndVotes => {
+      this.avgRating = averageAndVotes.average;
+    });
+  }
   toggleSummaryWidget () {
     this.showSummary = !this.showSummary;
   }
@@ -211,16 +228,16 @@ export class DsFullView implements OnInit {
   popupActionDone(asqm: AssetSetQueryModel) {
     let futureRdataSet;
 
-    if(asqm.selectionList.length) 
+    if(asqm.selectionList.length)
       futureRdataSet = this.richDatasetService.addSelectedAssets(this.dsModel.id, this.dsModel.clusterId, asqm.selectionList);
     else
       futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
-    
+
     futureRdataSet.subscribe(rData => {
-        this.updateDsModel(rData)
-        // this.assetSetQueryModelsForAddition.push(asqm);
-        this.showPopup = false;
-      })
+      this.updateDsModel(rData)
+      // this.assetSetQueryModelsForAddition.push(asqm);
+      this.showPopup = false;
+    })
   }
 
 }

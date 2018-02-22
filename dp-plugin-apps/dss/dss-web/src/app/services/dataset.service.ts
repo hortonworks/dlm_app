@@ -51,7 +51,7 @@ export class DataSetService {
 
   update(dataset: DataSet): Observable<DataSet> {
     return this.http
-      .patch(`${this.url}/${dataset.id}`, dataset, new RequestOptions(HttpUtil.getHeaders()))
+      .patch(`${this.url}/${dataset.id}`, dataset, new RequestOptions(HttpUtil.getHeaders()))  // planning to change it to PUT.
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

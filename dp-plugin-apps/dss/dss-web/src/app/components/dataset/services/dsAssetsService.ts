@@ -102,7 +102,7 @@ export class DsAssetsService {
     let dataArr = assetsNCount.assets;
     dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
-        creationTime: "-",
+        createdTime: ent.assetProperties.createTime?((new Date(parseInt(ent.assetProperties.createTime))).toDateString()):"-",
         id: ent.guid,
         name: ent.assetProperties.name || "-",
         description : ent.assetProperties.description || "-",
@@ -120,7 +120,7 @@ export class DsAssetsService {
     let assetModelArr :DsAssetModel[] = [];
     dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
-        creationTime: "-",
+        createdTime: ent.attributes.createTime?((new Date(parseInt(ent.attributes.createTime))).toDateString()):"-",
         id: ent.guid,
         name: ent.displayText,
         description : ent.attributes.description || "-",

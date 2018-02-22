@@ -92,6 +92,7 @@ export class CommentsComponent implements OnInit {
     this.ratingService.getAverage(this.objectId,this.objectType).subscribe( averageAndVotes => {
       this.totalVotes = averageAndVotes.votes;
       this.averageRating = averageAndVotes.average;
+      this.ratingService.dataChanged.next(this.averageRating);
     });
   }
 

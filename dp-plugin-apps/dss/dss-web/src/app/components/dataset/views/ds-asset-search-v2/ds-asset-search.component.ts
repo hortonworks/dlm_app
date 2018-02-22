@@ -15,11 +15,11 @@ import {AdvanceQueryEditor} from "../ds-asset-search/queryEditors/advance/advanc
 import {DsAssetsService} from "../../services/dsAssetsService";
 
 @Component({
-	selector: "asset-search",
+	selector: "asset-search-V2",
 	styleUrls: ["./ds-asset-search.component.scss"],
 	templateUrl: "./ds-asset-search.component.html"
 })
-export class DsAssetSearch implements OnInit {
+export class DsAssetSearchV2 implements OnInit {
 
 	@Input() clusterId:number;
 	@Input() showBelongsToColumn = false;
@@ -84,6 +84,7 @@ export class DsAssetSearch implements OnInit {
 		this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "db.name");
 		if(this.dbName){
 			this.queryModel.filters.push({column: "db.name", operator: "contains", value: this.dbName, dataType:"string"});
+			// this.queryModel.filters.push({column: "createTime", operator: "lt", value: "'2018-02-20T11:50:00.000Z'", dataType:"date"}); //aa.toISOString()
 		}
 		this.freshFetch();
 	}
@@ -92,10 +93,13 @@ export class DsAssetSearch implements OnInit {
 		this.onDbNameChange(null);
 	}
 	onTagSelectionChange (e) {
-		console.log(this.selectedTag);
 		this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "tag");
-		if(this.dbName){
-			this.queryModel.filters.push({column: "tag", operator: "contains", value: this.dbName, dataType:"tag"});
+		if(this.selectedTag){
+			if(this.tagOptions.indexOf(this.selectedTag) == -1) {
+				this.selectedTag="";
+				return;
+			}
+			this.queryModel.filters.push({column: "tag", operator: "equals", value: this.selectedTag, dataType:"tag"});
 		}
 		this.freshFetch();
 	}
