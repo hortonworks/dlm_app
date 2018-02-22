@@ -30,7 +30,7 @@ export class CommentService implements OnDestroy , OnInit {
     this.dataChanged = new Subject<boolean>();
     this.dataChanged$ = this.dataChanged.asObservable();
   }
-  
+
   getByObjectRef(objectId: string, objectType: string, offset:number, size:number): Observable<CommentWithUser[]>  {
     const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}&offset=${offset}&size=${size}`;
 
@@ -73,6 +73,7 @@ export class CommentService implements OnDestroy , OnInit {
   }
 
   ngOnDestroy(){
+    this.dataChanged.unsubscribe();
     this.dataChanged = null;
     this.dataChanged$ = null;
   }

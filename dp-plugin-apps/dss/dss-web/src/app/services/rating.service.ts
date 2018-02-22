@@ -70,6 +70,7 @@ export class RatingService implements OnDestroy, OnInit{
   }
 
   ngOnDestroy() {
+    this.dataChanged.unsubscribe();
     this.dataChanged = null;
     this.dataChanged$ = null;
   }
