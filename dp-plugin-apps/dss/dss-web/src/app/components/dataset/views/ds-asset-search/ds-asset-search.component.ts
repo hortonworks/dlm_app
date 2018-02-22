@@ -30,7 +30,6 @@ export class DsAssetSearch {
   queryObj: SimpleQueryObjectModel = new SimpleQueryObjectModel("");
   queryModel: AssetSetQueryModel = new AssetSetQueryModel([]);
   showQueryResults: boolean = false;
-  hideActionButtonCont : boolean = false;
 
   allSelected:boolean=false;
   cherryPicked:number=0;
@@ -44,25 +43,20 @@ export class DsAssetSearch {
   @ViewChild("basicQueryEditor") basicQueryEditor: BasicQueryEditor;
   @ViewChild("advanceQueryEditor") advanceQueryEditor: AdvanceQueryEditor;
 
+  @Input() hideActionButtons : boolean = false;
   @Input() clusterId:number;
   @Input() showBelongsToColumn = false;
-  @Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
+  @Output("addNotification") addNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
-
-  onSimpleQueryObjUpdate(flag: any) {
-    // this.queryModel = new AssetSetQueryModel([]);
-    // if(this.queryObj.searchText){
-    //   this.queryModel.filters.push({column: "name", operator: "contains", value: this.queryObj.searchText, dataType:"string"});
-    //   // this.queryModel.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"});
-    // }
-    // if(!this.queryModel.filters.length) return this.onEmptySearch();
-    if (!this.showQueryResults) (setTimeout(() => this._actionSearch(), 0));
-    this.showQueryResults = true;
-
-  }
 
   get showDone () {
     return (this.allSelected || this.cherryPicked || this.cherryDroped);
+  }
+
+  setActiveTab (tabEnum:DsAssetSearchTabEnum) {
+    if(this.activeTab == tabEnum) return;
+    this.actionReset();
+    this.activeTab = tabEnum;
   }
 
   actionCancel() {
@@ -86,16 +80,9 @@ export class DsAssetSearch {
   }
   actionDone () {
     if(!this.allSelected && !this.cherryPicked && !this.cherryDroped) return this.actionCancel();
-    this.hideActionButtonCont = true;
     this.dsAssetList.updateQueryModels();
-    this.doneNotificationEmitter.emit(this.queryModel);
+    this.addNotificationEmitter.emit(this.queryModel);
   }
-
-  // actionDone() {
-  //   this.hideActionButtonCont = true;
-  //   this.dsAssetList.updateQueryModels();
-  //   this.doneNotificationEmitter.emit(this.queryModel);
-  // }
 
   actionSearch() {
     this.showQueryResults = true;
@@ -105,7 +92,6 @@ export class DsAssetSearch {
   _actionSearch() {
     switch (this.activeTab) {
       case this.tabEnum.NORMAL :
-        // this.onSimpleQueryObjUpdate(false);
         if(!this.queryModel.filters.length) return this.onEmptySearch();
         this.basicQueryEditor.hideFilterCont();
         this.dsAssetList.freshFetch();
@@ -127,7 +113,7 @@ export class DsAssetSearch {
         this.advanceQueryEditor.reset();
         break;
     }
-    this.dsAssetList.clearResults();
+    this.dsAssetList && this.dsAssetList.clearResults();
     this.showQueryResults = false;
   }
 

@@ -24,7 +24,7 @@ export class DsAssetSearchV2 implements OnInit {
 	@Input() clusterId:number;
 	@Input() showBelongsToColumn = false;
 
-	@Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
+	@Output("addNotification") addNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
 	@Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 
 	@ViewChild("dsAssetList") dsAssetList: DsAssetList;
@@ -127,7 +127,7 @@ export class DsAssetSearchV2 implements OnInit {
 		if(!this.allSelected && !this.cherryPicked && !this.cherryDroped) return this.onCancel();
 		this.hideActionButtonCont = true;
     	this.dsAssetList.updateQueryModels();
-    	this.doneNotificationEmitter.emit(this.queryModel);
+    	this.addNotificationEmitter.emit(this.queryModel);
 	}
 
 	onCancel () {

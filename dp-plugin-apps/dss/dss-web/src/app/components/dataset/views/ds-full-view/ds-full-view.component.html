@@ -47,7 +47,6 @@
       <ul onclick="function(){}">
         <li data-tab="Dashboard" class="">Dashboard</li>
         <li data-tab="Assets" class="active">Assets</li>
-        <li data-tab="Profile and Schedule" class="">Profile &amp; Schedule</li>
       </ul>
 
       <div>
@@ -133,6 +132,15 @@
 
   <div *ngIf="showPopup" class="popup borderBox">
     <div class="opaque">
-      <asset-search [showBelongsToColumn]="true" [clusterId]="dsModel.clusterId" (doneNotification)="popupActionDone($event)" (cancelNotification)="popupActionCancel()"></asset-search>
+      <asset-search 
+        [hideActionButtons]="hidePopupActionButtons"
+        [showBelongsToColumn]="true" 
+        [clusterId]="dsModel.clusterId" 
+        (addNotification)="popupActionAdd($event)" 
+        (cancelNotification)="popupActionCancel()"
+      ></asset-search>
     </div>
+  </div>
+  <div *ngIf="showConfirmationSticker" class="confirmationSticker borderBox">
+    <span>{{confirmationStickerText}}</span>
   </div>

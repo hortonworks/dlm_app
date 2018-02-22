@@ -1,0 +1,94 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+@import "../../../../../styles/variables";
+
+.dsCreator {
+  margin:25px 20px;
+  padding:25px 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hwx-white-bg {
+  background: #fff;
+}
+
+.hwx-title {
+  margin-bottom: 15px;
+}
+
+.dp-input__icon {
+  position: absolute;
+  right: 0px;
+  bottom: 10px;
+}
+.dp-input__option {
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgb(221, 221, 221);
+  }
+}
+
+textarea {height:100px;}
+select {height: 34px;}
+
+input,
+select,
+textarea {
+  width: 400px;
+}
+
+footer {
+  margin-top: 15px;
+}
+
+.markMandatory{
+  color: $burnt-sienna;
+}
+
+.dp-input-and-message-wrapper {
+  display: flex;
+  align-items: center;
+
+  .validation-error {
+    color: $roman-red;
+    border: 1px solid $roman-red;
+    outline: none;
+  }
+
+  .error-message {
+    margin-left: 15px;
+    color: $roman-red;
+  }
+}
+
+:host /deep/ .mdl-switch.is-public .mdl-switch__track{
+  background: $forest-green-1;
+}
+
+:host /deep/ .mdl-switch.is-checked .mdl-switch__track{
+  background: $shuttle-gray;
+}
+
+:host /deep/ .mdl-switch.is-checked .mdl-switch__thumb{
+  background: $alabaster;
+}
+
+.form-group {
+	width:400px;
+}
+
+.fillMandatoryMsg {
+  margin-top: 15px;
+  color: $burnt-sienna;
+  display: none;
+}

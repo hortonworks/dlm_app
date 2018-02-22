@@ -308,3 +308,15 @@
   flex-grow: 1;
   -webkit-font-smoothing: antialiased;
 }
+
+.confirmationSticker {
+  position: fixed;
+  z-index: 1000;
+  background-color: #1eb475;
+  color: white;
+  padding: 10px 30px;
+  font-size: 18px;
+  left: 50%;
+  top: 35px;
+  transform: translate(-50%, 0px);
+}

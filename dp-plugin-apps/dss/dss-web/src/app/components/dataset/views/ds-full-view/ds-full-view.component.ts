@@ -44,9 +44,12 @@ export class DsFullView implements OnInit {
   showSummary : boolean = true;
   selectionAllowed : boolean = false;
   showPopup: boolean = false;
+  hidePopupActionButtons: boolean = false;
+  showConfirmationSticker: boolean = false;
   systemTags: string[] = [];
   objectType: string = "assetCollection";
   avgRating: number = 0;
+  assetCountDiff:number = 0;
 
   assetPrefix = isDevMode() ? ' ' : 'dss';
 
@@ -77,7 +80,13 @@ export class DsFullView implements OnInit {
       this.avgRating = avgRating;
     });
   }
+  get confirmationStickerText() {
+    return `${Math.abs(this.assetCountDiff)} Assets successfully ${(this.assetCountDiff < 0)?"removed from":"added to"} ${this.dsModel.name}.`;
+  }
   updateDsModel = (rData) => {
+    this.assetCountDiff = rData.counts.hiveCount - this.dsModel.counts.hiveCount;
+    this.showConfirmationSticker=true;
+    setTimeout(()=>this.showConfirmationSticker=false, 3000);
     this.dsModel = rData;
     this.dsAssetList.clearSelection();
     this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
@@ -225,7 +234,12 @@ export class DsFullView implements OnInit {
     this.showPopup = false;
   }
 
-  popupActionDone(asqm: AssetSetQueryModel) {
+  popupActionDone() {
+    this.showPopup = false;
+  }
+
+  popupActionAdd(asqm: AssetSetQueryModel) {
+    this.hidePopupActionButtons = true;
     let futureRdataSet;
 
     if(asqm.selectionList.length)
@@ -233,10 +247,9 @@ export class DsFullView implements OnInit {
     else
       futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
 
-    futureRdataSet.subscribe(rData => {
-      this.updateDsModel(rData)
-      // this.assetSetQueryModelsForAddition.push(asqm);
-      this.showPopup = false;
+    futureRdataSet.subscribe(rdata=> {
+      this.hidePopupActionButtons = false;
+      this.updateDsModel(rdata);  
     })
   }
 

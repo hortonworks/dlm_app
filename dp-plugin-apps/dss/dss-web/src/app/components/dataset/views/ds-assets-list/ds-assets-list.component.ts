@@ -120,6 +120,7 @@ export class DsAssetList implements OnInit {
   clearResults() {
     this.dsAssets = [];
     this.totalPages = this.assetsCount = 0;
+    this.clearSelection();
   }
 
   clearSelection () {
