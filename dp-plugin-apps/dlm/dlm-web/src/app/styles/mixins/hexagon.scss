@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-@mixin hexagon($size, $color, $border_width: 0, $border_color: transparent, $box_shadow: 0) {
+@mixin hexagon($size, $color, $border_width: 0, $border_color: transparent) {
   position: relative;
   width: $size;
   height: ($size * 0.5774);
