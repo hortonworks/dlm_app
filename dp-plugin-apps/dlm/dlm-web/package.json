@@ -19,7 +19,8 @@
     "e2e": "protractor",
     "e2edebug": "protractor debug protractor.conf.js --elementExplorer",
     "dev:hmr": "ng serve --hmr -e=dev-hmr --host 0.0.0.0 --proxy-config proxy.conf.dev.json",
-    "alltests": "npm run build && npm run lint && npm run test",
+    "dev:staging": "npx ng serve --hmr -e=dev-hmr --host 0.0.0.0 --proxy-config proxy.conf.staging.json -p 4201",
+    "alltests": "yarn run build && yarn run lint && yarn run test",
     "report:licenses": "nlf"
   },
   "dependencies": {

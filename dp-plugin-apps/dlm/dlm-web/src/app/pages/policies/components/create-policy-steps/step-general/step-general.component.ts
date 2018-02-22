@@ -35,6 +35,7 @@ export function nameValidator(): ValidatorFn {
 @Component({
   selector: 'dlm-step-general',
   templateUrl: './step-general.component.html',
+  styleUrls: ['./step-general.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })

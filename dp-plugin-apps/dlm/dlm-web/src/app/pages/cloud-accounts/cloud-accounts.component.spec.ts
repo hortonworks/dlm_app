@@ -17,19 +17,18 @@ import {configureComponentTest} from 'testing/configure';
 import {RouterTestingModule} from '@angular/router/testing';
 import {ModalModule, BsDropdownModule} from 'ngx-bootstrap';
 import {HortonStyleModule} from 'common/horton-style.module';
-import {TableComponent} from 'common/table/table.component';
-import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
 import {MockTranslateLoader} from 'mocks/mock-translate-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {CloudAccountActionsComponent} from './components/cloud-account-actions/cloud-account-actions.component';
 import {AddCloudFormComponent} from './components/add-cloud-form/add-cloud-form.component';
 import {AddAccountModalComponent} from './components/add-account-modal/add-account-modal.component';
-import {CheckboxColumnComponent} from 'components/table-columns';
-import {ActionColumnComponent} from 'components/table-columns/action-column';
-import {CheckboxComponent} from 'common/checkbox/checkbox.component';
 import {CloudAccountService} from 'services/cloud-account.service';
 import {TooltipModule} from 'ngx-bootstrap';
+import {CloudAccountsPoliciesTableComponent} from './components/cloud-account-policies-table/cloud-account-policies-table.component';
+import {PrevJobsComponent} from '../policies/components/prev-jobs/prev-jobs.component';
+import {MomentModule} from 'angular2-moment';
+import {PipesModule} from 'pipes/pipes.module';
 
 describe('CloudAccountsComponent', () => {
   let component: CloudAccountsComponent;
@@ -50,7 +49,9 @@ describe('CloudAccountsComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         CommonComponentsModule,
-        HortonStyleModule
+        HortonStyleModule,
+        MomentModule,
+        PipesModule
       ],
       declarations: [
         CloudAccountsComponent,
@@ -58,6 +59,8 @@ describe('CloudAccountsComponent', () => {
         CloudAccountActionsComponent,
         AddCloudFormComponent,
         AddAccountModalComponent,
+        CloudAccountsPoliciesTableComponent,
+        PrevJobsComponent
       ],
       providers: [
         CloudAccountService
