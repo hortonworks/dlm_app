@@ -147,7 +147,7 @@
   color: $iron;
 }
 .listCont .list .listRow .col {
-  width:13%;
+  width:15%;
   margin:0px 2%;
   overflow: hidden;
   white-space:nowrap ;
@@ -155,17 +155,7 @@
   float: left;
 }
 .listCont .list.withDsNameCom .listRow .col{
-  width:9%;
-}
-.listCont .list .listRow .col.ownerCol {
-  width:8%;
-}
-
-.listCont .list .listRow .col.descCol {
-  width:30%;
-}
-.listCont .list.withDsNameCom .listRow .col.descCol {
-  width:24%;
+  width:10%;
 }
 
 .listCont .list .listRow .checkboxCont,

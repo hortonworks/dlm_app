@@ -18,7 +18,9 @@
   <div class="queryEditorCont" #queryEditorCont>
     <normlal-query-editor *ngIf="activeTab == tabEnum.NORMAL"
                           [queryObj]="queryObj"
-                          (onQueryObjUpdate)="onSimpleQueryObjUpdate($event)"
+                          [queryModel]="queryModel"
+                          [clusterId]="clusterId"
+                          (onQueryObjUpdate)="actionSearch($event)"
                           (onHeightChange)="onQueryEditorResize($event)"
                           #basicQueryEditor ></normlal-query-editor>
     <advance-query-editor *ngIf="activeTab == tabEnum.ADVANCE"
@@ -36,21 +38,20 @@
     <div style="clear: both"></div>
   </div>
   <div class="queryResultCont" #queryResultCont>
-    <ds-assets-list [hideTabs]="true"
+    <ds-assets-list-style1 [hideTabs]="true"
                     [hideSearch]="true"
                     [queryModels]="queryModel"
                     [innerListScrollable]="true"
                     [avoidLoadingOnInit]="true"
                     [clusterId]="clusterId"
                     [allowAssetNavigation]="false"
-                    [showBelongsToColumn]="showBelongsToColumn"
-                    *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
+                    [showBelongsToColumn]="false"
+                    (onAction)="onListAction($event)"
+                    *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list-style1>
     <div *ngIf="!showQueryResults" class="noSearchMessage"><span>{{"pages.dataset.asset-search.noSearchMsg" | translate}}</span></div>
   </div>
   <div class="actionButtonCont" *ngIf="!hideActionButtonCont" >
+    <button *ngIf="showDone" class="mdl-button btn-hwx-primary" data-se="asset_selection_popup_done" (click)="actionDone()">{{"pages.dataset.asset-search.add" | translate}}</button>
     <button class="mdl-button btn-hwx-default"  data-se="asset_selection_popup_cancle" (click)="actionCancel()">{{"pages.dataset.asset-search.cancel" | translate}}</button>
-    <button *ngIf="showDone && !saveButton" class="mdl-button btn-hwx-primary" data-se="asset_selection_popup_done" (click)="actionDone()">{{"pages.dataset.asset-search.done" | translate}}</button>
-    <button *ngIf="showDone && saveButton" class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"common.save" | translate}}</button>
-    <div style="clear: both"></div>
   </div>
 </div>

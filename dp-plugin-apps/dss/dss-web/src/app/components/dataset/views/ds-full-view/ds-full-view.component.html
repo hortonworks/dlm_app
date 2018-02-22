@@ -11,7 +11,7 @@
 
 <router-outlet name="sidebar"></router-outlet>
 <div *ngIf="!dsModel">Loading ... </div>
-<div *ngIf="dsModel" class="dsFullView borderBox flex-grid">
+<div *ngIf="dsModel" class="dsFullView borderBox flex-grid" [class.showSummary]="showSummary">
 
 
 
@@ -34,9 +34,9 @@
         <div class="utility-space">
           <!-- <button class="btn btn-circle" type="button"><i class="fa fa-ellipsis-v"></i></button> -->
           <button class="btn btn-circle" type="button" (click)="toggleSummaryWidget()" style="position: relative;">
-            <i class="fa fa-circle-thin" style="position: absolute; top: 6px; right: 4px; font-size: .8em"></i>
-            <i class="fa fa-circle-thin" style="position: absolute; top: 10px; left: -3px; font-size: .8em"></i>
-            <i class="fa fa-circle-thin" style="position: absolute; top: 5px; font-size: .8em; left: -5px;"></i>
+            <i class="fa fa-circle-thin" style="position: absolute; top: 6px; right: -5px; font-size: .8em"></i>
+            <i class="fa fa-circle-thin" style="position: absolute; top: 10px; left: -4px; font-size: .8em"></i>
+            <i class="fa fa-circle-thin" style="position: absolute; top: 5px; font-size: .8em; left: -6px;"></i>
             <i class="fa fa-circle hwx-error" style="position: absolute; font-size: .6em; top: 2px; left: 2px;"></i></button>
         </div>
       </div>

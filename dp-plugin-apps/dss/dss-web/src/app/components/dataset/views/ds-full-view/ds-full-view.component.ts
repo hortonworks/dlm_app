@@ -79,6 +79,7 @@ export class DsFullView implements OnInit {
   }
   updateDsModel = (rData) => {
     this.dsModel = rData;
+    this.dsAssetList.clearSelection();
     this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
   }
 

@@ -40,6 +40,7 @@
   cursor: pointer;
 }
 .searchWidgetCont{
+  line-height:2.8;
   float: left;
   width:100%;
 }
@@ -51,14 +52,24 @@
   border-bottom-right-radius: 2px;
 }
 .filterCont .singleFilterCont {
-  padding:20px;
-  width: 20%;
+  padding:15px 20px 20px 20px;
+  width: 25%;
   float: left;
+}
+.singleFilterCont > input {
+  width:100%;
+}
+.singleFilterCont .filter-header {
+  margin-bottom:5px;
+}
+.singleFilterCont .clear {
+  cursor:pointer;
+  float:right;
 }
 
 .search-text {
   border: none;
-  width: 100%;
+  width: 30%;
 }
 
 select {
@@ -70,3 +81,15 @@ select {
   border-radius: 5px;
 }
 select {background-color: inherit}
+
+.tagSticker {
+  color: white;
+  background-color: #666666;
+  padding: 3px 8px 3px;
+  border-radius: 3px;
+  margin-left:5px;
+}
+
+.tagSticker > .fa {
+  cursor:pointer;
+}

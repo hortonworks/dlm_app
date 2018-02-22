@@ -32,11 +32,19 @@
                             <span class="pull-right clear-filter" style="cursor:pointer;">Clear</span>
                         </div>
                         <div>
+                            <div class="radio-control"><input class="regular-radio" type="radio" name="created" title=""> <span>Last day</span></div>
                             <div class="radio-control"><input class="regular-radio" type="radio" name="created" title=""> <span>Last 30 days</span></div>
                             <div class="radio-control"><input class="regular-radio" type="radio" name="created" title=""> <span>Last 60 days</span></div>
-                            <div class="radio-control"><input class="regular-radio" type="radio" name="created" title=""> <span>Last day</span></div>
-                            <div class="radio-control"><input class="regular-radio" type="radio" name="created" title=""> <span>Custom</span></div>
                         </div>
+                    </div>
+                    <div class="filter-section">
+                        <div class="filter-header">
+                            <i class="fa fa-angle-right"></i>
+                            <span class="hwx-subtitle">Tag</span>
+                            <span class="pull-right clear-filter" style="cursor:pointer;" (click)="clearTag()">Clear</span>
+                        </div>
+                        <input type="Text" ngui-auto-complete [(ngModel)]="selectedTag" [source]="tagOptions"
+								placeholder="Enter Text" max-num-list="5" (change)="onTagSelectionChange($event)"/>
                     </div>
                     <div class="filter-section">
                         <div class="filter-header">
@@ -53,15 +61,6 @@
                             <span class="pull-right clear-filter" style="cursor:pointer;" (click)="clearDbName()">Clear</span>
                         </div>
                         <input placeholder="Enter Text" type="Text" [(ngModel)]="dbName" (change)="onDbNameChange($event)"/>
-                    </div>
-                    <div class="filter-section">
-                        <div class="filter-header">
-                            <i class="fa fa-angle-right"></i>
-                            <span class="hwx-subtitle">Tag</span>
-                            <span class="pull-right clear-filter" style="cursor:pointer;" (click)="clearTag()">Clear</span>
-                        </div>
-                        <input type="Text" ngui-auto-complete [(ngModel)]="selectedTag" [source]="tagOptions"
-								placeholder="Enter Text" max-num-list="5" (change)="onTagSelectionChange($event)"/>
                     </div>
 <!--
 					<div class="filter-section">
