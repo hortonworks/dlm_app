@@ -122,7 +122,7 @@ export const WIZARD_STEP_LABELS = {
   [SOURCE]: 'Select Source',
   [DESTINATION]: 'Select Destination',
   [SCHEDULE]: 'Schedule',
-  [ADVANCED]: 'Advanced Settings',
+  [ADVANCED]: 'Advanced Settings (Optional)',
   [REVIEW]: 'Review'
 };
 

@@ -515,8 +515,14 @@
         },
         "no_containers": "No containers",
         "fields": {
-          "policy_name": "Policy Name",
-          "policy_description": "Description",
+          "policy_name": {
+            "label": "Policy Name",
+            "placeholder": "Enter a unique name for the policy"
+          },
+          "policy_description": {
+            "label": "Description",
+            "placeholder": "Enter a description for the policy"
+          },
           "sourceCluster": {
             "self": "Source Cluster"
           },
