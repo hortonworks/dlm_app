@@ -91,10 +91,10 @@ export class LakeService {
   }
 
   validate(ambariUrl: string): Observable<any> {
-  return this.http
-    .get(`api/ambari/status?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))
-    .map(HttpUtil.extractData)
-    .catch(HttpUtil.handleError);
+    return this.http
+      .get(`api/ambari/status?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
   getServicesInfo(lakeId: string): Observable<ServiceInfo[]> {
