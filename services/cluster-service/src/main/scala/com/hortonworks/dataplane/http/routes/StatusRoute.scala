@@ -242,13 +242,13 @@ class StatusRoute @Inject()(val ws: WSClient,
       }
       .flatMap { res =>
         res.status match {
-          case 200 => Future.successful()
-          case 403 => Future.failed(WrappedErrorException(Error(403, "User does not have required rights to access this cluster. Please disable or configure Ranger to add roles or log-in as another user.", "cluster.ambari.status.knox.access-detail-rights-unavailable")))
-          case _ => Future.failed(WrappedErrorException(Error(500, s"Unknown error. Server returned ${res.status}", "cluster.ambari.status.knox.genric")))
+          case 403 => Future.failed(WrappedErrorException(Error(403, "User does not have required rights to access this cluster. Please ask your Ambari administrator to grant required rights.", "cluster.ambari.status.knox.detail.access-detail-rights-unavailable")))
+          case _ => Future.successful()
         }
       }
       .recoverWith {
-        case ex: Exception => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.knox.connection-refused"))
+        case ex: WrappedErrorException => Future.failed(ex)
+        case ex: Exception => Future.successful()
       }
   }
 
