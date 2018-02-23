@@ -49,11 +49,13 @@ export class LakeStatsComponent implements OnInit {
     }
 
     if(this.cCluster && this.cCluster.id) {
-      this.clusterService.retrieveHealth(this.cCluster.id, this.lake.id)
+      this.clusterService
+        .retrieveHealth(this.cCluster.id)
         .subscribe(health => this.cHealth = health);
     }
 
-    this.locationService.retrieve(this.lake.location)
+    this.locationService
+      .retrieve(this.lake.location)
       .subscribe(location => this.location = location);
   }
 
