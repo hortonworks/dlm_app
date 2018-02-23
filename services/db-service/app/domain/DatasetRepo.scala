@@ -212,10 +212,10 @@ class DatasetRepo @Inject()(
 
   private def getAverageRating(datasetIds: Seq[Long]) = {
     for {
-      (datasetId, comments) <- {
-        ratingRepo.getAvgRatingForListQuery(datasetIds, Constants.AssetCollectionObjectType)
+      (datasetId, ratings) <- {
+        ratingRepo.getRatingForListQuery(datasetIds, Constants.AssetCollectionObjectType)
       }
-    } yield (datasetId, comments.map(_.rating).avg)
+    } yield (datasetId, ratings.map(_.rating).avg)
   }
 
   def sortByDataset(paginationQuery: Option[PaginatedQuery],

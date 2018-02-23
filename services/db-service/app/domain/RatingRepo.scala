@@ -73,7 +73,7 @@ class RatingRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     db.run(Ratings.filter(m =>(m.objectId === objectId && m.objectType === objectType)).delete)
   }
 
-  def getAvgRatingForListQuery(objectIds: Seq[Long], objectType:String)={
+  def getRatingForListQuery(objectIds: Seq[Long], objectType:String)={
     Ratings.filter(t => (t.objectId.inSet(objectIds) && t.objectType === objectType)).groupBy(a => a.objectId)
   }
 
