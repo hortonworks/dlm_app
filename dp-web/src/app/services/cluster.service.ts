@@ -85,7 +85,7 @@ export class ClusterService {
 
   getClusterInfo(clusterDetailRequest:ClusterDetailRequest) :Observable<Cluster> {
     return this.http
-      .post(`api/clusters/details`,clusterDetailRequest, new RequestOptions(HttpUtil.getHeaders()))
+      .post(`api/ambari/details`,clusterDetailRequest, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
