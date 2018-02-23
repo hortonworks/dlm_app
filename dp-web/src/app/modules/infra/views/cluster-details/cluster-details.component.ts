@@ -175,7 +175,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   private getClusterHealth(clusterId, lakeId) {
     Loader.show();
     this.clusterService
-      .retrieveDetailedHealth(clusterId, lakeId)
+      .retrieveDetailedHealth(clusterId)
       .subscribe(
         health => {
           this.clusterHealthInProgress = false;
