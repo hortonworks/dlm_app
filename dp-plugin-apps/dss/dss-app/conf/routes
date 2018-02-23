@@ -83,6 +83,7 @@ GET           /api/ranger/:clusterId/policies                         controller
 # ===========================================
 POST          /api/comments                                           controllers.Comments.addComments
 GET           /api/comments                                           controllers.Comments.getByObjectRef(objectId: String, objectType: String)
+GET           /api/comments/actions/count                             controllers.Comments.getCommentsCount(objectId: Long, objectType: String)
 DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
 PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
 GET           /api/comments/:parentId/replies                         controllers.Comments.getByParentId(parentId: String)

@@ -9,19 +9,39 @@
  *
  */
 
-import {Injectable} from '@angular/core';
+import {Injectable, OnDestroy, OnInit} from '@angular/core';
 import {Http, Headers, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {HttpUtil} from '../shared/utils/httpUtil';
 import {Comment, CommentWithUser} from "../models/comment";
+import {Subject} from "rxjs/Subject";
 
 @Injectable()
-export class CommentService {
+export class CommentService implements OnDestroy , OnInit {
+
   uri = 'api/comments';
+
+  dataChanged = new Subject<boolean>();
+  dataChanged$ = this.dataChanged.asObservable();
+
   constructor(private http:Http) { }
+
+  ngOnInit() {
+    this.dataChanged = new Subject<boolean>();
+    this.dataChanged$ = this.dataChanged.asObservable();
+  }
 
   getByObjectRef(objectId: string, objectType: string, offset:number, size:number): Observable<CommentWithUser[]>  {
     const uri = `${this.uri}?objectId=${objectId}&objectType=${objectType}&offset=${offset}&size=${size}`;
+
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  getCommentsCount(objectId: string, objectType: string): Observable<any>  {
+    const uri = `${this.uri}/actions/count?objectId=${objectId}&objectType=${objectType}`;
 
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
@@ -50,5 +70,11 @@ export class CommentService {
       .delete(`${this.uri}/${id}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
+  }
+
+  ngOnDestroy(){
+    this.dataChanged.unsubscribe();
+    this.dataChanged = null;
+    this.dataChanged$ = null;
   }
 }

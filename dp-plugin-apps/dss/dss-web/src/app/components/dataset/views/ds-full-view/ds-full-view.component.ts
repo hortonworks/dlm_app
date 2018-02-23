@@ -27,6 +27,7 @@ import {FavouriteService} from "../../../../services/favourite.service";
 import {BookmarkService} from "../../../../services/bookmark.service";
 import {RatingService} from "../../../../services/rating.service";
 import {DataSet} from "../../../../models/data-set";
+import {CommentService} from "../../../../services/comment.service";
 
 @Component({
   selector: "ds-full-view",
@@ -56,6 +57,7 @@ export class DsFullView implements OnInit {
               private favouriteService: FavouriteService,
               private bookmarkService: BookmarkService,
               private ratingService: RatingService,
+              private commentService: CommentService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -70,13 +72,27 @@ export class DsFullView implements OnInit {
         this.dsAssetQueryModel = new AssetSetQueryModel([
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
+
         this.tagService.listAtlasTags(+params["id"]).subscribe(tags => this.systemTags=tags)
-        this.getAverageRating(params["id"]);
+
+        this.commentService.ngOnInit();
+        this.commentService.dataChanged$.subscribe(callRequired => {
+          if(callRequired){
+            this.commentService.getCommentsCount(params["id"], this.objectType).subscribe(commentsCount => {
+              this.dsModel.totalComments = commentsCount.totalComments;
+            });
+          }
+        });
+
       });
+
+    this.ratingService.ngOnInit();
     this.ratingService.dataChanged$.subscribe(avgRating => {
-      this.avgRating = avgRating;
+      this.dsModel.avgRating = avgRating;
     });
+
   }
+
   updateDsModel = (rData) => {
     this.dsModel = rData;
     this.dsAssetList.clearSelection();
@@ -139,9 +155,9 @@ export class DsFullView implements OnInit {
     this.dialogConfirm.nativeElement.close();
   }
 
-  getFavCount(id){
-    if(this.dsModel.favouriteCount){
-      return this.dsModel.favouriteCount;
+  getAggregateValue(val){
+    if(val){
+      return val;
     }
     return 0;
   }
@@ -212,11 +228,6 @@ export class DsFullView implements OnInit {
     this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true, queryParams: { returnURl: this.router.url }});
   }
 
-  getAverageRating(datasetId: string) {
-    this.ratingService.getAverage(datasetId, this.objectType).subscribe( averageAndVotes => {
-      this.avgRating = averageAndVotes.average;
-    });
-  }
   toggleSummaryWidget () {
     this.showSummary = !this.showSummary;
   }
@@ -240,4 +251,8 @@ export class DsFullView implements OnInit {
     })
   }
 
+  ngOnDestroy(){
+    this.commentService.ngOnDestroy();
+    this.ratingService.ngOnDestroy();
+  }
 }
