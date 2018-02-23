@@ -174,15 +174,19 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   private getClusterHealth(clusterId, lakeId) {
     Loader.show();
-    this.clusterService.retrieveDetailedHealth(clusterId, lakeId).subscribe(health => {
-      this.clusterHealthInProgress = false;
-      this.clusterHealth = health;
-      this.populateClusterDetails();
-      this.processHealthProgressbarInfo();
-      Loader.hide();
-    }, error => {
-      Loader.hide();
-    });
+    this.clusterService
+      .retrieveDetailedHealth(clusterId, lakeId)
+      .subscribe(
+        health => {
+          this.clusterHealthInProgress = false;
+          this.clusterHealth = health;
+          this.populateClusterDetails();
+          this.processHealthProgressbarInfo();
+          Loader.hide();
+        }, error => {
+          Loader.hide();
+        }
+      );
   }
 
   private getRMHealth(clusterId) {

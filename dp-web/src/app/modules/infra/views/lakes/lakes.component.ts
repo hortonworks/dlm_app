@@ -98,24 +98,30 @@ export class LakesComponent implements OnInit {
   updateUnSyncedLakes(unSyncedLakes) {
     unSyncedLakes.forEach((unSyncedlake) => {
       let count = 1;
-      this.lakeService.retrieve(unSyncedlake.data.id).delay(this.DELAY_IN_MS).repeat(this.MAXCALLS).skipWhile((lake) => lake.state !== this.SYNCED && lake.state !== this.SYNC_ERROR && count++ < this.MAXCALLS).first().subscribe(lake => {
-        let locationObserver;
-        if (lake.state === this.SYNCED || lake.state === this.SYNC_ERROR) {
-          unSyncedlake.data = lake;
-          this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters => {
-            unSyncedlake.clusters = clusters;
-            if (clusters && clusters.length > 0) {
-              locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id, unSyncedlake.data.ambariUrl);
-            } else {
-              locationObserver = this.getLocationInfo(unSyncedlake.data.location);
-            }
+      this.lakeService
+        .retrieve(unSyncedlake.data.id)
+        .delay(this.DELAY_IN_MS)
+        .repeat(this.MAXCALLS)
+        .skipWhile((lake) => lake.state !== this.SYNCED && lake.state !== this.SYNC_ERROR && count++ < this.MAXCALLS)
+        .first()
+        .subscribe(lake => {
+          let locationObserver;
+          if (lake.state === this.SYNCED || lake.state === this.SYNC_ERROR) {
+            unSyncedlake.data = lake;
+            this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters => {
+              unSyncedlake.clusters = clusters;
+              if (clusters && clusters.length > 0) {
+                locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id, unSyncedlake.data.ambariUrl);
+              } else {
+                locationObserver = this.getLocationInfo(unSyncedlake.data.location);
+              }
+              this.updateHealth(unSyncedlake, locationObserver, false);
+            });
+          } else {
+            locationObserver = this.getLocationInfo(unSyncedlake.data.location);
             this.updateHealth(unSyncedlake, locationObserver, false);
-          });
-        } else {
-          locationObserver = this.getLocationInfo(unSyncedlake.data.location);
-          this.updateHealth(unSyncedlake, locationObserver, false);
-        }
-      });
+          }
+        });
     });
   }
 
@@ -166,15 +172,15 @@ export class LakesComponent implements OnInit {
         } else {
           return ambariUrl;
         }
-      }).catch(() => Observable.of(ambariUrl));
+      })
+      .catch(() => Observable.of(ambariUrl));
   }
 
   private getLocationInfo(locationId) {
-    return this.locationService.retrieve(locationId).map(location => {
-      return {
+    return this.locationService.retrieve(locationId)
+      .map(location => ({
         location: location
-      };
-    });
+      }));
   }
 
   private extractMapPoints(locationInfo, lake) {
