@@ -29,6 +29,9 @@ class DataAssets @Inject()(dataAssetRepo: DataAssetRepo)(implicit exec: Executio
     dataAssetRepo.allWithDatasetId(datasetId, queryName, offset, limit).map(aNc => success(linkData(aNc))).recoverWith(apiError)
   }
 
+  def allAssetsWithDatasetId(datasetId: Long): Action[AnyContent] = Action.async {
+    dataAssetRepo.allAssetsWithDatasetId(datasetId).map(dataAssets => success(linkData(dataAssets))).recoverWith(apiError)
+  }
 
   private def makeLink(c: DataAsset) = {
     Map("dataset" -> s"${API.datasets}/${c.datasetId}"

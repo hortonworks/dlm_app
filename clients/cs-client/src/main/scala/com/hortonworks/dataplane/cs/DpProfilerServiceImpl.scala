@@ -11,6 +11,7 @@
 
 package com.hortonworks.dataplane.cs
 
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.DpProfilerService
 import com.typesafe.config.Config
@@ -19,6 +20,7 @@ import play.api.libs.ws.WSResponse
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import com.hortonworks.dataplane.commons.domain.profiler.parsers.RequestParser._
 
 class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) extends DpProfilerService{
 
@@ -66,7 +68,7 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       .delete()
       .map(mapResultsGeneric)
   }
-  
+
   override def startAndScheduleProfilerJob(clusterId: String, jobName: String, assets: Seq[String])(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
     ws.url(s"$url/cluster/$clusterId/dp-profiler/start-schedule-job")
       .withToken(token)
@@ -97,6 +99,14 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
+      .map(mapResultsGeneric)
+  }
+
+  override def getMetrics(metricRequest: Requests.AssetResolvedProfilerMetricRequest, userName: String)(implicit token: Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+    ws.url(s"$url/cluster/dp-profiler/metrics?userName=$userName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(metricRequest))
       .map(mapResultsGeneric)
   }
 }

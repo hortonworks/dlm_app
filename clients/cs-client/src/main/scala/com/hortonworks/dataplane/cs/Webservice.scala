@@ -14,6 +14,7 @@ package com.hortonworks.dataplane.cs
 import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, AmbariEndpoint, ServiceInfo}
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.AssetResolvedProfilerMetricRequest
 import com.typesafe.config.Config
 import play.api.libs.json.{JsObject, JsResult, JsValue}
 import play.api.libs.ws.{WSRequest, WSResponse}
@@ -108,7 +109,7 @@ object Webservice {
     def getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
     def deleteProfilerByJobName(clusterId: Long, jobName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
-    
+
     def startAndScheduleProfilerJob(clusterId: String, jobName: String, assets: Seq[String])(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
     def getScheduleInfo(clusterId: String, taskName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
@@ -116,6 +117,8 @@ object Webservice {
     def getAuditResults(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
     def getAuditActions(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+
+    def getMetrics(metricRequest: AssetResolvedProfilerMetricRequest, userName: String)(implicit token: Option[HJwtToken]): Future[Either[Errors, JsObject]]
 
   }
 }
