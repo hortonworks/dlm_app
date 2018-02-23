@@ -203,7 +203,7 @@ export class DsFullView implements OnInit {
       dataset.id = this.dsModel.id;
       dataset.createdBy = this.dsModel.creatorId;
       dataset.createdOn = this.dsModel.createdOn;
-      dataset.dpClusterId = this.dsModel.clusterId;
+      dataset.dpClusterId = this.dsModel.datalakeId;
       dataset.datalakeId = this.dsModel.datalakeId;
       dataset.description = this.dsModel.description;
       dataset.lastModified = this.dsModel.lastModified;
