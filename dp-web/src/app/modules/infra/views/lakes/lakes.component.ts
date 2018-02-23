@@ -147,14 +147,20 @@ export class LakesComponent implements OnInit {
 
   private getLocationInfoWithStatus(locationId, clusterId, lakeId, ambariUrl): Observable<any> {
     return Observable.forkJoin(
-      this.locationService.retrieve(locationId).map((res) => res).catch(err => {
-        return Observable.of(null);
-      }),
-      this.clusterService.retrieveHealth(clusterId, lakeId).map((res) => res).catch(err => {
-        return Observable.of(null);
-      }),
-      this.getAmbariUrl(clusterId, ambariUrl)
-      , (location, health, ambariUrl) => ({location, health, ambariUrl}));
+      this.locationService
+        .retrieve(locationId)
+        .map((res) => res)
+        .catch(err => {
+          return Observable.of(null);
+        }),
+      this.clusterService
+        .retrieveHealth(clusterId)
+        .map((res) => res)
+        .catch(err => {
+          return Observable.of(null);
+        }),
+      this.getAmbariUrl(clusterId, ambariUrl),
+      (location, health, ambariUrl) => ({location, health, ambariUrl}));
   }
 
   private getAmbariUrl(clusterId, ambariUrl): Observable<string> {
