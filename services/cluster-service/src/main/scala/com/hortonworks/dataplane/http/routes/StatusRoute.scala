@@ -35,7 +35,7 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
-import play.api.libs.ws.{WSAuthScheme, WSClient}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -227,22 +227,48 @@ class StatusRoute @Inject()(val ws: WSClient,
   }
 
 
-  private def probeAccess(clusterHrefs: Seq[String], knoxUrl: String, token: String): Future[Unit] = {
+  private def probeAccessViaKnox(href: String, knoxUrl: String, token: String): Future[WSResponse] = {
+    val delegatedRequest = ws.url(href).withRequestTimeout(NETWORK_TIMEOUT seconds)
+
+    KnoxApiExecutor.withExceptionHandling(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)
+      .execute(KnoxApiRequest(delegatedRequest, (req => req.get), Some(token)))
+  }
+
+
+  private def probeAccessViaAmbari(href: String): Future[WSResponse] = {
+    credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
+      .map { credential =>
+        (credential.user, credential.pass) match {
+          case (Some(username), Some(password)) => (username, password)
+          case _ => throw new WrappedErrorException(Error(500, "There is no credential configured for Ambari default user", "cluster.ambari.status.raw.credential-not-found"))
+        }
+      }
+      .flatMap { case (username, password) =>
+        ws.url(href)
+          .withAuth(username, password, WSAuthScheme.BASIC)
+          .withRequestTimeout(NETWORK_TIMEOUT seconds)
+          .get()
+      }
+  }
+
+
+  private def probeAccess(clusterHrefs: Seq[String], knoxUrl: Option[String] = None, token: Option[String] = None): Future[Unit] = {
     Future
       .fromTry(clusterHrefs.size match {
-        case 0 => Failure(WrappedErrorException(Error(404, "There are no clusters attached to this Ambari instance.", "cluster.ambari.status.knox.detail.0-clusters-on-ambari")))
+        case 0 => Failure(WrappedErrorException(Error(404, "There are no clusters attached to this Ambari instance.", "cluster.ambari.status.detail.0-clusters-on-ambari")))
         case 1 => Success(clusterHrefs.head)
-        case _ => Failure(WrappedErrorException(Error(404, "There are more than one clusters attached to this Ambari instance. This should not happen.", "cluster.ambari.status.knox.detail.more-than-1-clusters-on-ambari")))
+        case _ => Failure(WrappedErrorException(Error(404, "There are more than one clusters attached to this Ambari instance. This should not happen.", "cluster.ambari.status.detail.more-than-1-clusters-on-ambari")))
       })
       .flatMap { href =>
-        val delegatedRequest = ws.url(href).withRequestTimeout(NETWORK_TIMEOUT seconds)
-
-        KnoxApiExecutor.withExceptionHandling(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)
-          .execute(KnoxApiRequest(delegatedRequest, (req => req.get), Some(token)))
+        (knoxUrl, token) match {
+          case (Some(knoxUrl), Some(token)) => probeAccessViaKnox(href, knoxUrl, token)
+          case (None, None) => probeAccessViaAmbari(href)
+          case (_, _) => Future.failed(WrappedErrorException(Error(500, "Unknown error: One of Knox URL or Token is unavailable. This should not happen.", "cluster.ambari.status.detail.missing-data")))
+        }
       }
       .flatMap { res =>
         res.status match {
-          case 403 => Future.failed(WrappedErrorException(Error(403, "User does not have required rights to access this cluster. Please ask your Ambari administrator to grant required rights.", "cluster.ambari.status.knox.detail.access-detail-rights-unavailable")))
+          case 403 => Future.failed(WrappedErrorException(Error(403, "User does not have required rights to access this cluster. Please ask your Ambari administrator to grant required rights.", "cluster.ambari.status.detail.access-detail-rights-unavailable")))
           case _ => Future.successful()
         }
       }
@@ -268,7 +294,7 @@ class StatusRoute @Inject()(val ws: WSClient,
           token <- Future.fromTry(tokenTryable)
           json <- probeKnox(endpoint, knoxUrl, token)
           hrefs <- Future.successful((json \ "items" \\ "href").map(_.asOpt[String]).toList.filter(_.isDefined).map(_.get))
-          _ <- probeAccess(hrefs, knoxUrl, token)
+          _ <- probeAccess(hrefs, Some(knoxUrl), Some(token))
         } yield AmbariCheckResponse(ambariApiCheck = true,
           knoxDetected = true,
           ambariApiStatus = 200,
@@ -282,6 +308,8 @@ class StatusRoute @Inject()(val ws: WSClient,
           url <- Future.fromTry(constructUrl(endpoint))
           inet <- Future.fromTry(probeNetwork(url))
           json <- probeAmbari(endpoint)
+          hrefs <- Future.successful((json \ "items" \\ "href").map(_.asOpt[String]).toList.filter(_.isDefined).map(_.get))
+          _ <- probeAccess(hrefs)
         } yield AmbariCheckResponse(ambariApiCheck = true,
           knoxDetected = false,
           ambariApiStatus = 200,
