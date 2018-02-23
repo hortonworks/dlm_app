@@ -29,7 +29,7 @@ export class ClusterService {
   }
 
   listByLakeId({ lakeId }): Observable<Cluster[]>{
-    const uri = lakeId ? `${this.uri}?lakeId=${lakeId}` : this.uri;
+    const uri = lakeId ? `${this.uri}?dpClusterId=${lakeId}` : this.uri;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
