@@ -108,7 +108,7 @@ export class LakesComponent implements OnInit {
           let locationObserver;
           if (lake.state === this.SYNCED || lake.state === this.SYNC_ERROR) {
             unSyncedlake.data = lake;
-            this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters => {
+            this.clusterService.listByLakeId(lake.id).subscribe(clusters => {
               unSyncedlake.clusters = clusters;
               if (clusters && clusters.length > 0) {
                 locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id, unSyncedlake.data.ambariUrl);

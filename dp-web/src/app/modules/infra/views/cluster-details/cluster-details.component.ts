@@ -103,7 +103,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   private getClusterDetails() {
     Loader.show();
     Observable.forkJoin(
-      this.clusterService.listByLakeId({lakeId: this.lake.id}),
+      this.clusterService.listByLakeId(this.lake.id),
       this.locationService.retrieve(this.lake.location),
     ).subscribe(responses => {
       Loader.show();
