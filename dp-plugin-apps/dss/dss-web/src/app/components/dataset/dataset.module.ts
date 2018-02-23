@@ -14,12 +14,14 @@ import {RouterModule} from "@angular/router";
 import {routes} from "./dataset.routes";
 import {DatasetSharedModule} from './dataset-shared.module';
 import {SharedModule} from '../../shared/shared.module';
+import {AssetCollectionModule} from './views/asset-collection/asset-collection.module';
 
 @NgModule({
   imports: [
     SharedModule,
     RouterModule.forChild(routes),
-    DatasetSharedModule
+    DatasetSharedModule,
+    AssetCollectionModule
   ]
 })
 export class DatasetModule {

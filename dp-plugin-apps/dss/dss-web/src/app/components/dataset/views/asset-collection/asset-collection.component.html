@@ -1,0 +1,11 @@
+<div class="dss-container">
+  <div class="hwx-title green"> {{dsModel.name}}</div>
+  <div class="hwx-desc"> {{dsModel.description}}</div>
+
+  <div class="tabs-container">
+    <dp-tabs [tabEnum]="tabEnum" (selected)="selectedTab=$event"> </dp-tabs>
+  </div>
+
+  <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW"> </dss-overview>
+
+</div>

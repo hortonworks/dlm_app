@@ -1,0 +1,110 @@
+@import "../../../../../../styles/variables";
+
+.overview-cards-container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: stretch;
+
+  .overview-card {
+    border: 1px solid #E7E7E7;
+    border-radius: 2px;
+    flex-grow: 1;
+    margin: 0px 5px;
+    padding: 15px;
+
+  }
+}
+
+.overview-cards-container.summary {
+  height: 120px;
+
+  .overview-card {
+    min-width: 150px;
+  }
+
+  .title {
+    color: $shuttle-gray;
+    font-weight: 500;
+  }
+
+  .value {
+    color: $shuttle-gray;
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 75px;
+    text-align: center;
+  }
+}
+
+.overview-cards-container.two-col {
+  margin-top: 10px;
+
+  .overview-card {
+    min-height: 320px;
+  }
+}
+
+.overview-cards-container.one-col {
+  margin-top: 10px;
+
+  .overview-card {
+    min-height: 320px;
+  }
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nvd3 .nv-axis.nv-x path.domain {
+  stroke-opacity: 0;
+
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .75;
+  shape-rendering: crispEdges;
+  stroke-opacity: .75;
+}
+
+
+button.date-range {
+  font-weight: 500;
+  font-size: 13px;
+  color: #53646A;
+  border: none;
+
+  &.selected {
+    color: #FFFFFF;
+    background: #444F62;
+    border-radius: 4px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+}
+
+.bold {
+  font-weight: bold;
+}
+
+:host ::ng-deep .nvd3.nv-pie .nv-pie-title {
+  fill: #455A64;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .tick line{
+  opacity: 0;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart nv-zeroLine {
+  stroke-width: 2;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .nv-y text{
+  display:none;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .domain {
+  display:none;
+}

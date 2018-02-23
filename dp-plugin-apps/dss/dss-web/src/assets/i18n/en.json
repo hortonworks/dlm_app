@@ -71,63 +71,6 @@
         "systemError": "System Error"
       }
     },
-    "onboard": {
-      "labels": {
-        "welcomeText": "Welcome to",
-        "hwxDataplane": "Hortonworks DataPlane Service",
-        "setupAuth": "Setup Authentication",
-        "defineUsers": "Define User Privileges Roles and Groups",
-        "manageUsers": "Manage User Privileges Roles and Groups",
-        "startButton": "Get Started",
-        "addCluster": "Add Clusters",
-        "addDataset": "Add Asset Collection",
-        "setService": "Setup Services"
-      },
-      "description": {
-        "dataplane": "Welcome to Hortonworks DataPlane Service. To start, please configure the LDAP properties and allow DataPlane authenticate against it. Optionally, you can add DataPlane Administrators. Please proceed by clicking on GET STARTED",
-        "clusterOnboard": "Welcome to Hortonworks DataPlane Service. To start, please add your Ambari managed clusters to DataPlane. You can also enable DataPlane services or provide more users or groups access to them. Please proceed by clicking on GET STARTED.",
-        "setupAuth": "The first step is to help DataPlane connect to your LDAP by providing the LDAP configurations to DataPlane.",
-        "defineUsers": "Upon completing the LDAP configuration, you may add administrators to DataPlane. You can add users or groups to DataPlane and assign or modify their roles anytime through the User Management Screen.",
-        "manageUsers": "You can manage users or groups in DataPlane and assign or modify their roles anytime through the User Management Screen.",
-        "addCluster": "Add Ambari Managed HDP clusters to DataPlane. DataPlane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
-        "setService": "Set up services to enable DataPlane to manage your data",
-        "addDataset": "Create asset collection using Data Steward Studio capability",
-        "ldapEditNote": "Note: Values for attributes which are disabled must be valid on the LDAP instance if it is being pointed to a new URL."
-      },
-      "configure": {
-        "labels": {
-          "ldapConfiguration": "LDAP Configuration",
-          "masterPassword": "Master Password",
-          "userDNTemplate": "User DN Template",
-          "url": "URL",
-          "userSearchBase": "User Search base",
-          "userSearchAttributeName": "User Search Attribute",
-          "groupSearchAttributeName": "Group Search Attribute",
-          "groupMemberAttributeName": "Group Member Attribute Name",
-          "groupObjectClass": "Group Object Class",
-          "groupSearchBase": "Group Search base",
-          "adminBindDN": "Administrator Bind DN",
-          "adminPassword": "Administrator Password",
-          "showPassword": "Show Password",
-          "configError": "Unable to save LDAP configuration. Please check and try again."
-        },
-        "description": {
-          "configurationDesctiption": "The first step is to help DataPlane connect to your LDAP by providing the appropriate configurations."
-        }
-      },
-      "adduser": {
-        "labels": {
-          "users": "Users",
-          "groups": "Groups",
-          "saveAndLogin": "SAVE & LOGIN",
-          "configSuccess": "LDAP ADDED SUCCESSFULLY"
-        },
-        "description" : {
-          "ldapUserFetchError": "Not able to fetch users from LDAP.",
-          "ldapGroupFetchError": "Not able to fetch groups from LDAP"
-        }
-      }
-    },
     "services": {
       "labels": {
         "enabledServices": "Enabled Services",
@@ -168,97 +111,6 @@
         "optionalInstallation":"Optionally, you can install the following services to perform additional functions on the cluster.",
         "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
         "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service."
-      }
-    },
-    "infra": {
-      "topnav": {
-        "cluster-link": "CLUSTERS"
-      },
-      "labels": {
-        "nodes": "Nodes",
-        "uptime": "Uptime",
-        "services": "Services",
-        "allServices": "All Services",
-        "less": "Less",
-        "hdfsUsed": "HDFS Used",
-        "hdfsTotal": "HDFS Total",
-        "addButton": "Add Cluster",
-        "addCluster": "Add Your Cluster",
-        "goToAmbari":"Go to Ambari",
-        "ambariUrl": "Ambari URL",
-        "ambariUsername": "Ambari Username",
-        "ambariPassword": "Ambari Password",
-        "knoxUrl": "Knox URL",
-        "clusterName": "Cluster Name",
-        "ipAddress": "IP Address",
-        "clusterLocation": "Cluster Location",
-        "dataCenter": "Data Center",
-        "clusterAddSuccess": "Cluster Added successfully",
-        "connectionFailed": "Unable to connect, please retry",
-        "clusterAddError": "Failed to Add Cluster",
-        "emptyClusters": "No Clusters.",
-        "addUser": "ADD USER",
-        "addGroup": "ADD GROUP",
-        "username": "Username",
-        "addUserNames": "Usernames",
-        "groupName": "Group Name",
-        "addGroupNames": "Group Names",
-        "roles": "Roles",
-        "usernameorgroup": "Username/Group",
-        "active": "Active",
-        "inactive": "Inactive",
-        "additionalConfigs": "Additional Configs",
-        "editCluster": "Edit Cluster",
-        "duplicateRole": "Duplicate values in Roles Input - ",
-        "duplicateUser": "Duplicate values in Users Input - ",
-        "duplicateGroup": "Duplicate values in Groups Input - ",
-        "noMatch": "No Match",
-        "ldapUrl": "Ldap URL",
-        "confirmRemove": "Remove Confirmation",
-        "hdpVersion":"HDP Version",
-        "registeredBy": "Registered By",
-        "securityType": "Security Type",
-        "noOfServices": "No of Services",
-        "dataNodes": "DataNodes",
-        "nameNodeHeapSize": "NameNode Heap Size",
-        "hdfsDiskSpace": "HDFS Disk Space",
-        "nodeManagers": "NodeManagers",
-        "resourceManagerHeapSize": "ResourceManager Heap Size",
-        "resourceManagerUptime": "ResourceManager Uptime"
-      },
-      "description": {
-        "editCluster": "Please update your Ambari managed cluster (already added to DataPlane) here.",
-        "addCluster": "Please add Ambari managed cluster to DataPlane. DataPlane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
-        "datalake": "This cluster has been identified as a Datalake since it has data management services,  {{serviceNames}} running.",
-        "clusterLocation": "Geographical location of the cluster",
-        "dataCenter": "Data Center of the cluster",
-        "tags": "Tags for the cluster",
-        "description": "Description of the cluster",
-        "clusterAddSuccess": "Your cluster has been added to DataPlane.",
-        "duplicateDataCenter": "A cluster with the same name already exists in the given data center. Please select a different cluster, or specify a different data center name.",
-        "connectionFailed": " DataPlane could not retreive cluster information.",
-        "connectionFailureReasons": {
-          "ambariServerDown": "Check if the Ambari server is up and running in the given url",
-          "insufficientAccessRights": "Make sure that you have right access rights to the ambari server"
-        },
-        "clusterAlreadyExists": "Cluster already exists in DataPlane",
-        "userManagement": "You can manage the users or groups added to DataPlane through User Management. This page is available for the DataPlane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows.",
-        "additionalConfigs": "Please provide these additional configurations required by DataPlane to discover the cluster information",
-        "knoxUrl": "Please enter the URL of the Knox Service on the HDP cluster which is configured to work with DataPlane.",
-        "ldapError": "Not able to fetch users from LDAP",
-        "addUserError": "The following users could not be saved. Please check if they have already been added.",
-        "updateUserError": "Not able to update user",
-        "addGroupError": "The following groups could not be saved. Please check if they have already been added.",
-        "updateGroupError": "Not able to update group",
-        "invalidRoleInput": "One or more roles are invalid. You must select a role from the Roles dropdown or dropdown options that appear as you type in the Roles field.",
-        "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http[s]://hostname[:port][/path].",
-        "invalidLocation" : "Not a valid location. Please select a location from dropdown.",
-        "invalidUserInput": "One or more usernames are invalid. You must select a name from the dropdown options that appear as you type in the Usernames field.",
-        "invalidGroupInput": "One or more group names are invalid. You must select a name from the dropdown options that appear as you type in the Group Names field.",
-        "loadServiceError": "Could not fetch Data Plane Services information from Ambari",
-        "rolesOverrideWarning":"This will override any roles the user acquired as part of groups",
-        "clusterDeleteWarning":"Removing a cluster causes loss of data such as associated pairings, policies and asset collections. Please delete those objects first before deleting a cluster. This action cannot be undone. Please confirm if you want to go ahead.",
-        "deleteFailed": "Cluster could not be deleted"
       }
     },
     "dataset": {
@@ -354,36 +206,24 @@
           "addToFav": "Add to Favourites",
           "remFromFav": "Remove from Favourites"
         }
+      },
+      "asset-collection": {
+        "no-of-tables": "# of Tables",
+        "no-of-profiled-tables": "# of Profiled Tables",
+        "no-of-sensitive-tables": "# of Sensitive Tables",
+        "unsecured-assets": "# of Unsecured Assets",
+        "no-of-new-tags": "# of New Tags Added",
+        "top-10-users": "Top 10 users",
+        "sensitive-vs-non-sensitive": "Sensitive Vs Non Sensitive",
+        "asset-distribution-by-sensitive-tag": "Asset Distribution by Sensitive Tag",
+        "no-of-quires-running-sensitive-data": "# of Quires Running Sensitive Data"
+
       }
     },
     "comments": {
       "collaborate": "Collaborate",
       "fetchErrorMsg": "Could not fetch related Comments",
       "noComments": "No Comments yet"
-    },
-    "analytics": {
-      "workspace": {
-        "title": "Workspaces",
-        "create-workspace": "Create Workspace",
-        "assets": {
-          "add-assets": "Add Assets",
-          "add-assets-desc": "Add related data assets into your workspace, by searching across the Data-Lake"
-        }
-      },
-      "add-workspace": {
-        "title": "Add Workspace"
-      }
-    },
-    "profile": {
-      "change_password": {
-        "current_password": "Current password",
-        "new_password": "New password",
-        "confirm_new_password": "Confirm new password",
-        "submit_and_logout": "Change & Logout",
-        "errors": {
-          "noMatch": "New password does not match re-entered password."
-        }
-      }
     },
     "not_found": {
       "message": "This page does not exist.",

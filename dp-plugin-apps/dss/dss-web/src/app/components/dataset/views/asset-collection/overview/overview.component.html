@@ -1,0 +1,66 @@
+<div style="display: flex;justify-content: flex-end;margin: 0px 0px 15px 0px;">
+  <div>
+    <button class="date-range selected">D</button>
+    <button class="date-range">W</button>
+    <button class="date-range">M</button>
+    <button class="date-range">Y</button>
+  </div>
+</div>
+
+
+<div class="overview-cards-container summary">
+  <div class="overview-card">
+    <div class="title">{{"pages.dataset.asset-collection.no-of-tables" | translate}} </div>
+    <div class="value"> {{assetCollectionDashboard.summary.noOfTables}} </div>
+  </div>
+
+  <div class="overview-card">
+    <div class="title">{{"pages.dataset.asset-collection.no-of-profiled-tables" | translate}} </div>
+    <div class="value"> {{assetCollectionDashboard.summary.noOfProfiledTables}} </div>
+  </div>
+
+  <div class="overview-card">
+    <div class="title">{{"pages.dataset.asset-collection.no-of-sensitive-tables" | translate}} </div>
+    <div class="value"> {{assetCollectionDashboard.summary.noOfSensitiveTables}} </div>
+  </div>
+
+  <div class="overview-card">
+    <div class="title">{{"pages.dataset.asset-collection.unsecured-assets" | translate}} </div>
+    <div class="value"> {{assetCollectionDashboard.summary.noOfUnsecuredAssets}} </div>
+  </div>
+
+  <div class="overview-card">
+    <div class="title">{{"pages.dataset.asset-collection.no-of-new-tags" | translate}} </div>
+    <div class="value"> {{assetCollectionDashboard.summary.noOfNewTagsAdded}} </div>
+  </div>
+</div>
+
+
+<div class="overview-cards-container two-col">
+  <div class="overview-card">
+    <div class="bold"> Top 10K Users </div>
+    <svg #topUsers></svg>
+  </div>
+  <div class="overview-card">
+    <div class="bold"> Sensitive Vs Non Sensitive </div>
+    <svg #sensitiveNonSensitive></svg>
+  </div>
+</div>
+
+<div class="overview-cards-container two-col">
+  <div class="overview-card">
+    <div class="bold"> Asset Distribution by Sensitive Tag </div>
+    <svg #distributionByTag></svg>
+  </div>
+  <div class="overview-card">
+    <div class="bold"> # of Quires running Sensitive Data </div>
+    <svg #quiresRunningSensitiveData></svg>
+  </div>
+</div>
+
+<div class="overview-cards-container one-col">
+  <div class="overview-card">
+    <div class="bold"> Users Accessing Sensitive Data</div>
+    <svg #usersAccessingSensitiveData></svg>
+  </div>
+</div>
