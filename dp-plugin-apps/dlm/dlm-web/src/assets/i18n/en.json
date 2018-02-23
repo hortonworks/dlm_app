@@ -59,6 +59,7 @@
     "yes": "Yes",
     "no": "No",
     "not_applicable": "Not Applicable",
+    "last_job": "Last Job",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
       "unknown": "Something went wrong.",
@@ -405,7 +406,8 @@
         "no_containers": "No Containers",
         "table": {
           "actions": "ACTIONS",
-          "user_details": "CREDENTIAL"
+          "user_details": "CREDENTIAL",
+          "policies": "POLICIES"
         },
         "accounts": {
           "iam_role": "IAM Role",
@@ -513,8 +515,14 @@
         },
         "no_containers": "No containers",
         "fields": {
-          "policy_name": "Policy Name",
-          "policy_description": "Description",
+          "policy_name": {
+            "label": "Policy Name",
+            "placeholder": "Enter a unique name for the policy"
+          },
+          "policy_description": {
+            "label": "Description",
+            "placeholder": "Enter a description for the policy"
+          },
           "sourceCluster": {
             "self": "Source Cluster"
           },

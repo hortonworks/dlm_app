@@ -1,0 +1,101 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<div class="form-container">
+  <form class="basic-form policy-form" [formGroup]="form">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="form-section col-xs-12">
+          <div class="form-group">
+            <!-- SOURCE -->
+            <fieldset formGroupName="source">
+              <div class="col-xs-12">
+                <div class="row">
+                  <!-- SOURCE TYPE -->
+                  <div class="col-xs-4">
+                    <dlm-form-field
+                      [label]="'page.policies.form.fields.source_type' | translate"
+                      [fieldClass]="'col-xs-12'"
+                      [errorClass]=""
+                      [required]="true">
+                      <dlm-select-field
+                        qe-attr="policy-source-type"
+                        formField
+                        formControlName="type"
+                        [options]="sourceTypes"
+                        [value]="sourceType">
+                      </dlm-select-field>
+                    </dlm-form-field>
+                  </div>
+                  <!-- SOURCE TYPE END -->
+                  <!-- SOURCE CLUSTER -->
+                  <div class="col-xs-4" *ngIf="form.get('source.type').value === CLUSTER">
+                    <dlm-form-field
+                      [label]="'page.policies.form.fields.sourceCluster.self' | translate"
+                      [fieldClass]="'col-xs-12'"
+                      [errorClass]=""
+                      [required]="true">
+                      <dlm-select-field
+                        qe-attr="policy-source-cluster"
+                        formField
+                        formControlName="cluster"
+                        [options]="sourceClusters"
+                        [value]="sourceCluster">
+                      </dlm-select-field>
+                    </dlm-form-field>
+                  </div>
+                  <!-- SOURCE CLUSTER END -->
+                  <!-- SOURCE CLOUD ACCOUNT -->
+                  <div class="col-xs-4"
+                       *ngIf="form.get('source.type').value === S3">
+                    <dlm-form-field
+                      [label]="'page.policies.form.fields.s3.account' | translate"
+                      [required]="true"
+                      [fieldClass]="'col-xs-12'"
+                      [errorClass]="">
+                      <dlm-select-field
+                        qe-attr="source-cloud-account"
+                        formField
+                        formControlName="cloudAccount"
+                        [options]="sourceCloudAccounts"
+                        [value]="sourceCloudAccount">
+                      </dlm-select-field>
+                    </dlm-form-field>
+                  </div>
+                  <!-- SOURCE CLOUD ACCOUNT END -->
+                  <!-- SOURCE S3 ENDPOINT -->
+                  <div class="col-xs-4" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === S3">
+                    <dlm-form-field
+                      [label]="'page.policies.form.fields.s3.endpoint' | translate"
+                      [errorClass]="'col-xs-12'"
+                      [fieldClass]="'col-xs-12'"
+                      [required]="true">
+                      <div class="input-group">
+                        <div class="input-group-addon">{{S3}}</div>
+                        <input
+                          type="text"
+                          class="form-control"
+                          qe-attr="source-S3-endpoint"
+                          formField
+                          formControlName="s3endpoint"/>
+                      </div>
+                    </dlm-form-field>
+                    <button type="button" class="btn btn-success pull-right">{{"page.policies.form.validateBtn" | translate}}</button>
+                  </div>
+                  <!-- SOURCE S3 ENDPOINT END -->
+                </div>
+              </div>
+            </fieldset>
+            <!-- SOURCE END -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

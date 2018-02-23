@@ -95,6 +95,7 @@ export class DsFullView implements OnInit {
 
   updateDsModel = (rData) => {
     this.dsModel = rData;
+    this.dsAssetList.clearSelection();
     this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
   }
 
@@ -203,7 +204,7 @@ export class DsFullView implements OnInit {
       dataset.id = this.dsModel.id;
       dataset.createdBy = this.dsModel.creatorId;
       dataset.createdOn = this.dsModel.createdOn;
-      dataset.dpClusterId = this.dsModel.datalakeId;
+      dataset.dpClusterId = this.dsModel.datalakeId; // this datalakeId is actually dpClusterId of dataset
       dataset.datalakeId = this.dsModel.datalakeId;
       dataset.description = this.dsModel.description;
       dataset.lastModified = this.dsModel.lastModified;

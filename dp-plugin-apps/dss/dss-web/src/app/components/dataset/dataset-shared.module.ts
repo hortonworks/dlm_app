@@ -24,8 +24,8 @@ import {DsNavResultViewer} from "./views/dashboard/ds-result-viewer/ds-result-vi
 import {DsRowProxy} from "./views/dashboard/ds-result-viewer/row-proxy/row-proxy.component";
 import {DsTileProxy} from "./views/dashboard/ds-result-viewer/tile-proxy/tile-proxy.component";
 import {NavTagPanel} from "./views/dashboard/nav-tag-panel/nav-tag-panel.component";
-import {DsAssetSearch_Old} from "./views/ds-asset-search/ds-asset-search.component";
-import {DsAssetSearch} from "./views/ds-asset-search-v2/ds-asset-search.component";
+import {DsAssetSearch} from "./views/ds-asset-search/ds-asset-search.component";
+import {DsAssetSearchV2} from "./views/ds-asset-search-v2/ds-asset-search.component";
 import {AdvanceQueryEditor} from "./views/ds-asset-search/queryEditors/advance/advance-query-editor.component";
 import {QueryFilter} from "./views/ds-asset-search/queryEditors/advance/filter/filter.component";
 import {BasicQueryEditor} from "./views/ds-asset-search/queryEditors/basic/basic-query-editor.component";
@@ -80,7 +80,7 @@ import {BookmarkService} from "../../services/bookmark.service";
     DsAssetListStyle1,
     DsRowProxy,
     DatasetDashboardComponent,
-    DsAssetSearch_Old,
+    DsAssetSearchV2,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,
@@ -125,7 +125,7 @@ import {BookmarkService} from "../../services/bookmark.service";
     DsAssetList,
     DsRowProxy,
     DatasetDashboardComponent,
-    DsAssetSearch_Old,
+    DsAssetSearchV2,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,

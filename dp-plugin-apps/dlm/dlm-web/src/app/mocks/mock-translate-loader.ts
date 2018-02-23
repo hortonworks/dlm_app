@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import {Observable} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
 import {TranslateLoader} from '@ngx-translate/core';
 
 export class MockTranslateLoader implements TranslateLoader {

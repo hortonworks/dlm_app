@@ -40,10 +40,12 @@ export const routes: Routes = [{
   },
   {
     path: 'clusters',
+    pathMatch: 'full',
     component: ClustersComponent
   },
   {
     path: 'cloud-accounts',
+    pathMatch: 'full',
     component: CloudAccountsComponent,
     data: {
       breadcrumb: 'page.cloud_stores.header'
@@ -76,13 +78,12 @@ export const routes: Routes = [{
       },
       {
         path: 'create',
-        component: CreatePolicyComponent,
-        data: {
-          breadcrumb: 'page.policies.header_create'
-        }
+        pathMatch: 'full',
+        component: CreatePolicyComponent
       },
       {
         path: 'review',
+        pathMatch: 'full',
         component: ReviewPolicyComponent,
         data: {
           breadcrumb: 'page.policies.header_create'
@@ -92,10 +93,12 @@ export const routes: Routes = [{
   },
   {
     path: 'notifications',
+    pathMatch: 'full',
     component: NotificationsPageComponent
   },
   {
     path: 'help',
+    pathMatch: 'full',
     component: HelpComponent
   }, {
     path: '**',

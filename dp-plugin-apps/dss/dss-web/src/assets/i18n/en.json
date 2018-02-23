@@ -256,12 +256,6 @@
         "invalidUserInput": "One or more usernames are invalid. You must select a name from the dropdown options that appear as you type in the Usernames field.",
         "invalidGroupInput": "One or more group names are invalid. You must select a name from the dropdown options that appear as you type in the Group Names field.",
         "loadServiceError": "Could not fetch Data Plane Services information from Ambari",
-        "backenderrors":{
-          "Url": "This is not a valid Ambari URL. Please enter a valid Ambari URL.",
-          "Ambari": "There was an error fetching information from Ambari.",
-          "Network": "There was a network error when connecting to Ambari.",
-          "General": "DataPlane could not connect to the Ambari cluster. Information may not be up to date."
-        },
         "rolesOverrideWarning":"This will override any roles the user acquired as part of groups",
         "clusterDeleteWarning":"Removing a cluster causes loss of data such as associated pairings, policies and asset collections. Please delete those objects first before deleting a cluster. This action cannot be undone. Please confirm if you want to go ahead.",
         "deleteFailed": "Cluster could not be deleted"
@@ -326,8 +320,10 @@
           "edit": "Edit",
           "delete": "Delete",
           "addAssets": "Add Assets",
-          "removeAll": "Remove Selected",
+          "removeAll": "Remove All",
+          "remove": "Remove",
           "addMoreAssets": "Add More Assets",
+          "add": "Add",
           "done" : "Done"
         },
         "errors": {
@@ -344,7 +340,8 @@
         "noResultsMsg": "No Results!!",
         "noMoreResultsMsg": "No More Results!!",
         "cancel": "Cancel",
-        "done": "Done"
+        "done": "Done",
+        "add": "Add"
       },
       "asset-list": {
         "starAssetmessage": "Few assets listed above already belong to other asset collections."

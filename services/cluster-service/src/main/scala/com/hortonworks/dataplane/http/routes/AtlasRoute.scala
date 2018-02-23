@@ -74,7 +74,7 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
           onComplete(attributes) {
             case Success(att) => complete(success(att))
             case Failure(th) =>
-              complete(StatusCodes.InternalServerError, errors(th))
+              complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
           }
         }
       }
@@ -90,7 +90,7 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
             onComplete(atlasEntities) {
               case Success(entities) => complete(success(entities))
               case Failure(th) =>
-                complete(StatusCodes.InternalServerError, errors(th))
+                complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
             }
           }
         }
@@ -153,7 +153,7 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
             onComplete(typeDefs) {
               case Success(typeDefs) => complete(success(typeDefs))
               case Failure(th) =>
-                complete(StatusCodes.InternalServerError, errors(th))
+                complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
             }
           }
         }
@@ -179,8 +179,8 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
       case Failure(th) =>
         th match {
           case exception: AtlasServiceException =>
-            complete(exception.getStatus.getStatusCode, errors(th, status = exception.getStatus.getStatusCode))
-          case _ => complete(StatusCodes.InternalServerError, errors(th))
+            complete(exception.getStatus.getStatusCode, errors(exception.getStatus.getStatusCode, "cluster.atlas.api-failure", th.getMessage, th))
+          case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
         }
     }
   }

@@ -122,11 +122,15 @@ export class DsAssetList implements OnInit {
     this.totalPages = this.assetsCount = 0;
   }
 
-  freshFetch () {
-    this.setFirstPage();
+  clearSelection () {
     this.selExcepList = [];
     this.selectState = this.selStates.CHECKSOME
     this.onChangeInSelection();
+  }
+
+  freshFetch () {
+    this.setFirstPage();
+    this.clearSelection();
     return this.fetchAssets();
   }
 

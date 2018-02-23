@@ -57,11 +57,6 @@ describe('NotificationsPageComponent', () => {
       declarations: [
         NotificationsPageComponent,
         NotificationsTableComponent,
-        TableComponent,
-        TableFooterComponent,
-        CheckboxColumnComponent,
-        CheckboxComponent,
-        ActionColumnComponent,
         LogModalDialogComponent
       ],
       providers: [

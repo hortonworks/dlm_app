@@ -91,6 +91,7 @@ export interface PolicyForm {
 }
 
 export interface CustomProperties {
+  cloudCred?: string;
   distcpMapBandwidth?: string;
   targetSnapshotRetentionAgeLimit?: string;
   sourceSnapshotRetentionNumber?: string;

@@ -17,9 +17,6 @@
 GET           /health                                                controllers.Status.health
 GET           /metrics                                               controllers.Status.metrics
 
-GET           /api/ga/properties                                     controllers.Config.getGAProperties()
-GET           /api/config/:key                                       controllers.Config.getConfig(key: String)
-
 # identity calls
 # ===========================================
 GET           /api/identity                                          controllers.Authentication.userDetail
@@ -47,7 +44,6 @@ DELETE        /api/lakes/:dpClusterId                                controllers
 GET           /api/lakes/:dpClusterId/services                       controllers.DataplaneClusters.retrieveServices(dpClusterId: String)
 GET           /api/lakes/:dpClusterId/servicesDetails                controllers.DataplaneClusters.getDependentServicesDetails(dpClusterId: String)
 
-GET           /api/lakes/ambari/status                               controllers.DataplaneClusters.ambariCheck
 POST          /api/lakes/:dpClusterId/sync                           controllers.Clusters.syncCluster(dpClusterId: String)
 
 # AmbariClusters
@@ -57,8 +53,6 @@ GET           /api/clusters/:clusterId/health                        controllers
 GET           /api/clusters/:clusterId/rmhealth                      controllers.Clusters.getResourceManagerHealth(clusterId: String)
 GET           /api/clusters/:clusterId/dnhealth                      controllers.Clusters.getDataNodeHealth(clusterId: String)
 GET           /api/clusters/:clusterId/hosts                         controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
-
-POST          /api/clusters/details                                  controllers.Clusters.getDetails
 
 GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
 
@@ -125,3 +119,16 @@ GET           /api/workspaces/:workspaceId/assets                    controllers
 POST          /api/workspaces/notebooks                              controllers.NotebookWorkspaces.add
 DELETE        /api/workspaces/notebooks/:notebookId                  controllers.NotebookWorkspaces.delete(notebookId: String)
 GET           /api/workspaces/:workspaceId/notebooks                 controllers.NotebookWorkspaces.getNotebooks(workspaceId: String)
+
+# Query Clusters
+# ===========================================
+GET           /api/ambari/status                                     controllers.DataplaneClusters.ambariCheck(url: String)
+POST          /api/ambari/details                                    controllers.Clusters.getDetails
+
+# Configuration
+# ===========================================
+GET           /api/config/:key                                       controllers.Config.getConfig(key: String)
+
+# Miscellaneous
+# ===========================================
+GET           /api/ga/properties                                     controllers.Config.getGAProperties()

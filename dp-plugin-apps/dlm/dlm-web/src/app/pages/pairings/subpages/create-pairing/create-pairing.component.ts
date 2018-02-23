@@ -21,7 +21,6 @@ import * as fromRoot from 'reducers';
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Progress } from 'models/progress.model';
-import { fromJS } from 'immutable';
 import { PairingsComponent } from '../../pairings.component';
 import { NotificationService } from 'services/notification.service';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
@@ -32,6 +31,7 @@ import { getMergedProgress } from 'selectors/progress.selector';
 import { SERVICES } from 'constants/cluster.constant';
 import { SERVICE_STATUS } from 'constants/status.constant';
 import { CLUSTER_STATUS } from 'constants/status.constant';
+import { cloneDeep } from 'utils/object-utils';
 
 const PAIR_REQUEST = '[CREATE PAIR] PAIR_REQUEST';
 const CLUSTERS_REQUEST = '[CREATE PAIR] CLUSTERS_REQUEST';
@@ -174,7 +174,7 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
       this.resetSecondCluster();
       // Filter out the selected cluster from the list of clusters to be paired
       // Assign immutable copy of the filtered subset to secondSetClusters
-      this.secondSetClusters = fromJS(this.firstSetClusters.filter(clust => clust.id !== cluster.id)).toJS();
+      this.secondSetClusters = cloneDeep(this.firstSetClusters.filter(clust => clust.id !== cluster.id));
       const clusterPairIds = this.getClusterPairIds(cluster);
       // Set the disabled property of a cluster to true if the cluster is already paired with the selected cluster
       this.secondSetClusters.forEach(clust => {

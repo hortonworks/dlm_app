@@ -9,7 +9,6 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {JobsTableComponent} from './jobs-table/jobs-table.component';
-import {JobTransferredGraphComponent} from './jobs-transferred-graph/job-transferred-graph.component';
 import {TableComponent} from '../../common/table/table.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {JobsComponent} from './jobs.component';
@@ -17,7 +16,6 @@ import {CheckboxColumnComponent, ActionColumnComponent} from '../../components/t
 import {CheckboxComponent} from '../../common/checkbox/checkbox.component';
 import {FormsModule} from '@angular/forms';
 import {MomentModule} from 'angular2-moment';
-import {ChartsModule} from 'ng2-charts';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
 import { TableFilterComponent } from '../../common/table/table-filter/table-filter.component';
@@ -37,7 +35,7 @@ describe('JobsComponent', () => {
   beforeEach(async(() => {
     configureComponentTest({
       imports: [
-        TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule,
+        TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, RouterTestingModule,
         TooltipModule.forRoot(),
         ProgressbarModule.forRoot(),
         PipesModule,
@@ -47,14 +45,7 @@ describe('JobsComponent', () => {
       declarations: [
         JobsComponent,
         JobsTableComponent,
-        JobTransferredGraphComponent,
-        JobsStatusFilterComponent,
-        TableComponent,
-        TableFilterComponent,
-        TableFooterComponent,
-        CheckboxComponent,
-        CheckboxColumnComponent,
-        ActionColumnComponent
+        JobsStatusFilterComponent
       ],
       providers: [
         NavbarService,

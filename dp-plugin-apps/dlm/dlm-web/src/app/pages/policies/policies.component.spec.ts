@@ -10,7 +10,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
-import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { ModalModule } from 'ngx-bootstrap';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { PoliciesComponent } from './policies.component';
@@ -30,7 +29,6 @@ import { NavbarService } from 'services/navbar.service';
 import { PipesModule } from 'pipes/pipes.module';
 import { PolicyDetailsComponent } from './policy-details/policy-details.component';
 import { JobsTableComponent } from '../jobs/jobs-table/jobs-table.component';
-import { JobTransferredGraphComponent } from '../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableFilterComponent } from 'common/table/table-filter/table-filter.component';
 import { PolicyServiceFilterComponent } from './components/policy-service-filter/policy-service-filter.component';
 import { TypeaheadModule, TooltipModule } from 'ngx-bootstrap';
@@ -57,7 +55,6 @@ describe('PoliciesComponent', () => {
         CommonComponentsModule,
         HortonStyleModule,
         MomentModule,
-        ChartsModule,
         ModalModule.forRoot(),
         TypeaheadModule,
         TooltipModule.forRoot()
@@ -65,20 +62,12 @@ describe('PoliciesComponent', () => {
       declarations: [
         PoliciesComponent,
         PolicyTableComponent,
-        TableComponent,
-        TableFooterComponent,
         PolicyInfoComponent,
-        CheckboxComponent,
-        ActionColumnComponent,
         FlowStatusComponent,
-        CheckboxColumnComponent,
         PolicyDetailsComponent,
         JobsTableComponent,
-        JobTransferredGraphComponent,
-        TableFilterComponent,
         PolicyServiceFilterComponent,
-        PrevJobsComponent,
-        HdfsBrowserComponent
+        PrevJobsComponent
       ],
       providers: [
         AsyncActionsService,
