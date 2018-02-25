@@ -15,39 +15,58 @@ BRIGHT=$(tput bold)
 NORMAL=$(tput sgr0)
 UNDERLINE=$(tput smul)
 OPTION_TABSPACE=40
-OPTION_INDENDSPACE=2
+OPTION_INDENTSPACE=2
 DP_DEPLOY_COMMAND="./dpdeploy.sh"
 
-all_usage(){
-    local indendSpace=2
+print_one_line_usage() {
+    local indentSpace=2
     local tabspace=50
+    local cmd_name=$1
+    local cmd_help=$2
+    printf "%-${indentSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}${cmd_name}${NORMAL}" "${cmd_help}"
+}
 
+print_detailed_usage() {
+    if [ $# -eq 3 ]; then
+        cmd_name="$1 $2"
+        cmd_desc=$3
+    else
+        cmd_name=$1
+        cmd_desc=$2
+    fi
+    printf "\nUsage:\t ${DP_DEPLOY_COMMAND} ${cmd_name}\n"
+    printf "\n${cmd_desc}\n"
+}
+
+all_usage(){
     printf "\n${UNDERLINE}Lifecycle Commands:${NORMAL}"
     printf "\nUsage: ${DP_DEPLOY_COMMAND} COMMAND\n\n"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}init --all${NORMAL}" "Initialize and start all containers for the first time"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}start${NORMAL}" "Re-initialize all containers while using previous data and state"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}stop${NORMAL}" "Destroy all containers but keeps data and state"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}destroy --all${NORMAL}" "Kill all containers and remove them. Needs to start from init again"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}upgrade --from <old_setup_directory>${NORMAL}" "Upgrade existing dp-core to current version"
+    print_one_line_usage "load" "Load packaged Docker images from binary tarballs to local Docker repository."
+    print_one_line_usage "init --all" "Initialize and start all containers for the first time"
+    print_one_line_usage "start" "Re-initialize all containers while using previous data and state"
+    print_one_line_usage "stop"  "Destroy all containers but keeps data and state"
+    print_one_line_usage "destroy --all" "Kill all containers and remove them. Needs to start from init again"
+    print_one_line_usage "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to latest version"
 
     printf "\n${UNDERLINE}Status Commands:${NORMAL}"
     printf "\nUsage: ${DP_DEPLOY_COMMAND} COMMAND\n\n"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}ps${NORMAL}" "List the status of the docker containers"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}logs [OPTIONS] CONTAINER${NORMAL}" "Logs of supplied container id or name"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}metrics${NORMAL}" "Print metrics for containers"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}version${NORMAL}" "Print the version of DataPlane Service"
+    print_one_line_usage "ps" "List the status of the DataPlane Docker containers"
+    print_one_line_usage "logs [OPTIONS] CONTAINER" "Print logs of supplied container id or name"
+    print_one_line_usage "metrics" "Print metrics for DataPlane containers"
+    print_one_line_usage "version" "Print the version of DataPlane Service"
 
     printf "\n${UNDERLINE}Utility Commands:${NORMAL}"
     printf "\nUsage: ${DP_DEPLOY_COMMAND} utils COMMAND\n\n"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}get-config <key>${NORMAL}" "Gets config value for the given config key"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}enable-config <key>${NORMAL}" "Sets config value to true for the given config key"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}disable-config <key>${NORMAL}" "Sets config value to false for the given config key"
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}update-user [ambari | atlas | ranger]${NORMAL}" "Update user credentials for services that DataPlane will use to connect to clusters."
-    printf "%-${indendSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}add-host <ip> <host>${NORMAL}" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
+    print_one_line_usage "get-config <key>" "Gets config value for the given config key"
+    print_one_line_usage "enable-config <key>" "Sets config value to true for the given config key"
+    print_one_line_usage "disable-config <key>" "Sets config value to false for the given config key"
+    print_one_line_usage "update-user [ambari | atlas | ranger]" "Update user credentials for services that DataPlane will use to connect to clusters."
+    print_one_line_usage "add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
 
     printf "\nRun ${BRIGHT}'${DP_DEPLOY_COMMAND} COMMAND --help'${NORMAL} for more information on Lifecycle and Status commands"
     printf "\nRun ${BRIGHT}'${DP_DEPLOY_COMMAND} utils COMMAND --help'${NORMAL} for more information on utility commands\n"
 }
+
 if [ $# -lt 1 ]
 then
     all_usage;
@@ -56,71 +75,66 @@ else
         --help)
            all_usage;
             ;;
+        load)
+            print_detailed_usage "load" "Load packaged Docker images from binary tarballs to local Docker repository."
+            ;;
         init)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} init --all\n"
-            printf "\nInitialize and start all containers for the first time\n"
+            print_detailed_usage "init --all" "Initialize and start all containers for the first time"
             ;;
         start)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} start\n"
-            printf "\nRe-initialize all containers while using previous data and state\n"
+            print_detailed_usage "start" "Re-initialize all containers while using previous data and state"
             ;;
         stop)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} stop\n"
-            printf "\nDestroy all containers but keeps data and state\n"
+            print_detailed_usage "stop" "Destroy all containers but keeps data and state"
             ;;
         ps)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} ps\n"
-            printf "\nList the status of the docker containers\n"
+            print_detailed_usage "ps" "List the status of the docker containers"
             ;;
         logs)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} logs [OPTIONS] CONTAINER\n"
-            printf "\nPrints logs of supplied container id or name\n"
+            print_detailed_usage "logs [OPTIONS] CONTAINER" "Prints logs of supplied container id or name"
             printf "\nOptions:"
-            printf "\n%-${OPTION_INDENDSPACE}s%-4s%-36s%s\n" "" "" "--details" "Show extra details provided to logs"
-            printf "%-${OPTION_INDENDSPACE}s%-${OPTION_TABSPACE}s%s\n" "" "-f, --follow" "Follow log output"
-            printf "%-${OPTION_INDENDSPACE}s%-4s%-36s%s\n" "" "" "--since string" "Show logs since timestamp (e.g. 2013-01-02T13:23:37) or relative (e.g. 42m for 42 minutes)"
-            printf "%-${OPTION_INDENDSPACE}s%-4s%-36s%s\n" "" "" "--tail string" "Number of lines to show from the end of the logs (default 'all')"
-            printf "%-${OPTION_INDENDSPACE}s%-${OPTION_TABSPACE}s%s\n" "" "-t, --timestamps" "Show timestamps"
-            printf "%-${OPTION_INDENDSPACE}s%-4s%-36s%s\n" "" "" "--until string" "Show logs before a timestamp (e.g. 2013-01-02T13:23:37) or relative (e.g. 42m for 42 minutes)"
+            printf "\n%-${OPTION_INDENTSPACE}s%-4s%-36s%s\n" "" "" "--details" "Show extra details provided to logs"
+            printf "%-${OPTION_INDENTSPACE}s%-${OPTION_TABSPACE}s%s\n" "" "-f, --follow" "Follow log output"
+            printf "%-${OPTION_INDENTSPACE}s%-4s%-36s%s\n" "" "" "--since string" "Show logs since timestamp (e.g. 2013-01-02T13:23:37) or relative (e.g. 42m for 42 minutes)"
+            printf "%-${OPTION_INDENTSPACE}s%-4s%-36s%s\n" "" "" "--tail string" "Number of lines to show from the end of the logs (default 'all')"
+            printf "%-${OPTION_INDENTSPACE}s%-${OPTION_TABSPACE}s%s\n" "" "-t, --timestamps" "Show timestamps"
+            printf "%-${OPTION_INDENTSPACE}s%-4s%-36s%s\n" "" "" "--until string" "Show logs before a timestamp (e.g. 2013-01-02T13:23:37) or relative (e.g. 42m for 42 minutes)"
             ;;
         metrics)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} metrics\n"
-            printf "\nPrints the metrics for containers\n"
+            print_detailed_usage "metrics" "Prints the metrics for DataPlane containers"
             ;;
         destroy)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} destroy --all\n"
-            printf "\nKill all containers and remove them. Needs to start from init again\n"
+            print_detailed_usage "destroy --all" \
+                "Kill all containers and remove them. User needs to start from ${DP_DEPLOY_COMMAND} init again"
             ;;
         upgrade)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} upgrade --from <old_setup_directory>\n"
-            printf "\nUpgrade existing dp-core to current version\n"
+            print_detailed_usage "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to latest available version"
             ;;
         version)
-            printf "\nUsage:\t ${DP_DEPLOY_COMMAND} version\n"
-            printf "\nPrints the version of DataPlane Service\n"
+            print_detailed_usage "version" "Prints the version of DataPlane Service"
             ;;
         utils)
             shift
             case "$1" in
                 add-host)
-                    printf "\nUsage: dpdeploy.sh utils add-host <ip> <host>\n"
-                    printf "\nAppends a single entry to /etc/hosts file of the container interacting with HDP clusters\n"
+                    print_detailed_usage "utils" "add-host <ip> <host>" \
+                        "Appends a single entry to /etc/hosts file of the container interacting with HDP clusters"
                     ;;
                 update-user)
-                    printf "\nUsage: dpdeploy.sh utils update-user [ambari | atlas | ranger]\n"
-                    printf "\nUpdate user credentials for services that DataPlane will use to connect to clusters. The available options are ambari, atlas, ranger\n"
+                    print_detailed_usage "utils" "update-user [ambari | atlas | ranger]" \
+                        "Update user credentials for services that DataPlane will use to connect to clusters. The available options are ambari, atlas, ranger"
                     ;;
                 get-config)
-                    printf "\nUsage: dpdeploy.sh utils get-config <key>\n"
-                    printf "\nPrints the configuration value for the given configuration key\n"
+                    print_detailed_usage "utils" "get-config <key>" \
+                        "Prints the configuration value for the given configuration key"
                     ;;
                 enable-config)
-                    printf "\nUsage: dpdeploy.sh utils enable-config <key>\n"
-                    printf "\nSets config value to true for the given configuration key\n"
+                    print_detailed_usage "utils" "enable-config <key" \
+                        "Sets config value to true for the given configuration key"
                     ;;
                 disable-config)
-                    printf "\nUsage: dpdeploy.sh utils disable-config <key>\n"
-                    printf "\nSets config value to false for the given configuration key\n"
+                    print_detailed_usage "utils" "disable-config <key>" \
+                        "Sets config value to false for the given configuration key"
                     ;;
                 *)
                     printf "Unknown option"

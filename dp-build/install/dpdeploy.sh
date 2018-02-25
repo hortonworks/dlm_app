@@ -35,13 +35,6 @@ init_network() {
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
-    # This is not a clean solution and will be fixed later
-    # else
-    #     echo "Network dp already exists. Destroying all containers on network dp."
-    #     CONTAINER_LIST=$(docker container ls --all --quiet --filter "network=dp")
-    #     if [[ $(echo $CONTAINER_LIST) ]]; then
-    #         docker rm  --force $CONTAINER_LIST
-    #     fi
     fi
 }
 
@@ -190,9 +183,9 @@ init_app() {
 }
 
 read_master_password() {
-    printf "${BRIGHT}\nMaster password ${NORMAL}is used to secure the secret storage for DataPlane Services. \n"
-    printf "${BRIGHT}\nCaution: ${NORMAL}: Setting up the master password is a one-time step. Master password once set cannot be reset. Master password is required to unlock the secret storage in case DataPlane Services are restarted or when other add on services are installed in DataPlane or while updating the credentials for Ambari/Atlas/Ranger in DataPlane Services\n\n"
-    read -s -p "Enter master password for DataPlane Service(Min 6 Characters long): " MASTER_PASSWD
+    printf "\nDataPlane Services will now setup a ${BRIGHT}Master password ${NORMAL} that is used to secure the secret storage for the system. \n"
+    printf "\n${BRIGHT}Caution: ${NORMAL}The master password can be setup only once and cannot be reset easily. You will need to provide it for various admin operations. Hence please remember what you enter here.\n\n"
+    read -s -p "Enter master password for DataPlane Service (Minimum 6 characters long): " MASTER_PASSWD
     echo
 
     if [ "${#MASTER_PASSWD}" -lt 6 ]; then
@@ -222,7 +215,8 @@ read_admin_password_safely() {
 }
 
 read_admin_password() {
-    printf "${BRIGHT}\nDataPlane Services Admin User ${NORMAL}is a user who logs into DataPlane for the first time and does the initial set up such as configuring LDAP, adding other LDAP user as DataPlane Service Admins. \nThe password you enter now is the one which the 'admin' user uses to login for the first time into DataPlane Services.\n\n"
+    printf "\nDataPlane Services will now setup an ${BRIGHT}'admin' ${NORMAL}user who can configure LDAP, add other DataPlane Service Admins.\n"
+    printf "Setup a password for this user.\n\n"
     read -s -p "Enter DataPlane Services admin password: " ADMIN_PASSWD
     echo
     read -s -p "Re-enter password: " ADMIN_PASSWD_VERIFY
@@ -556,26 +550,28 @@ print_version() {
 }
 
 do_confirm_stop(){
-   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will stop all the DataPlane Services container.\n\n"
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will stop all the DataPlane Services containers.\n\n"
    local option
    read -p "Do you want to continue? (yes/no): " option
    if [ "$option" == "yes" ]
     then
          destroy_all_but_state
     else
-         exit 0
+        printf "\nContainers are not destroyed.\n"
+        exit -1
     fi
 }
 
 do_confirm_destroy(){
-   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will destroy all the DataPlane Services container and the data associated with them. This action cannot be undone.\n\n"
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will destroy all the DataPlane Services containers and the data associated with them. This action cannot be undone.\n\n"
    local option
    read -p "Do you want to continue? (yes/no): " option
    if [ "$option" == "yes" ]
     then
-         destroy_all_with_state
+        destroy_all_with_state
     else
-         exit 0
+        printf "\nContainers are not destroyed.\n"
+        exit -1
     fi
 }
 
@@ -588,6 +584,10 @@ then
     exit 0;
 else
     case "$1" in
+        # Adding load command temporarily to enable QE changes
+        load)
+            load_images
+            ;;
         init)
             echo "Found $2"
             case "$2" in
