@@ -87,7 +87,7 @@ export class LakesComponent implements OnInit {
             }
           } else {
             isWaiting = true;
-            unSyncedLakes.push(lake);
+            unSyncedLakes.push(lake.data.id);
             locationObserver = this.getLocationInfo(lake.data.location);
           }
           this.updateHealth(lake, locationObserver, isWaiting);
@@ -97,10 +97,10 @@ export class LakesComponent implements OnInit {
   }
 
   updateUnSyncedLakes(unSyncedLakes) {
-    unSyncedLakes.forEach((unSyncedlake) => {
+    unSyncedLakes.forEach(cUnsyncedId => {
       let count = 1;
       this.lakeService
-        .retrieve(unSyncedlake.data.id)
+        .retrieve(cUnsyncedId)
         .delay(this.DELAY_IN_MS)
         .repeat(this.MAXCALLS)
         .skipWhile((lake) => lake.state !== this.SYNCED && lake.state !== this.SYNC_ERROR && count++ < this.MAXCALLS)
@@ -223,7 +223,7 @@ export class LakesComponent implements OnInit {
     if (lakeInfo.data.state === this.SYNCED) {
       this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId, lakeInfo.data.ambariUrl), false);
     } else {
-      this.updateUnSyncedLakes([lakeInfo]);
+      this.updateUnSyncedLakes([lakeInfo.data.id]);
     }
   }
 
