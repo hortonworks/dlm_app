@@ -54,7 +54,7 @@ GET           /api/clusters/:clusterId/rmhealth                      controllers
 GET           /api/clusters/:clusterId/dnhealth                      controllers.Clusters.getDataNodeHealth(clusterId: String)
 GET           /api/clusters/:clusterId/hosts                         controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
 
-GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
+GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters
 
 # LDAP
 # ===========================================
