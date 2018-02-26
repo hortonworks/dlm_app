@@ -48,6 +48,8 @@ const ADMIN_STATUS_REQUEST = '[CREATE POLICY] ADMIN_STATUS_REQUEST';
       [showFooter]="false"
       [showOk]="false"
       [showCancel]="false"
+      [subtitleText]="'page.policies.subpage.create_policy.help_text' | translate"
+      [subtitleLink]="'page.policies.subpage.create_policy.help_url' | translate"
       (onClose)="handleCloseModal()">
       <dlm-modal-dialog-body>
         <dlm-progress-container [progressState]="overallProgress$ | async">
