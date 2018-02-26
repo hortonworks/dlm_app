@@ -43,12 +43,14 @@ export const getUrlDomain = (urlAddress: string): string => {
   return url;
 };
 
-export const toSearchParams = (queryParams = {}): HttpParams => {
-  const params = new HttpParams();
-  for (const param in queryParams) {
-    if (param && queryParams.hasOwnProperty(param)) {
-      params.append(param, queryParams[param]);
+export const toSearchParams = (queryParams: {[param: string]: any}): HttpParams => {
+  let params = new HttpParams();
+  Object.keys(queryParams || {}).forEach(param => {
+    let value = queryParams[param];
+    if (typeof value !== 'string') {
+      value = JSON.stringify(value);
     }
-  }
+    params = params.set(param, value);
+  });
   return params;
 };
