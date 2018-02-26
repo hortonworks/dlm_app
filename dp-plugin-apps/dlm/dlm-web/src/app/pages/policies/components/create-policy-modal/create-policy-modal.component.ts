@@ -52,29 +52,17 @@ const ADMIN_STATUS_REQUEST = '[CREATE POLICY] ADMIN_STATUS_REQUEST';
       <dlm-modal-dialog-body>
         <dlm-progress-container [progressState]="overallProgress$ | async">
           <div>
-            <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
-              <dlm-create-policy-wizard
-                [accounts]="accounts$ | async"
-                [clusters]="clusters$ | async"
-                [containers]="containersGrouped$ | async"
-                [containersList]="containers$ | async"
-                [beaconStatuses]="beaconStatuses$ | async"
-                [pairings]="pairings$ | async"
-                [sourceClusterId]="sourceClusterId"
-                (onCancel)="handleOnCancel($event)"
-                >
-              </dlm-create-policy-wizard>
-            </div>
-            <ng-template #noPairs>
-              <div>
-                <div class="alert alert-warning" role="alert">
-                  {{ "page.pairings.content.no_pairs" | translate}}
-                  <button type="button" class="btn btn-primary" [routerLink]="'/pairings/create'">
-                    {{ "page.pairings.create_button_text" | translate }}
-                  </button>
-                </div>
-              </div>
-            </ng-template>
+            <dlm-create-policy-wizard
+              [accounts]="accounts$ | async"
+              [clusters]="clusters$ | async"
+              [containers]="containersGrouped$ | async"
+              [containersList]="containers$ | async"
+              [beaconStatuses]="beaconStatuses$ | async"
+              [pairings]="pairings$ | async"
+              [sourceClusterId]="sourceClusterId"
+              (onCancel)="handleOnCancel($event)"
+              >
+            </dlm-create-policy-wizard>
           </div>
         </dlm-progress-container>
       </dlm-modal-dialog-body>
