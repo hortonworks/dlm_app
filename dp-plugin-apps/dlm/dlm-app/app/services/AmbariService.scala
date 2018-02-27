@@ -387,9 +387,45 @@ class AmbariService @Inject()(
                           "hive-site",
                           "hive.server2.authentication.kerberos.principal"))
 
+                    val hiveMetastoreUris: Option[String] =
+                      convertEitherToOption(
+                        getPropertyValue(
+                          res,
+                          AmbariService.HIVE_SERVICE_NAME,
+                          "hive-site",
+                          "hive.metastore.uris"))
+
+                    val hmsWarehouseDir: Option[String] =
+                      convertEitherToOption(
+                        getPropertyValue(
+                          res,
+                          AmbariService.HIVE_SERVICE_NAME,
+                          "hive-site",
+                          "hive.metastore.warehouse.dir"))
+
+                    val hmsWarehouseDirPerms: Option[String] =
+                      convertEitherToOption(
+                        getPropertyValue(
+                          res,
+                          AmbariService.HIVE_SERVICE_NAME,
+                          "hive-site",
+                          "hive.warehouse.subdir.inherit.perms"))
+
+                    val hmsReplRootDir: Option[String] =
+                      convertEitherToOption(
+                        getPropertyValue(
+                          res,
+                          AmbariService.HIVE_SERVICE_NAME,
+                          "hive-site",
+                          "hive.repl.replica.functions.root.dir"))
+
                     val hiveServiceConfigMap: Map[String, Option[String]] = Map(
                       "hsEndpoint" -> Some(hsEndpoint),
-                      "hive.server2.authentication.kerberos.principal" -> hsKerberosPrincipal
+                      "hive.server2.authentication.kerberos.principal" -> hsKerberosPrincipal,
+                      "hive.metastore.uris" -> hiveMetastoreUris,
+                      "hive.metastore.warehouse.dir" -> hmsWarehouseDir,
+                      "hive.warehouse.subdir.inherit.perms" -> hmsWarehouseDirPerms,
+                      "hive.repl.replica.functions.root.dir" -> hmsReplRootDir
                     )
 
                     p.success(Right(hiveServiceConfigMap))

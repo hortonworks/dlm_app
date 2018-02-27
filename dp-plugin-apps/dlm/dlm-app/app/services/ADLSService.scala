@@ -14,8 +14,9 @@ import com.microsoft.azure.datalake.store.{ADLStoreClient, DirectoryEntry, Direc
 import com.microsoft.azure.datalake.store.oauth2.{AccessTokenProvider, ClientCredsTokenProvider}
 import models.ADLSEntities.{ADLSAccountCredentials, ADLSAccountDetails, ADLSFileItem, ADLSFileListResponse}
 import models.CloudAccountEntities.Error.GenericError
-import models.{CloudAccountProvider, CloudCredentialType}
+import models.{CloudAccountProvider, CloudAccountStatus, CloudCredentialType}
 import models.CloudResponseEntities.{FileListResponse, MountPointDefinition, MountPointsResponse}
+import models.Entities.CloudCredentialStatus
 
 import scala.concurrent.Future
 import scala.collection.JavaConverters._
@@ -88,10 +89,10 @@ class ADLSService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
 
   // todo: need to check another way to check identity since if credential isn't valid azure-sdk
   // will throw error only after timeout
-  override def checkUserIdentityValid(accountId: String): Future[Either[GenericError, Unit]] = {
+  override def checkUserIdentityValid(accountId: String): Future[Either[GenericError, CloudCredentialStatus]] = {
     listFiles(accountId, ADLSService.deafultMountPoint, "/") map {
       case Left(err) =>  Left(err)
-      case _ => Right(())
+      case _ => Right(CloudCredentialStatus(accountId, CloudAccountStatus.ACTIVE))
     }
   }
 }

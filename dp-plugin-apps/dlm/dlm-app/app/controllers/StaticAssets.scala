@@ -24,21 +24,21 @@ class StaticAssets @Inject() (environment: play.api.Environment,
 
 
   /**
-    * Generates an `Action` that serves a static resource from an external folder
+    * Generates an `Action` that serves a static resource from DLM web home
     *
-    * @param rootPath the root folder for searching the static resource files such as `"/home/peter/public"`, `C:\external` or `relativeToYourApp`
     * @param file the file part extracted from the URL
     */
-  override def at(rootPath: String, file: String): Action[AnyContent] = Action { request =>
+  def atDlmPath(file: String): Action[AnyContent] = Action { request =>
+    val dlmWebHome : String = configuration.underlying.getString("DLM_WEB_HOME")
     environment.mode match {
       case Mode.Prod => {
 
-        val fileToServe = rootPath match {
-          case AbsolutePath(_) => new File(rootPath, file)
-          case _ => new File(environment.getFile(rootPath), file)
+        val fileToServe = dlmWebHome match {
+          case AbsolutePath(_) => new File(dlmWebHome, file)
+          case _ => new File(environment.getFile(dlmWebHome), file)
         }
 
-        val defaultFileToServe = new File(rootPath, "index.html")
+        val defaultFileToServe = new File(dlmWebHome, "index.html")
 
         if (fileToServe.exists) {
           Ok.sendFile(fileToServe, inline = true).withHeaders(CACHE_CONTROL -> "max-age=3600")
