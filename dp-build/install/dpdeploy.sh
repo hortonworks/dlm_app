@@ -208,12 +208,6 @@ read_master_password() {
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
-get_master_password(){
-    echo "Enter master password for DataPlane Service: "
-    read -s MASTER_PASSWD
-    MASTER_PASSWORD="$MASTER_PASSWD"
-}
-
 read_admin_password_safely() {
     if [ -z "$USER_ADMIN_PASSWORD" ]; then
         read_admin_password
