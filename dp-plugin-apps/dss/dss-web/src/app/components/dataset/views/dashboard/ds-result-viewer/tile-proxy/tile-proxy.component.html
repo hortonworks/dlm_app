@@ -10,49 +10,37 @@
   -->
 
 <div class="tileProxy" (click)="showFullView($event)">
-  <div class="header overFlowEllipsis">
-    <span class="title">{{dsModel.name}}</span>
-    <span class="options">
-      <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
-
-<!--
-      <button id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon"><i class="fa fa-ellipsis-v"></i></button>
-      <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
-             for="dropDownIcon_{{ dsModel.id }}">
-        <li class="mdl-menu__item"><i class="fa fa-edit"></i>Edit</li>
-        <li class="mdl-menu__item"><i class="fa fa-close"></i>Delete</li>
-        <li class="mdl-menu__item">
-          <i class="fa fa-star"></i>
-          <span *ngIf="dsModel.favourite">{{"pages.dataset.dashboard.actions.remFromFav" | translate}}</span>
-          <span *ngIf="!dsModel.favourite">{{"pages.dataset.dashboard.actions.addToFav" | translate}}</span>
-        </li>
-      </label>
- -->
-    </span>
+  <div class="grapic-holder">
+    <img src="{{assetPrefix}}/assets/images/collection-banners/dsimg{{dsModel.id%7}}.png" alt="Dataset image">
+    <span class="rating">{{getAggregateValue(dsModel.avgRating).toFixed(1)}} <i class="fa fa-star"></i></span>
   </div>
-  <div class="metaInfo">
-    <div><div class="label">{{("common.datalake" | translate).toUpperCase()}}</div>:&nbsp;<b>{{dsModel.datalakeName}}</b></div>
-    <div><div class="label">{{("pages.dataset.labels.createdBy" | translate).toUpperCase()}}</div>:&nbsp;<b>{{dsModel.creatorName}}</b></div>
-  </div>
-
-  <div class="footer">
-    <div class="division"><span>{{("pages.dataset.labels.hive" | translate).toUpperCase()}}:</span><span>{{dsModel.counts.hiveCount}}</span></div>
-<!--
-    <div class="division border-left"><span>{{("pages.dataset.labels.files" | translate).toUpperCase()}}:</span><span>{{dsModel.counts.filesCount}}</span></div>
--->
-    <div class="dataset-item__action" (click)="preventEvent($event)">
-      <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
-        <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i>
-      </button>
-      <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+dsModel.id">
-        <li class="mdl-menu__item" (click)="deleteDataset(dsModel.id)">
+  <div class="card-info">
+    <h3 class="dataset-action">
+      <span class="hwx-subtitle hwx-secondary dataset-name">{{dsModel.name}}</span>
+      <span class="right-button" (click)="preventEvent($event)">
+        <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button mdl-button--icon button-icon">
+          <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i>
+        </button>
+        <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+dsModel.id">
+          <li class="mdl-menu__item" (click)="deleteDataset(dsModel.id)">
           <span>
             <i class="fa__fa-close--icon fa fa-trash-o"></i>
             {{"common.delete" | translate}}
           </span>
-        </li>
-      </ul>
+          </li>
+        </ul>
+      </span>
+    </h3>
+    <div class="tag">{{displayAssetCount(dsModel.counts)}} Assets</div>
+    <div class="info-group">
+      <div class="info">Author: <span>{{dsModel.creatorName}}</span></div>
+      <div class="info">Datalake: <span>{{dsModel.datalakeName}}</span></div>
     </div>
+  </div>
+  <div class="flex-grid">
+    <span class="utility-space"><i class="fa fa-heart" [ngClass] = "{'marked': dsModel.favouriteId}"></i> {{getAggregateValue(dsModel.favouriteCount)}}</span>
+    <span class="primary-space"><i class="fa fa-comments"></i> {{getAggregateValue(dsModel.totalComments)}}</span>
+    <span class="utility-space hwx-warning"><i class="fa fa-bookmark" [ngClass] = "{'marked': dsModel.bookmarkId}"></i></span>
   </div>
 </div>
 
