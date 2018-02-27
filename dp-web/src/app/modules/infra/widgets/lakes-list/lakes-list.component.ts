@@ -14,7 +14,6 @@ import {Router} from '@angular/router';
 
 import {Sort} from '../../../../shared/utils/enums';
 import {Cluster} from '../../../../models/cluster';
-import {ClusterService} from '../../../../services/cluster.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
 import {DialogBox, DialogType} from '../../../../shared/utils/dialog-box';
 import {LakeService} from '../../../../services/lake.service';
@@ -272,11 +271,12 @@ export class LakesListComponent implements OnChanges {
       DialogType.DeleteConfirmation
     ).subscribe(result => {
       if (result) {
-        this.lakeService.deleteCluster(lakeId).subscribe(() => {
-          this.lakeService.clusterDeleted.next(lakeId);
-        }, () => {
-          this.lakeService.clusterDeleteFailed.next();
-        })
+        this.lakeService.deleteCluster(lakeId)
+          .subscribe(() => {
+            this.lakeService.clusterDeleted.next(lakeId);
+          }, () => {
+            this.lakeService.clusterDeleteFailed.next();
+          })
       }
     });
   }

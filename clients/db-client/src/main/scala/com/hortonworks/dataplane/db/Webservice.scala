@@ -229,6 +229,8 @@ object Webservice {
 
     def getByParentId(parentId: String, queryString: String): Future[Seq[CommentWithUser]]
 
+    def getCommentsCount(objectId: Long, objectType: String): Future[JsObject]
+
   }
 
   trait RatingService extends DbClientService {

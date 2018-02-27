@@ -36,6 +36,8 @@ export class RichDatasetModel {
   favouriteId?: number;
   favouriteCount?: number;
   bookmarkId?: number;
+  totalComments?: number;
+  avgRating?: number;
 }
 
 export class Favourite {

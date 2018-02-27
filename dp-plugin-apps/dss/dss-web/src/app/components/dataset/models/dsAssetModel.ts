@@ -10,7 +10,7 @@
  */
 
 export class DsAssetModel {
-  creationTime: string;
+  createdTime: string;
   id: number;
   name: string;
   description?: string;

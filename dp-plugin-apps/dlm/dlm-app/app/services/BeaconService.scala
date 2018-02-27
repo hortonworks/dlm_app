@@ -19,7 +19,7 @@ import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
 import models.CloudAccountEntities.CloudAccountWithCredentials
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import models.Entities.{UnpairClusterDefinition, _}
+import models.Entities.{CloudCredWithPolicies, UnpairClusterDefinition, _}
 import models.PolicyAction
 import models._
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
@@ -40,6 +40,7 @@ import scala.concurrent.{Future, Promise}
   * @param beaconCloudCredService  beacon service to get beacon cloud credentials
   * @param dataplaneService     dataplane service to interact with dataplane db service
   * @param ambariService        ambari client service
+  * @param cloudServiceImpl     cloud interaction
   * @param dlmKeyStore          DLM keystore service
   */
 @Singleton
@@ -55,6 +56,7 @@ class BeaconService @Inject()(
    @Named("beaconCloudCredService") val beaconCloudCredService: BeaconCloudCredService,
    val dataplaneService: DataplaneService,
    val ambariService: AmbariService,
+   val cloudServiceImpl: CloudServiceImpl,
    val dlmKeyStore: DlmKeyStore) {
 
 
@@ -119,7 +121,7 @@ class BeaconService @Inject()(
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPairedClustersOption.filter(_.isLeft).map(_.left.get)
-          if (failedResponses.length == beaconClusters.length) {
+          if (failedResponses.lengthCompare(beaconClusters.length) == 0) {
             p.success(Left(DlmApiErrors(failedResponses)))
           } else {
             p.success(Right(PairedClustersResponse(failedResponses, setOfPairedClusters)))
@@ -488,12 +490,10 @@ class BeaconService @Inject()(
               case None => true
               case Some(sourceCluster) => beaconClusters.exists(x => x.dataCenter + "$" + x.name == sourceCluster)
             }
-
-            // @TODO: Uncomment below lines once beacon bug is fixed
-           val isTargetClusterRegisteredToDp = true /*policy.targetCluster match {
+           val isTargetClusterRegisteredToDp = policy.targetCluster match {
               case None => true
               case Some(targetCluster) => beaconClusters.exists(x => x.dataCenter + "$" + x.name == targetCluster)
-            } */
+            }
             isSourceClusterRegisteredToDp && isTargetClusterRegisteredToDp
           })
 
@@ -506,7 +506,7 @@ class BeaconService @Inject()(
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPoliciesOption.filter(_.isLeft).map(_.left.get)
-          if (failedResponses.length == beaconClusters.length) {
+          if (failedResponses.lengthCompare(beaconClusters.length) == 0) {
             p.success(Left(DlmApiErrors(failedResponses)))
           } else {
             p.success(Right(PoliciesDetailsResponse(failedResponses, policiesDetails)))
@@ -949,11 +949,11 @@ class BeaconService @Inject()(
     val p: Promise[DlmApiErrors] = Promise()
     dlmKeyStore.updateCloudAccount(cloudAccount) map {
       case Right(result) =>
-        val queryString = Map(("numResults","100"))
+        val queryString = Map(("numResults","200"))
         getAllCloudCreds(queryString).map {
         case Left(errors) =>  p.success(errors)
         case Right(cloudCredsDetailResponse) =>
-          val filteredCloudCreds = cloudCredsDetailResponse.cloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudAccount.id))
+          val filteredCloudCreds = cloudCredsDetailResponse.allCloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudAccount.id))
           if (filteredCloudCreds.isEmpty) {
             p.success(DlmApiErrors(cloudCredsDetailResponse.unreachableBeacon))
           } else {
@@ -993,11 +993,11 @@ class BeaconService @Inject()(
   def deleteCloudCreds(cloudCredName: String)
                       (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors, Unit]] = {
     val p: Promise[Either[DlmApiErrors, Unit]] = Promise()
-    val queryString = Map(("numResults","100"))
+    val queryString = Map(("numResults","200"))
     getAllCloudCreds(queryString).map {
       case Left(errors) =>  p.success(Left(errors))
       case Right(cloudCredsDetailResponse) =>
-        val filteredCloudCreds = cloudCredsDetailResponse.cloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudCredName))
+        val filteredCloudCreds = cloudCredsDetailResponse.allCloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudCredName))
         if (filteredCloudCreds.isEmpty) {
           if (cloudCredsDetailResponse.unreachableBeacon.isEmpty) {
             dlmKeyStore.deleteCloudAccount(cloudCredName) map {
@@ -1058,6 +1058,109 @@ class BeaconService @Inject()(
     })
     p.future
   }
+
+  /**
+    * Get cloud credentials from all beacon clusters
+    * @param queryString
+    * @param token
+    * @return
+    */
+  def getAllCloudCredsWithPolicies(queryString: Map[String, String])
+                      (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors, CloudCredWithPoliciesResponse]] = {
+    val p: Promise[Either[DlmApiErrors, CloudCredWithPoliciesResponse]] = Promise()
+    dlmKeyStore.getAllCloudAccountNames.map {
+      case Left(error) => p.success(Left(DlmApiErrors(List(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message))))))
+      case Right(cloudAccounts) =>
+        cloudAccounts.accounts.head.id
+        getAllBeaconAdminStatus().map ({
+          case Left(errors) => p.success(Left(errors))
+          case Right(adminStatusResponse) =>
+            val originalPageLenth : Option[String] = queryString.get(BeaconService.API_PAGE_SIZE_KEY)
+            val originalOffset : Int = queryString.getOrElse(BeaconService.API_OFFSET_KEY,BeaconService.API_OFFSET_DEFAULT_VALUE).toInt
+            val queryStringPaginated = getQueryStringForResources(queryString, originalPageLenth, originalOffset)
+            val clustersWithCloudSupport : Seq[BeaconAdminStatusDetails] = adminStatusResponse.response.filter(x => x.beaconAdminStatus.replication_cloud_fs.isDefined)
+            Future.sequence(clustersWithCloudSupport.map(
+              x => {
+                for {
+                  cloudCredList <- beaconCloudCredService.listAllCloudCred(x.beaconEndpoint, x.clusterId, queryStringPaginated)
+                  policies <- beaconPolicyService.listPolicies(x.beaconEndpoint, x.clusterId, queryStringPaginated)
+                } yield {
+                  CloudCredPoliciesEither(cloudCredList, policies)
+                }
+              }
+            )).map({
+              cloudCredListFromAllClusters => {
+                val allCloudCreds : Seq[CloudCredPolicies] = cloudCredListFromAllClusters.filter(x => x.cloudCred.isRight && x.policies.isRight).map(
+                  x => {
+                    val policiesDetails: Seq[PoliciesDetails] = x.policies.right.get.map(policy => {
+                      PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.executionType,
+                        policy.status, policy.sourceDataset, policy.targetDataset, policy.frequencyInSec,
+                        policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster,
+                        policy.customProperties, policy.instances, policy.report)
+                    })
+                    CloudCredPolicies(x.cloudCred.right.get, policiesDetails)
+                  }
+                )
+
+                val failedResponses: Seq[BeaconApiErrors] = cloudCredListFromAllClusters.filter(x => x.cloudCred.isLeft || x.policies.isLeft)
+                  .map(x => if (x.cloudCred.isLeft) x.cloudCred.left.get else x.policies.left.get)
+                if (failedResponses.lengthCompare(clustersWithCloudSupport.length) == 0) {
+                  p.success(Left(DlmApiErrors(failedResponses ++ adminStatusResponse.unreachableBeacon)))
+                } else {
+                  val allCloudCredentials: Seq[CloudCredWithPolicies] = allCloudCreds.foldLeft(List(): List[CloudCredWithPolicies]) {
+                    (acc, next) => {
+                      val policies = next.policies
+                      var newAcc : List[CloudCredWithPolicies] = List()
+                      if (policies.isEmpty)
+                        newAcc = acc
+                      else {
+                        for (nextPolicyInCluster <- policies) {
+                          newAcc = nextPolicyInCluster.customProperties match {
+                            case None => acc
+                            case Some(customProperties) =>
+                              customProperties.get("cloudCred") match {
+                                case None => acc
+                                case Some(cloudCredId) =>
+                                  val cloudCred = next.cloudCred.cloudCreds.cloudCred.find(x => x.id == cloudCredId)
+                                  cloudCred match {
+                                    case None => acc
+                                    case Some(cloudCredResponse) =>
+                                      val cloudCredName = cloudCredResponse.name
+                                      val cloudCredWithSameName = acc.find(x => x.name == cloudCredName)
+                                      cloudCredWithSameName match {
+                                        case None => acc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster))
+                                        case Some(cloudCredWithPolicies) =>
+                                          val index = acc.indexOf(cloudCredWithPolicies)
+                                          val updatedPoliciesList = cloudCredWithPolicies.policies :+ nextPolicyInCluster
+                                          acc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList))
+                                      }
+                                  }
+                              }
+                          }
+                        }
+                      }
+                      newAcc
+                    }
+                  }
+
+                  val dlmCloudCredentials = cloudAccounts.accounts.foldLeft(List(): List[CloudCredWithPolicies]) {
+                    (acc, next) => {
+                      allCloudCredentials.find(x => x.name == next.id) match {
+                        case None => acc :+ CloudCredWithPolicies(next.id, List())
+                        case Some(cloudCredWithPolicies) => acc :+ cloudCredWithPolicies
+                      }
+                    }
+                  }
+                  p.success(Right(CloudCredWithPoliciesResponse(failedResponses, dlmCloudCredentials)))
+                }
+              }
+            })
+        })
+    }
+
+    p.future
+  }
+
 
   /**
     * Get cloud credential details

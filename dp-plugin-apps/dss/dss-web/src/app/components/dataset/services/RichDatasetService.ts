@@ -140,6 +140,8 @@ export class RichDatasetService {
       favouriteId: data.favouriteId,
       favouriteCount: data.favouriteCount,
       bookmarkId: data.bookmarkId,
+      totalComments: data.totalComments,
+      avgRating: data.avgRating
     } as RichDatasetModel;
   }
 

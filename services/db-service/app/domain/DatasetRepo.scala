@@ -34,6 +34,8 @@ class DatasetRepo @Inject()(
                              protected val clusterRepo: ClusterRepo,
                              protected val favouriteRepo: FavouriteRepo,
                              protected val bookmarkRepo: BookmarkRepo,
+                             protected val commentRepo: CommentRepo,
+                             protected val ratingRepo: RatingRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
@@ -182,22 +184,38 @@ class DatasetRepo @Inject()(
 
   private def getFavIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, favId),res) <- favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => (a.objectId, a.id))
+      ((datasetId, favId),res) <- favouriteRepo.getFavInfoByUidForListQuery(datasetIds, userId, Constants.AssetCollectionObjectType)
     } yield (datasetId, favId)
   }
 
   private def getBookmarkIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, bmId),res) <- bookmarkRepo.Bookmarks.filter(t => (t.objectId.inSet(datasetIds) && t.userId === userId && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => (a.objectId, a.id))
+      ((datasetId, bmId),res) <- bookmarkRepo.getBookmarkInfoForObjListQuery(datasetIds, userId, Constants.AssetCollectionObjectType)
     } yield (datasetId, bmId)
   }
 
-  private def getFavCounts(datasetIds: Seq[Long], userId: Long) = {
+  private def getFavCounts(datasetIds: Seq[Long]) = {
     for {
       (datasetId, favs) <- {
-        favouriteRepo.Favourites.filter(t => (t.objectId.inSet(datasetIds) && t.objectType === Constants.AssetCollectionObjectType)).groupBy(a => a.objectId)
+        favouriteRepo.getFavInfoForListQuery(datasetIds, Constants.AssetCollectionObjectType)
       }
     } yield (datasetId, favs.length)
+  }
+
+  private def getCommentsCount(datasetIds: Seq[Long]) = {
+    for {
+      (datasetId, comments) <- {
+        commentRepo.getCommentsInfoForListQuery(datasetIds, Constants.AssetCollectionObjectType)
+      }
+    } yield (datasetId, comments.length)
+  }
+
+  private def getAverageRating(datasetIds: Seq[Long]) = {
+    for {
+      (datasetId, ratings) <- {
+        ratingRepo.getRatingForListQuery(datasetIds, Constants.AssetCollectionObjectType)
+      }
+    } yield (datasetId, ratings.map(_.rating).avg)
   }
 
   def sortByDataset(paginationQuery: Option[PaginatedQuery],
@@ -292,10 +310,20 @@ class DatasetRepo @Inject()(
 
       favCount <- {
         val datasetIds = datasetWithUsername.map(_._1.id.get)
-        getFavCounts(datasetIds,userId).to[List].result
+        getFavCounts(datasetIds).to[List].result
       }
 
-    } yield (datasetWithUsername, datasetAssetCount, datasetCategories, favId, favCount, bmId)
+      commentsCounts <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getCommentsCount(datasetIds).to[List].result
+      }
+
+      avgRatings <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getAverageRating(datasetIds).to[List].result
+      }
+
+    } yield (datasetWithUsername, datasetAssetCount, datasetCategories, favId, favCount, bmId, commentsCounts, avgRatings)
 
     db.run(query).map {
       result =>
@@ -308,6 +336,8 @@ class DatasetRepo @Inject()(
         val favIdMap: Map[Long, Option[Long]] = result._4.groupBy(_._1).mapValues(_.map(_._2).head)
         val favCountMap = result._5.groupBy(_._1).mapValues(_.map(_._2).head)
         val bmIdMap: Map[Long, Option[Long]] = result._6.groupBy(_._1).mapValues(_.map(_._2).head)
+        val commentsCountsMap = result._7.groupBy(_._1).mapValues(_.map(_._2).head)
+        val avgRatingsMap = result._8.groupBy(_._1).mapValues(_.map(_._2).head)
 
         result._1.map {
           case (dataset, user, cluster, clusterId) =>
@@ -320,7 +350,9 @@ class DatasetRepo @Inject()(
               datasetWithAssetCountMap.getOrElse(dataset.id.get, Nil),
               favIdMap.get(dataset.id.get).flatten,
               favCountMap.get(dataset.id.get),
-              bmIdMap.get(dataset.id.get).flatten
+              bmIdMap.get(dataset.id.get).flatten,
+              commentsCountsMap.get(dataset.id.get),
+              avgRatingsMap.get(dataset.id.get).flatten
             )
         }.toSeq
     }

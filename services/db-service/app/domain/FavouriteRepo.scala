@@ -42,6 +42,14 @@ class FavouriteRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
     db.run(Favourites.filter(t => (t.objectId === objectId && t.objectType === objectType)).length.result)
   }
 
+  def getFavInfoByUidForListQuery(objectIds: Seq[Long], userId: Long, objectType: String) = {
+    Favourites.filter(t => (t.objectId.inSet(objectIds) && t.userId === userId && t.objectType === objectType)).groupBy(a => (a.objectId, a.id))
+  }
+
+  def getFavInfoForListQuery(objectIds: Seq[Long], objectType: String) = {
+    Favourites.filter(t => (t.objectId.inSet(objectIds) && t.objectType === objectType)).groupBy(a => a.objectId)
+  }
+
   final class FavouritesTable(tag: Tag) extends Table[Favourite](tag, Some("dataplane"), "favourites") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

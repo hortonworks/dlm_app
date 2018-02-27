@@ -9,29 +9,21 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
-import { MyDatePickerModule } from 'mydatepicker';
-import {CollapseModule, TabsModule, TypeaheadModule, TimepickerModule} from 'ngx-bootstrap';
+import { TabsModule} from 'ngx-bootstrap';
 
-import {RadioButtonComponent} from 'common/radio-button/radio-button.component';
-import {CheckboxListComponent} from 'common/checkbox-list/checkbox-list.component';
-import {CheckboxComponent} from 'common/checkbox/checkbox.component';
-import { CommonComponentsModule } from 'components/common-components.module';
-import {PolicyFormComponent} from '../../components/policy-form/policy-form.component';
+import {CommonComponentsModule} from 'components/common-components.module';
+import {CreatePolicyModalComponent} from '../../components/create-policy-modal/create-policy-modal.component';
+import {CreatePolicyWizardComponent} from '../../components/create-policy-wizard/create-policy-wizard.component';
 import {CreatePolicyComponent} from './create-policy.component';
-import {HdfsBrowserComponent} from 'components/hdfs-browser/hdfs-browser.component';
-import {TableComponent} from 'common/table/table.component';
-import {MomentModule} from 'angular2-moment';
-import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
-import {NgxDatatableModule} from '@swimlane/ngx-datatable';
-import {TableFilterComponent} from 'common/table/table-filter/table-filter.component';
-import {ActionColumnComponent} from 'components/table-columns/action-column/action-column.component';
+import {WizardContentComponent} from '../../components/wizard-content/wizard-content.component';
+import {CreatePolicyStepsModule} from '../../components/create-policy-steps/create-policy-steps.module';
 import {NavbarService} from 'services/navbar.service';
-import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import {PipesModule} from 'pipes/pipes.module';
 import {TooltipModule} from 'ngx-bootstrap';
-import { configureComponentTest } from 'testing/configure';
-import { SelectCloudDestinationComponent } from '../../components/select-cloud-destination/select-cloud-destination.component';
+import {configureComponentTest} from 'testing/configure';
+import {HortonStyleModule} from 'common/horton-style.module';
+import {PolicyService} from 'services/policy.service';
+import {JobService} from 'services/job.service';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -42,34 +34,23 @@ describe('CreatePolicyComponent', () => {
       imports: [
         TooltipModule.forRoot(),
         CommonComponentsModule,
-        TimepickerModule.forRoot(),
         ReactiveFormsModule,
         FormsModule,
-        CollapseModule,
         TabsModule.forRoot(),
-        MyDatePickerModule,
-        MomentModule,
-        NgxDatatableModule,
+        CreatePolicyStepsModule,
         RouterTestingModule,
-        TypeaheadModule,
-        PipesModule
+        HortonStyleModule
       ],
       declarations: [
         CreatePolicyComponent,
-        PolicyFormComponent,
-        RadioButtonComponent,
-        CheckboxListComponent,
-        CheckboxComponent,
-        HdfsBrowserComponent,
-        TableComponent,
-        TableFooterComponent,
-        TableFilterComponent,
-        ActionColumnComponent,
-        CheckboxColumnComponent,
-        SelectCloudDestinationComponent
+        CreatePolicyWizardComponent,
+        CreatePolicyModalComponent,
+        WizardContentComponent
       ],
       providers: [
-        NavbarService
+        NavbarService,
+        PolicyService,
+        JobService
       ]
     })
       .compileComponents();

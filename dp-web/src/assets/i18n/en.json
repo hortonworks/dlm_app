@@ -427,28 +427,33 @@
     "dss": "Data Steward Studio"
   },
   "error": {
-    "cluster.ambari.status.unreachable-host-error": "Host is unreachable. Please check if Ambari is up and reachable from DataPlane host.",
-    "cluster.ambari.status.dns-error": "Unable to resolve host. Please verify that the DataPlane host can reach the domain specified in the URL and it is configured correctly in your corporate or public DNS.",
+    "cluster.ambari.status.unreachable-host-error": "Host is unreachable. Please check if Ambari is up and reachable from DataPlane host. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1946' target=\"_blank\">Learn More</a>",
+    "cluster.ambari.status.dns-error": "Unable to resolve host. Please verify that the DataPlane host can reach the domain specified in the URL and it is configured correctly in your corporate or public DNS.<a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1946' target=\"_blank\">Learn More</a>",
     "cluster.ambari.status.invalid-json-response": "Unable to deserialize JSON. Please verify the exact errors from DataPlane logs.",
-    "cluster.ambari.status.unexpected-response-hd-insight": "We recieved an unexpected response from cluster. Please verify the exact errors from DataPlane logs.",
+    "cluster.ambari.status.unexpected-response-hd-insight": "We received an unexpected response from cluster. Please verify the exact errors from DataPlane logs.",
     "cluster.ambari.status.unexpected-response-for-prereq-call": "Unexpected Response from Ambari, expected 403 or 401. Please verify the exact errors from DataPlane logs.",
-    "cluster.ambari.status.connection-refused": "Connection to remote address was refused. Please check if Ambari is up and reachable from DataPlane host.",
+    "cluster.ambari.status.connection-refused": "Connection to remote address was refused. Please check if Ambari is up and reachable from DataPlane host. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1946' target=\"_blank\">Learn More</a>",
 
-    "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that trust between Knox and DataPlane has been setup correctly.",
-    "cluster.ambari.status.knox.ranger-rights-unavailable": "User does not have required rights to access Knox on this HDP cluster. Please ensure that logged-in user has required privileges granted.",
-    "cluster.ambari.status.knox.configuration-error": "Knox has not been setup for DataPlane correctly. Please verify Knox gateway logs on HDP cluster for more information.",
-    "cluster.ambari.status.knox.public-key-corrupted": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify Knox gateway logs on HDP cluster for more information.",
-    "cluster.ambari.status.knox.connection-refused": "Connection to remote address was refused. Please check if Knox is up and reachable from DataPlane host.",
+    "cluster.ambari.status.detail.0-clusters-on-ambari": "There are no clusters attached to this Ambari instance. Please check logs for more information.",
+    "cluster.ambari.status.detail.more-than-1-clusters-on-ambari": "There are more than one clusters attached to this Ambari instance. Please check logs for more information.",
+    "cluster.ambari.status.detail.access-detail-rights-unavailable": "User does not have required rights to access this cluster. Please ask your Ambari administrator to grant required rights.",
+    "cluster.ambari.status.detail.missing-data": "Unknown error: One of Knox URL or Token is unavailable.. Please check logs for more information.",
+
+    "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that trust between Knox and DataPlane has been setup correctly. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1995' target=\"blank\">Learn More</a>",
+    "cluster.ambari.status.knox.ranger-rights-unavailable": "User does not have required rights to access Knox on this HDP cluster. Please ensure that logged-in user has required privileges granted. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1995' target=\"blank\">Learn More</a>",
+    "cluster.ambari.status.knox.configuration-error": "Knox has not been setup for DataPlane correctly. Please verify Knox gateway logs on HDP cluster for more information. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1995' target=\"blank\">Learn More</a>",
+    "cluster.ambari.status.knox.public-key-corrupted": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify Knox gateway logs on HDP cluster for more information. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1995' target=\"blank\">Learn More</a>",
+    "cluster.ambari.status.knox.connection-refused": "Connection to remote address was refused. Please check if Knox is up and reachable from DataPlane host. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1946' target=\"_blank\">",
     "cluster.ambari.status.knox.jwt-token-missing": "This operation is not supported for non-LDAP users. Please log-in as an LDAP user to add this cluster.",
-    "cluster.ambari.status.knox.tls-error": "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.",
+    "cluster.ambari.status.knox.tls-error": "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore. ",
     "cluster.ambari.status.knox.genric": "Unknown error. Server returned an unexpected response. Please check DataPlane logs for more information.",
 
-    "cluster.ambari.status.raw.credential-not-found": "There is no credential configured for Ambari default user",
-    "cluster.ambari.status.raw.unauthorized": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that Knox has been setup and configured correctly for DataPlane.",
-    "cluster.ambari.status.raw.forbidden": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that Knox has been setup and configured correctly for DataPlane.",
+    "cluster.ambari.status.raw.credential-not-found": "There is no credential configured for Ambari default user. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1971' target=\"blank\">Learn More</a>",
+    "cluster.ambari.status.raw.unauthorized": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that Knox has been setup and configured correctly for DataPlane. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1971' target=\"blank\">Learn More</a>",
+    "cluster.ambari.status.raw.forbidden": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that Knox has been setup and configured correctly for DataPlane. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1971' target=\"blank\">Learn More</a>",
     "cluster.ambari.status.raw.not-found": "We were unable to find the endpoint you were querying.",
     "cluster.ambari.status.raw.server-error": "An internal server error occurred. Please check DataPlane logs for more information.",
-    "cluster.ambari.status.raw.connection-refused": "Connection to remote address was refused. Please check if Ambari is up and reachable from DataPlane host.",
+    "cluster.ambari.status.raw.connection-refused": "Connection to remote address was refused. Please check if Ambari is up and reachable from DataPlane host. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1946' target=\"blank\">Learn More</a> ",
     "cluster.ambari.status.raw.tls-error": "TLS error. Please ensure your Ambari server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.",
     "cluster.ambari.status.raw.generic": "Unknown error while communicating with Ambari. Please check DataPlane logs for more information.",
 
@@ -456,8 +461,8 @@
 
     "core.ambari.status.already-added": "This Ambari cluster has already been added.",
 
-    "database.generic": "An unexpected error occured with database. Please check DataPlane logs for more information.",
+    "database.generic": "An unexpected error occurred with database. Please check DataPlane logs for more information.",
 
-    "generic": "An unexpected error occured. Please check DataPlane logs for more information."
+    "generic": "An unexpected error occurred. Please check DataPlane logs for more information."
   }
 }

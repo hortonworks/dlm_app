@@ -70,9 +70,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
       // each item is a Some(cluster)
       // start defining the cluster mapping
       val clusterOpts = items.map { item =>
-        item.flatMap { map =>
-          map.get("cluster_name")
-        }
+        item.flatMap { _.get("cluster_name") }
       }
       clusterOpts.collect { case Some(c) => c }
     }

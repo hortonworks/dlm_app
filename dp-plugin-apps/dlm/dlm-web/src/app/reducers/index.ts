@@ -22,6 +22,7 @@ import * as fromJob from './job.reducer';
 import * as fromForm from './form.reducer';
 import * as fromEvent from './event.reducer';
 import * as fromProgress from './progress.reducer';
+import * as fromCreatePolicy from './create-policy.reducer';
 import * as fromOperation from './operation.reducer';
 import * as fromHdfs from './hdfs.reducer';
 import * as fromHive from './hive.reducer';
@@ -32,6 +33,7 @@ import * as fromYarnQueues from './yarn-queues.reducer';
 import * as fromCloudAccount from './cloud-account.reducer';
 import * as fromCloudContainer from './cloud-container.reducer';
 import * as fromCloudContainerItem from './cloud-container-item.reducer';
+import * as fromBeaconCloudCred from './beacon-cloud-cred.reducer';
 
 export interface State {
   router: RouterReducerState;
@@ -52,6 +54,8 @@ export interface State {
   cloudAccounts: fromCloudAccount.State;
   cloudContainers: fromCloudContainer.State;
   cloudContainerItems: fromCloudContainerItem.State;
+  beaconCloudCreds: fromBeaconCloudCred.State;
+  createPolicyWizard: fromCreatePolicy.State;
 }
 
 export const reducers: ActionReducerMap<State> = {
@@ -72,7 +76,9 @@ export const reducers: ActionReducerMap<State> = {
   yarnQueues: fromYarnQueues.reducer,
   cloudAccounts: fromCloudAccount.reducer,
   cloudContainers: fromCloudContainer.reducer,
-  cloudContainerItems: fromCloudContainerItem.reducer
+  cloudContainerItems: fromCloudContainerItem.reducer,
+  beaconCloudCreds: fromBeaconCloudCred.reducer,
+  createPolicyWizard: fromCreatePolicy.reducer
 };
 
 export const logger = (reducer: ActionReducer<State>) => {

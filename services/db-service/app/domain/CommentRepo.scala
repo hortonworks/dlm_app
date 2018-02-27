@@ -110,6 +110,15 @@ class CommentRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     db.run(query)
   }
 
+  def getCommentsCount(objectId: Long, objectType: String): Future[Int] = {
+    val query = Comments.filter(m => (m.objectId === objectId && m.objectType === objectType)).length.result
+    db.run(query)
+  }
+
+  def getCommentsInfoForListQuery(objectIds: Seq[Long], objectType: String) = {
+    Comments.filter(t => (t.objectId.inSet(objectIds) && t.objectType === objectType)).groupBy(a => a.objectId)
+  }
+
   final class CommentsTable(tag: Tag) extends Table[Comment](tag, Some("dataplane"), "comments") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

@@ -15,18 +15,17 @@ import {configureComponentTest} from 'testing/configure';
 import {RouterTestingModule} from '@angular/router/testing';
 import {BsDropdownModule} from 'ngx-bootstrap';
 import {HortonStyleModule} from 'common/horton-style.module';
-import {TableComponent} from 'common/table/table.component';
-import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
 import {MockTranslateLoader} from 'mocks/mock-translate-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {CloudAccountActionsComponent} from '../cloud-account-actions/cloud-account-actions.component';
-import {CheckboxColumnComponent} from 'components/table-columns';
-import {ActionColumnComponent} from 'components/table-columns/action-column';
-import {CheckboxComponent} from 'common/checkbox/checkbox.component';
 import {CloudAccountService} from 'services/cloud-account.service';
 import {NavbarService} from 'services/navbar.service';
 import {TooltipModule} from 'ngx-bootstrap';
+import {MomentModule} from 'angular2-moment';
+import {PipesModule} from 'pipes/pipes.module';
+import {PrevJobsComponent} from 'pages/policies/components/prev-jobs/prev-jobs.component';
+import {CloudAccountsPoliciesTableComponent} from '../cloud-account-policies-table/cloud-account-policies-table.component';
 
 describe('CloudAccountsListComponent', () => {
   let component: CloudAccountsListComponent;
@@ -45,16 +44,15 @@ describe('CloudAccountsListComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         CommonComponentsModule,
-        HortonStyleModule
+        HortonStyleModule,
+        MomentModule,
+        PipesModule
       ],
       declarations: [
         CloudAccountsListComponent,
-        TableComponent,
-        TableFooterComponent,
         CloudAccountActionsComponent,
-        ActionColumnComponent,
-        CheckboxColumnComponent,
-        CheckboxComponent
+        CloudAccountsPoliciesTableComponent,
+        PrevJobsComponent
       ],
       providers: [
         CloudAccountService,

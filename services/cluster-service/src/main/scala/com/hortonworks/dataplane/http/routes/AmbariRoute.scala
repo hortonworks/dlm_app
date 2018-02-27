@@ -48,22 +48,6 @@ class AmbariRoute @Inject()(val ws: WSClient,
 
   val logger = Logger(classOf[AmbariRoute])
 
-  private[dataplane] class TempDataplaneCluster(
-      ambariDetailRequest: AmbariDetailRequest)
-      extends DataplaneCluster(
-        id = None,
-        name = "",
-        dcName = "",
-        description = "",
-        ambariUrl = ambariDetailRequest.url,
-        ambariIpAddress = "",
-        createdBy = None,
-        properties = None,
-        location = None,
-        knoxEnabled = Some(ambariDetailRequest.knoxDetected),
-        knoxUrl = ambariDetailRequest.knoxUrl
-      )
-
   def mapToCluster(json: Option[JsValue],
                    cluster: String,dataplaneCluster: DataplaneCluster): Future[Option[AmbariCluster]] =
     Future.successful(
@@ -87,7 +71,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
     val futures = clusters.map { c =>
       for {
         json <- dli.getClusterDetails(c)
-        ambariCluster <- mapToCluster(json, c,dataplaneCluster)
+        ambariCluster <- mapToCluster(json, c,  dataplaneCluster)
       } yield ambariCluster
     }
     Future.sequence(futures)
@@ -96,38 +80,25 @@ class AmbariRoute @Inject()(val ws: WSClient,
   def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest,
                        request: HttpRequest): Future[Seq[AmbariCluster]] = {
 
-    /*
-    Check if Ambari credentials were sent with the request
-    and if the configuration expects a separate config group
-    for knox
-
-    If true, then update the knox URL to the one pointed to by the
-    config group
-     */
-
-    val expectConfigGroup =
-      config.getBoolean("dp.services.knox.token.expect.separate.config")
-    val checkCredentials =
-      config.getBoolean("dp.services.knox.token.infer.endpoint.using.credentials")
-
-    // validations
-    if (ambariDetailRequest.knoxDetected && expectConfigGroup) {
-      if (checkCredentials)
-        assert(
-          ambariDetailRequest.hasCredentials,
-          "Knox detected and a config group was expected, but no credentials sent in request")
-      else
-        assert(
-          ambariDetailRequest.hasTopology,
-          "Knox detected and a config group was expected, but no topology sent in request")
-    }
-
     val header = request.getHeader(Constants.DPTOKEN)
     implicit val token =
       if (header.isPresent) Some(HJwtToken(header.get.value)) else None
 
+    val dataplaneCluster = DataplaneCluster(
+      id = None,
+      name = "",
+      dcName = "",
+      description = "",
+      ambariUrl = ambariDetailRequest.url,
+      ambariIpAddress = "",
+      createdBy = None,
+      properties = None,
+      location = None,
+      knoxEnabled = Some(ambariDetailRequest.knoxDetected),
+      knoxUrl = ambariDetailRequest.knoxUrl
+    )
+
     val finalList = for {
-      dataplaneCluster <- getDpCluster(ambariDetailRequest,expectConfigGroup,checkCredentials)
       creds <- credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
@@ -138,9 +109,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
       details <- getDetails(dataplaneCluster,clusters, dli)
     } yield details
 
-    finalList.map { item =>
-      item.collect { case o if o.isDefined => o.get }
-    }
+    finalList.map { _.collect { case o if o.isDefined => o.get } }
 
   }
 
@@ -194,17 +163,6 @@ class AmbariRoute @Inject()(val ws: WSClient,
       clusterName <- loadDefaultCluster(ambariDetailRequest)
       newUrl <- loadKnoxUrl(clusterName,ambariDetailRequest)
     } yield newUrl
-  }
-
-  private def getDpCluster(ambariDetailRequest: AmbariDetailRequest, expectConfigGroup:Boolean, checkCredentials:Boolean) = {
-    // set the Knox Url with the entered URL if set up
-    val newRequest = if(ambariDetailRequest.knoxDetected && expectConfigGroup ){
-      if(!checkCredentials)
-        Future.successful(ambariDetailRequest.copy(knoxUrl = Some(ambariDetailRequest.knoxTopology.get)))
-      else getTargetUrl(ambariDetailRequest).map(url => ambariDetailRequest.copy(knoxUrl = Some(url)))
-    } else Future.successful(ambariDetailRequest)
-
-    newRequest.map(new TempDataplaneCluster(_))
   }
 
   def getClusterData(clusterId: Long) = {
@@ -434,8 +392,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
           onComplete(list) {
             case Success(clusters) =>
               clusters.size match {
-                case 0 =>
-                  complete(StatusCodes.NotFound, notFound)
+                case 0 => complete(StatusCodes.NotFound, notFound)
                 case _ => complete(success(clusters))
               }
             case Failure(th) =>

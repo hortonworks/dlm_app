@@ -20,6 +20,7 @@ import services._
 import play.api.mvc.{Action, Controller}
 import play.api.Logger
 import play.api.libs.json.Json
+import models.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -29,12 +30,11 @@ class Cloud @Inject()(
   val wasbService: WASBService,
   val adlsService: ADLSService,
   val cloudServiceFactory: CloudServiceFactory,
-  val cloudServiceImpl: CloudServiceImpl,
-  val dlmKeyStore: DlmKeyStore
+  val cloudServiceImpl: CloudServiceImpl
 ) extends Controller {
 
   def listAllMountPoints(accountId: String) = Action.async {
-    Logger.info("Received list all bucket request")
+    Logger.debug("Received list all bucket request")
     cloudServiceImpl.listMountPoints(accountId).map {
       case Right(mountPoints) => Ok(Json.toJson(mountPoints))
       case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
@@ -42,7 +42,7 @@ class Cloud @Inject()(
   }
 
   def listFiles(accountId: String, mountPoint: String) = Action.async { request =>
-    Logger.info("Received list all objects request")
+    Logger.debug("Received list all objects request")
     val path: String = request.getQueryString("path").getOrElse("/")
     cloudServiceImpl.listFiles(accountId, mountPoint, path).map {
       case Right(files) => Ok(Json.toJson(files))
@@ -50,10 +50,18 @@ class Cloud @Inject()(
     }
   }
 
+  def checkAllCredStatus = Action.async {
+    Logger.debug("Received check for all credential status")
+    cloudServiceImpl.checkValidityForAllCredentials.map {
+      case Right(result) => Ok(Json.toJson(result))
+      case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
+    }
+  }
+
   def checkUserIdentity(cloudAccountId: String) = Action.async {
     Logger.debug("Received check user identity request")
     cloudServiceImpl.checkUserIdentityValid(cloudAccountId).map {
-      case Right(files) => Ok(JsonResponses.statusOk)
+      case Right(result) => Ok(Json.toJson(result))
       case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
     }
   }

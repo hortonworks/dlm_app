@@ -22,7 +22,9 @@ import { ModalSize, SIZE_CLASS_MAP } from './modal-dialog.size';
       <div [ngClass]="['modal-dialog', modalSizeClassMap[modalSize]]">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title pull-left">{{ title | translate }}</h4>
+            <h4 class="modal-title pull-left">{{ title | translate }}
+              <small *ngIf="subtitleLink"><a [href]="subtitleLink" target="_blank">{{subtitleText}}</a></small>
+            </h4>
             <div class="pull-right">
               <ng-content select="dlm-modal-dialog-header-block"></ng-content>
               <button type="button" class="close pull-right" data-dismiss="modal" (click)="hide()">
@@ -61,6 +63,8 @@ export class ModalDialogComponent implements OnInit, OnChanges {
   // Ok and Cancel buttons are shown by default
   // and can be overridden by respective inputs
   @Input() title: string;
+  @Input() subtitleLink: string;
+  @Input() subtitleText: string;
   @Input() body: string;
   @Input() okText = 'OK';
   @Input() deleteText = 'Delete';

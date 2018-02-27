@@ -58,3 +58,15 @@ object CloudAccountProvider extends Enumeration {
     def writes(myEnum: CloudAccountProvider) = JsString(myEnum.toString)
   }
 }
+
+object CloudAccountStatus extends Enumeration {
+  type CloudAccountStatus = Value
+
+  val ACTIVE = Value("ACTIVE")
+  val EXPIRED = Value("EXPIRED")
+
+  implicit val cloudAccountStatusFormat = new Format[CloudAccountStatus] {
+    def reads(json: JsValue) = JsSuccess(CloudAccountStatus.withName(json.as[String]))
+    def writes(myEnum: CloudAccountStatus) = JsString(myEnum.toString)
+  }
+}

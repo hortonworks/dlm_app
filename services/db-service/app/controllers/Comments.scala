@@ -73,6 +73,14 @@ class Comments @Inject()(commentRepo: CommentRepo)(implicit exec: ExecutionConte
       }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Getting Comments with parent Id $parentId failed with message ${e.getMessage}", e)))
   }
 
+  def getCommentsCount(objectId: Long, objectType: String) = Action.async { req =>
+    Logger.info("Comments Controller: Received get CommentsCount by object Id and object type request")
+    commentRepo.getCommentsCount(objectId, objectType)
+      .map{ commentsCount =>
+        success(Json.obj("totalComments"->commentsCount))
+      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Comments Controller: Getting Comments count with object Id $objectId and object type $objectType failed with message ${e.getMessage}", e)))
+  }
+
   def delete(objectId: Long, objectType: String) = Action.async { req =>
     Logger.info("Comments Controller: Received delete comment by object-reference request")
     val numOfRowsDel = commentRepo.deleteByObjectRef(objectId,objectType)

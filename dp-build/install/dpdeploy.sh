@@ -9,6 +9,9 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
+BRIGHT=$(tput bold)
+NORMAL=$(tput sgr0)
+
 set -e
 
 source $(pwd)/config.env.sh
@@ -32,13 +35,6 @@ init_network() {
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
-    # This is not a clean solution and will be fixed later
-    # else
-    #     echo "Network dp already exists. Destroying all containers on network dp."
-    #     CONTAINER_LIST=$(docker container ls --all --quiet --filter "network=dp")
-    #     if [[ $(echo $CONTAINER_LIST) ]]; then
-    #         docker rm  --force $CONTAINER_LIST
-    #     fi
     fi
 }
 
@@ -67,6 +63,10 @@ ps() {
 }
 
 list_logs() {
+    if [ $# -lt 1 ]; then
+        source $(pwd)/help.sh "logs"
+        exit -1;
+    fi
     docker logs "$@"
 }
 
@@ -106,8 +106,7 @@ reset_db() {
 
 utils_add_host() {
     if [ $# -ne 2 ]; then
-        echo "Invalid arguments."
-        echo "Usage: dpdeploy.sh utils add-host <ip> <host>"
+        source $(pwd)/help.sh "utils" "add-host"
         return -1
     else
         add_host_entry "$@"
@@ -126,12 +125,18 @@ add_host_entry() {
 
 utils_update_user_secret() {
     if [[ $# -ne 1  || ( "$1" != "ambari" && "$1" != "atlas" && "$1" != "ranger" ) ]]; then
-        echo "Invalid arguments."
-        echo "Usage: dpdeploy.sh utils update-user [ambari | atlas | ranger]"
+        source $(pwd)/help.sh "utils" "update-user"
         return -1
     else
         update_user_entry "$@"
     fi
+}
+
+
+get_master_password(){
+    read -s -p "Enter previously entered master password for DataPlane Service: " MASTER_PASSWD
+    MASTER_PASSWORD="$MASTER_PASSWD"
+    echo
 }
 
 update_user_entry() {
@@ -139,26 +144,6 @@ update_user_entry() {
         get_master_password
     fi
     source $(pwd)/keystore-manage.sh "$@"
-}
-
-utils_reload_app_containers() {
-    # stop containers other than db, consul and knox
-    docker stop $APP_CONTAINERS_WITHOUT_DB
-
-    # start containers other than db, consul and knox
-    echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh
-
-    echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh
-
-    echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh
-
-    echo "Starting Application API"
-    source $(pwd)/docker-app.sh
-
-    echo "Restart done."
 }
 
 destroy() {
@@ -198,21 +183,22 @@ init_app() {
 }
 
 read_master_password() {
-    echo "Enter master password for DataPlane Service: "
-    read -s MASTER_PASSWD
-    
+    printf "\nDataPlane Services will now setup a ${BRIGHT}Master password ${NORMAL} that is used to secure the secret storage for the system. \n"
+    printf "\n${BRIGHT}Caution: ${NORMAL}The master password can be setup only once and cannot be reset easily. You will need to provide it for various admin operations. Hence please remember what you enter here.\n\n"
+    read -s -p "Enter master password for DataPlane Service (Minimum 6 characters long): " MASTER_PASSWD
+    echo
+
     if [ "${#MASTER_PASSWD}" -lt 6 ]; then
         echo "Password needs to be at least 6 characters long."
         exit 1
     fi
 
-    echo "Reenter password: "
-    read -s MASTER_PASSWD_VERIFY
-    
+    read -s -p "Reenter password: " MASTER_PASSWD_VERIFY
+    echo
     if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
     then
-       echo "Password did not match. Reenter password:"
-       read -s MASTER_PASSWD_VERIFY
+       read -s -p "Password did not match. Reenter password:" MASTER_PASSWD_VERIFY
+       echo
        if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
        then
         echo "Password did not match"
@@ -235,11 +221,12 @@ read_admin_password_safely() {
 }
 
 read_admin_password() {
-    echo "Enter DataPlane Service admin password: "
-    read -s ADMIN_PASSWD
-
-    echo "Reenter password: "
-    read -s ADMIN_PASSWD_VERIFY
+    printf "\nDataPlane Services will now setup an ${BRIGHT}'admin' ${NORMAL}user who can configure LDAP, add other DataPlane Service Admins.\n"
+    printf "Setup a password for this user.\n\n"
+    read -s -p "Enter DataPlane Services admin password: " ADMIN_PASSWD
+    echo
+    read -s -p "Re-enter password: " ADMIN_PASSWD_VERIFY
+    echo
     
     if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
     then
@@ -255,13 +242,11 @@ read_admin_password() {
 }
 
 read_user_supplied_certificate_password() {
-    echo "Please enter password used for supplied certificates:"
-    read -s CERTIFICATE_PASSWORD
+    read -s -p "Please enter password used for supplied certificates:" CERTIFICATE_PASSWORD
 }
 
 read_use_test_ldap() {
-    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
-    read USE_TEST_LDAP
+    read -p "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: " USE_TEST_LDAP
 }
 
 import_certs() {
@@ -291,8 +276,7 @@ init_certs() {
     fi
 
     if [ "$USE_PROVIDED_CERTIFICATES" != "yes" ] && [ "$USE_PROVIDED_CERTIFICATES" != "no" ]; then
-        echo "Do you have certificate to be configured? (yes/no):"
-        read USE_PROVIDED_CERTIFICATES
+        read -p "Do you have certificate to be configured? (yes/no):" USE_PROVIDED_CERTIFICATES
     fi
     if [ "$USE_PROVIDED_CERTIFICATES" == "yes" ]; then
         echo "Importing certificates..."
@@ -329,7 +313,7 @@ init_knox() {
     echo "Initializing Knox"
     
     if [ "$MASTER_PASSWORD" == "" ]; then
-        read_master_password
+        get_master_password
     fi
     if [ "$USE_TEST_LDAP" == "" ];then
         read_use_test_ldap
@@ -397,7 +381,7 @@ load_images() {
 
 init_keystore() {
    if [ "$MASTER_PASSWORD" == "" ]; then
-       read_master_password
+       get_master_password
    fi
     mkdir -p $(pwd)/certs
     source $(pwd)/keystore-initialize.sh
@@ -415,19 +399,35 @@ update_admin_password() {
 }
 
 utils_enable_config_value() {
-  source $(pwd)/database-run-script.sh "ENABLE_CONFIG" "$@"
+    if [ $# -ne 1 ]; then
+        source $(pwd)/help.sh "utils" "enable-config"
+        return -1
+    else
+        source $(pwd)/database-run-script.sh "ENABLE_CONFIG" "$@"
+    fi
 }
 
 utils_disable_config_value() {
-  source $(pwd)/database-run-script.sh "DISABLE_CONFIG" "$@"
+    if [ $# -ne 1 ]; then
+        source $(pwd)/help.sh "utils" "disable-config"
+        return -1
+    else
+        source $(pwd)/database-run-script.sh "DISABLE_CONFIG" "$@"
+    fi
 }
 
 utils_get_config_value(){
-  source $(pwd)/database-run-script.sh "GET_CONFIG" "$@"
+    if [ $# -ne 1 ]; then
+        source $(pwd)/help.sh "utils" "get-config"
+        return -1
+    else
+        source $(pwd)/database-run-script.sh "GET_CONFIG" "$@"
+    fi
 }
 
 
 init_all() {
+    load_images
     read_admin_password_safely
     read_master_password_safely
 
@@ -446,7 +446,7 @@ init_all() {
 }
 
 init_all_from_state() {
-    read_master_password_safely
+    get_master_password
     read_certs_config
 
     init_db
@@ -501,7 +501,7 @@ destroy_all_but_state() {
 
 upgrade() {
     if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
-        usage
+        source $(pwd)/help.sh "upgrade"
         exit -1
     fi
 
@@ -510,14 +510,13 @@ upgrade() {
         exit -1
     fi
 
-    echo "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):"
-    read CONTINUE_MIGRATE
+    read -p "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):" CONTINUE_MIGRATE
     if [ "$CONTINUE_MIGRATE" != "yes" ]; then
         exit -1
     fi
 
     source $(pwd)/config.clear.sh
-    read_master_password_safely
+    get_master_password
 
     echo "Moving configuration..."
     mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
@@ -556,40 +555,45 @@ print_version() {
     fi
 }
 
-usage() {
-    local tabspace=20
-    echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands"
-    printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
-    printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
-    printf "%-${tabspace}s:%s\n" "utils get-config <key>" "Gets config value for the given config key"
-    printf "%-${tabspace}s:%s\n" "utils enable-config <key>" "Sets config value to true for the given config key"
-    printf "%-${tabspace}s:%s\n" "utils disable-config <key>" "Sets config value to false for the given config key"
-    printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that DataPlane will use to connect to clusters."
-    printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
-    printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
-    printf "%-${tabspace}s:%s\n" "start" "Re-initialize all container while using previous data and state"
-    printf "%-${tabspace}s:%s\n" "stop" "Destroy all containers but keep data and state"
-    printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
-    printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
-    printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
-    printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
-    printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
-    printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
-    printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
-    printf "%-${tabspace}s:%s\n" "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to current version"
-    printf "%-${tabspace}s:%s\n" "version" "Print the version of DataPlane Service"
+do_confirm_stop(){
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will stop all the DataPlane Services containers.\n\n"
+   local option
+   read -p "Do you want to continue? (yes/no): " option
+   if [ "$option" == "yes" ]
+    then
+         destroy_all_but_state
+    else
+        printf "\nContainers are not destroyed.\n"
+        exit -1
+    fi
+}
+
+do_confirm_destroy(){
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will destroy all the DataPlane Services containers and the data associated with them. This action cannot be undone.\n\n"
+   local option
+   read -p "Do you want to continue? (yes/no): " option
+   if [ "$option" == "yes" ]
+    then
+        destroy_all_with_state
+    else
+        printf "\nContainers are not destroyed.\n"
+        exit -1
+    fi
 }
 
 VERSION=$(print_version)
 init_network
 
-if [ $# -lt 1 ]
+if [ $# -lt 1 ] || [ ${@:$#} == "--help" ]
 then
-    usage;
+    source $(pwd)/help.sh "$@"
     exit 0;
 else
     case "$1" in
+        # Adding load command temporarily to enable QE changes
+        load)
+            load_images
+            ;;
         init)
             echo "Found $2"
             case "$2" in
@@ -597,12 +601,42 @@ else
                     init_all
                     ;;
                 *)
-                    usage
+                    source $(pwd)/help.sh "$@"
                     ;;
             esac
             ;;
-        migrate)
-            reset_db
+        start)
+            init_all_from_state
+            ;;
+        stop)
+            do_confirm_stop
+            ;;
+        ps)
+            ps
+            ;;
+        logs)
+            shift
+            list_logs "$@"
+            ;;
+        metrics)
+            list_metrics
+            ;;
+        destroy)
+            case "$2" in
+                --all)
+                    do_confirm_destroy
+                    ;;
+                *)
+                    source $(pwd)/help.sh "$@"
+                    ;;
+            esac
+            ;;
+        upgrade)
+            shift
+            upgrade "$@"
+            ;;
+        version)
+            print_version
             ;;
         utils)
             shift
@@ -627,53 +661,14 @@ else
                     shift
                     utils_disable_config_value "$@"
                     ;;
-                reload-apps)
-                    utils_reload_app_containers
-                    ;;
                 *)
                     echo "Unknown option"
-                    usage
+                    source $(pwd)/help.sh "$@"
                     ;;
             esac
             ;;
-        start)
-            init_all_from_state
-            ;;
-        stop)
-            destroy_all_but_state
-            ;;
-        ps)
-            ps
-            ;;
-        logs)
-            shift
-            list_logs "$@"
-            ;;
-        metrics)
-            list_metrics
-            ;;
-        destroy)
-            case "$2" in
-                knox) destroy_knox
-                ;;
-                --all) destroy_all_with_state
-                ;;
-                *) destroy
-                ;;
-            esac
-            ;;
-        load)
-            load_images
-            ;;
-        upgrade)
-            shift
-            upgrade "$@"
-            ;;
-        version)
-            print_version
-            ;;
         *)
-            usage
+            source $(pwd)/help.sh "$@"
             ;;
     esac
 fi
