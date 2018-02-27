@@ -8,10 +8,8 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-unset SEPARATE_KNOX_CONFIG
-unset KNOX_CONFIG_USING_CREDS
 
-unset USE_EXT_DB
+unset USE_EXTERNAL_DB
 unset DATABASE_URI
 unset DATABASE_USER
 unset DATABASE_PASS

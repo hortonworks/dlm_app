@@ -48,7 +48,7 @@ main() {
     DB_PASS="dp_admin"
 
     # update if required
-    if [ "$USE_EXT_DB" == "yes" ]; then
+    if [ "$USE_EXTERNAL_DB" == "yes" ]; then
         local T_SOCKET=$(echo $DATABASE_URI | awk -F/ '{print $3}')
         DB_NAME=$(echo $DATABASE_URI | awk -F/ '{print $4}')
         DB_HOST=$(echo $T_SOCKET | awk -F: '{print $1}')
