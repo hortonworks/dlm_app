@@ -22,9 +22,10 @@ export class DatasetTagService {
   constructor(private http: Http) {
   }
 
-  public list(text:string): Observable<DatasetTag[]> {
+  public list(text:string, filter: string): Observable<DatasetTag[]> {
+    
     return this.http
-      .get(`${this.url}?search=${text}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}?search=${text}&filter=${filter}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
 

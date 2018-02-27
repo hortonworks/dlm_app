@@ -14,6 +14,7 @@
       #tagViewer
       (updateSelection)="onTagChange($event)"
       [dsNameSearch]="dsNameSearch"
+      [bookmarkFilter]="bookmarkFilter"
     ></nav-tag-panel>
     <div class="result-viewer">
         <div class="page-container">
@@ -58,6 +59,7 @@
                   [view]="currentView"
                   [currentDsTag]="currentDsTag"
                   [dsNameSearch]="dsNameSearch"
+                  [bookmarkFilter]="bookmarkFilter"
                   (onViewRefresh)="onViewRefresh()"
                 ></ds-nav-result-viewer>
             </div>

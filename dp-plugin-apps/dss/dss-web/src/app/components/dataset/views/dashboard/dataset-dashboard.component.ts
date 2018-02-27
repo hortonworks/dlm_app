@@ -10,7 +10,7 @@
  */
 
 import {Component, OnInit, ViewChild, ElementRef} from "@angular/core";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {DatasetTag} from "../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../shared/utils/views";
 import {NavTagPanel} from "./nav-tag-panel/nav-tag-panel.component";
@@ -27,10 +27,19 @@ export class DatasetDashboardComponent implements OnInit {
   dsNameSearch : string = "";
   views = ViewsEnum;
   currentView: ViewsEnum;
+  bookmarkFilter: string = "";
 
   @ViewChild('tagViewer') tagViewer: NavTagPanel;
 
-  constructor(private router: Router) {
+  constructor(private router: Router,
+              private route: ActivatedRoute) {
+    this.route.queryParams.subscribe( params => {
+      if(params['filter']){
+        this.bookmarkFilter = params['filter']; //currently this filter ,if present, is always 'bookmark' filter
+      }else{
+        this.bookmarkFilter = "";
+      }
+    });
   }
 
   ngOnInit() {

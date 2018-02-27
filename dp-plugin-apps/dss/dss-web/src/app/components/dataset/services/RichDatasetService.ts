@@ -26,8 +26,11 @@ export class RichDatasetService {
   constructor(private http: Http) {
   }
 
-  listByTag(tagName: string, nameSearchText : string, start: number, limit: number): Observable<RichDatasetModel[]> {
+  listByTag(tagName: string, nameSearchText : string, start: number, limit: number, filter: string): Observable<RichDatasetModel[]> {
     let url = `${this.url1}/${tagName}?offset=${start}&size=${limit}`;
+    if(filter){
+      url = url+`&filter=${filter}`;
+    }
     nameSearchText && (url += `&search=${nameSearchText}`);
     return this.http
       .get(url, new RequestOptions(HttpUtil.getHeaders()))

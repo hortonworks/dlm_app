@@ -10,7 +10,7 @@
  */
 
 import {Component, ViewChild, ElementRef, OnInit, HostBinding, isDevMode} from '@angular/core';
-import {Router} from '@angular/router';
+import {NavigationStart, Router} from '@angular/router';
 import {DpAppNavigation} from 'dps-apps';
 import {navigation} from '../../_nav';
 
@@ -31,10 +31,21 @@ export class CollapsibleNavComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
+    this.activeTabName = this.navItems[0].name;
     DpAppNavigation.init({
         srcElement: this.personaNavSrc.nativeElement,
         assetPrefix: '/assets/images'
     });
+    let that = this;
+    this.router.events.subscribe( event => {
+      if(event instanceof NavigationStart){
+        if(event.url.endsWith("/collections")){
+          this.activeTabName = "Asset Collection";
+        } else if(event.url.endsWith("/collections?filter=bookmark")){
+          this.activeTabName = "Bookmarks";
+        }
+      }
+    })
   }
 
   toggleNav() {
@@ -42,6 +53,7 @@ export class CollapsibleNavComponent implements OnInit {
   }
 
   navigateToURL(nav) {
+    this.activeTabName = nav.name;
     this.router.navigateByUrl(nav.url);
   }
 }

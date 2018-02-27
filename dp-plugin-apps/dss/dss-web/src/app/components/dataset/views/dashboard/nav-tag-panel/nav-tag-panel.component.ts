@@ -21,6 +21,7 @@ import {DatasetTagService} from "../../../../../services/tag.service";
 export class NavTagPanel implements OnInit {
 
   @Input() dsNameSearch:string = "";
+  @Input() bookmarkFilter:string = "";
   @Output("updateSelection") updateSelectionEmitter: EventEmitter<DatasetTag> = new EventEmitter<DatasetTag>();
   allTags: DatasetTag[] = null;
   displayTags: DatasetTag[] = null;
@@ -31,7 +32,9 @@ export class NavTagPanel implements OnInit {
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    changes["dsNameSearch"] && !changes["dsNameSearch"].firstChange && this.fetchList();
+    if ((changes["dsNameSearch"] && !changes["dsNameSearch"].firstChange) || (changes["bookmarkFilter"])) {
+      this.fetchList();
+    }
   }
 
   ngOnInit() {
@@ -40,7 +43,7 @@ export class NavTagPanel implements OnInit {
 
   fetchList() {
     this.tagService
-      .list(this.dsNameSearch)
+      .list(this.dsNameSearch, this.bookmarkFilter)
       .map(tags => tags.filter(cTag => cTag.name === 'ALL' || cTag.count > 0))
       .subscribe(tags => {
           this.currentDsTag && (this.currentDsTag = tags.filter(tag=>tag.name==this.currentDsTag.name)[0]);

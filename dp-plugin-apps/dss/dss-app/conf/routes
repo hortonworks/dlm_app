@@ -14,7 +14,7 @@ GET           /api/query-attributes                                  controllers
 
 # DatasetTags
 # ===========================================
-GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search: Option[String])
+GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount
 GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName: String)
 GET           /api/dataset/:datasetId/atlas-tags                     controllers.DataSets.getUniqueTagsFromAssetsOfDataset(datasetId: String)
 

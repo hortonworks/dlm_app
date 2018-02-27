@@ -51,9 +51,10 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   def allRichDataset = Action.async { req =>
     val userId = req.getQueryString("userId")
+    val filter = req.getQueryString("filter")
     if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
     else{
-      datasetRepo.getRichDataSet(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
+      datasetRepo.getRichDataSet(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong, filter)
         .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
         .recoverWith(apiError)
     }
@@ -61,9 +62,10 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   def richDatasetByTag(tagName: String) = Action.async { req =>
     val userId = req.getQueryString("userId")
+    val filter = req.getQueryString("filter")
     if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
     else{
-      datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
+      datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong, filter)
         .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
         .recoverWith(apiError)
     }

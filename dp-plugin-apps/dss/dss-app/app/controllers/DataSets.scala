@@ -459,9 +459,9 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def listCategoriesCount(search: Option[String]) =  AuthenticatedAction.async { req =>
+  def listCategoriesCount =  AuthenticatedAction.async { req =>
     categoryService
-      .listWithCount(search, req.user.id.get)
+      .listWithCount(req.rawQueryString, req.user.id.get)
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
