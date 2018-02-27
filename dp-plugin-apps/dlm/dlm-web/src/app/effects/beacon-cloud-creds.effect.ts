@@ -14,7 +14,9 @@ import {Effect, Actions, toPayload} from '@ngrx/effects';
 import {
   loadBeaconCloudCredsFailure,
   loadBeaconCloudCredsSuccess,
-  ActionTypes as beaconActions
+  ActionTypes as beaconActions,
+  loadBeaconCloudCredsWithPoliciesSuccess,
+  loadBeaconCloudCredsWithPoliciesFailure
 } from 'actions/beacon-cloud-cred.action';
 import {BeaconService} from 'services/beacon.service';
 
@@ -29,6 +31,15 @@ export class BeaconCloudCredEffects {
       .fetchBeaconCloudCreds()
       .map(result => loadBeaconCloudCredsSuccess(result, payload.meta))
       .catch(err => Observable.of(loadBeaconCloudCredsFailure(err, payload.meta))));
+
+  @Effect()
+  loadBeaconCloudCredsWithPolicies$: Observable<any> = this.actions$
+    .ofType(beaconActions.LOAD_BEACON_CLOUD_CREDS_WITH_POLICIES.START)
+    .map(toPayload)
+    .switchMap(payload => this.beaconService
+      .fetchBeaconCloudCredsWithPolicies()
+      .map(result => loadBeaconCloudCredsWithPoliciesSuccess(result, payload.meta))
+      .catch(err => Observable.of(loadBeaconCloudCredsWithPoliciesFailure(err, payload.meta))));
 
   constructor(private actions$: Actions, private beaconService: BeaconService) {
   }

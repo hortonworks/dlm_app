@@ -9,6 +9,9 @@
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { BeaconCloudCredWithPoliciesResponse } from 'models/beacon-cloud-cred.model';
+import { Observable } from 'rxjs/Observable';
+import { PolicyService } from 'services/policy.service';
 
 @Injectable()
 export class BeaconService {
@@ -38,5 +41,18 @@ export class BeaconService {
     return this.httpClient.get<any>('cluster/cloudCredentials');
   }
 
-  constructor(private httpClient: HttpClient) { }
+  fetchBeaconCloudCredsWithPolicies(): Observable<BeaconCloudCredWithPoliciesResponse> {
+    return this.httpClient.get<BeaconCloudCredWithPoliciesResponse>('cluster/cloudCredWithPolicies').map(r => {
+      const allCloudCreds = r.allCloudCreds.map(cred => ({
+        ...cred,
+        policies: cred.policies.map(policy => this.policyService.normalizePolicy(policy))
+      }));
+      return {
+        ...r,
+        allCloudCreds
+      };
+    });
+  }
+
+  constructor(private httpClient: HttpClient, private policyService: PolicyService) { }
 }

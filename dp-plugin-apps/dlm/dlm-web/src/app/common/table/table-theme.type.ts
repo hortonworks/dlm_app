@@ -9,7 +9,8 @@
 
 export enum TableTheme {
   Plain,
-  Cards
+  Cards,
+  Transparent
 }
 
 export const PLAIN_TABLE_ROW_HEIGHT = 36;
@@ -33,5 +34,11 @@ export const TableThemeSettings = {
     rowHeight: 90,
     headerHeight: 22,
     footerHeight: PLAIN_TABLE_ROW_HEIGHT
-  }
+  },
+  [TableTheme.Transparent]: <ThemeSetting>{
+    className: 'transparent-theme',
+    rowHeight: PLAIN_TABLE_ROW_HEIGHT,
+    headerHeight: PLAIN_TABLE_ROW_HEIGHT,
+    footerHeight: PLAIN_TABLE_ROW_HEIGHT
+  },
 };

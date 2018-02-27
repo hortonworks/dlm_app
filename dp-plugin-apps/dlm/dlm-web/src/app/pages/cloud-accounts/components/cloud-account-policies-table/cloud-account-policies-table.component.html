@@ -7,12 +7,16 @@
   ~ of all or any part of the contents of this software is strictly prohibited.
   -->
 
-<h5>{{"common.policies" | translate}}</h5>
+<h4 class="title">{{"common.policies" | translate}}</h4>
 
 <dlm-table
+  [showFooter]="false"
+  [theme]="tableTheme"
   [columns]="columns"
   [columnMode]="columnMode"
   [rows]="policies"
+  [limit]="1000"
+  [scrollbarV]="true"
   [footerOptions]="tableFooterOptions">
 </dlm-table>
 
@@ -25,8 +29,8 @@
   <span [attr.qe-attr]="'policy-status-' + index" class="policy-status">{{value | translate}}</span>
 </ng-template>
 
-<ng-template #policyNameCellTemplate let-row="row" let-name="value">
-  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name" [tooltip]="name">
+<ng-template #policyNameCellTemplate let-row="row" let-name="value" let-index="rowIndex">
+  <span [attr.qe-attr]="'go-to-policies-' + index" (click)="goToPolicy(row)" class="actionable text-primary policy-name" [tooltip]="name" container="body">
    {{name}}
   </span>
 </ng-template>

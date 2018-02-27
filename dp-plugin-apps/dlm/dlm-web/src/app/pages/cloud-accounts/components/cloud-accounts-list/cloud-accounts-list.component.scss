@@ -9,64 +9,62 @@
 
 @import '../../../../styles/variables';
 
-.cell-content {
-  font-size: 16px;
-}
+.dlm-cloud-accounts-list {
+  .cell-content {
+    font-size: 16px;
+  }
 
-.status-header {
-  padding-left: 35px;
-}
+  .status-header {
+    padding-left: 35px;
+  }
 
-.datatable-body-cell {
-  &.add-actions-cell {
-    justify-content: flex-end !important;
-    .datatable-body-cell-label {
-      text-align: center;
+  .datatable-body-cell {
+    &.add-actions-cell {
+      justify-content: flex-end !important;
+      .datatable-body-cell-label {
+        text-align: center;
+      }
     }
   }
-}
 
-.datatable-row-detail {
-  padding: 25px;
-  background-color: #EEE;
-  overflow-y: visible !important;
-}
-
-.datatable-scroll {
-  width: 100% !important;
-}
-
-.datatable-header-cell {
-  text-align: center !important;
-}
-
-.text-center {
-  .datatable-body-cell-label {
-    width: 100%;
+  .datatable-row-detail {
+    padding: 0;
+    background-color: #EEE;
+    overflow-y: visible !important;
   }
-}
 
-span.provider {
-  background-color: $link-color;
-  color: $white-color;
-  text-align: center;
-  font-size: 12px;
-  position: absolute;
-  top: 24px;
-  width: 60px;
-  left: -10px;
-  z-index: 2;
-}
+  .datatable-scroll {
+    width: 100% !important;
+  }
 
-span.left-arrow {
-  font-size: 15px;
-  color: #A0A0A0;
-  position: absolute;
-  top: 32px;
-  left: -12px;
-  z-index: 1;
-}
+  .text-center {
+    .datatable-body-cell-label {
+      width: 100%;
+    }
+  }
 
-.userDetails {
-  color: $grey-color;
+  span.provider {
+    background-color: $link-color;
+    color: $white-color;
+    text-align: center;
+    font-size: 12px;
+    position: absolute;
+    top: 24px;
+    width: 60px;
+    left: -10px;
+    z-index: 2;
+  }
+
+  span.left-arrow {
+    font-size: 15px;
+    color: #A0A0A0;
+    position: absolute;
+    top: 32px;
+    left: -12px;
+    z-index: 1;
+  }
+
+  .userDetails {
+    color: $grey-color;
+  }
 }

@@ -13,7 +13,8 @@ import { requestType } from 'utils/type-action';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 
 export const ActionTypes = {
-  LOAD_BEACON_CLOUD_CREDS: requestType('LOAD_BEACON_CLOUD_CREDS')
+  LOAD_BEACON_CLOUD_CREDS: requestType('LOAD_BEACON_CLOUD_CREDS'),
+  LOAD_BEACON_CLOUD_CREDS_WITH_POLICIES: requestType('LOAD_BEACON_CLOUD_CREDS_WITH_POLICIES')
 };
 
 export const loadBeaconCloudCreds = (meta = {}): ActionWithPayload<any> => ({
@@ -28,5 +29,20 @@ export const loadBeaconCloudCredsSuccess = (response, meta): ActionSuccess => ({
 
 export const loadBeaconCloudCredsFailure = (error, meta): ActionFailure => ({
   type: ActionTypes.LOAD_BEACON_CLOUD_CREDS.FAILURE,
+  payload: {error, meta}
+});
+
+export const loadBeaconCloudCredsWithPolicies = (meta = {}): ActionWithPayload<any> => ({
+  type: ActionTypes.LOAD_BEACON_CLOUD_CREDS_WITH_POLICIES.START,
+  payload: {meta}
+});
+
+export const loadBeaconCloudCredsWithPoliciesSuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.LOAD_BEACON_CLOUD_CREDS_WITH_POLICIES.SUCCESS,
+  payload: {response, meta}
+});
+
+export const loadBeaconCloudCredsWithPoliciesFailure = (error, meta): ActionFailure => ({
+  type: ActionTypes.LOAD_BEACON_CLOUD_CREDS_WITH_POLICIES.FAILURE,
   payload: {error, meta}
 });

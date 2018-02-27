@@ -15,7 +15,7 @@
   [showFooter]="showFooter"
   [limit]="1000"
   [rows]="accounts"
-  [rowDetailHeight]="600"
+  [rowDetailHeight]="rowDetailHeight"
   [rowDetailTemplate]="rowDetailRef">
 </dlm-table>
 
@@ -27,9 +27,11 @@
 </ng-template>
 
 <ng-template #policiesCell let-account="row" let-index="rowIndex">
-  <div [attr.qe-attr]="'cloud-account-policies' + index">
+  <div [attr.qe-attr]="'cloud-account-policies' + index" class="is-text-large">
     <span *ngIf="account.policies?.length; else noPolicies" class="actionable" (click)="toggleRowDetails(account)">
-      {{account.policies.length}}<span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isAccountActive(account), 'fa-caret-down': !isAccountActive(account)}"></span>
+      {{account.policies.length}}
+      <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-chevron-up': isAccountActive(account), 'fa-chevron-down': !isAccountActive(account)}">
+      </span>
     </span>
     <ng-template #noPolicies>
       <span class="fa fa-minus"></span>
@@ -47,7 +49,7 @@
     </ng-template>
   </ng-template>
   <div
-    class="userName"
+    class="userName is-text-large"
     [tooltip]="accountTemplate"
     [attr.qe-attr]="'cloud-account-id-' + index">
     {{account.id}}
