@@ -42,7 +42,7 @@ export class OverviewComponent implements OnInit {
     const topUsersData = [
       {
         'key': '',
-        'color': '#60CEA5',
+        'color': '#2DB075',
         'values': this.assetCollectionDashboard.topUsers.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
       }
     ];
@@ -87,10 +87,9 @@ export class OverviewComponent implements OnInit {
         return d.y
       })
       .donut(true)
-      .color(['#CA6266', '#65CDA6']);
+      .color(['#2DB075', '#2891C0']);
 
-      chart1.title('100%');
-      chart1.pie.donutLabelsOutside(true).donut(true);
+      chart1.pie.labelsOutside(true).donut(true);
 
       d3.select(this.sensitiveNonSensitive.nativeElement)
       .datum(data)
@@ -105,7 +104,7 @@ export class OverviewComponent implements OnInit {
     const distributionByTagData = [
       {
         'key': '',
-        'color': '#EE6162',
+        'color': '#2DB075',
         'values': this.assetCollectionDashboard.assetDistribution.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
       }
     ];
@@ -147,10 +146,10 @@ export class OverviewComponent implements OnInit {
         return d.y
       })
       .donut(true)
-      .color(['#CA6266', '#65CDA6']);
+      .title('')
+      .color(['#2DB075', '#2891C0']);
 
-      chart1.title('100%');
-      chart1.pie.donutLabelsOutside(true).donut(true);
+      chart1.pie.labelsOutside(true).donut(true);
 
       d3.select(this.quiresRunningSensitiveData.nativeElement)
       .datum(data)
@@ -184,7 +183,7 @@ export class OverviewComponent implements OnInit {
           area: true,
           values: this.assetCollectionDashboard.usersAccessingSecureData.stats.map(stat => ({'x': stat.key, 'y': stat.value})),
           key: 'User Accessing Secure Data',
-          color: '  #34C6D8',
+          color: '  #2DB075',
           fillOpacity: .1
         }
       ];
