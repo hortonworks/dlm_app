@@ -244,20 +244,20 @@ read_use_test_ldap() {
 }
 
 import_certs() {
-    if [ ! -e "$PUBLIC_KEY_L" ]; then
-        echo "Public key file not found at $PUBLIC_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+    if [ ! -e "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" ]; then
+        echo "Public key file not found at $DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH. Please try this command again after updating config.env.sh file with correct location."
         return -1
     fi
-    if [ ! -e "$PRIVATE_KEY_L" ]; then
-        echo "Private key file not found at $PRIVATE_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+    if [ ! -e "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" ]; then
+        echo "Private key file not found at $DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH. Please try this command again after updating config.env.sh file with correct location."
         return -1
     fi
 
     mkdir -p certs
     rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
-    cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
+    cp "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" $(pwd)/certs/ssl-cert.pem
     rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
-    cp "$PRIVATE_KEY_L" $(pwd)/certs/ssl-key.pem
+    cp "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" $(pwd)/certs/ssl-key.pem
 
     echo "Certificates were copied successfully."
 

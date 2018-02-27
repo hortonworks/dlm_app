@@ -38,6 +38,42 @@ print_detailed_usage() {
     printf "\n${cmd_desc}\n"
 }
 
+show_config_help() {
+    echo
+    print_one_line_usage "USE_EXT_DB" "Set to yes for pointing to an external Postgres instance, no otherwise. Defaults to no"
+    echo
+    print_one_line_usage "DATABASE_URI" "If USE_EXT_DB is yes, this must point to the external Database URI"
+    echo
+    print_one_line_usage "DATABASE_USER" "If USE_EXT_DB is yes, this must point to the Dataplane Admin user name of the external Database URI"
+    echo
+    print_one_line_usage "DATABASE_PASS" "If USE_EXT_DB is yes, this must point to the Dataplane Admin password of the external Database URI"
+    echo
+    print_one_line_usage "SEPARATE_KNOX_CONFIG" "Set to true if a separate Knox instance is setup on HDP clusters for handling Dataplane traffic, false otherwise. Defaults to false"
+    echo
+    print_one_line_usage "KNOX_CONFIG_USING_CREDS" "If SEPARATE_KNOX_CONFIG is true, when a cluster is registered, we must provide additional information to discover it."
+    echo
+    print_one_line_usage "" "This is either using Ambari credentials or explicitly specifying the URL. Set to true if you want to use Ambari credentials, false for URL. Defaults to true"
+    echo
+    print_one_line_usage "CONSUL_HOST" "Set to the IP address of the host where Dataplane containers are launched"
+    echo
+    print_one_line_usage "MASTER_PASSWORD" "Set to the password to be used for Knox keystore configuration."
+    print_one_line_usage "" "${BRIGHT}IMPORTANT: This is in clear text and should typically not be set in production environments. Instead specify it when prompted on command line.${NORMAL}"
+    echo
+    print_one_line_usage "USE_TEST_LDAP" "Specifies whether to use an external LDAP instance or connect to a test LDAP instance that comes with the Dataplane Knox container"
+    echo
+    print_one_line_usage "USE_TLS" "Set to true to enable TLS / HTTPS"
+    echo
+    print_one_line_usage "USE_PROVIDED_CERTIFICATES" "Set to yes if you have public-private key-pair already generated/issued. Setting to no automatically generates a key-pair for you."
+    echo
+    print_one_line_usage "DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" "If USE_PROVIDED_CERTIFICATES is yes, this must point to the absolute path of public key file"
+    echo
+    print_one_line_usage "DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" "If USE_PROVIDED_CERTIFICATES is yes, this must point to the absolute path of encrypted private key file"
+    echo
+    print_one_line_usage "CERTIFICATE_PASSWORD" "If USE_PROVIDED_CERTIFICATES is yes, this should be the password required to decrypt the private key file."
+    print_one_line_usage "" "${BRIGHT}IMPORTANT: This is in clear text and should typically not to be set in production environments. Instead specify it when prompted on command line.${NORMAL}"
+
+}
+
 all_usage(){
     printf "\n${UNDERLINE}Lifecycle Commands:${NORMAL}"
     printf "\nUsage: ${DP_DEPLOY_COMMAND} COMMAND\n\n"
@@ -64,7 +100,8 @@ all_usage(){
     print_one_line_usage "add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
 
     printf "\nRun ${BRIGHT}'${DP_DEPLOY_COMMAND} COMMAND --help'${NORMAL} for more information on Lifecycle and Status commands"
-    printf "\nRun ${BRIGHT}'${DP_DEPLOY_COMMAND} utils COMMAND --help'${NORMAL} for more information on utility commands\n"
+    printf "\nRun ${BRIGHT}'${DP_DEPLOY_COMMAND} utils COMMAND --help'${NORMAL} for more information on utility commands"
+    printf "\nRun ${BRIGHT}'${DP_DEPLOY_COMMAND} config --help'${NORMAL} for more information on configurations\n"
 }
 
 if [ $# -lt 1 ]
@@ -141,6 +178,9 @@ else
                     all_usage
                     ;;
             esac
+            ;;
+        config)
+            show_config_help
             ;;
         *)
             all_usage

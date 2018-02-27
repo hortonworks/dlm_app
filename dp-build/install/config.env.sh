@@ -18,8 +18,8 @@ USE_EXT_DB="no"
 # SSL Configs
 USE_TLS="true"
 USE_PROVIDED_CERTIFICATES="no"
-# PUBLIC_KEY_L="/absolute/path/of/public/key.pem"
-# PRIVATE_KEY_L="/absolute/path/of/private/key.pem"
+# DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH="/absolute/path/of/public/key.pem"
+# DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH="/absolute/path/of/private/key.pem"
 
 # Knox Configs
 SEPARATE_KNOX_CONFIG=false
