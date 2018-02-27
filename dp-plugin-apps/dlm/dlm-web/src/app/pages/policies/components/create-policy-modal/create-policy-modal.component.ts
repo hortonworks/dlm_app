@@ -27,6 +27,7 @@ import { loadBeaconAdminStatus } from 'actions/beacon.action';
 import { getAllBeaconAdminStatuses } from 'selectors/beacon.selector';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { loadClusters } from 'actions/cluster.action';
+import { wizardResetAllSteps } from 'actions/policy.action';
 import { getAllClusters } from 'selectors/cluster.selector';
 import { Cluster } from 'models/cluster.model';
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
@@ -121,6 +122,7 @@ export class CreatePolicyModalComponent implements OnInit, OnDestroy {
   }
 
   handleCloseModal() {
+    this.store.dispatch(wizardResetAllSteps());
     this.router.navigate(['/policies']);
   }
 

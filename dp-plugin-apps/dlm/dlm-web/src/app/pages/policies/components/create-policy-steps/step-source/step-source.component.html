@@ -91,6 +91,78 @@
                   <!-- SOURCE S3 ENDPOINT END -->
                 </div>
               </div>
+
+              <!-- HDFS FILE BROWSER -->
+              <div class="row" *ngIf="isHDFSPolicy() && sourceCluster">
+                <div class="form-section col-xs-12">
+                  <div class="form-section-title">
+                    {{'page.policies.form.sections.directories' | translate}}
+                  </div>
+                  <fieldset>
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
+                          <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
+                          <dlm-field-error *ngIf="form.get('source.directories').hasError('isFile')">
+                            {{'forms.validation_errors.not_directory' | translate:directoryField}}
+                          </dlm-field-error>
+                          <dlm-field-error *ngIf="form.get('source.directories').hasError('notExist')">
+                            {{'forms.validation_errors.not_exist_directory' | translate:directoryField}}
+                          </dlm-field-error>
+                        </dlm-form-field>
+                        <div class="hdfs-browser-container">
+                          <dlm-hdfs-browser
+                            [rootPath]="hdfsRootPath"
+                            [clusterId]="sourceCluster"
+                            (select)="handleHdfsPathChange($event)"
+                          ></dlm-hdfs-browser>
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+              <!-- HDFS FILE BROWSER END -->
+
+              <!-- HIVE DB VIEWER -->
+              <div class="row" *ngIf="isHivePolicy() && sourceCluster">
+                <div class="form-section col-xs-12">
+                  <div class="form-section-title">
+                    {{'page.policies.form.sections.database' | translate}}
+                  </div>
+                  <fieldset>
+                    <div class="form-group">
+                      <div class="row flex-center">
+                        <div class="col-xs-8">
+                  <span class="text-muted">
+                    <span>
+                      {{'page.policies.form.selected' | translate}}: {{form.value.source.databases}}
+                    </span>
+                  </span>
+                        </div>
+                        <div class="col-xs-4">
+                          <dlm-search-input
+                            qe-attr="policy-database-search-filter"
+                            (valueChange)="handleSearchChange($event)"
+                            [value]="databaseSearch$ | async">
+                          </dlm-search-input>
+                        </div>
+                      </div>
+                      <dlm-progress-container [progressState]="databaseRequest$ | async">
+                        <dlm-hive-browser
+                          formControlName="databases"
+                          [tablesLoadingMap]="databaseTablesLoadingMap"
+                          [databases]="sourceDatabases$ | async"
+                          [readonly]="false"
+                          (databaseTablesCollapsed)="onDatabaseTablesCollapsed($event)"
+                        ></dlm-hive-browser>
+                      </dlm-progress-container>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+              <!-- HIVE DB VIEWER END -->
+
             </fieldset>
             <!-- SOURCE END -->
           </div>
