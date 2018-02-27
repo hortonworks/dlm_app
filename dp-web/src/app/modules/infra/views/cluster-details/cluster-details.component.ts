@@ -103,7 +103,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   private getClusterDetails() {
     Loader.show();
     Observable.forkJoin(
-      this.clusterService.listByLakeId({lakeId: this.lake.id}),
+      this.clusterService.listByLakeId(this.lake.id),
       this.locationService.retrieve(this.lake.location),
     ).subscribe(responses => {
       Loader.show();
@@ -174,15 +174,19 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   private getClusterHealth(clusterId, lakeId) {
     Loader.show();
-    this.clusterService.retrieveDetailedHealth(clusterId, lakeId).subscribe(health => {
-      this.clusterHealthInProgress = false;
-      this.clusterHealth = health;
-      this.populateClusterDetails();
-      this.processHealthProgressbarInfo();
-      Loader.hide();
-    }, error => {
-      Loader.hide();
-    });
+    this.clusterService
+      .retrieveDetailedHealth(clusterId, lakeId)
+      .subscribe(
+        health => {
+          this.clusterHealthInProgress = false;
+          this.clusterHealth = health;
+          this.populateClusterDetails();
+          this.processHealthProgressbarInfo();
+          Loader.hide();
+        }, error => {
+          Loader.hide();
+        }
+      );
   }
 
   private getRMHealth(clusterId) {

@@ -29,21 +29,13 @@ class DpClusterActions @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     @Named("clusterService") val clusterService: ClusterService) extends Controller {
 
-  def listWithClusters(`type`: Option[String]) = Action.async {
+  def listWithClusters() = Action.async {
     Logger.info("list lakes with clusters")
-
-    val typeFlag = `type`.getOrElse("all");
 
     retrieveLakes()
       .flatMap({ lakes =>
         val lakeFutures =
           lakes
-            .filter{cLake =>
-              if(typeFlag == "lake") {
-                cLake.isDatalake.getOrElse(false)   // only valid lakes
-              }  else {
-                true  // return all results if flag is not sent
-              }}
             .map({ cLake =>
               for {
                 lake <- Future.successful(cLake)
