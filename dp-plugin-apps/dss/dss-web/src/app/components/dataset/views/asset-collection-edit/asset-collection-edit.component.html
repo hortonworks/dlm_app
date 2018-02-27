@@ -32,7 +32,7 @@
 
   <div class="summaryWidgetCont flex-side flex-side-right hwx-white-bg" [ngClass]="{'showSummary': showSummary}">
     <div class="grapic-holder" style="height: 83px;">
-      <img src="{{assetPrefix}}/assets/images/collection-banners/dsimg{{dsModel.id%7}}.png">
+      <img *ngIf="dsModel && dsModel.id" src="{{assetPrefix}}/assets/images/collection-banners/dsimg{{dsModel.id%7}}.png">
       <span class="rating">{{getAggregateValue(dsModel.avgRating).toFixed(1)}}<i class="fa fa-star"></i></span>
     </div>
     <div class="flex-grid flex-summary">
