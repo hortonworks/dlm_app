@@ -69,7 +69,7 @@ check_master_password_validity(){
       if keytool \
             -list \
             -storetype jceks \
-            -keystore /dp-shared/dp-keystore.jceks \
+            -keystore /usr/dp/current/core/bin/certs/dp-keystore.jceks \
             -storepass "$MASTER_PASSWORD" \
             -alias "dummy"  &> /dev/null; then
             echo "Verification Successful. Initialising DLM..."
