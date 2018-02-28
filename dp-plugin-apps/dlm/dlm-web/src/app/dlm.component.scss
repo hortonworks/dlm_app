@@ -143,3 +143,13 @@ ng-select {
     }
   }
 }
+
+.btn {
+  &.btn-xs {
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: normal;
+    border-radius: 3px;
+    height: auto;
+  }
+}

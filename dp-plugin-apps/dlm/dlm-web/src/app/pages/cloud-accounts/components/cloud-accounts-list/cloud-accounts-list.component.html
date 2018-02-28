@@ -16,8 +16,13 @@
   [limit]="1000"
   [rows]="accounts"
   [rowDetailHeight]="rowDetailHeight"
+  [rowClass]="rowClass"
   [rowDetailTemplate]="rowDetailRef">
 </dlm-table>
+
+<ng-template #statusCell let-account="row">
+  <i *ngIf="isExpiredAccount(account)" class="fa fa-2x fa-exclamation-triangle text-danger"></i>
+</ng-template>
 
 <ng-template #providerCell let-account="row" let-index="rowIndex">
   <div>
@@ -41,11 +46,16 @@
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
   <ng-template #accountTemplate>
-        <span *ngIf="account.accountDetails.credentialType === S3_TOKEN; else iamRole">
-       {{account.accountDetails.userName}}<br>{{account.accountDetails.accountName}}
-     </span>
-    <ng-template #iamRole>
-      {{'page.cloud_stores.content.accounts.iam_role' | translate}}<br>{{account.accountDetails.accountName}}
+    <span *ngIf="isExpiredAccount(account); else accountInfo">
+      {{'page.cloud_stores.content.accounts.expired_account' | translate}}
+    </span>
+    <ng-template #accountInfo>
+      <span *ngIf="account.accountDetails.credentialType === S3_TOKEN; else iamRole">
+        {{account.accountDetails.userName}}<br>{{account.accountDetails.accountName}}
+      </span>
+      <ng-template #iamRole>
+        {{'page.cloud_stores.content.accounts.iam_role' | translate}}<br>{{account.accountDetails.accountName}}
+      </ng-template>
     </ng-template>
   </ng-template>
   <div
@@ -68,6 +78,11 @@
       *ngIf="account.accountDetails.accountName">
       | {{account.accountDetails.accountName}}
     </span>
+  </div>
+  <div *ngIf="isExpiredAccount(account)">
+    <button type="button" class="btn btn-secondary btn-xs" (click)="edit(account)">
+      {{'common.edit' | translate}}
+    </button>
   </div>
 </ng-template>
 

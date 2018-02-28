@@ -17,7 +17,8 @@ export const ActionTypes = {
   LOAD_ACCOUNTS: requestType('LOAD_ACCOUNTS'),
   ADD_CLOUD_STORE: requestType('ADD_CLOUD_STORE'),
   VALIDATE_CREDENTIALS: requestType('VALIDATE_CREDENTIALS'),
-  RESET_ADD_CLOUD_PROGRESS_STATE: type('RESET_ADD_CLOUD_PROGRESS_STATE')
+  RESET_ADD_CLOUD_PROGRESS_STATE: type('RESET_ADD_CLOUD_PROGRESS_STATE'),
+  LOAD_ACCOUNTS_STATUS: requestType('LOAD_ACCOUNTS_STATUS')
 };
 
 export const loadAccounts = (requestId?): ActionWithPayload<any> => ({
@@ -66,4 +67,18 @@ export const validateCredentialsFailure = (error, meta): ActionFailure => ({
 export const resetAddCloudProgressState = (requestId): ActionWithPayload<any> => ({
   type: ActionTypes.RESET_ADD_CLOUD_PROGRESS_STATE,
   payload: {requestId}
+});
+
+
+export const loadAccountsStatus = (meta = {}): ActionWithPayload<any> => ({
+  type: ActionTypes.LOAD_ACCOUNTS_STATUS.START, payload: {meta}
+});
+
+export const loadAccountsStatusSuccess = (statuses, meta = {}): ActionSuccess => {
+  return {type: ActionTypes.LOAD_ACCOUNTS_STATUS.SUCCESS, payload: {response: statuses, meta}};
+};
+
+export const loadAccountsStatusFail = (error, meta = {}): ActionFailure => ({
+  type: ActionTypes.LOAD_ACCOUNTS_STATUS.FAILURE,
+  payload: {error, meta}
 });

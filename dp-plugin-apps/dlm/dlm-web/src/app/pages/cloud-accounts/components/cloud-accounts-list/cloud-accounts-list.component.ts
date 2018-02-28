@@ -9,11 +9,10 @@
 
 import {
   ChangeDetectionStrategy, Component, Input, OnInit, ViewChild, ViewEncapsulation, TemplateRef,
-  ChangeDetectorRef,
-  HostBinding
+  ChangeDetectorRef, HostBinding, EventEmitter, Output
 } from '@angular/core';
-import { CloudAccount } from 'models/cloud-account.model';
 import { ColumnMode } from '@swimlane/ngx-datatable';
+import { CloudAccount, AccountStatus } from 'models/cloud-account.model';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
@@ -31,10 +30,13 @@ export class CloudAccountsListComponent implements OnInit {
 
   S3_TOKEN = S3_TOKEN;
 
+  @Output() editAccount = new EventEmitter();
+
   @Input() accounts: CloudAccount[] = [];
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
   @ViewChild('providerCell') providerCellRef: TemplateRef<any>;
+  @ViewChild('statusCell') statusCellRef: TemplateRef<any>;
   @ViewChild('policiesCell') policiesCellRef: TemplateRef<any>;
   @ViewChild('nameCell') nameCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
@@ -74,6 +76,12 @@ export class CloudAccountsListComponent implements OnInit {
         flexGrow: 3
       },
       {
+        name: '',
+        cellTemplate: this.statusCellRef,
+        prop: 'status',
+        flexGrow: 1
+      },
+      {
         name: this.t.instant('page.cloud_stores.content.table.user_details'),
         cellTemplate: this.nameCellRef,
         sortable: false,
@@ -96,6 +104,16 @@ export class CloudAccountsListComponent implements OnInit {
     ];
   }
 
+  isExpiredAccount(account): boolean {
+    return account.status === AccountStatus.Expired;
+  }
+
+  rowClass = (row): {[className: string]: boolean} => {
+    return {
+      'card-danger': this.isExpiredAccount(row)
+    };
+  }
+
   isAccountActive(account) {
     return this.tableComponent.isRowExpanded(account);
   }
@@ -104,13 +122,16 @@ export class CloudAccountsListComponent implements OnInit {
     this.tableComponent.toggleRowDetail(account);
   }
 
-  handleSelectedAction({cluster, action}) {
+  handleSelectedAction({cloudAccount, action}) {
     switch (action.type) {
       case ACTION_TYPES.DELETE:
         // TODO: Add action
       case ACTION_TYPES.EDIT:
-        // TODO: Add action
+        this.edit(cloudAccount);
     }
   }
 
+  edit(account) {
+    this.editAccount.emit(account);
+  }
 }

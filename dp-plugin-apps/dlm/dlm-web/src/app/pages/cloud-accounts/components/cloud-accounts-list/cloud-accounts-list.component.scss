@@ -55,6 +55,12 @@
     z-index: 2;
   }
 
+  .card-danger {
+    .provider {
+      background-color: $alert-color;
+    }
+  }
+
   span.left-arrow {
     font-size: 15px;
     color: #A0A0A0;

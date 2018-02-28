@@ -11,7 +11,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody } from 'models/cloud-account.model';
+import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody, CloudAccountsStatusResponse } from 'models/cloud-account.model';
 
 @Injectable()
 export class CloudAccountService {
@@ -38,5 +38,9 @@ export class CloudAccountService {
 
   validateCredentials(credentials: ValidateCredentialsRequestBody): Observable<any> {
     return this.httpClient.post('cloud/userIdentity', credentials);
+  }
+
+  fetchCloudAccountsStatus() {
+    return this.httpClient.get<CloudAccountsStatusResponse>('cloud/accounts/status');
   }
 }

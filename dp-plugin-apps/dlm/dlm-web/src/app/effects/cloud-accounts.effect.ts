@@ -18,7 +18,9 @@ import {
   addCloudStoreFailure,
   validateCredentialsSuccess,
   validateCredentialsFailure,
-  ActionTypes as accountActions
+  ActionTypes as accountActions,
+  loadAccountsStatusSuccess,
+  loadAccountsStatusFail
 } from 'actions/cloud-account.action';
 
 @Injectable()
@@ -57,5 +59,16 @@ export class CloudAccountsEffects {
         })
         .catch(err => Observable.of(validateCredentialsFailure(err, payload.meta)));
     });
+
+  @Effect()
+  loadAccountsStatus$: Observable<any> = this.actions$
+    .ofType(accountActions.LOAD_ACCOUNTS_STATUS.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.accountService.fetchCloudAccountsStatus()
+        .map(statuses => loadAccountsStatusSuccess(statuses, payload.meta))
+        .catch(err => Observable.of(loadAccountsStatusFail(err, payload.meta)));
+    });
+
   constructor(private actions$: Actions, private accountService: CloudAccountService) {}
 }

@@ -113,6 +113,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   };
   @Input() sorts = [];
   @Input() offset = 0;
+
   @Input('footerOptions')
 
   set footerOptions(options: TableFooterOptions) {
@@ -208,6 +209,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   }
 
   @Input() selectCheck = () => true;
+  @Input() rowClass = _ => '';
 
   @HostBinding('class') get className() {
     return TableThemeSettings[this.theme].className;

@@ -44,3 +44,13 @@ export const getAllAccountsWithPolicies =
   });
 
 export const getCloudStoreProgress = createSelector(getCloudAccounts, state => state.progress);
+
+export const getAccountsStatusEntities = createSelector(getCloudAccounts, state => state.status.entities);
+export const getAllAccountsStatuses = createSelector(getAccountsStatusEntities, entities => mapToList(entities));
+
+export const getFullAccountsInfo = createSelector(getAllAccountsWithPolicies, getAccountsStatusEntities, (accounts, statuses) => {
+  return accounts.map(account => ({
+    ...account,
+    status: statuses[account.id] && statuses[account.id].status
+  }));
+});

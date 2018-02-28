@@ -67,5 +67,8 @@ export const routes: MockRoute[] = [
   new MockRoute('store/credentials', 'cloud_credentials.json'),
 
   // beacon cloud accounts with policies
-  new MockRoute('cluster/cloudCredWithPolicies', 'cloud_cred_with_policies.json')
+  new MockRoute('cluster/cloudCredWithPolicies', 'cloud_cred_with_policies.json'),
+
+  // accounts statuses
+  new MockRoute('cloud/accounts/status', 'accounts_status.json')
 ];

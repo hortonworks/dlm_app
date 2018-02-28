@@ -9,6 +9,11 @@
 
 import { CloudContainer } from './cloud-container.model';
 
+export enum AccountStatus {
+  Expired = 'EXPIRED',
+  Active = 'ACTIVE'
+}
+
 export interface CloudAccount {
   id: string;
   accountDetails: CloudAccountDetails;
@@ -61,3 +66,10 @@ export interface CloudAccountAction {
   label: string;
   type: string;
 }
+
+export interface CloudAccountStatus {
+  name: string;
+  status: AccountStatus;
+}
+
+export type CloudAccountsStatusResponse = CloudAccountStatus[];

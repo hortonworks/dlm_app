@@ -411,6 +411,7 @@
         },
         "accounts": {
           "iam_role": "IAM Role",
+          "expired_account": "Cloud credentials invalid. Edit these credentials to continue using them.",
           "add": {
             "title": "Add Cloud Account",
             "provider": "Cloud Provider",
