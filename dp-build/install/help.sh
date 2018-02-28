@@ -21,9 +21,16 @@ DP_DEPLOY_COMMAND="./dpdeploy.sh"
 print_one_line_usage() {
     local indentSpace=2
     local tabspace=60
+    local extraIndentSpace=4
     local cmd_name=$1
     local cmd_help=$2
-    printf "%-${indentSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}${cmd_name}${NORMAL}" "${cmd_help}"
+    local extraIndent=$3
+
+    if [ "$extraIndent" == "true" ]; then
+        printf "%-${extraIndentSpace}s%-58s%s\n" "" "${BRIGHT}${cmd_name}${NORMAL}" "${cmd_help}"
+    else
+        printf "%-${indentSpace}s%-${tabspace}s%s\n" "" "${BRIGHT}${cmd_name}${NORMAL}" "${cmd_help}"
+    fi
 }
 
 print_detailed_usage() {
@@ -41,18 +48,23 @@ print_detailed_usage() {
 show_config_help() {
     echo
     print_one_line_usage "USE_EXTERNAL_DB" "Set to yes for pointing to an external Postgres instance, no otherwise. Defaults to no"
-    printf "\n%-${OPTION_INDENTSPACE}s%-2s%-58s%s\n" "" "" "${BRIGHT}DATABASE_URI${NORMAL}" "If USE_EXTERNAL_DB is yes, this must point to the external Database URI"
-    printf "\n%-${OPTION_INDENTSPACE}s%-2s%-58s%s\n" "" "" "${BRIGHT}DATABASE_USER${NORMAL}" "If USE_EXTERNAL_DB is yes, this must point to the Dataplane Admin user name of the external Database URI"
-    printf "\n%-${OPTION_INDENTSPACE}s%-2s%-58s%s\n" "" "" "${BRIGHT}DATABASE_PASS${NORMAL}" "If USE_EXTERNAL_DB is yes, this must point to the Dataplane Admin password of the external Database URI. This is either using Ambari credentials"
-    print_one_line_usage "" "or explicitly specifying the URL. Set to true if you want to use Ambari credentials, false for URL. Defaults to true"
+    echo
+    print_one_line_usage "DATABASE_URI" "If USE_EXTERNAL_DB is yes, this must point to the external Database URI" "true"
+    echo
+    print_one_line_usage "DATABASE_USER$" "If USE_EXTERNAL_DB is yes, this must point to the Dataplane Admin user name of the external Database URI" "true"
+    echo
+    print_one_line_usage "DATABASE_PASS" "If USE_EXTERNAL_DB is yes, this must point to the Dataplane Admin password of the external Database URI. This is either using Ambari credentials" "true"
+    print_one_line_usage "" "or explicitly specifying the URL. Set to true if you want to use Ambari credentials, false for URL. Defaults to true" "true"
     echo
     print_one_line_usage "USE_TEST_LDAP" "Specifies whether to use an external LDAP instance or connect to a test LDAP instance that comes with the Dataplane Knox container"
     echo
     print_one_line_usage "USE_TLS" "Set to true to enable TLS / HTTPS"
     echo
     print_one_line_usage "USE_PROVIDED_CERTIFICATES" "Set to yes if you have public-private key-pair already generated/issued. Setting to no automatically generates a key-pair for you."
-    printf "\n%-${OPTION_INDENTSPACE}s%-2s%-58s%s\n" "" "" "${BRIGHT}DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH${NORMAL}" "If USE_PROVIDED_CERTIFICATES is yes, this must point to the absolute path of public key file"
-    printf "\n%-${OPTION_INDENTSPACE}s%-2s%-58s%s\n" "" "" "${BRIGHT}DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH${NORMAL}" "If USE_PROVIDED_CERTIFICATES is yes, this must point to the absolute path of encrypted private key file"
+    echo
+    print_one_line_usage "DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH$" "If USE_PROVIDED_CERTIFICATES is yes, this must point to the absolute path of public key file" "true"
+    echo
+    print_one_line_usage "DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" "If USE_PROVIDED_CERTIFICATES is yes, this must point to the absolute path of encrypted private key file" "true"
 
 }
 
