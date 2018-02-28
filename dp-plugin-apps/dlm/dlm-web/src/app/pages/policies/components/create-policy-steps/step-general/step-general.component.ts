@@ -62,7 +62,7 @@ export class StepGeneralComponent implements OnInit, OnDestroy, StepComponent {
   private initForm(): FormGroup {
     return this.formBuilder.group({
       name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
-      description: ['', Validators.maxLength(512)],
+      description: ['', Validators.maxLength(256)],
       type: [this.selectedPolicyType],
     });
   }
