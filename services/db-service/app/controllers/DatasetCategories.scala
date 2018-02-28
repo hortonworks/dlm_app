@@ -35,9 +35,7 @@ class DatasetCategories @Inject()(datasetCategoryRepo: DatasetCategoryRepo,
     datasetCategoryRepo.allWithDatasetId(datasetId).map(dc => success(dc)).recoverWith(apiError)
   }
 
-  def categoriesCount(userId: Long) = Action.async { req =>
-    val searchText = req.getQueryString("search")
-    val filterParam = req.getQueryString("filter")
+  def categoriesCount(searchText: Option[String], filterParam: Option[String],userId: Long) = Action.async { req =>
     (for (
       categoriesCount <- datasetRepo.getCategoriesCount(searchText, userId, filterParam);
       totalDataset <- datasetRepo.count(searchText, Some(userId), filterParam)

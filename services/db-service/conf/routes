@@ -158,13 +158,13 @@ DELETE        /datasets/:datasetId                                           con
 PATCH         /datasets/:datasetId                                           controllers.Datasets.updateDatset(datasetId:String)
 
 #RichDataset
-GET           /richdatasets                                                  controllers.Datasets.allRichDataset
-GET           /richdatasets/tags/:tagName                                    controllers.Datasets.richDatasetByTag(tagName:String)
+GET           /richdatasets                                                  controllers.Datasets.allRichDataset(userId: Long, filter: Option[String], search: Option[String])
+GET           /richdatasets/tags/:tagName                                    controllers.Datasets.richDatasetByTag(tagName: String, userId: Long,filter: Option[String], search: Option[String] )
 GET           /richdatasets/:id                                              controllers.Datasets.richDatasetById(id:Long)
 
 
 #Categories Api
-GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount(userId: Long)
+GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount(search: Option[String], filter: Option[String],userId: Long)
 GET           /categoriescount/:name                                         controllers.DatasetCategories.categoriesCountByName(name : String)
 
 #DatasetCategory Api

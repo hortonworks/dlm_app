@@ -49,26 +49,16 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
 
-  def allRichDataset = Action.async { req =>
-    val userId = req.getQueryString("userId")
-    val filter = req.getQueryString("filter")
-    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
-    else{
-      datasetRepo.getRichDataSet(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong, filter)
-        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-        .recoverWith(apiError)
-    }
+  def allRichDataset(userId: Long, filter: Option[String], searchText: Option[String]) = Action.async { req =>
+    datasetRepo.getRichDataSet(searchText, getPaginatedQuery(req), userId, filter)
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
   }
 
-  def richDatasetByTag(tagName: String) = Action.async { req =>
-    val userId = req.getQueryString("userId")
-    val filter = req.getQueryString("filter")
-    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
-    else{
-      datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong, filter)
-        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-        .recoverWith(apiError)
-    }
+  def richDatasetByTag(tagName: String, userId: Long,filter: Option[String], searchText: Option[String] ) = Action.async { req =>
+    datasetRepo.getRichDatasetByTag(tagName, searchText, getPaginatedQuery(req), userId, filter)
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
   }
 
   def richDatasetById(id: Long) = Action.async { req=>
