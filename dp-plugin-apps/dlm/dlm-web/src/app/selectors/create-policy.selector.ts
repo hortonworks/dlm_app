@@ -9,7 +9,7 @@
 
 import { createSelector } from 'reselect';
 import { getCreatePolicyWizardState } from './root.selector';
-import { mapToList } from 'utils/store-util';
+import { mapToList, toEntities } from 'utils/store-util';
 import { Step } from 'models/wizard.model';
 
 const sortSteps = (steps: Step[]) => {
@@ -25,4 +25,4 @@ const getStepsList = createSelector(getEntities, mapToList);
 
 export const getAllSteps = createSelector(getStepsList, sortSteps);
 
-export const getStep = (stepId) => createSelector(getAllSteps, entities => entities[stepId]);
+export const getStep = (stepId) => createSelector(getEntities, entities => entities[stepId]);

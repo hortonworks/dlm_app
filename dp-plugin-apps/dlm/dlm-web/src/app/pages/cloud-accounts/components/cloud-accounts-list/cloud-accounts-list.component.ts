@@ -9,10 +9,11 @@
 
 import {
   ChangeDetectionStrategy, Component, Input, OnInit, ViewChild, ViewEncapsulation, TemplateRef,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  HostBinding
 } from '@angular/core';
 import { CloudAccount } from 'models/cloud-account.model';
-import { ColumnMode } from '@swimlane/ngx-datatable/release';
+import { ColumnMode } from '@swimlane/ngx-datatable';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
@@ -38,9 +39,17 @@ export class CloudAccountsListComponent implements OnInit {
   @ViewChild('nameCell') nameCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
 
+  @HostBinding('class') className = 'dlm-cloud-accounts-list';
+
   tableTheme = TableTheme.Cards;
   columns = [];
   footerHeight = 0;
+  /**
+   * should be enough for:
+   * - table 5 rows + header each by ~38px
+   * - details title ~40px
+   */
+  rowDetailHeight = 300; //
   showFooter = false;
   columnMode = ColumnMode.flex;
   cloudAccountActions = [

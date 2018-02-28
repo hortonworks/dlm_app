@@ -42,6 +42,10 @@ export function reducer(state = initialState, action): State {
       return wizardSaveStep(state, action);
     case fromPolicy.ActionTypes.WIZARD_MOVE_TO_STEP:
       return wizardMoveToStep(state, action);
+    case fromPolicy.ActionTypes.WIZARD_RESET_ALL_STEPS:
+      return wizardResetAllSteps(state, action);
+    case fromPolicy.ActionTypes.WIZARD_RESET_STEP:
+      return wizardResetStep(state, action);
     default:
       return state;
   }
@@ -75,4 +79,15 @@ function wizardMoveToStep(state: State, action): State {
     return {...step, state: stepState};
   });
   return Object.assign({}, state, {entities:  toEntities(updatedState)});
+}
+
+function wizardResetAllSteps(state: State, action): State {
+  return Object.assign({}, state, initialState);
+}
+
+function wizardResetStep(state: State, action): State {
+  const {stepId} = action.payload;
+  const updatedEntity = {...state.entities[stepId], value: {}, state: WIZARD_STATE.DISABLED};
+  const newEntities = Object.assign({}, state.entities, {[stepId]: updatedEntity});
+  return Object.assign({}, state, {entities: newEntities});
 }

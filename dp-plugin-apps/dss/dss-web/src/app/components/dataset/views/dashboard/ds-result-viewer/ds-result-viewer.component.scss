@@ -15,8 +15,8 @@
 }
 
 ds-tile-proxy {
-  height:150px;
-  width:270px;
+  height:290px;
+  width:272px;
   float: left;
   margin: 0 0 20px 20px;
 }
@@ -28,4 +28,9 @@ dp-pagination{
   top: 50%;
   transform: translateY(-50%);
   width: 500px;
+}
+
+.grid-view{
+  display: flex ;
+  flex-wrap: wrap
 }

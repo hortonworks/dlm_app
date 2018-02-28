@@ -22,11 +22,10 @@ import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Cluster } from 'models/cluster.model';
 import { Step } from 'models/wizard.model';
 import { getAllSteps } from 'selectors/create-policy.selector';
-import { WIZARD_STEP_ID } from 'constants/policy.constant';
+import { WIZARD_STEP_ID, WIZARD_STATE } from 'constants/policy.constant';
 import { wizardSaveStep, wizardMoveToStep } from 'actions/policy.action';
 import { StepGeneralComponent } from '../create-policy-steps/step-general/step-general.component';
 import { StepSourceComponent } from '../create-policy-steps/step-source/step-source.component';
-import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 
 @Component({
   selector: 'dlm-create-policy-wizard',
@@ -94,7 +93,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
     this.wizardStepsSubscription = this.wizardSteps$.subscribe(steps => {
       this._steps = steps;
       if (steps && steps.length) {
-        const activeIndex = steps.findIndex(step => step.state === 'active');
+        const activeIndex = steps.findIndex(step => step.state === WIZARD_STATE.ACTIVE);
         this.activeStepId = steps[activeIndex].id;
       }
     });
@@ -118,6 +117,8 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   handleBackButtonClick(event) {
     if (!this.isBackButtonDisabled && this.activeStepId !== null) {
       const previousStepId = this._getStepById(this.activeStepId).previousStepId;
+      // Handle form valid state by setting it to the previous step's form valid state
+      this.handleFormValidityChange(this.viewChildStepIdMap[previousStepId].isFormValid());
       this.store.dispatch(wizardMoveToStep(previousStepId));
     }
   }

@@ -135,6 +135,14 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     return { width: size, maxWidth: size, minWidth: size};
   }
 
+  static paddingColumn(padding: number) {
+    return {
+      prop: '_',
+      name: ' ',
+      ...TableComponent.makeFixedWith(padding)
+    };
+  }
+
   @Input() set headerHeight(value: string | number) {
     this._headerHeight = value;
   }

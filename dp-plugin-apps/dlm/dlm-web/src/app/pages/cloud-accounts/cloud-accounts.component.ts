@@ -19,7 +19,7 @@ import { getMergedProgress } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
 import { CloudAccountService } from 'services/cloud-account.service';
 import { TranslateService } from '@ngx-translate/core';
-import {loadBeaconCloudCreds} from 'actions/beacon-cloud-cred.action';
+import {loadBeaconCloudCredsWithPolicies} from 'actions/beacon-cloud-cred.action';
 import {getAllBeaconCloudCreds} from 'selectors/beacon-cloud-cred.selector';
 import {BeaconCloudCred} from 'models/beacon-cloud-cred.model';
 import {loadPolicies} from 'actions/policy.action';
@@ -58,9 +58,8 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store.dispatch(loadPolicies({}, {requestId: POLICIES_REQUEST}));
     this.store.dispatch(loadAccounts(ACCOUNTS_REQUEST));
-    this.store.dispatch(loadBeaconCloudCreds({requestId: BEACON_ACCOUNTS_REQUEST}));
+    this.store.dispatch(loadBeaconCloudCredsWithPolicies({requestId: BEACON_ACCOUNTS_REQUEST}));
     this.accountsSubscription$ = this.accounts$.subscribe(accounts => {
       this._accounts = accounts;
     });

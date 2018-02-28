@@ -7,6 +7,32 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.ngx-datatable.fixed-header .datatable-header .datatable-header-inner .datatable-header-cell {
-  text-align: left !important;
+// .ngx-datatable.fixed-header .datatable-header .datatable-header-inner .datatable-header-cell {
+//   text-align: left !important;
+// }
+
+@import '../../../../styles/variables.scss';
+
+$visible-items: 5;
+$row-height: 36px + 2px; // 2px magic padding
+
+.title {
+  padding: 10px 25px;
+}
+
+:host /deep/ .ngx-datatable {
+  .policy-status {
+    margin-left: -4px; // magic number
+    text-transform: uppercase;
+  }
+
+  .datatable-header-cell {
+    text-align: left !important;
+  }
+
+  .datatable-body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: $visible-items * $row-height !important;
+  }
 }
