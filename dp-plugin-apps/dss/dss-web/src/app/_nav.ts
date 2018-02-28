@@ -6,7 +6,7 @@ export const navigation = [
   },
   {
     name: 'Bookmarks',
-    url: '/dss/collections?filter=bookmark',
+    url: '/dss/bookmarks',
     iconClassName: 'fa-bookmark'
   }
 ];

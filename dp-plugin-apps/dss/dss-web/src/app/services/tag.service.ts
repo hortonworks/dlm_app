@@ -22,10 +22,14 @@ export class DatasetTagService {
   constructor(private http: Http) {
   }
 
-  public list(text:string, filter: string): Observable<DatasetTag[]> {
-    
+  public list(text:string, bookmarkFilter: boolean): Observable<DatasetTag[]> {
+
+    let filterParam = '';
+    if(bookmarkFilter){
+      filterParam = '&filter=bookmark'
+    }
     return this.http
-      .get(`${this.url}?search=${text}&filter=${filter}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}?search=${text}${filterParam}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
 

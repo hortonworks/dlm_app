@@ -36,12 +36,11 @@ export class CollapsibleNavComponent implements OnInit {
         srcElement: this.personaNavSrc.nativeElement,
         assetPrefix: '/assets/images'
     });
-    let that = this;
     this.router.events.subscribe( event => {
       if(event instanceof NavigationStart){
         if(event.url.endsWith("/collections")){
           this.activeTabName = "Asset Collection";
-        } else if(event.url.endsWith("/collections?filter=bookmark")){
+        } else if(event.url.endsWith("/bookmarks")){
           this.activeTabName = "Bookmarks";
         }
       }

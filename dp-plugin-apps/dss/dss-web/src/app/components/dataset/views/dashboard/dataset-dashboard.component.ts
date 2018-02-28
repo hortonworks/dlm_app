@@ -27,18 +27,14 @@ export class DatasetDashboardComponent implements OnInit {
   dsNameSearch : string = "";
   views = ViewsEnum;
   currentView: ViewsEnum;
-  bookmarkFilter: string = "";
+  bookmarkFilter  = false;
 
   @ViewChild('tagViewer') tagViewer: NavTagPanel;
 
   constructor(private router: Router,
               private route: ActivatedRoute) {
-    this.route.queryParams.subscribe( params => {
-      if(params['filter']){
-        this.bookmarkFilter = params['filter']; //currently this filter ,if present, is always 'bookmark' filter
-      }else{
-        this.bookmarkFilter = "";
-      }
+    this.route.data.subscribe( params => {
+      this.bookmarkFilter = (params['filter'] && params['filter'] === 'bookmark'); //currently this filter ,if present, is always 'bookmark' filter
     });
   }
 

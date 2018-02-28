@@ -69,4 +69,13 @@ export const routes: Routes = [{
     component: NodeDetailsComponent,
     outlet: 'sidebar'
   }]
-}];
+},
+  {
+    path: "bookmarks",
+    component: DatasetDashboardComponent,
+    data: {
+      filter: 'bookmark',
+      crumb: 'dss.bookmarks'
+    }
+  }
+];

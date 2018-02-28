@@ -20,8 +20,8 @@ import {DatasetTagService} from "../../../../../services/tag.service";
 })
 export class NavTagPanel implements OnInit {
 
-  @Input() dsNameSearch:string = "";
-  @Input() bookmarkFilter:string = "";
+  @Input() dsNameSearch: string = "";
+  @Input() bookmarkFilter: boolean = false;
   @Output("updateSelection") updateSelectionEmitter: EventEmitter<DatasetTag> = new EventEmitter<DatasetTag>();
   allTags: DatasetTag[] = null;
   displayTags: DatasetTag[] = null;
