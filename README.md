@@ -166,10 +166,10 @@ Dataplane uses some configuration items to bootstrap itself.
 
 | Configuration Item                        | Description    | Default Value    |
 |-------------------------------------------|----------------|------------------|
-| `USE_EXT_DB`                              | Set to `yes` for pointing to an external Postgres instance, no otherwise | `no` |
-| `DATABASE_URI`                            | If `USE_EXT_DB` is `yes`, this must point to the external Database URI | |
-| `DATABASE_USER`                           | If `USE_EXT_DB` is `yes`, this must point to the Dataplane Admin user name of the external Database URI | |
-| `DATABASE_PASS`                           | If `USE_EXT_DB` is `yes`, this must point to the Dataplane Admin password of the external Database URI | |
+| `USE_EXTERNAL_DB`                         | Set to `yes` for pointing to an external Postgres instance, no otherwise | `no` |
+| `DATABASE_URI`                            | If `USE_EXTERNAL_DB` is `yes`, this must point to the external Database URI | |
+| `DATABASE_USER`                           | If `USE_EXTERNAL_DB` is `yes`, this must point to the Dataplane Admin user name of the external Database URI | |
+| `DATABASE_PASS`                           | If `USE_EXTERNAL_DB` is `yes`, this must point to the Dataplane Admin password of the external Database URI | |
 | `SEPARATE_KNOX_CONFIG`                    | Set to `true` if a separate Knox instance is setup on HDP clusters for handling Dataplane traffic, false otherwise | `false` |
 | `KNOX_CONFIG_USING_CREDS`                 | If `SEPARATE_KNOX_CONFIG` is `true`, when a cluster is registered, we must provide additional information to discover it. This is either using Ambari credentials or explicitly specifying the URL. Set to `true` if you want to use Ambari credentials, `false` for URL | `true` |
 | `CONSUL_HOST`                             | Set to the IP address of the host where Dataplane containers are launched | |
@@ -194,7 +194,7 @@ Only Postgresql is supported. To prepare the database, following steps need to b
 7. Give neccessary permissions of created database to desired user. Recommended: `ALTER DATABASE <database_name> OWNER TO <user_name>;`
 8. Provide connection information in `${INSTALLER_HOME}/config.env.sh`.
 ```
-USE_EXT_DB="yes"
+USE_EXTERNAL_DB="yes"
 DATABASE_URI="jdbc:postgresql://<host_name>:5432/<database_name>"
 DATABASE_USER="<user_name>"
 DATABASE_PASS="<password>"
