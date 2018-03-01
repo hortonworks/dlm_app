@@ -19,11 +19,10 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { POLICY_TYPES, WIZARD_STEP_ID } from 'constants/policy.constant';
+import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES} from 'constants/policy.constant';
 import { getStep } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
-import { S3 } from 'constants/cloud.constant';
 import { Subscription } from 'rxjs/Subscription';
 import { loadTables } from 'actions/hivelist.action';
 import { ProgressState } from 'models/progress-state.model';
@@ -39,7 +38,6 @@ import { getAllDatabases } from 'selectors/hive.selector';
 import { merge } from 'utils/object-utils';
 import { wizardResetStep } from 'actions/policy.action';
 
-const CLUSTER = 'CLUSTER';
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
 @Component({
@@ -59,8 +57,7 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
   @HostBinding('class') className = 'dlm-step-source';
 
   private tableRequestPrefix = '[StepSourceComponent] LOAD_TABLES ';
-  CLUSTER = CLUSTER;
-  S3 = S3;
+  SOURCE_TYPES = SOURCE_TYPES;
   form: FormGroup;
   general: {};
   WIZARD_STEP_ID = WIZARD_STEP_ID;
@@ -112,8 +109,8 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
    * @type {{label: string, value: string}}[]
    */
   get sourceTypes() {
-    const cluster = {label: this.CLUSTER, value: this.CLUSTER};
-    const s3 = {label: this.S3, value: this.S3};
+    const cluster = {label: this.SOURCE_TYPES.CLUSTER, value: this.SOURCE_TYPES.CLUSTER};
+    const s3 = {label: this.SOURCE_TYPES.S3, value: this.SOURCE_TYPES.S3};
     return this.isHivePolicy() ? [cluster] : [s3, cluster];
   }
 
@@ -153,11 +150,12 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
         }
       }
     });
-    this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
+    const formSubscription = this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
       .subscribe(isFormValid => this.onFormValidityChange.emit(isFormValid));
     this.subscribeToSourceType();
     this.subscribeToSourceCluster();
     this.setupDatabaseChanges(this.form);
+    this.subscriptions.push(formSubscription);
   }
 
   isFormValid() {
@@ -226,12 +224,12 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
       // Reset destination values if source type is changed
       this.store.dispatch(wizardResetStep(WIZARD_STEP_ID.DESTINATION));
       let toEnable = [], toDisable = [];
-      if (type === S3) {
+      if (type === this.SOURCE_TYPES.S3) {
         toEnable = this.s3Fields;
         toDisable = this.clusterFields;
         sourceControls['directories'].disable();
       }
-      if (type === CLUSTER) {
+      if (type === this.SOURCE_TYPES.CLUSTER) {
         toEnable = this.clusterFields;
         toDisable = this.s3Fields;
         if (this.general['type'] === POLICY_TYPES.HDFS) {

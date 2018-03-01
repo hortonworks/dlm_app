@@ -35,7 +35,7 @@
                   </div>
                   <!-- SOURCE TYPE END -->
                   <!-- SOURCE CLUSTER -->
-                  <div class="col-xs-4" *ngIf="form.get('source.type').value === CLUSTER">
+                  <div class="col-xs-4" *ngIf="form.get('source.type').value === SOURCE_TYPES.CLUSTER">
                     <dlm-form-field
                       [label]="'page.policies.form.fields.sourceCluster.self' | translate"
                       [fieldClass]="'col-xs-12'"
@@ -53,7 +53,7 @@
                   <!-- SOURCE CLUSTER END -->
                   <!-- SOURCE CLOUD ACCOUNT -->
                   <div class="col-xs-4"
-                       *ngIf="form.get('source.type').value === S3">
+                       *ngIf="form.get('source.type').value === SOURCE_TYPES.S3">
                     <dlm-form-field
                       [label]="'page.policies.form.fields.s3.account' | translate"
                       [required]="true"
@@ -70,14 +70,14 @@
                   </div>
                   <!-- SOURCE CLOUD ACCOUNT END -->
                   <!-- SOURCE S3 ENDPOINT -->
-                  <div class="col-xs-4" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === S3">
+                  <div class="col-xs-4" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === SOURCE_TYPES.S3">
                     <dlm-form-field
                       [label]="'page.policies.form.fields.s3.endpoint' | translate"
                       [errorClass]="'col-xs-12'"
                       [fieldClass]="'col-xs-12'"
                       [required]="true">
                       <div class="input-group">
-                        <div class="input-group-addon">{{S3}}</div>
+                        <div class="input-group-addon">{{SOURCE_TYPES.S3}}://</div>
                         <input
                           type="text"
                           class="form-control"
