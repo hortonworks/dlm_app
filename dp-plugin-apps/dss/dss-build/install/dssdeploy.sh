@@ -13,6 +13,8 @@ set -e
 
 DEFAULT_VERSION=0.0.1-latest
 CONSUL_CONTAINER="dp-consul-server"
+DSS_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 
 source_dp_config () {
     # Expected to be present in RPM deployments
@@ -73,7 +75,7 @@ stop_app() {
 }
 
 load_image() {
-    LIB_DIR=../lib
+    LIB_DIR="$( dirname "${DSS_PATH}" )/lib"
     if [ -d "$LIB_DIR" ]; then
         for imgFileName in $LIB_DIR/*.tar; do
             echo "Loading $imgFileName"

@@ -11,10 +11,11 @@
 #
 BRIGHT=$(tput bold)
 NORMAL=$(tput sgr0)
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 set -e
 
-source $(pwd)/config.env.sh
+source "$DP_PATH"/config.env.sh
 
 DEFAULT_VERSION=0.0.1-latest
 
@@ -40,20 +41,20 @@ init_network() {
 
 init_consul(){
     echo "Initializing Consul"
-    source $(pwd)/docker-consul.sh
+    source "$DP_PATH"/docker-consul.sh
 }
 
 generate_certs() {
     CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
 
-    source $(pwd)/docker-certificates.sh
+    source "$DP_PATH"/docker-certificates.sh
 }
 
 init_db() {
     if [ "$USE_EXTERNAL_DB" == "yes" ]; then
         echo "DataPlane Service is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
     else
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
     fi
 }
 
@@ -64,7 +65,7 @@ ps() {
 
 list_logs() {
     if [ $# -lt 1 ]; then
-        source $(pwd)/help.sh "logs"
+        source "$DP_PATH"/help.sh "logs"
         exit -1;
     fi
     docker logs "$@"
@@ -81,32 +82,32 @@ list_metrics() {
 migrate_schema() {
     if [ "$USE_EXTERNAL_DB" == "no" ]; then
         # start database container
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
 
         # wait for database start
-        source $(pwd)/database-check.sh
+        source "$DP_PATH"/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-flyway.sh migrate
+    source "$DP_PATH"/docker-flyway.sh migrate
 }
 
 reset_db() {
     if [ "$USE_EXTERNAL_DB" == "no" ]; then
         # start database container
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
 
         # wait for database start
-        source $(pwd)/database-check.sh
+        source "$DP_PATH"/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-flyway.sh clean migrate
+    source "$DP_PATH"/docker-flyway.sh clean migrate
 }
 
 utils_add_host() {
     if [ $# -ne 2 ]; then
-        source $(pwd)/help.sh "utils" "add-host"
+        source "$DP_PATH"/help.sh "utils" "add-host"
         return -1
     else
         add_host_entry "$@"
@@ -125,7 +126,7 @@ add_host_entry() {
 
 utils_update_user_secret() {
     if [[ $# -ne 1  || ( "$1" != "ambari" && "$1" != "atlas" && "$1" != "ranger" ) ]]; then
-        source $(pwd)/help.sh "utils" "update-user"
+        source "$DP_PATH"/help.sh "utils" "update-user"
         return -1
     else
         update_user_entry "$@"
@@ -143,7 +144,7 @@ update_user_entry() {
     if [ "$MASTER_PASSWORD" == "" ]; then
         get_master_password
     fi
-    source $(pwd)/keystore-manage.sh "$@"
+    source "$DP_PATH"/keystore-manage.sh "$@"
 }
 
 destroy() {
@@ -166,20 +167,20 @@ init_app() {
 
     if [ "$USE_EXTERNAL_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
     fi
 
     echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh
+    source "$DP_PATH"/docker-gateway.sh
 
     echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh
+    source "$DP_PATH"/docker-service-db.sh
 
     echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh
+    source "$DP_PATH"/docker-service-cluster.sh
 
     echo "Starting Application API"
-    source $(pwd)/docker-app.sh
+    source "$DP_PATH"/docker-app.sh
 }
 
 read_master_password() {
@@ -221,7 +222,7 @@ read_admin_password() {
     echo
     read -s -p "Re-enter password: " ADMIN_PASSWD_VERIFY
     echo
-    
+
     if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
     then
        echo "Password did not match. Reenter password:"
@@ -258,7 +259,6 @@ import_certs() {
     cp "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" $(pwd)/certs/ssl-cert.pem
     rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
     cp "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" $(pwd)/certs/ssl-key.pem
-
     echo "Certificates were copied successfully."
 
     read_user_supplied_certificate_password
@@ -305,44 +305,44 @@ init_knox_and_consul() {
 
 init_knox() {
     echo "Initializing Knox"
-    
+
     if [ "$MASTER_PASSWORD" == "" ]; then
         get_master_password
     fi
     if [ "$USE_TEST_LDAP" == "" ];then
         read_use_test_ldap
     fi
-    
+
     echo "Starting Knox"
-    source $(pwd)/docker-knox.sh
+    source "$DP_PATH"/docker-knox.sh
 }
 
 start_app() {
     if [ "$USE_EXTERNAL_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
     fi
 
     echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh
+    source "$DP_PATH"/docker-gateway.sh
 
     echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh
+    source "$DP_PATH"/docker-service-db.sh
 
     echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh
+    source "$DP_PATH"/docker-service-cluster.sh
 
     echo "Starting Application API"
-    source $(pwd)/docker-app.sh
+    source "$DP_PATH"/docker-app.sh
 }
 start_consul() {
     echo "Starting Consul"
-    source $(pwd)/docker-consul.sh
+    source "$DP_PATH"/docker-consul.sh
 }
 start_knox() {
     echo "Starting Knox"
     start_consul
-    source $(pwd)/docker-knox.sh
+    source "$DP_PATH"/docker-knox.sh
 }
 
 stop_app() {
@@ -361,7 +361,7 @@ stop_knox() {
 }
 
 load_images() {
-    LIB_DIR=../lib
+    LIB_DIR="$( dirname "${DP_PATH}" )/lib"
     if [ -d "$LIB_DIR" ]; then
         for imgFileName in $LIB_DIR/*.tar; do
             echo "Loading $imgFileName"
@@ -377,8 +377,8 @@ init_keystore() {
    if [ "$MASTER_PASSWORD" == "" ]; then
        get_master_password
    fi
-    mkdir -p $(pwd)/certs
-    source $(pwd)/keystore-initialize.sh
+    mkdir -p "$DP_PATH"/certs
+    source "$DP_PATH"/keystore-initialize.sh
 }
 
 read_master_password_safely() {
@@ -389,33 +389,33 @@ read_master_password_safely() {
 
 update_admin_password() {
     read_admin_password_safely
-    source $(pwd)/database-run-script.sh "UPDATE_ADMIN_PASSWORD" "$USER_ADMIN_PASSWORD"
+    source "$DP_PATH"/database-run-script.sh "UPDATE_ADMIN_PASSWORD" "$USER_ADMIN_PASSWORD"
 }
 
 utils_enable_config_value() {
     if [ $# -ne 1 ]; then
-        source $(pwd)/help.sh "utils" "enable-config"
+        source "$DP_PATH"/help.sh "utils" "enable-config"
         return -1
     else
-        source $(pwd)/database-run-script.sh "ENABLE_CONFIG" "$@"
+        source "$DP_PATH"/database-run-script.sh "ENABLE_CONFIG" "$@"
     fi
 }
 
 utils_disable_config_value() {
     if [ $# -ne 1 ]; then
-        source $(pwd)/help.sh "utils" "disable-config"
+        source "$DP_PATH"/help.sh "utils" "disable-config"
         return -1
     else
-        source $(pwd)/database-run-script.sh "DISABLE_CONFIG" "$@"
+        source "$DP_PATH"/database-run-script.sh "DISABLE_CONFIG" "$@"
     fi
 }
 
 utils_get_config_value(){
     if [ $# -ne 1 ]; then
-        source $(pwd)/help.sh "utils" "get-config"
+        source "$DP_PATH"/help.sh "utils" "get-config"
         return -1
     else
-        source $(pwd)/database-run-script.sh "GET_CONFIG" "$@"
+        source "$DP_PATH"/database-run-script.sh "GET_CONFIG" "$@"
     fi
 }
 
@@ -431,7 +431,7 @@ init_all() {
     update_admin_password
 
     init_knox_and_consul
-    
+
     init_keystore
 
     init_app
@@ -495,7 +495,7 @@ destroy_all_but_state() {
 
 upgrade() {
     if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
-        source $(pwd)/help.sh "upgrade"
+        source "$DP_PATH"/help.sh "upgrade"
         exit -1
     fi
 
@@ -509,22 +509,22 @@ upgrade() {
         exit -1
     fi
 
-    source $(pwd)/config.clear.sh
+    source "$DP_PATH"/config.clear.sh
     get_master_password
 
     echo "Moving configuration..."
-    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
-    cp $2/config.env.sh $(pwd)/config.env.sh
+    mv "$DP_PATH"/config.env.sh "$DP_PATH"/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
+    cp $2/config.env.sh "$DP_PATH"/config.env.sh
     # sourcing again to overwrite values
-    source $(pwd)/config.env.sh
+    source "$DP_PATH"/config.env.sh
 
     echo "Moving certs directory"
-    mkdir -p $(pwd)/certs
-    cp -R $2/certs/* $(pwd)/certs
+    mkdir -p "$DP_PATH"/certs
+    cp -R $2/certs/* "$DP_PATH"/certs
 
     # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-    
+
     echo "Destroying Knox"
     docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
@@ -580,7 +580,7 @@ init_network
 
 if [ $# -lt 1 ] || [ ${@:$#} == "--help" ]
 then
-    source $(pwd)/help.sh "$@"
+    source "$DP_PATH"/help.sh "$@"
     exit 0;
 else
     case "$1" in
@@ -595,7 +595,7 @@ else
                     init_all
                     ;;
                 *)
-                    source $(pwd)/help.sh "$@"
+                    source "$DP_PATH"/help.sh "$@"
                     ;;
             esac
             ;;
@@ -621,7 +621,7 @@ else
                     do_confirm_destroy
                     ;;
                 *)
-                    source $(pwd)/help.sh "$@"
+                    source "$DP_PATH"/help.sh "$@"
                     ;;
             esac
             ;;
@@ -657,12 +657,12 @@ else
                     ;;
                 *)
                     echo "Unknown option"
-                    source $(pwd)/help.sh "$@"
+                    source "$DP_PATH"/help.sh "$@"
                     ;;
             esac
             ;;
         *)
-            source $(pwd)/help.sh "$@"
+            source "$DP_PATH"/help.sh "$@"
             ;;
     esac
 fi
