@@ -45,10 +45,6 @@ export const routes: Routes = [{
     crumb: 'profile',
     title: 'core',
   }
-// },{
-//   path: 'analytics',
-//   loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
-//   canActivate:[ NavigationGuard ]
 }, {
   path: 'sign-in',
   component: SignInComponent,

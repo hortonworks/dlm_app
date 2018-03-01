@@ -222,19 +222,6 @@ object Entities {
       updated: Option[LocalDateTime] = Some(LocalDateTime.now())
   )
 
-  case class AssetWorkspace(
-      assetType: String,
-      assetId: Long,
-      workspaceId: Long
-  )
-
-  case class NotebookWorkspace(
-      notebookId: String,
-      name: String,
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      workspaceId: Long
-  )
-
   case class EnabledSku(
       skuId: Long,
       enabledBy: Long,
@@ -371,20 +358,6 @@ object Entities {
       groupMemberAttributeName: Option[String]=None
   )
 
-  case class WorkspaceDataCount(asset: Int, notebook: Int)
-
-  case class WorkspaceDetails(
-      workspace: Workspace,
-      username: String,
-      clustername: String,
-      counts: Option[WorkspaceDataCount]
-  )
-
-  case class AssetWorkspaceRequest(workspaceId: Long,
-                                   clusterId: Long,
-                                   assetQueryModels: Seq[AtlasSearchQuery],
-                                   dataAssets: Seq[DataAsset] = Nil)
-
   case class BlacklistedToken(id: Option[Long], token: String, expiry: LocalDateTime)
 
   case class Comment(id: Option[Long] = None,
@@ -485,12 +458,6 @@ object JsonFormatters {
   implicit val hostWrites = Json.writes[ClusterServiceHost]
   implicit val hostReads = Json.reads[ClusterServiceHost]
 
-  implicit val workspaceWrites = Json.writes[Workspace]
-  implicit val workspaceReads = Json.reads[Workspace]
-
-  implicit val assetWorkspaceWrites = Json.writes[AssetWorkspace]
-  implicit val assetWorkspaceReads = Json.reads[AssetWorkspace]
-
   implicit val clusterHostWrites = Json.writes[ClusterHost]
   implicit val clusterHostReads = Json.reads[ClusterHost]
 
@@ -555,19 +522,6 @@ object JsonFormatters {
 
   implicit val ldapConfigurationReads = Json.reads[LdapConfiguration]
   implicit val ldapConfigurationWrites = Json.writes[LdapConfiguration]
-
-  implicit val workspacesAndCountReads = Json.reads[WorkspaceDataCount]
-  implicit val workspacesAndCountWrites = Json.writes[WorkspaceDataCount]
-
-  implicit val workspaceDetailsReads = Json.reads[WorkspaceDetails]
-  implicit val workspaceDetailsWrites = Json.writes[WorkspaceDetails]
-
-  implicit val assetWorkspaceRequestReads =
-    defaultJson.reads[AssetWorkspaceRequest]
-  implicit val assetWorkspaceRequestWrites = Json.writes[AssetWorkspaceRequest]
-
-  implicit val notebookWorkspaceReads = defaultJson.reads[NotebookWorkspace]
-  implicit val notebookWorkspaceWrites = Json.writes[NotebookWorkspace]
 
   implicit val roleTypeReads = Reads.enumNameReads(RoleType)
 

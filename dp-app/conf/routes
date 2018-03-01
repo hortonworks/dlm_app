@@ -102,24 +102,6 @@ POST          /api/services/verifyCode                               controllers
 POST          /api/services/enable                                   controllers.ServicesManager.enableService
 GET           /api/services/:serviceName/dependencies                controllers.ServicesManager.getDependentServices(serviceName: String)
 
-# Workspaces
-# ===========================================
-GET           /api/workspaces                                        controllers.Workspaces.list
-GET           /api/workspaces/name/:name                             controllers.Workspaces.retrieve(name: String)
-POST          /api/workspaces                                        controllers.Workspaces.create
-DELETE        /api/workspaces/name/:name                             controllers.Workspaces.delete(name: String)
-
-# WorkspaceAssets
-# ===========================================
-POST          /api/workspaces/assets                                 controllers.AssetWorkspaces.add
-GET           /api/workspaces/:workspaceId/assets                    controllers.AssetWorkspaces.getAssets(workspaceId: String)
-
-# WorkspaceNotebooks
-# ===========================================
-POST          /api/workspaces/notebooks                              controllers.NotebookWorkspaces.add
-DELETE        /api/workspaces/notebooks/:notebookId                  controllers.NotebookWorkspaces.delete(notebookId: String)
-GET           /api/workspaces/:workspaceId/notebooks                 controllers.NotebookWorkspaces.getNotebooks(workspaceId: String)
-
 # Query Clusters
 # ===========================================
 GET           /api/ambari/status                                     controllers.DataplaneClusters.ambariCheck(url: String)

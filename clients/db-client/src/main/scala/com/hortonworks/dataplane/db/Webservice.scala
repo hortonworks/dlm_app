@@ -334,33 +334,6 @@ object Webservice {
 
   }
 
-  trait WorkspaceService extends DbClientService {
-    def list(): Future[Either[Errors, Seq[WorkspaceDetails]]]
-
-    def retrieve(name: String): Future[Either[Errors, WorkspaceDetails]]
-
-    def create(workspace: Workspace): Future[Either[Errors, Workspace]]
-
-    def delete(name: String): Future[Either[Errors, Int]]
-
-  }
-
-  trait AssetWorkspaceService extends DbClientService {
-    def list(workspaceId: Long): Future[Either[Errors, Seq[DataAsset]]]
-
-    def create(assetReq: AssetWorkspaceRequest): Future[Either[Errors, Seq[DataAsset]]]
-
-    def delete(workspaceId: Long): Future[Either[Errors, Int]]
-  }
-
-  trait NotebookWorkspaceService extends DbClientService {
-    def list(workspaceId: Long): Future[Either[Errors, Seq[NotebookWorkspace]]]
-
-    def create(notebookWorkspace: NotebookWorkspace): Future[Either[Errors, NotebookWorkspace]]
-
-    def delete(notebookId: String): Future[Either[Errors, Int]]
-  }
-
   trait DataAssetService extends DbClientService {
     def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
     def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]]
