@@ -1,7 +1,9 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {color} from 'd3';
+import {Chart} from 'nvd3';
+
 import {ProfilerService} from '../../../../../services/profiler.service';
 import {AssetCollectionDashboard} from '../../../../../models/asset-collection-dashboard';
+import {DssAppEvents} from "app/services/dss-app-events";
 
 declare let d3: any;
 declare let nv: any;
@@ -20,8 +22,10 @@ export class OverviewComponent implements OnInit {
   @ViewChild('usersAccessingSensitiveData') usersAccessingSensitiveData: ElementRef;
 
   assetCollectionDashboard = new AssetCollectionDashboard();
+  charts: Chart[] = [];
 
-  constructor(private profileService: ProfilerService) { }
+  constructor(private profileService: ProfilerService,
+              private dssAppEvents: DssAppEvents) { }
 
   ngOnInit() {
     this.profileService.assetCollectionStats().subscribe(assetCollectionDashboard => {
@@ -31,11 +35,16 @@ export class OverviewComponent implements OnInit {
   }
 
   private initCharts() {
+    this.charts = [] ;
+
     this.createTopUsersChart();
     this.createSensitiveNonSensitiveChart();
     this.createDistributionByTagChart();
     this.createQuiresRunningSensitiveDataChart();
     this.createUsersAccessingSensitiveDataChart();
+
+    this.dssAppEvents.sideNavCollapsed$.subscribe(collapsed => this.updateChartDimensions());
+    this.dssAppEvents.dataSetCollaborationPaneCollapsed$.subscribe(collapsed => this.updateChartDimensions());
   }
 
   private createTopUsersChart() {
@@ -62,15 +71,15 @@ export class OverviewComponent implements OnInit {
       .showControls(false)
       .showLegend(false)
       .showYAxis(true)
-      .groupSpacing(0.4);
-
-      // chart.yAxis.tickFormat(d3.format(',.2f'));
+      .groupSpacing(0.4)
+      .margin({left: 85});
 
       d3.select(this.topUsers.nativeElement)
       .datum(topUsersData)
       .call(chart);
 
       nv.utils.windowResize(chart.update);
+      this.charts.push(chart);
 
       return chart;
     });
@@ -79,7 +88,7 @@ export class OverviewComponent implements OnInit {
   private createSensitiveNonSensitiveChart() {
     const data = this.assetCollectionDashboard.sensitiveAndNonSensitive.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
     nv.addGraph(() => {
-      let chart1 = nv.models.pieChart()
+      let chart = nv.models.pieChart()
       .x(function (d) {
         return d.key
       })
@@ -87,16 +96,21 @@ export class OverviewComponent implements OnInit {
         return d.y
       })
       .donut(true)
-      .color(['#2DB075', '#2891C0']);
+      .color(['#2DB075', '#2891C0'])
+      .labelFormat((val) => `${val}%`)
+      .labelType('percent');
 
-      chart1.pie.labelsOutside(true).donut(true);
+      chart.pie.labelsOutside(true).donut(true);
 
       d3.select(this.sensitiveNonSensitive.nativeElement)
       .datum(data)
       .transition().duration(1200)
-      .call(chart1);
+      .call(chart);
 
-      return chart1;
+      nv.utils.windowResize(chart.update);
+      this.charts.push(chart);
+
+      return chart;
     });
   }
 
@@ -123,13 +137,15 @@ export class OverviewComponent implements OnInit {
       .showControls(false)
       .showLegend(false)
       .showYAxis(true)
-      .groupSpacing(0.4);
+      .groupSpacing(0.4)
+      .margin({left: 85});
 
       d3.select(this.distributionByTag.nativeElement)
       .datum(distributionByTagData)
       .call(chart);
 
       nv.utils.windowResize(chart.update);
+      this.charts.push(chart);
 
       return chart;
     });
@@ -138,7 +154,7 @@ export class OverviewComponent implements OnInit {
   private createQuiresRunningSensitiveDataChart() {
     const data = this.assetCollectionDashboard.quiresRunningSensitiveData.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
     nv.addGraph(() => {
-      const chart1 = nv.models.pieChart()
+      const chart = nv.models.pieChart()
       .x(function (d) {
         return d.key
       })
@@ -147,26 +163,27 @@ export class OverviewComponent implements OnInit {
       })
       .donut(true)
       .title('')
-      .color(['#2DB075', '#2891C0']);
+      .color(['#2DB075', '#2891C0'])
+      .labelFormat((val) => `${val}%`)
+      .labelType('percent');
 
-      chart1.pie.labelsOutside(true).donut(true);
+      chart.pie.labelsOutside(true).donut(true);
 
       d3.select(this.quiresRunningSensitiveData.nativeElement)
       .datum(data)
       .transition().duration(1200)
-      .call(chart1);
+      .call(chart);
 
-      return chart1;
+      nv.utils.windowResize(chart.update);
+      this.charts.push(chart);
+
+      return chart;
     });
   }
 
   private createUsersAccessingSensitiveDataChart() {
-
-    let chart;
-    let data;
-
     nv.addGraph(() => {
-      chart = nv.models.lineChart()
+      const chart = nv.models.lineChart()
       .options({
         duration: 300,
         useInteractiveGuideline: true,
@@ -178,7 +195,7 @@ export class OverviewComponent implements OnInit {
       });
       chart.yAxis.tickFormat(d3.format(',d'));
 
-      data = [
+      let data = [
         {
           area: true,
           values: this.assetCollectionDashboard.usersAccessingSecureData.stats.map(stat => ({'x': stat.key, 'y': stat.value})),
@@ -190,8 +207,15 @@ export class OverviewComponent implements OnInit {
       d3.select(this.usersAccessingSensitiveData.nativeElement)
       .datum(data)
       .call(chart);
+
       nv.utils.windowResize(chart.update);
+      this.charts.push(chart);
+
       return chart;
     });
+  }
+
+  private updateChartDimensions() {
+    this.charts.forEach(chart => chart.update());
   }
 }

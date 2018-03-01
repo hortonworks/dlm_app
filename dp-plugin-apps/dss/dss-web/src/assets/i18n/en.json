@@ -216,7 +216,7 @@
         "top-10-users": "Top 10 users",
         "sensitive-vs-non-sensitive": "Sensitive Vs Non Sensitive",
         "asset-distribution-by-sensitive-tag": "Asset Distribution by Sensitive Tag",
-        "no-of-quires-running-sensitive-data": "# of Quires Running Sensitive Data"
+        "no-of-quires-running-sensitive-data": "# of Queries Running Sensitive Data"
 
       }
     },

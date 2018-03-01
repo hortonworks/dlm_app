@@ -233,10 +233,10 @@
   width: 0;
   margin-left: 0;
   border: none;
-  -webkit-transition: min-width .8s ease;
-  -moz-transition: min-width .8s ease;
-  -o-transition: min-width .8s ease;
-  transition: min-width .8s ease;
+  -webkit-transition: min-width $layout-transition-time ease;
+  -moz-transition: min-width $layout-transition-time ease;
+  -o-transition: min-width $layout-transition-time ease;
+  transition: min-width $layout-transition-time ease;
   -webkit-font-smoothing: antialiased;
 }
 .showSummary {

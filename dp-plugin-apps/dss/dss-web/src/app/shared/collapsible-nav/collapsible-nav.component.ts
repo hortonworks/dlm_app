@@ -13,6 +13,7 @@ import {Component, ViewChild, ElementRef, OnInit, HostBinding, isDevMode} from '
 import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {DpAppNavigation} from 'dps-apps';
 import {navigation} from '../../_nav';
+import {DssAppEvents} from '../../services/dss-app-events';
 
 @Component({
   selector: 'dss-collapsible-nav',
@@ -28,7 +29,8 @@ export class CollapsibleNavComponent implements OnInit {
   @ViewChild('personaNavSrc') personaNavSrc: ElementRef;
   @HostBinding('class.dss-sidebar-collapsed') collapseSideNav = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+              private dssAppEvents: DssAppEvents) {}
 
   ngOnInit() {
     //this.activeTabName = this.navItems[0].name;
@@ -60,6 +62,7 @@ export class CollapsibleNavComponent implements OnInit {
 
   toggleNav() {
     this.collapseSideNav = !this.collapseSideNav;
+    setTimeout(() => this.dssAppEvents.setSideNavCollapsed(this.collapseSideNav), 300);
   }
 
   navigateToURL(nav) {

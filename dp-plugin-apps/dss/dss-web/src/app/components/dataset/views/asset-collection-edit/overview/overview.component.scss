@@ -25,7 +25,8 @@
 
   .title {
     color: $shuttle-gray;
-    font-weight: 500;
+    font-weight: 400;
+    font-size: 16px;
   }
 
   .value {
@@ -43,6 +44,12 @@
   .overview-card {
     min-height: 320px;
   }
+
+  .title {
+    color: $shuttle-gray;
+    font-weight: 400;
+    font-size: 16px;
+  }
 }
 
 .overview-cards-container.one-col {
@@ -50,6 +57,12 @@
 
   .overview-card {
     min-height: 320px;
+  }
+
+  .title {
+    color: $shuttle-gray;
+    font-weight: 400;
+    font-size: 16px;
   }
 }
 

@@ -13,6 +13,7 @@ import {CommentService} from '../../../../services/comment.service';
 import {RatingService} from "app/services/rating.service";
 import {DataSet} from '../../../../models/data-set';
 import {DataSetService} from '../../../../services/dataset.service';
+import {DssAppEvents} from '../../../../services/dss-app-events';
 
 declare var d3: any;
 declare var nv: any;
@@ -45,7 +46,8 @@ export class AssetCollectionEditComponent implements OnInit {
               private bookmarkService: BookmarkService,
               private favouriteService: FavouriteService,
               private ratingService: RatingService,
-              private activeRoute: ActivatedRoute) { }
+              private activeRoute: ActivatedRoute,
+              private dssAppEvents: DssAppEvents) { }
 
   ngOnInit() {
     this.activeRoute.params.subscribe(params => {
@@ -80,6 +82,7 @@ export class AssetCollectionEditComponent implements OnInit {
 
   toggleSummaryWidget () {
     this.showSummary = !this.showSummary;
+    setTimeout(() => this.dssAppEvents.setDataSetCollaborationPaneCollapsed(!this.showSummary), 300);
   }
 
   isLoggedInUser(datasetUserId: number){
