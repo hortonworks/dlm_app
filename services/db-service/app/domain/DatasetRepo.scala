@@ -58,24 +58,32 @@ class DatasetRepo @Inject()(
         DBIO.failed(new AlreadyExistsError()) // no-op
       }
     }
-  )
+    )
 
-  def count(search:Option[String], userId: Option[Long]): Future[Int] = {
-    val filterQueryOnStatus = userId.map{ uid =>
-      Datasets.filter(t => (t.sharedStatus === SharingStatus.PUBLIC.id) || (t.createdBy === uid))
+  def count(search: Option[String], userId: Option[Long], filterParam: Option[String]): Future[Int] = {
+    val filterQuery = userId.map { uid =>
+      val filterQueryOnStatus = Datasets.filter(t => (t.sharedStatus === SharingStatus.PUBLIC.id) || (t.createdBy === uid))
+      filterParam.map { value =>
+        if (value.equalsIgnoreCase("bookmark")) {
+          filterQueryOnStatus.join(bookmarkRepo.Bookmarks).on((ds, bm) => (ds.id === bm.objectId && bm.objectType === Constants.AssetCollectionObjectType && bm.userId === uid)).map(_._1)
+        } else {
+          filterQueryOnStatus
+        }
+      }.getOrElse(filterQueryOnStatus)
     }.getOrElse(Datasets)
+
     val query = search
-      .map(s => filterQueryOnStatus.join(userRepo.Users).on(_.createdBy === _.id)
+      .map(s => filterQuery.join(userRepo.Users).on(_.createdBy === _.id)
         .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
-        .filter(m => filterDatasets(m,s)))
-      .getOrElse(Datasets)
+        .filter(m => filterDatasets(m, s)))
+      .getOrElse(filterQuery)
     db.run(query.length.result)
   }
 
-  def filterDatasets(m: ((DatasetsTable, userRepo.UsersTable), clusterRepo.ClustersTable), s: String) ={
+  def filterDatasets(m: ((DatasetsTable, userRepo.UsersTable), clusterRepo.ClustersTable), s: String) = {
     val searchTextLowerCase = s.toLowerCase
     (m._1._1.name.toLowerCase like s"%${searchTextLowerCase}%") || (m._1._1.description.toLowerCase like s"%${searchTextLowerCase}%") || (m._1._2.username.toLowerCase like s"%${searchTextLowerCase}%") ||
-    (m._2.name.toLowerCase like s"%${searchTextLowerCase}%")
+      (m._2.name.toLowerCase like s"%${searchTextLowerCase}%")
   }
 
   def findById(datasetId: Long): Future[Option[Dataset]] = {
@@ -111,33 +119,33 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def addAssets(datasetId:Long, assets:Seq[DataAsset]) :Future[RichDataset] = {
+  def addAssets(datasetId: Long, assets: Seq[DataAsset]): Future[RichDataset] = {
     val assetsToSave = assets.map(_.copy(datasetId = Some(datasetId)))
     var query = for {
       _ <- Datasets.filter(_.id === datasetId).result.head // if no result, .head will throw NoSuchElementException
       _ <- dataAssetRepo.DatasetAssets ++= assetsToSave
     } yield ()
-    db.run(query.transactionally).flatMap{
+    db.run(query.transactionally).flatMap {
       case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None).map(_.head)
     }
   }
 
-  def removeAssets(datasetId:Long, assetGuIds: Seq[String]) :Future[RichDataset] = {
+  def removeAssets(datasetId: Long, assetGuIds: Seq[String]): Future[RichDataset] = {
     var query = for {
       _ <- Datasets.filter(_.id === datasetId).result.head // if no result, .head will throw NoSuchElementException
       _ <- dataAssetRepo.DatasetAssets.filter(_.datasetId === datasetId).filter(_.guid inSet assetGuIds).delete
     } yield ()
-    db.run(query.transactionally).flatMap{
+    db.run(query.transactionally).flatMap {
       case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None).map(_.head)
     }
   }
 
-  def removeAllAssets(datasetId:Long) :Future[RichDataset] = {
+  def removeAllAssets(datasetId: Long): Future[RichDataset] = {
     var query = for {
       _ <- Datasets.filter(_.id === datasetId).result.head // if no result, .head will throw NoSuchElementException
       _ <- dataAssetRepo.DatasetAssets.filter(_.datasetId === datasetId).delete
     } yield ()
-    db.run(query.transactionally).flatMap{
+    db.run(query.transactionally).flatMap {
       case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None).map(_.head)
     }
   }
@@ -159,12 +167,12 @@ class DatasetRepo @Inject()(
     db.run(query.transactionally)
   }
 
-  private def getDatasetWithNameQuery(inputQuery: Query[DatasetsTable, Dataset, Seq], searchText:Option[String]) = {
+  private def getDatasetWithNameQuery(inputQuery: Query[DatasetsTable, Dataset, Seq], searchText: Option[String]) = {
     val query = (inputQuery.join(userRepo.Users).on(_.createdBy === _.id))
       .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
     for {
       ((dataset, user), cluster) <-
-      searchText.map(st => query.filter(m => filterDatasets(m,st))).getOrElse(query)
+      searchText.map(st => query.filter(m => filterDatasets(m, st))).getOrElse(query)
     } yield (dataset, user.username, cluster.name, cluster.id)
   }
 
@@ -184,13 +192,13 @@ class DatasetRepo @Inject()(
 
   private def getFavIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, favId),res) <- favouriteRepo.getFavInfoByUidForListQuery(datasetIds, userId, Constants.AssetCollectionObjectType)
+      ((datasetId, favId), res) <- favouriteRepo.getFavInfoByUidForListQuery(datasetIds, userId, Constants.AssetCollectionObjectType)
     } yield (datasetId, favId)
   }
 
   private def getBookmarkIds(datasetIds: Seq[Long], userId: Long) = {
     for {
-      ((datasetId, bmId),res) <- bookmarkRepo.getBookmarkInfoForObjListQuery(datasetIds, userId, Constants.AssetCollectionObjectType)
+      ((datasetId, bmId), res) <- bookmarkRepo.getBookmarkInfoForObjListQuery(datasetIds, userId, Constants.AssetCollectionObjectType)
     } yield (datasetId, bmId)
   }
 
@@ -233,7 +241,7 @@ class DatasetRepo @Inject()(
                   case "cluster" => oq._3
                   case "user" => oq._2
                 }
-            } (ColumnOrdered(_, sq.ordering))
+            }(ColumnOrdered(_, sq.ordering))
         }.getOrElse(query)
         q.drop(pq.offset).take(pq.size)
     }.getOrElse(query)
@@ -241,10 +249,10 @@ class DatasetRepo @Inject()(
 
   private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq],
                              paginatedQuery: Option[PaginatedQuery], searchText: Option[String], userId: Option[Long] = None): Future[Seq[RichDataset]] = {
-    if(userId.isDefined){
-      getRichDatasetWithFavInfo(inputQuery,paginatedQuery,searchText,userId.get)
-    }else {
-      getRichDatasetFromQuery(inputQuery,paginatedQuery, searchText)
+    if (userId.isDefined) {
+      getRichDatasetWithFavInfo(inputQuery, paginatedQuery, searchText, userId.get)
+    } else {
+      getRichDatasetFromQuery(inputQuery, paginatedQuery, searchText)
     }
 
   }
@@ -252,7 +260,7 @@ class DatasetRepo @Inject()(
   private def getRichDatasetFromQuery(inputQuery: Query[DatasetsTable, Dataset, Seq],
                                       paginatedQuery: Option[PaginatedQuery], searchText: Option[String]) = {
     val query = for {
-      datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery,searchText)).to[List].result
+      datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery, searchText)).to[List].result
       datasetAssetCount <- {
         val datasetIds = datasetWithUsername.map(_._1.id.get)
         getDatasetAssetCount(datasetIds).to[List].result
@@ -284,10 +292,11 @@ class DatasetRepo @Inject()(
         }.toSeq
     }
   }
+
   private def getRichDatasetWithFavInfo(inputQuery: Query[DatasetsTable, Dataset, Seq],
-    paginatedQuery: Option[PaginatedQuery], searchText: Option[String], userId: Long): Future[Seq[RichDataset]] = {
+                                        paginatedQuery: Option[PaginatedQuery], searchText: Option[String], userId: Long): Future[Seq[RichDataset]] = {
     val query = for {
-      datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery,searchText)).to[List].result
+      datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery, searchText)).to[List].result
       datasetAssetCount <- {
         val datasetIds = datasetWithUsername.map(_._1.id.get)
         getDatasetAssetCount(datasetIds).to[List].result
@@ -300,12 +309,12 @@ class DatasetRepo @Inject()(
 
       favId <- {
         val datasetIds = datasetWithUsername.map(_._1.id.get)
-        getFavIds(datasetIds,userId).to[List].result
+        getFavIds(datasetIds, userId).to[List].result
       }
 
       bmId <- {
         val datasetIds = datasetWithUsername.map(_._1.id.get)
-        getBookmarkIds(datasetIds,userId).to[List].result
+        getBookmarkIds(datasetIds, userId).to[List].result
       }
 
       favCount <- {
@@ -359,24 +368,47 @@ class DatasetRepo @Inject()(
   }
 
 
-  def getRichDataSet(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId:Long): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id)), paginatedQuery, searchText, Some(userId))
+  def getRichDataSet(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId: Long, filterParam: Option[String]): Future[Seq[RichDataset]] = {
+    val query = Datasets.filter(m => (m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
+    val filterQuery = filterParam.map { value =>
+      if (value.equalsIgnoreCase("bookmark")) {
+        query.join(bookmarkRepo.Bookmarks).on((ds, bm) => (ds.id === bm.objectId && bm.objectType === Constants.AssetCollectionObjectType && bm.userId === userId))
+          .map(_._1)
+      } else {
+        query
+      }
+    }.getOrElse(query)
+
+    getRichDataset(filterQuery, paginatedQuery, searchText, Some(userId))
   }
 
-  def getRichDatasetById(id: Long,userId:Long): Future[Option[RichDataset]] = {
+  def getRichDatasetById(id: Long, userId: Long): Future[Option[RichDataset]] = {
     getRichDataset(Datasets.filter(m => (m.id === id && m.createdBy === userId) || (m.id === id && m.sharedStatus === SharingStatus.PUBLIC.id)), None, None, Some(userId)).map(_.headOption)
   }
 
-  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None,userId:Long): Future[Seq[RichDataset]] = {
+  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId: Long, filterParam: Option[String]): Future[Seq[RichDataset]] = {
+
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
-      .map(_._2).filter(m=>(m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
-    getRichDataset(query, paginatedQuery, searchText, Some(userId))
+
+    val filterQuery = filterParam.map { value =>
+      if (value.equalsIgnoreCase("bookmark")) {
+        query.join(bookmarkRepo.Bookmarks).on((ds, bm) => (ds._2.id === bm.objectId && bm.objectType === Constants.AssetCollectionObjectType && bm.userId === userId))
+          .map(_._1._2).filter(m => (m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
+      } else {
+        query.map(_._2).filter(m => (m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
+      }
+    }.getOrElse {
+      query.map(_._2).filter(m => (m.createdBy === userId) || (m.sharedStatus === SharingStatus.PUBLIC.id))
+    }
+    getRichDataset(filterQuery, paginatedQuery, searchText, Some(userId))
   }
 
   def insertWithCategories(dsNtags: DatasetAndTags): Future[RichDataset] = {
+
     val tags = dsNtags.tags
+
     val query = (for {
       existingCategories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- {
@@ -387,7 +419,8 @@ class DatasetRepo @Inject()(
       categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
     } yield (savedDataset)).transactionally
-    db.run(query).flatMap{
+
+    db.run(query).flatMap {
       case sDset => getRichDataset(Datasets.filter(_.id === sDset.id.get), None, None).map(_.head)
     }
   }
@@ -406,43 +439,55 @@ class DatasetRepo @Inject()(
       categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
     } yield (savedDataset)).transactionally
-    db.run(query).flatMap{
+    db.run(query).flatMap {
       case sDset => getRichDataset(Datasets.filter(_.id === sDset.id.get), None, None).map(_.head)
     }
   }
 
   def updateDatset(datasetId: Long, dataset: Dataset) = {
     val datasetCopy = dataset.copy(lastModified = LocalDateTime.now)
-    val query = ( for {
+    val query = (for {
       _ <- Datasets.filter(_.id === datasetId).update(datasetCopy)
       ds <- Datasets.filter(_.id === datasetId).result.headOption
-    } yield(ds)).transactionally
+    } yield (ds)).transactionally
 
     db.run(query)
   }
 
-  def getCategoriesCount(searchText: Option[String], userId: Long): Future[List[CategoryCount]] = {
-    val countQuery = datasetCategoryRepo.DatasetCategories.groupBy(_.categoryId).map {
-      case (catId, results) => (catId -> results.length)
-    }
+  def getCategoriesCount(searchText: Option[String], userId: Long, filter: Option[String]): Future[List[CategoryCount]] = {
+    val countQuery = datasetCategoryRepo.DatasetCategories.join(Datasets.filter(e => e.sharedStatus === SharingStatus.PUBLIC.id || e.createdBy === userId))
+      .on(_.datasetId === _.id).map(_._1)
+
     def countQueryWithFilter(st: String) = {
-      ((datasetCategoryRepo.DatasetCategories.joinLeft(
-        Datasets.join(userRepo.Users).on(_.createdBy === _.id)
+      datasetCategoryRepo.DatasetCategories.join(
+        Datasets.filter(e => e.sharedStatus === SharingStatus.PUBLIC.id || e.createdBy === userId)
+          .join(userRepo.Users).on(_.createdBy === _.id)
           .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.dpClusterid)
           .filter(m => filterDatasets(m, st))
-      ) on ((category, datasetInfo) => {
-        ( category.datasetId === datasetInfo._1._1.id && datasetInfo._1._1.sharedStatus === SharingStatus.PUBLIC.id) || (category.datasetId === datasetInfo._1._1.id && datasetInfo._1._1.createdBy === userId)
-      })).groupBy(_._1.categoryId)).map{
-        case(catId, results) => (catId -> results.map(_._2.map(_._1._1.name)).countDefined)
-      }
+          .map(_._1._1)
+      ).on(_.datasetId === _.id).map(_._1)
     }
 
     val countQueryWithSearchOption = searchText.map(st => countQueryWithFilter(st)).getOrElse(countQuery)
 
-    val statement = countQueryWithSearchOption.to[List].result.statements
+    val queryWithBookmarkOption = filter match {
+      case Some(fv) =>
+        countQueryWithSearchOption
+          .join(bookmarkRepo.Bookmarks.filter(bm => bm.objectType === Constants.AssetCollectionObjectType && bm.userId === userId))
+          .on(_.datasetId === _.objectId)
+          .map(_._1)
+      case None => countQueryWithSearchOption
+    }
+
+    val groupByCatId = queryWithBookmarkOption
+      .groupBy(_.categoryId)
+      .map { case (catId, results) => (catId -> results.length) }
+
+
+    val statement = groupByCatId.to[List].result.statements
 
     val query = for {
-      ((catId, count), cat) <- countQueryWithSearchOption.join(categoryRepo.Categories).on(_._1 === _.id)
+      ((catId, count), cat) <- groupByCatId.join(categoryRepo.Categories).on(_._1 === _.id)
     } yield (cat.name, count)
 
     db.run(query.to[List].result).map {
@@ -453,7 +498,6 @@ class DatasetRepo @Inject()(
         }.sortBy(_.name)
     }
   }
-
 
   def queryManagedAssets(clusterId: Long, assets: Seq[String]): Future[Seq[EntityDatasetRelationship]] = {
     val query = for {

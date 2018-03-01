@@ -394,6 +394,7 @@
     "dss": "Data Steward",
     "dss.assets.cAsset": "Asset Details",
     "dss.collections": "Asset Collections",
+    "dss.bookmarks": "Bookmarks",
     "dss.collections.add": "Add",
     "dss.collections.cCollection": "Details",
     "dss.collections.cCollection.edit": "Edit",
