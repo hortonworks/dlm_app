@@ -24,8 +24,6 @@ docker start dp-cluster-service >> install.log 2>&1 || \
         --network dp \
         --detach \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        --env "SEPARATE_KNOX_CONFIG=${SEPARATE_KNOX_CONFIG}" \
-        --env "KNOX_CONFIG_USING_CREDS=${KNOX_CONFIG_USING_CREDS}" \
         --env "KEYSTORE_PATH=/dp-shared/dp-keystore.jceks" \
         --env "KEYSTORE_PASSWORD=$MASTER_PASSWORD" \
         --env "SINGLE_NODE_CLUSTER=$SINGLE_NODE_CLUSTER" \

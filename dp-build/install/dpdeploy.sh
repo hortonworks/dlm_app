@@ -22,7 +22,7 @@ CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
 DB_CONTAINER="dp-database"
 APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service $CLUSTER_SERVICE_CONTAINER dp-gateway"
 APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
-if [ "$USE_EXT_DB" == "no" ]; then
+if [ "$USE_EXTERNAL_DB" == "no" ]; then
     APP_CONTAINERS="$DB_CONTAINER $APP_CONTAINERS"
 fi
 KNOX_CONTAINER="knox"
@@ -50,7 +50,7 @@ generate_certs() {
 }
 
 init_db() {
-    if [ "$USE_EXT_DB" == "yes" ]; then
+    if [ "$USE_EXTERNAL_DB" == "yes" ]; then
         echo "DataPlane Service is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
     else
         source $(pwd)/docker-database.sh
@@ -79,7 +79,7 @@ list_metrics() {
 }
 
 migrate_schema() {
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         # start database container
         source $(pwd)/docker-database.sh
 
@@ -92,7 +92,7 @@ migrate_schema() {
 }
 
 reset_db() {
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         # start database container
         source $(pwd)/docker-database.sh
 
@@ -164,7 +164,7 @@ destroy_knox() {
 init_app() {
     echo "Initializing app"
 
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
         source $(pwd)/docker-database.sh
     fi
@@ -244,20 +244,20 @@ read_use_test_ldap() {
 }
 
 import_certs() {
-    if [ ! -e "$PUBLIC_KEY_L" ]; then
-        echo "Public key file not found at $PUBLIC_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+    if [ ! -e "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" ]; then
+        echo "Public key file not found at $DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH. Please try this command again after updating config.env.sh file with correct location."
         return -1
     fi
-    if [ ! -e "$PRIVATE_KEY_L" ]; then
-        echo "Private key file not found at $PRIVATE_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+    if [ ! -e "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" ]; then
+        echo "Private key file not found at $DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH. Please try this command again after updating config.env.sh file with correct location."
         return -1
     fi
 
     mkdir -p certs
     rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
-    cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
+    cp "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" $(pwd)/certs/ssl-cert.pem
     rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
-    cp "$PRIVATE_KEY_L" $(pwd)/certs/ssl-key.pem
+    cp "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" $(pwd)/certs/ssl-key.pem
 
     echo "Certificates were copied successfully."
 
@@ -318,7 +318,7 @@ init_knox() {
 }
 
 start_app() {
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
         source $(pwd)/docker-database.sh
     fi
