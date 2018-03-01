@@ -34,8 +34,8 @@ export interface AddCloudStoreRequestBody {
 
 export interface AddCloudAccountDetails {
   provider: string;
-  accountName: string;
-  userName: string;
+  accountName?: string;
+  userName?: string;
 }
 
 export interface ValidateCredentialsResponse {
@@ -53,8 +53,8 @@ export interface HttpProgress {
 
 export interface ValidateCredentialsRequestBody {
   credentialType: string;
-  accessKeyId: string;
-  secretAccessKey: string;
+  accessKeyId?: string;
+  secretAccessKey?: string;
 }
 
 export interface Progress {

@@ -71,6 +71,15 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
     this.cloudAccountService.showAddAccountModal();
   }
 
+  handleEditAccount(account: CloudAccount): void {
+    this.cloudAccountService.showAddAccountModal(account);
+  }
+
+  // TODO: implement this
+  handleRemoveAccount(account: CloudAccount): void {
+
+  }
+
   ngOnDestroy() {
     if (this.accountsSubscription$) {
       this.accountsSubscription$.unsubscribe();

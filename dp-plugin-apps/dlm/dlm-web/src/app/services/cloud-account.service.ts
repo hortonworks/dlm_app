@@ -11,12 +11,20 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody, CloudAccountsStatusResponse } from 'models/cloud-account.model';
+import {
+  AddCloudStoreRequestBody,
+  ValidateCredentialsRequestBody,
+  CloudAccountsStatusResponse,
+  CloudAccount
+} from 'models/cloud-account.model';
+import { AddAccountModalState, AddAccountModalActions } from 'pages/cloud-accounts/components/add-account-modal/add-account-modal.type';
 
 @Injectable()
 export class CloudAccountService {
 
-  showAddAccountModal$: BehaviorSubject<any> = new BehaviorSubject('');
+  addAccountModalState$: BehaviorSubject<AddAccountModalState> = new BehaviorSubject({
+    action: AddAccountModalActions.HIDE
+  });
 
   constructor(private httpClient: HttpClient) { }
 
@@ -24,16 +32,25 @@ export class CloudAccountService {
     return this.httpClient.get<any>('store/credentials');
   }
 
-  showAddAccountModal() {
-    this.showAddAccountModal$.next('show');
+  showAddAccountModal(account: CloudAccount = {} as CloudAccount) {
+    this.addAccountModalState$.next({
+      action: AddAccountModalActions.SHOW,
+      account
+    });
   }
 
   closeAddAccountModal() {
-    this.showAddAccountModal$.next('close');
+    this.addAccountModalState$.next({
+      action: AddAccountModalActions.HIDE
+    });
   }
 
   addCloudStore(cloudStore: AddCloudStoreRequestBody): Observable<any> {
     return this.httpClient.post('store/credential', cloudStore);
+  }
+
+  updateCloudStore(cloudStore: AddCloudStoreRequestBody): Observable<any> {
+    return this.httpClient.put('store/credential', cloudStore);
   }
 
   validateCredentials(credentials: ValidateCredentialsRequestBody): Observable<any> {

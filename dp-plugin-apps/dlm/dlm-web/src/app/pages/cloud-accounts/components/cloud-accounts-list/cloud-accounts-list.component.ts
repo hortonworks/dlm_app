@@ -30,7 +30,8 @@ export class CloudAccountsListComponent implements OnInit {
 
   IAM_ROLE = IAM_ROLE;
 
-  @Output() editAccount = new EventEmitter();
+  @Output() removeAccount = new EventEmitter<CloudAccount>();
+  @Output() editAccount = new EventEmitter<CloudAccount>();
 
   @Input() accounts: CloudAccount[] = [];
 
@@ -125,9 +126,12 @@ export class CloudAccountsListComponent implements OnInit {
   handleSelectedAction({cloudAccount, action}) {
     switch (action.type) {
       case ACTION_TYPES.DELETE:
-        // TODO: Add action
+        this.removeAccount.emit(cloudAccount);
+        break;
       case ACTION_TYPES.EDIT:
         this.edit(cloudAccount);
+        break;
+      default:
     }
   }
 

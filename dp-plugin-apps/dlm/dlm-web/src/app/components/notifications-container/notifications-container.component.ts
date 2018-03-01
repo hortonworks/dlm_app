@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostBinding } from '@angular/core';
 
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { NotificationService, NotificationState } from 'services/notification.service';
@@ -20,16 +20,22 @@ import { NOTIFICATION_TIMEOUT } from 'constants/notification.constant';
     <dlm-modal-dialog #notificationError
       [title]="'common.error'"
       [modalSize]="MODAL_SIZES.MEDIUM"
-      [showDialog]="(notificationsState$ | async)?.activeErrorId ? true : false"
+      [showDialog]="!!(notificationsState$ | async)?.activeErrorId"
       [showCancel]="false"
-      (onClose)="hideNotificationError()"
-    >
+      (onClose)="hideNotificationError()">
       <dlm-modal-dialog-body>
         <pre>{{(notificationsState$ | async).errors[(notificationsState$ | async)?.activeErrorId]}}</pre>
       </dlm-modal-dialog-body>
     </dlm-modal-dialog>
   `,
-  styles: []
+  styles: [
+    `
+    :host {
+      position: absolute;
+      z-index: 2081;
+    }
+    `
+  ]
 })
 export class NotificationsContainerComponent implements OnInit {
   MODAL_SIZES = ModalSize;

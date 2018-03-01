@@ -18,6 +18,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AddCloudFormComponent} from './add-cloud-form.component';
 import {CloudAccountService} from 'services/cloud-account.service';
 import {NotificationService} from 'services/notification.service';
+import { AsyncActionsService } from 'services/async-actions.service';
+import { ChangeDetectorRef } from '@angular/core';
 
 describe('AddCloudFormComponent', () => {
   let component: AddCloudFormComponent;
@@ -40,7 +42,9 @@ describe('AddCloudFormComponent', () => {
       ],
       providers: [
         CloudAccountService,
-        NotificationService
+        NotificationService,
+        AsyncActionsService,
+        ChangeDetectorRef
       ]
     })
       .compileComponents();
