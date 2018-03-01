@@ -11,7 +11,7 @@
 
 package controllers
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.Error
 import domain.API.{AlreadyExistsError, EntityNotFound, UpdateError}
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -29,7 +29,7 @@ trait JsonAPI extends Controller {
   def success(data: JsValueWrapper) = Ok(Json.obj("results" -> data))
   def entityCreated(data: JsValueWrapper) = Created(Json.obj("results" -> data))
 
-  val notFound = NotFound(Json.toJson(wrapErrors(404,"Not found")))
+  val notFound = NotFound(Json.toJson(Error(404,"Not found")))
 
   def linkData(data: JsValueWrapper, links: Map[String, String] = Map()) =
     Json.obj("data" -> data, "links" -> links)
@@ -48,19 +48,14 @@ trait JsonAPI extends Controller {
     case e: PSQLException =>
       Future.successful {
         val status = pgErrors.get(e.getSQLState).getOrElse(500)
-        val errors = wrapErrors(status, e.getMessage)
+        val errors = Error(status, e.getMessage)
         Status(status)(Json.toJson(errors))
       }
     case e:EntityNotFound => Future.successful(notFound)
     case e:UpdateError => Future.successful(NoContent)
     case e: AlreadyExistsError => Future.successful(Conflict)
     case e: Exception =>
-      Future.successful(InternalServerError(Json.toJson(wrapErrors(500,e.getMessage))))
+      Future.successful(InternalServerError(Json.toJson(Error(500,e.getMessage))))
   }
-
-  private def wrapErrors(code: Int, message: String): Errors = {
-    Errors(Seq(Error(code, message)))
-  }
-
 
 }

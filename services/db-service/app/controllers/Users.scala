@@ -170,7 +170,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
                 .map(updatedUserInfo =>success(userInfo))
                 .recoverWith(apiError)
               case _=>{
-                Future.successful(Conflict(Json.toJson(Errors(Seq(Error(409, s"User Already Exists:${user.username}"))))))
+                Future.successful(Conflict(Json.toJson(Error(409, s"User Already Exists:${user.username}"))))
               }
             }
            }
@@ -182,7 +182,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
     req.body.validate[UserGroupInfo]
       .map { userGroupInfo =>
         if (userGroupInfo.groupIds.isEmpty){
-          Future.successful(BadRequest(Json.toJson(Errors(Seq(Error(400, "Group needs to be specified"))))))
+          Future.successful(BadRequest(Json.toJson(Error(400, "Group needs to be specified"))))
         }else{
           val password: String = Random.alphanumeric.take(10).mkString
           userRepo.insertUserWithGroups(userGroupInfo,password)

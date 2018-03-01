@@ -13,7 +13,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, GroupInfo}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, GroupInfo}
 import domain.{GroupsRepo, RolesUtil}
 import play.api.libs.json.Json
 import play.api.mvc.Action
@@ -49,7 +49,7 @@ class Groups @Inject()(groupsRepo: GroupsRepo, rolesUtil: RolesUtil)(
       .validate[GroupInfo]
       .map { groupInfo =>
         groupsRepo.groupExists(groupInfo.groupName).flatMap {
-          case true=>Future.successful(Conflict(Json.toJson(Errors(Seq(Error(409, s"Group Already Exists:${groupInfo.groupName}"))))))
+          case true=>Future.successful(Conflict(Json.toJson(Error(409, s"Group Already Exists:${groupInfo.groupName}"))))
           case _=>{
             groupsRepo
               .addGroupWithRoles(groupInfo)
