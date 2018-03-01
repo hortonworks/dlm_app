@@ -14,6 +14,7 @@ import com.hortonworks.dlm.beacon.domain.ResponseEntities.BeaconApiErrors
 import factories.CloudServiceFactory
 import models.CloudAccountEntities.Error.GenericError
 import models.CloudAccountStatus.CloudAccountStatus
+import models.CloudCredentialType
 import models.CloudResponseEntities.{FileListResponse, MountPointsResponse}
 import models.Entities.{CloudCredentialStatus, DlmApiErrors}
 import play.api.http.Status.INTERNAL_SERVER_ERROR
@@ -45,15 +46,18 @@ class CloudServiceImpl @Inject() (
     val p: Promise[Either[DlmApiErrors, Seq[CloudCredentialStatus]]] = Promise()
     dlmKeyStore.getAllCloudAccountNames.map {
       case Left(error) => p.success(Left(DlmApiErrors(List(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message))))))
-      case Right(cloudAccounts) => {
+      case Right(cloudAccounts) =>
         val accounts = cloudAccounts.accounts
-        Future.sequence(accounts.map(x => checkUserIdentityValid(x.id))).map({
+        Future.sequence(accounts.filter(x =>
+          x.accountDetails.credentialType match {
+            case None => false
+            case Some(result) => result != CloudCredentialType.IAM_ROLE
+          }).map(x => checkUserIdentityValid(x.id))).map({
           cloudCredentialStatusList => {
             val allCloudCreds : Seq[CloudCredentialStatus] = cloudCredentialStatusList.filter(x => x.isRight).map(_.right.get)
             p.success(Right(allCloudCreds))
           }
         })
-      }
     }
     p.future
   }

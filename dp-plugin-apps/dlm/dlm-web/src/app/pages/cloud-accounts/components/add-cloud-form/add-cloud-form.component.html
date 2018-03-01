@@ -21,8 +21,8 @@
             [label]="'page.cloud_stores.content.accounts.add.provider' | translate"
             [fieldClass]="fieldClass"
             [errorClass]="fieldClass">
-            <dlm-select-field qe-attr="add-cloud-store-credential-type" formField formControlName="credentialType"
-                              [options]="credentialTypeOptions" [value]="credentialType">
+            <dlm-select-field qe-attr="add-cloud-store-cloud-provider-type" formField formControlName="cloudProviderType"
+                              [options]="cloudProviderOptions" [value]="cloudProviderType">
             </dlm-select-field>
           </dlm-form-field>
           <dlm-form-field
@@ -41,23 +41,12 @@
             [label]="'page.cloud_stores.content.accounts.add.auth_type.label' | translate"
             [fieldClass]="fieldClass"
             [errorClass]="fieldClass"
-            [inlineError]="true"
-            [required]="true">
-            <div class="ui-switch">
-              <p class="pull-left">{{"page.cloud_stores.content.accounts.add.auth_type.keys" | translate}}</p>
-              <ui-switch
-                class="pull-left"
-                qe-attr="cloud-store-auth-type"
-                formField
-                reverse
-                [disabled]="uiSwitchDisabled"
-                [defaultBgColor]="'#64bd63'"
-                (change)="onChangeAuthType($event)"
-                formControlName="authTypeFlag"></ui-switch>
-              <p class="pull-left">{{"page.cloud_stores.content.accounts.add.auth_type.role" | translate}}</p>
-            </div>
+            [inlineError]="true">
+            <dlm-select-field qe-attr="add-cloud-store-credential-type" [disabled]="authTypeDisabled" formField formControlName="authType"
+                              [options]="authenticationTypeOptions" [value]="authType">
+            </dlm-select-field>
           </dlm-form-field>
-          <dlm-form-field
+          <dlm-form-field *ngIf="isS3AccessKeyAuthType"
             [label]="'page.cloud_stores.content.accounts.add.access_key.label' | translate"
             [inlineError]="true"
             [fieldClass]="fieldClass"
@@ -71,7 +60,7 @@
               {{'forms.validation_errors.invalid_credentials' | translate}}
             </dlm-field-error>
           </dlm-form-field>
-          <dlm-form-field
+          <dlm-form-field *ngIf="isS3AccessKeyAuthType"
             [label]="'page.cloud_stores.content.accounts.add.secret_key.label' | translate"
             [fieldClass]="fieldClass"
             [errorClass]="fieldClass"
@@ -104,14 +93,14 @@
             <dlm-form-field
               [fieldClass]="fieldClass"
               [errorClass]="fieldClass"
-              [label]="'page.cloud_stores.content.accounts.add.username' | translate">
+              [label]="'page.cloud_stores.content.accounts.iam_username' | translate">
               <input type="hidden" qe-attr="add_cloud_username_input" formField formControlName="userName" />
               <span qe-attr="add_cloud_username">{{addCloudForm.get('userName').value}}</span>
             </dlm-form-field>
             <dlm-form-field
               [fieldClass]="fieldClass"
               [errorClass]="fieldClass"
-              [label]="'page.cloud_stores.content.accounts.add.account_id' | translate">
+              [label]="'page.cloud_stores.content.accounts.aws_account_id' | translate">
               <input type="hidden" qe-attr="add_cloud_account_id_input" formField formControlName="accountId" />
               <span qe-attr="add_cloud_account_id">{{addCloudForm.get('accountId').value}}</span>
             </dlm-form-field>
@@ -127,7 +116,7 @@
                     (click)="cancelButtonHandler()">
               {{'common.cancel' | translate}}
             </button>
-            <button *ngIf="!isValidationSuccess"
+            <button *ngIf="!(isValidationSuccess || isIamRoleAuthType)"
                     qe-attr="validate-cloud-connection-btn"
                     type="button"
                     [disabled]="isValidationInProgress || !canValidate"
@@ -137,10 +126,10 @@
                 {{'page.cloud_stores.content.accounts.add.validate' | translate}}
               </span>
             </button>
-            <button *ngIf="isValidationSuccess"
+            <button *ngIf="isValidationSuccess || isIamRoleAuthType"
                     qe-attr="save-cloud-btn"
                     type="submit"
-                    [disabled]="isSaveInProgress || !addCloudForm.valid"
+                    [disabled]="isSaveButtonDisabled"
                     class="btn btn-success"
                     (click)="saveButtonHandler()">
               <span *ngIf="!isSaveInProgress; else saving;">

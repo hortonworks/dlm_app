@@ -20,7 +20,6 @@ import {
   BsDropdownModule,
   ProgressbarModule
 } from 'ngx-bootstrap';
-import { UiSwitchModule } from 'ngx-ui-switch';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -182,7 +181,6 @@ import { CreatePolicyStepsModule } from './pages/policies/components/create-poli
       initialState: {},
       metaReducers
     }),
-    UiSwitchModule,
     StoreRouterConnectingModule,
     EffectsModule.forRoot([
       ClusterEffects,

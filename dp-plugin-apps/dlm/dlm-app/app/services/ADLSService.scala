@@ -40,7 +40,7 @@ class ADLSService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
             val details: ADLSAccountDetails = cloudAccount.accountDetails.asInstanceOf[ADLSAccountDetails]
             val credential = cloudAccount.accountCredentials.asInstanceOf[ADLSAccountCredentials]
             val provider: AccessTokenProvider = new ClientCredsTokenProvider(credential.authTokenEndpoint, credential.clientId, credential.clientSecret)
-            Right(ADLStoreClient.createClient(getAccountFqdn(details.accountName), provider))
+            Right(ADLStoreClient.createClient(getAccountFqdn(details.accountName.get), provider))
           }
         }
       }

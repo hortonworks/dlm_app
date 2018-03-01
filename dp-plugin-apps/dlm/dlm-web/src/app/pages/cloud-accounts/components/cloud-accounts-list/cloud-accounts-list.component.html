@@ -45,36 +45,29 @@
 </ng-template>
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
-  <ng-template #accountTemplate>
-    <span *ngIf="isExpiredAccount(account); else accountInfo">
-      {{'page.cloud_stores.content.accounts.expired_account' | translate}}
-    </span>
-    <ng-template #accountInfo>
-      <span *ngIf="account.accountDetails.credentialType === S3_TOKEN; else iamRole">
-        {{account.accountDetails.userName}}<br>{{account.accountDetails.accountName}}
-      </span>
-      <ng-template #iamRole>
-        {{'page.cloud_stores.content.accounts.iam_role' | translate}}<br>{{account.accountDetails.accountName}}
-      </ng-template>
-    </ng-template>
-  </ng-template>
-  <div
-    class="userName is-text-large"
-    [tooltip]="accountTemplate"
+  <div class="userName is-text-large"
+    [tooltip]="isExpiredAccount(account) ? ('page.cloud_stores.content.accounts.expired_account' | translate) : ''"
     [attr.qe-attr]="'cloud-account-id-' + index">
     {{account.id}}
   </div>
   <div class="userDetails">
     <span
+      class="iamRole"
+      [attr.qe-attr]="'cloud-account-account-iamRole-' + index"
+      *ngIf="account.accountDetails.credentialType === IAM_ROLE">
+      {{'page.cloud_stores.content.accounts.iam_role' | translate}}
+    </span>
+    <span
       class="userName"
       [attr.qe-attr]="'cloud-account-account-userName-' + index"
-      [tooltip]="accountTemplate"
+      [tooltip]="('page.cloud_stores.content.accounts.iam_username' | translate)"
       *ngIf="account.accountDetails.userName">
       {{account.accountDetails.userName}}
     </span>
     <span
       class="accountName"
       [attr.qe-attr]="'cloud-account-account-name-' + index"
+      [tooltip]="('page.cloud_stores.content.accounts.aws_account_id' | translate)"
       *ngIf="account.accountDetails.accountName">
       | {{account.accountDetails.accountName}}
     </span>

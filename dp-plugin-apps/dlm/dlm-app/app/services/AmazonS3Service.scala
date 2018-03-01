@@ -57,7 +57,7 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
   }
 
   private def createBasicClient(credential: S3AccountCredential): BasicAWSCredentials = {
-    new BasicAWSCredentials(credential.accessKeyId, credential.secretAccessKey)
+    new BasicAWSCredentials(credential.accessKeyId.get, credential.secretAccessKey.get)
   }
 
   private def createS3Client(credential: S3AccountCredential): AmazonS3 = {
@@ -80,7 +80,7 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
       val userName = arn.substring(userNameIndex)
       val accountId = callerIdentityResult.getAccount
       Future.successful(Right(S3AccountDetails(CloudAccountProvider.S3.toString, Some(CloudCredentialType.S3_TOKEN),
-        accountId, userName)))
+        Some(accountId), Some(userName))))
     } catch {
       case ex : AmazonClientException =>
         logger.error(ex.getMessage)

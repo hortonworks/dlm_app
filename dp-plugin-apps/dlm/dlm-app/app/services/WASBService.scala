@@ -49,7 +49,7 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
           s"AccountKey=${credential.accessKey}")
       case CloudCredentialType.WASB_SAS_TOKEN =>
         val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredentialSAS]
-        new CloudStorageAccount(new StorageCredentialsSharedAccessSignature(credential.token), true, null, accountDetails.accountName)
+        new CloudStorageAccount(new StorageCredentialsSharedAccessSignature(credential.token), true, null, accountDetails.accountName.get)
     }
   }
 

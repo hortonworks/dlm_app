@@ -410,7 +410,9 @@
           "policies": "POLICIES"
         },
         "accounts": {
-          "iam_role": "IAM Role",
+          "iam_role": "IAM ROLE",
+          "iam_username": "IAM USERNAME",
+          "aws_account_id": "AWS ACCOUNT ID",
           "expired_account": "Cloud credentials invalid. Edit these credentials to continue using them.",
           "add": {
             "title": "Add Cloud Account",
@@ -432,8 +434,6 @@
               "keys": "Access & Secret Key",
               "role": "IAM Role"
             },
-            "username": "IAM USERNAME",
-            "account_id": "ACCOUNT ID",
             "validate": "Validate",
             "validating": "Validating",
             "invalid_form": "Error: Cannot save cloud account since form is in invalid state",

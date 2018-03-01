@@ -571,7 +571,7 @@ class BeaconService @Inject()(
                             case CloudAccountProvider.S3 =>
                               val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
                               val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
-                              val cloudCredRequest = CloudCredRequest(Some(cloudCredName), Some(accountDetails.provider), Some(accountCredentials.accessKeyId), Some(accountCredentials.secretAccessKey))
+                              val cloudCredRequest = CloudCredRequest(Some(cloudCredName), Some(accountDetails.provider), accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
                               createCloudCred(clusterId, cloudCredRequest) map  {
                                 case Left(errors) => p.success(Left(errors))
                                 case Right(cloudCredPostResponse) =>
@@ -961,7 +961,7 @@ class BeaconService @Inject()(
               case CloudAccountProvider.S3 =>
                 val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
                 val cloudCredRequest = CloudCredRequest(None, None,
-                  Some(accountCredentials.accessKeyId), Some(accountCredentials.secretAccessKey))
+                  accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
                 Future.sequence(filteredCloudCreds.map(x => {
                   beaconCloudCredService.updateCloudCred(x.beaconUrl, x.clusterId, x.cloudCreds.cloudCred.head.id, cloudCredRequest)
                 })).map({
@@ -1071,7 +1071,6 @@ class BeaconService @Inject()(
     dlmKeyStore.getAllCloudAccountNames.map {
       case Left(error) => p.success(Left(DlmApiErrors(List(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message))))))
       case Right(cloudAccounts) =>
-        cloudAccounts.accounts.head.id
         getAllBeaconAdminStatus().map ({
           case Left(errors) => p.success(Left(errors))
           case Right(adminStatusResponse) =>

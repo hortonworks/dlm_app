@@ -17,7 +17,7 @@ import play.api.libs.json.Json
 
 object ADLSEntities {
   @SerialVersionUID(141)
-  case class ADLSAccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String) extends Serializable with CloudAccountDetails
+  case class ADLSAccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: Option[String]) extends Serializable with CloudAccountDetails
 
   @SerialVersionUID(142)
   case class ADLSAccountCredentials(credentialType: String, clientId: String, authTokenEndpoint: String, clientSecret: String) extends Serializable with CloudAccountCredentials

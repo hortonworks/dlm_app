@@ -15,7 +15,7 @@ import { ToastNotification } from 'models/toast-notification.model';
 import { CloudAccountService } from 'services/cloud-account.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SelectOption } from 'components/forms/select-field';
-import { CREDENTIAL_TYPE_LABELS, CREDENTIAL_TYPE_VALUES, S3_AUTH_TYPES } from 'constants/cloud.constant';
+import { CREDENTIAL_TYPE_LABELS, S3_TYPE_VALUES, S3_TOKEN, IAM_ROLE, CLOUD_PROVIDER_LABELS, CLOUD_PROVIDER_VALUES} from 'constants/cloud.constant';
 import { loadAccounts } from 'actions/cloud-account.action';
 import { addCloudStore, validateCredentials, resetAddCloudProgressState } from 'actions/cloud-account.action';
 import {
@@ -59,16 +59,25 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   PROGRESS_STATUS = PROGRESS_STATUS;
   addCloudForm: FormGroup;
   CREDENTIAL_TYPE_LABELS = CREDENTIAL_TYPE_LABELS;
-  CREDENTIAL_TYPE_VALUES = CREDENTIAL_TYPE_VALUES;
-  S3_AUTH_TYPES = S3_AUTH_TYPES;
+  S3_TYPE_VALUES = S3_TYPE_VALUES;
+  CLOUD_PROVIDER_VALUES = CLOUD_PROVIDER_VALUES;
+  CLOUD_PROVIDER_LABELS = CLOUD_PROVIDER_LABELS;
   fieldClass = 'col-xs-12';
   secretKeyInputType = 'password';
   isValidationInProgress = false;
   errorMessage = null;
   isSaveInProgress = false;
-  defaultCredentialType = this.CREDENTIAL_TYPE_VALUES[0];
+  defaultCloudProviderType = this.CLOUD_PROVIDER_VALUES[0];
+  defaultCredentialType = this.S3_TYPE_VALUES[0];
 
-  credentialTypeOptions = <SelectOption[]> this.CREDENTIAL_TYPE_VALUES.map(credentialType => {
+  cloudProviderOptions = <SelectOption[]> this.CLOUD_PROVIDER_VALUES.map(cloudProvider => {
+    return {
+      label: this.CLOUD_PROVIDER_LABELS[cloudProvider],
+      value: cloudProvider
+    };
+  });
+
+  authenticationTypeOptions = <SelectOption[]>  this.S3_TYPE_VALUES.map(credentialType => {
     return {
       label: this.CREDENTIAL_TYPE_LABELS[credentialType],
       value: credentialType
@@ -87,13 +96,12 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
 
   public initForm() {
     this.store.dispatch(resetAddCloudProgressState(ADD_CLOUD_FORM_REQUEST_ID));
-    const names = this.accounts.map(a => a.accountDetails.userName);
+    const names = this.accounts.map(a => a.id);
     this.resetErrors();
     this.addCloudForm = this.formBuilder.group({
-      credentialType: [this.defaultCredentialType, Validators.required],
+      cloudProviderType: [this.defaultCloudProviderType, Validators.required],
       credentialName: ['', Validators.compose([Validators.required, uniqValidator(names)])],
-      authType: [this.S3_AUTH_TYPES[0], Validators.required],
-      authTypeFlag: [''],
+      authType: [this.defaultCredentialType, Validators.required],
       accessKey: ['', Validators.required],
       secretKey: ['', Validators.required],
       accountId: [''],
@@ -143,8 +151,24 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     }
   }
 
-  get credentialType(): string {
-    return this.addCloudForm.get('credentialType').value;
+  get cloudProviderType(): string {
+    return this.addCloudForm.get('cloudProviderType').value;
+  }
+
+  get authType(): string {
+    return this.addCloudForm.get('authType').value;
+  }
+
+  get authTypeDisabled(): boolean {
+    return this.isValidationInProgress || this.isValidationSuccess;
+  }
+
+  get isS3AccessKeyAuthType(): boolean {
+    return this.authType === S3_TOKEN;
+  }
+
+  get isIamRoleAuthType(): boolean {
+    return this.authType === IAM_ROLE;
   }
 
   get isValidationFailure(): boolean {
@@ -164,15 +188,15 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     return this.progress && this.progress.addCloudStore && this.progress.addCloudStore.state === this.PROGRESS_STATUS.FAILED;
   }
 
+  get isSaveButtonDisabled(): boolean {
+    return this.isSaveInProgress || this.addCloudForm.controls['credentialName'].invalid || (this.addCloudForm.invalid && !this.isIamRoleAuthType);
+  }
+
   get canValidate(): boolean {
     // Check if a value is present for accessKey and secretKey fields before validation
     // credential name must be unique
     const form = this.addCloudForm;
     return form.get('credentialName').valid && form.get('accessKey').value.trim() && form.get('secretKey').value.trim();
-  }
-
-  get uiSwitchDisabled(): boolean {
-    return this.isValidationInProgress || this.isValidationSuccess;
   }
 
   isInputDisabled() {
@@ -202,27 +226,42 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
 
   saveButtonHandler() {
     this.resetErrors();
-    if (this.isValidationSuccess && this.progress.validateCredentials.response) {
+    const credentialType = this.addCloudForm.get('authType').value;
+    if (credentialType === S3_TOKEN) {
+      if (this.isValidationSuccess && this.progress.validateCredentials.response) {
+        this.isSaveInProgress = true;
+        const {accountName, credentialType, userName, provider, payload} =
+          <ValidateCredentialsResponse>this.progress.validateCredentials.response;
+        const requestPayload: AddCloudStoreRequestBody = <AddCloudStoreRequestBody> {
+          id: this.addCloudForm.get('credentialName').value.trim(),
+          accountDetails: {
+            provider,
+            accountName,
+            userName
+          },
+          accountCredentials: {
+            credentialType,
+            accessKeyId: payload.accessKeyId,
+            secretAccessKey: payload.secretAccessKey
+          }
+        };
+        this.store.dispatch(addCloudStore(requestPayload, {}));
+      } else {
+        this.errorMessage = this.t.instant('page.cloud_stores.content.accounts.add.invalid_form');
+      }
+    } else if (credentialType === IAM_ROLE) {
       this.isSaveInProgress = true;
-      // const {value} = addCloudForm;
-      const {accountName, credentialType, userName, provider, payload} =
-        <ValidateCredentialsResponse>this.progress.validateCredentials.response;
+      const cloudProviderType = this.addCloudForm.get('cloudProviderType').value;
       const requestPayload: AddCloudStoreRequestBody = <AddCloudStoreRequestBody> {
         id: this.addCloudForm.get('credentialName').value.trim(),
         accountDetails: {
-          provider,
-          accountName,
-          userName
+          provider: cloudProviderType
         },
         accountCredentials: {
-          credentialType,
-          accessKeyId: payload.accessKeyId,
-          secretAccessKey: payload.secretAccessKey
+          credentialType
         }
       };
       this.store.dispatch(addCloudStore(requestPayload, {}));
-    } else {
-      this.errorMessage = this.t.instant('page.cloud_stores.content.accounts.add.invalid_form');
     }
   }
 
@@ -231,7 +270,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     this.isValidationInProgress = true;
     const {value} = addCloudForm;
     const requestPayload: ValidateCredentialsRequestBody = {
-      credentialType: value.credentialType,
+      credentialType: value.authType,
       accessKeyId: value.accessKey,
       secretAccessKey: value.secretKey
     };
@@ -240,9 +279,5 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
 
   toggleSecretKeyInputType() {
     this.secretKeyInputType = this.secretKeyInputType === 'password' ? 'text' : 'password';
-  }
-
-  onChangeAuthType(e) {
-    this.addCloudForm.patchValue({authType: e ? S3_AUTH_TYPES[1] : S3_AUTH_TYPES[0]});
   }
 }

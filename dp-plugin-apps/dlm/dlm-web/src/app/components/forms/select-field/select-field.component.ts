@@ -32,7 +32,7 @@ export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="select-field-container">
-      <div class="form-control actionable" (click)="toggleMenu()">
+      <div class="form-control actionable" [attr.disabled]="disabled ? disabled : null" (click)="toggleMenu()">
         <div class="selected-item">
           <div *ngIf="!valueView?.template">
             {{selectedOption.label || selectedOption.value || ('common.none' | translate)}}
@@ -73,6 +73,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
   dropdownActionEmitter = new EventEmitter<string>();
   @Input() value: any;
   @Input() options: SelectOption[];
+  @Input() disabled = false;
   @Output() onSelect = new EventEmitter<SelectOption>();
   @ContentChild(SelectFieldValueDirective) valueView: SelectFieldValueDirective;
   @ContentChild(SelectFieldOptionDirective) optionView: SelectFieldOptionDirective;

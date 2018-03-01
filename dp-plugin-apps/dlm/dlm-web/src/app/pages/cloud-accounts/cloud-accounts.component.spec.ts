@@ -9,7 +9,6 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CommonComponentsModule} from 'components/common-components.module';
-import {UiSwitchModule} from 'ngx-ui-switch';
 import {CloudAccountsComponent} from './cloud-accounts.component';
 import {CloudAccountsListComponent} from './components/cloud-accounts-list/cloud-accounts-list.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
@@ -38,7 +37,6 @@ describe('CloudAccountsComponent', () => {
     configureComponentTest({
       imports: [
         RouterTestingModule,
-        UiSwitchModule,
         TooltipModule,
         ModalModule.forRoot(),
         TranslateModule.forRoot({

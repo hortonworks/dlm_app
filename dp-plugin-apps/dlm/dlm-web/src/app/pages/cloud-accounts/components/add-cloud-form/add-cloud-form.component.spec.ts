@@ -9,7 +9,6 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CommonComponentsModule} from 'components/common-components.module';
-import {UiSwitchModule} from 'ngx-ui-switch';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {configureComponentTest} from 'testing/configure';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -28,7 +27,6 @@ describe('AddCloudFormComponent', () => {
     configureComponentTest({
       imports: [
         RouterTestingModule,
-        UiSwitchModule,
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),

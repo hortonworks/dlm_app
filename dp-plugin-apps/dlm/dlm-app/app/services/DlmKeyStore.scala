@@ -72,11 +72,11 @@ class DlmKeyStore @Inject()(keyStoreManager: KeyStoreManager) extends
               S3AccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)),
                 accountDetails.accountName, accountDetails.userName)
             case CloudAccountProvider.WASB =>
-              val accountDetails = cloudAccount.accountDetails
+              val accountDetails = cloudAccount.accountDetails.asInstanceOf[WASBAccountDetails]
               WASBAccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)),
                 accountDetails.accountName)
             case CloudAccountProvider.ADLS =>
-              val accountDetails = cloudAccount.accountDetails
+              val accountDetails = cloudAccount.accountDetails.asInstanceOf[ADLSAccountDetails]
               ADLSAccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)),
                 accountDetails.accountName)
             }

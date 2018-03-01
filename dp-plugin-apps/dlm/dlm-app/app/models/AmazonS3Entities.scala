@@ -26,10 +26,10 @@ object AmazonS3Entities {
     final case class AmazonS3Error(message: String) extends Error
   }
   @SerialVersionUID(124)
-  case class S3AccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String, userName: String) extends Serializable with CloudAccountDetails
+  case class S3AccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: Option[String], userName: Option[String]) extends Serializable with CloudAccountDetails
 
   @SerialVersionUID(123)
-  case class S3AccountCredential (credentialType: String, accessKeyId: String, secretAccessKey: String) extends Serializable with CloudAccountCredentials
+  case class S3AccountCredential (credentialType: String, accessKeyId: Option[String], secretAccessKey: Option[String]) extends Serializable with CloudAccountCredentials
 
   case class S3FileItem(pathSuffix: String, `type`: String, length: Option[Long], modificationTime: Option[Long]) extends FileListItem
   case class S3FileListResponse(fileList: Seq[S3FileItem], provider: CloudAccountProvider = CloudAccountProvider.S3) extends FileListResponse
