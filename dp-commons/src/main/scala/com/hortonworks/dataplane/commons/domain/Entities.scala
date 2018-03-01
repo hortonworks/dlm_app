@@ -51,10 +51,7 @@ object Entities {
   case class WrappedErrorException(error: Error)
       extends Exception(error.message)
 
-  case class Errors(errors: Seq[Error] = Seq()) {
-    def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
-    def firstMessage: Int = errors.headOption.map(_.status).getOrElse(500)
-  }
+  case class Errors(errors: Seq[Error] = Seq())
 
   // Pagination
   case class Pagination(page: Int, offset: Long, limit: Long)

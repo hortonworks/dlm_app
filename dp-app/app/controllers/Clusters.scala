@@ -238,7 +238,7 @@ class Clusters @Inject()(
         hostsResponse <- clusterHostsService.getHostsByCluster(clusterId)
         hosts <- {
           if (hostsResponse.isLeft)
-            Future.failed(new Exception(hostsResponse.left.get.firstMessage.toString))
+            Future.failed(new Exception(hostsResponse.left.get.errors.head.message))
           else
             Future.successful(hostsResponse.right.get)
         }

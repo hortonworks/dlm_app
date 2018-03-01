@@ -254,7 +254,7 @@ private sealed class AtlasURLSupplier(
       .map {
         case Right(endpoints) => endpoints
         case Left(errors) =>
-          throw new Exception(errors.firstMessage.toString)
+          throw new Exception(errors.errors.head.message)
       }
   }
 
