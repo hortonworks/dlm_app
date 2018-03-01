@@ -24,6 +24,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {MyDatePickerModule} from 'mydatepicker';
 import {TimepickerModule, TypeaheadModule, TooltipModule} from 'ngx-bootstrap';
+import {StepAdvancedComponent} from './step-advanced/step-advanced.component';
 
 @NgModule({
   imports: [
@@ -46,13 +47,15 @@ import {TimepickerModule, TypeaheadModule, TooltipModule} from 'ngx-bootstrap';
     StepSourceComponent,
     StepDestinationComponent,
     StepScheduleComponent,
-    SelectCloudDestinationComponent
+    SelectCloudDestinationComponent,
+    StepAdvancedComponent
   ],
   exports: [
     StepGeneralComponent,
     StepScheduleComponent,
     StepDestinationComponent,
-    StepSourceComponent
+    StepSourceComponent,
+    StepAdvancedComponent
   ],
   providers: [
     BytesSizePipe,

@@ -18,6 +18,7 @@ import { FormGroup, Validators, FormBuilder, AbstractControl, ValidationErrors, 
 import { POLICY_TYPES } from 'constants/policy.constant';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs/Subscription';
 
 export function nameValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
@@ -56,6 +57,7 @@ export class StepGeneralComponent implements OnInit, OnDestroy, StepComponent {
   ];
   selectedPolicyType = POLICY_TYPES.HDFS;
   form: FormGroup;
+  subscriptions: Subscription[] = [];
 
   constructor(private store: Store<State>, private formBuilder: FormBuilder, private t: TranslateService) {}
 
@@ -69,12 +71,17 @@ export class StepGeneralComponent implements OnInit, OnDestroy, StepComponent {
 
   ngOnInit() {
     this.form = this.initForm();
-    this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
+    const formSubscription = this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
       .subscribe(isFormValid => this.onFormValidityChange.emit(isFormValid));
+    this.subscriptions.push(formSubscription);
   }
 
   ngOnDestroy() {
-
+    this.subscriptions.forEach(s => {
+      if (s) {
+        s.unsubscribe();
+      }
+    });
   }
 
   isFormValid() {
