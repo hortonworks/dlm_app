@@ -42,9 +42,12 @@
               <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
                 <div wizard-content-body>
                   <dlm-step-destination
-                    #destination [accounts]="accounts" [clusters]="clusters" [pairings]="pairings"
-                    (onFormValidityChange)="handleFormValidityChange($event)">
-                  </dlm-step-destination>
+                    #destination
+                    [accounts]="accounts"
+                    [clusters]="clusters"
+                    [pairings]="pairings"
+                    [beaconStatuses]="beaconStatuses"
+                    (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-destination>
                 </div>
               </dlm-wizard-content>
             </ng-template>

@@ -15,7 +15,14 @@ import { ToastNotification } from 'models/toast-notification.model';
 import { CloudAccountService } from 'services/cloud-account.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SelectOption } from 'components/forms/select-field';
-import { CREDENTIAL_TYPE_LABELS, S3_TYPE_VALUES, S3_TOKEN, IAM_ROLE, CLOUD_PROVIDER_LABELS, CLOUD_PROVIDER_VALUES} from 'constants/cloud.constant';
+import {
+  CREDENTIAL_TYPE_LABELS,
+  S3_TYPE_VALUES,
+  S3_TOKEN,
+  IAM_ROLE,
+  CLOUD_PROVIDER_LABELS,
+  CLOUD_PROVIDER_VALUES
+} from 'constants/cloud.constant';
 import { loadAccounts } from 'actions/cloud-account.action';
 import { addCloudStore, validateCredentials, resetAddCloudProgressState } from 'actions/cloud-account.action';
 import {
@@ -189,7 +196,9 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   }
 
   get isSaveButtonDisabled(): boolean {
-    return this.isSaveInProgress || this.addCloudForm.controls['credentialName'].invalid || (this.addCloudForm.invalid && !this.isIamRoleAuthType);
+    return this.isSaveInProgress ||
+      this.addCloudForm.controls['credentialName'].invalid ||
+      (this.addCloudForm.invalid && !this.isIamRoleAuthType);
   }
 
   get canValidate(): boolean {
@@ -230,7 +239,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     if (credentialType === S3_TOKEN) {
       if (this.isValidationSuccess && this.progress.validateCredentials.response) {
         this.isSaveInProgress = true;
-        const {accountName, credentialType, userName, provider, payload} =
+        const {accountName, userName, provider, payload} =
           <ValidateCredentialsResponse>this.progress.validateCredentials.response;
         const requestPayload: AddCloudStoreRequestBody = <AddCloudStoreRequestBody> {
           id: this.addCloudForm.get('credentialName').value.trim(),
@@ -240,7 +249,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
             userName
           },
           accountCredentials: {
-            credentialType,
+            credentialType: this.progress.validateCredentials.response['credentialType'],
             accessKeyId: payload.accessKeyId,
             secretAccessKey: payload.secretAccessKey
           }

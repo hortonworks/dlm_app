@@ -530,6 +530,7 @@
           "destinationCluster": {
             "self": "Destination Cluster",
             "default": "Select a Source Cluster first",
+            "path": "Destination Path",
             "noPair": "No paired cluster available for the selected source cluster"
           },
           "destination_type": "Destination Type",
