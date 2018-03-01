@@ -1,0 +1,44 @@
+dependencies:
+  - name: postgresql
+    repository: https://kubernetes-charts.storage.googleapis.com
+    version: 0.8.3
+    alias: postgresql
+    condition: true
+    tags:
+      - database
+    import-values:
+      - child: default.data
+        parent: myimports
+  # - name: dps-core-api
+  #   version: 0.1.0
+  #   repository: file://./charts/dps-core-api
+  #   condition: false
+  #   tags:
+  #     - api
+  # - name: dps-core-web
+  #   version: 0.1.0
+  #   repository: file://./charts/dps-core-web
+  #   condition: false
+  #   tags:
+  #     - web
+  # - name: dps-core-service-cluster
+  #   version: 0.1.0
+  #   repository: file://./charts/dps-core-service-cluster
+  #   condition: false
+  #   tags:
+  #     - service
+  #     - cluster
+  - name: dps-core-service-database
+    version: 0.1.0
+    repository: file://./charts/dps-core-service-database
+    condition: false
+    tags:
+      - service
+      - cluster
+  # - name: dps-core-service-gateway
+  #   version: 0.1.0
+  #   repository: file://./charts/dps-core-service-gateway
+  #   condition: false
+  #   tags:
+  #     - service
+  #     - gateway

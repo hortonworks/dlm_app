@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dps-core-web.fullname" . }}
+  labels:
+    app: {{ template "dps-core-web.name" . }}
+    chart: {{ template "dps-core-web.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "dps-core-web.name" . }}
+    release: {{ .Release.Name }}
