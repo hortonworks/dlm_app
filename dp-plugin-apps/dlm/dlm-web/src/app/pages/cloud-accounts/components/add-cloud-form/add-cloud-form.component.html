@@ -133,7 +133,7 @@
                     class="btn btn-success"
                     (click)="saveButtonHandler()">
               <span *ngIf="!isSaveInProgress; else saving;">
-                {{'common.save' | translate}}
+                {{(isEditMode ? 'common.update' : 'common.save') | translate}}
               </span>
             </button>
           </div>
@@ -146,5 +146,6 @@
   <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>{{'page.cloud_stores.content.accounts.add.validating' | translate}}
 </ng-template>
 <ng-template #saving>
-  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>{{'common.saving' | translate}}
+  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+  {{(isEditMode ? 'common.updating' : 'common.saving') | translate}}
 </ng-template>

@@ -7,7 +7,10 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Input, HostBinding, OnInit, Component, ViewEncapsulation, OnChanges, SimpleChange, ChangeDetectionStrategy } from '@angular/core';
+import {
+   Input, HostBinding, OnInit, Component, ViewEncapsulation,
+   OnChanges, SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 import { NotificationService } from 'services/notification.service';
@@ -24,7 +27,7 @@ import {
   CLOUD_PROVIDER_VALUES
 } from 'constants/cloud.constant';
 import { loadAccounts } from 'actions/cloud-account.action';
-import { addCloudStore, validateCredentials, resetAddCloudProgressState } from 'actions/cloud-account.action';
+import { addCloudStore, validateCredentials, resetAddCloudProgressState, updateCloudStore } from 'actions/cloud-account.action';
 import {
   AddCloudStoreRequestBody, ValidateCredentialsRequestBody,
   Progress, ValidateCredentialsResponse, CloudAccount
@@ -35,21 +38,14 @@ import {
   FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, ValidationErrors
 } from '@angular/forms';
 import { getError } from 'utils/http-util';
+import { uniqValidator } from 'utils/form-util';
+import { isEmpty } from 'utils/object-utils';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 const ADD_CLOUD_FORM_REQUEST_ID = '[ADD_CLOUD_FORM] RESET_PROGRESS_REQUEST';
 const ACCOUNTS_REQUEST = '[ADD_CLOUD_FORM] ACCOUNTS_REQUEST';
 const VALIDATE_CREDENTIALS_KEY = 'validateCredentials';
 const ADD_CLOUD_STORE_KEY = 'addCloudStore';
-
-export function uniqValidator(values): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors => {
-    const {value} = control;
-    if (!value) {
-      return null;
-    }
-    return values.includes(value) ? {uniqValidator: {name: value}} : null;
-  };
-}
 
 @Component({
   selector: 'dlm-add-cloud-form',
@@ -60,6 +56,7 @@ export function uniqValidator(values): ValidatorFn {
 })
 
 export class AddCloudFormComponent implements OnInit, OnChanges {
+  @Input() account: CloudAccount;
   @Input() progress: Progress;
   @Input() accounts: CloudAccount[] = [];
   @HostBinding('class') className = 'dlm-add-cloud-form';
@@ -76,6 +73,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   isSaveInProgress = false;
   defaultCloudProviderType = this.CLOUD_PROVIDER_VALUES[0];
   defaultCredentialType = this.S3_TYPE_VALUES[0];
+  isEditButtonDisabled = false;
 
   cloudProviderOptions = <SelectOption[]> this.CLOUD_PROVIDER_VALUES.map(cloudProvider => {
     return {
@@ -91,11 +89,53 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     };
   });
 
+  private deserializeAccount(account: CloudAccount) {
+    return {
+      cloudProviderType: account.accountDetails.provider,
+      credentialName: account.id
+    };
+  }
+
+  private serializeValue(formValue: AbstractControl, validationResponse: ValidateCredentialsResponse|any = {}): AddCloudStoreRequestBody {
+    const authType = formValue.get('authType').value;
+    if (authType === S3_TOKEN) {
+      if (validationResponse) {
+        const {accountName, credentialType, userName, provider, payload} = validationResponse;
+        return {
+          id: formValue.get('credentialName').value.trim(),
+          accountDetails: {
+            provider,
+            accountName,
+            userName
+          },
+          accountCredentials: {
+            credentialType,
+            accessKeyId: payload.accessKeyId,
+            secretAccessKey: payload.secretAccessKey
+          }
+        };
+      }
+    } else if (authType === IAM_ROLE) {
+      const cloudProviderType = formValue.get('cloudProviderType').value;
+      return {
+        id: formValue.get('credentialName').value.trim(),
+        accountDetails: {
+          provider: cloudProviderType
+        },
+        accountCredentials: {
+          credentialType: authType
+        }
+      };
+    }
+  }
+
   constructor(private formBuilder: FormBuilder,
               private store: Store<State>,
               private cloudAccountService: CloudAccountService,
               private notificationService: NotificationService,
-              private t: TranslateService) { }
+              private t: TranslateService,
+              private asyncActions: AsyncActionsService,
+              private cdRef: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.initForm();
@@ -114,10 +154,19 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
       accountId: [''],
       userName: ['']
     });
+    if (this.isEditMode) {
+      this.addCloudForm.patchValue(this.deserializeAccount(this.account));
+      this.addCloudForm.get('credentialName').disable();
+      this.addCloudForm.get('cloudProviderType').disable();
+    }
   }
+
 
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
     if (changes['progress']) {
+      if (!this.addCloudForm) {
+        return;
+      }
       if (this.isValidationFailure) {
         this.addCloudForm.controls['accessKey'].setErrors({'wrongCredentials': true});
         this.addCloudForm.controls['secretKey'].setErrors({'wrongCredentials': true});
@@ -158,6 +207,10 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     }
   }
 
+  get isEditMode(): boolean {
+    return !isEmpty(this.account || {});
+  }
+
   get cloudProviderType(): string {
     return this.addCloudForm.get('cloudProviderType').value;
   }
@@ -196,16 +249,12 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   }
 
   get isSaveButtonDisabled(): boolean {
-    return this.isSaveInProgress ||
-      this.addCloudForm.controls['credentialName'].invalid ||
+    return this.isSaveInProgress || this.addCloudForm.get('credentialName').invalid ||
       (this.addCloudForm.invalid && !this.isIamRoleAuthType);
   }
 
   get canValidate(): boolean {
-    // Check if a value is present for accessKey and secretKey fields before validation
-    // credential name must be unique
-    const form = this.addCloudForm;
-    return form.get('credentialName').valid && form.get('accessKey').value.trim() && form.get('secretKey').value.trim();
+    return this.addCloudForm.valid;
   }
 
   isInputDisabled() {
@@ -235,41 +284,26 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
 
   saveButtonHandler() {
     this.resetErrors();
-    const credentialType = this.addCloudForm.get('authType').value;
-    if (credentialType === S3_TOKEN) {
+    const authType = this.addCloudForm.get('authType').value;
+    if (authType === S3_TOKEN) {
       if (this.isValidationSuccess && this.progress.validateCredentials.response) {
         this.isSaveInProgress = true;
-        const {accountName, userName, provider, payload} =
-          <ValidateCredentialsResponse>this.progress.validateCredentials.response;
-        const requestPayload: AddCloudStoreRequestBody = <AddCloudStoreRequestBody> {
-          id: this.addCloudForm.get('credentialName').value.trim(),
-          accountDetails: {
-            provider,
-            accountName,
-            userName
-          },
-          accountCredentials: {
-            credentialType: this.progress.validateCredentials.response['credentialType'],
-            accessKeyId: payload.accessKeyId,
-            secretAccessKey: payload.secretAccessKey
-          }
-        };
-        this.store.dispatch(addCloudStore(requestPayload, {}));
+        const requestPayload = this.serializeValue(this.addCloudForm, this.progress.validateCredentials.response);
+        this.saveAccount(requestPayload);
       } else {
         this.errorMessage = this.t.instant('page.cloud_stores.content.accounts.add.invalid_form');
       }
-    } else if (credentialType === IAM_ROLE) {
+    } else if (authType === IAM_ROLE) {
       this.isSaveInProgress = true;
-      const cloudProviderType = this.addCloudForm.get('cloudProviderType').value;
-      const requestPayload: AddCloudStoreRequestBody = <AddCloudStoreRequestBody> {
-        id: this.addCloudForm.get('credentialName').value.trim(),
-        accountDetails: {
-          provider: cloudProviderType
-        },
-        accountCredentials: {
-          credentialType
-        }
-      };
+      const requestPayload = this.serializeValue(this.addCloudForm);
+      this.saveAccount(requestPayload);
+    }
+  }
+
+  saveAccount(requestPayload: AddCloudStoreRequestBody): void {
+    if (this.isEditMode) {
+      this.updateAccount(requestPayload);
+    } else {
       this.store.dispatch(addCloudStore(requestPayload, {}));
     }
   }
@@ -288,5 +322,29 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
 
   toggleSecretKeyInputType() {
     this.secretKeyInputType = this.secretKeyInputType === 'password' ? 'text' : 'password';
+  }
+
+  updateAccount(requestPayload: AddCloudStoreRequestBody): void {
+    this.isEditButtonDisabled = true;
+    this.asyncActions.dispatch(updateCloudStore(requestPayload))
+      .subscribe(progressState => {
+        let notification: ToastNotification = {
+          type: NOTIFICATION_TYPES.ERROR,
+          title: this.t.instant('page.cloud_stores.content.accounts.edit.error_notification.title'),
+          body: this.t.instant('page.cloud_stores.content.accounts.edit.error_notification.body')
+        };
+        if (progressState.success) {
+          notification = {
+            type: NOTIFICATION_TYPES.SUCCESS,
+            title: this.t.instant('page.cloud_stores.content.accounts.edit.success_notification.title'),
+            body: this.t.instant('page.cloud_stores.content.accounts.edit.success_notification.body')
+          };
+          this.cloudAccountService.closeAddAccountModal();
+        }
+        this.notificationService.create(notification);
+        this.isEditButtonDisabled = false;
+        this.isSaveInProgress = false;
+        this.cdRef.markForCheck();
+      });
   }
 }

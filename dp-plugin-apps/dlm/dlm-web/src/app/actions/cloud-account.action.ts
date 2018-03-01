@@ -18,7 +18,8 @@ export const ActionTypes = {
   ADD_CLOUD_STORE: requestType('ADD_CLOUD_STORE'),
   VALIDATE_CREDENTIALS: requestType('VALIDATE_CREDENTIALS'),
   RESET_ADD_CLOUD_PROGRESS_STATE: type('RESET_ADD_CLOUD_PROGRESS_STATE'),
-  LOAD_ACCOUNTS_STATUS: requestType('LOAD_ACCOUNTS_STATUS')
+  LOAD_ACCOUNTS_STATUS: requestType('LOAD_ACCOUNTS_STATUS'),
+  UPDATE_CLOUD_STORE: requestType('UPDATE_CLOUD_STORE')
 };
 
 export const loadAccounts = (requestId?): ActionWithPayload<any> => ({
@@ -69,6 +70,20 @@ export const resetAddCloudProgressState = (requestId): ActionWithPayload<any> =>
   payload: {requestId}
 });
 
+export const updateCloudStore = (cloudStore: AddCloudStoreRequestBody, meta = {}): ActionWithPayload<any> => ({
+  type: ActionTypes.UPDATE_CLOUD_STORE.START,
+  payload: {cloudStore, meta}
+});
+
+export const updateCloudStoreSuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.UPDATE_CLOUD_STORE.SUCCESS,
+  payload: { response, meta }
+});
+
+export const updateCloudStoreFailure = (error, meta): ActionFailure => ({
+  type: ActionTypes.UPDATE_CLOUD_STORE.FAILURE,
+  payload: { error, meta }
+});
 
 export const loadAccountsStatus = (meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_ACCOUNTS_STATUS.START, payload: {meta}
