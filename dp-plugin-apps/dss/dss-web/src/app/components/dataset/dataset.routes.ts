@@ -18,64 +18,18 @@ import {AssetViewComponent} from './views/asset-view/asset-view.component';
 import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
 import {CommentsComponent} from "../../shared/comments/comments.component";
 
-export const routes: Routes = [{
-  path: '',
-  pathMatch: 'full',
-  redirectTo: 'collections'
-}, {
-  path: "collections",
-  data: {
-    crumb: 'dss.collections'
-  },
-  children: [{
-    path: '',
-    pathMatch: 'full',
-    component: DatasetDashboardComponent,
-    data: {
-      crumb: undefined
-    },
-  }, {
-    path: "add",
-    component: DsEditor,
-    data: {
-      crumb: 'dss.collections.add'
-    }
-  }, {
-    path: ":id",
-    component: DsFullView,
-    data: {
-      crumb: 'dss.collections.cCollection'
-    },
-    children: [{
-      path: 'comments/:objectType/:isRatingEnabled',
-      component: CommentsComponent,
-      outlet: 'sidebar'
-    }]
-  }, {
-    path: ":id/edit",
-    component: DsEditor,
-    data: {
-      crumb: 'dss.collections.cCollection.edit'
-    }
-  }]
-}, {
-  path: "clusters/:clusterId/assets/:guid",
-  component: AssetViewComponent,
-  data: {
-    crumb: 'dss.assets.cAsset'
-  },
-  children: [{
-    path: 'nodes/:guidOfNode',
-    component: NodeDetailsComponent,
-    outlet: 'sidebar'
-  }]
-},
-  {
-    path: "bookmarks",
-    component: DatasetDashboardComponent,
-    data: {
-      filter: 'bookmark',
-      crumb: 'dss.bookmarks'
-    }
-  }
+export const routes: Routes = [
+  {path: '', pathMatch: 'full', redirectTo: 'collections'},
+  {path: "collections", data: {crumb: 'dss.collections'}, children: [
+    {path: '', pathMatch: 'full', component: DatasetDashboardComponent, data: {crumb: undefined}},
+    {path: "add", component: DsEditor, data: {crumb: 'dss.collections.add'}},
+    {path: ":id", component: DsFullView, data: {crumb: 'dss.collections.cCollection'}, children: [
+      {path: 'comments/:objectType/:isRatingEnabled', component: CommentsComponent, outlet: 'sidebar'}
+    ]},
+    {path: ":id/edit", component: DsEditor, data: {crumb: 'dss.collections.cCollection.edit'}}
+  ]},
+  {path: "clusters/:clusterId/assets/:guid", component: AssetViewComponent, data: {crumb: 'dss.assets.cAsset'}, children: [
+    {path: 'nodes/:guidOfNode', component: NodeDetailsComponent, outlet: 'sidebar'}
+  ]},
+  {path: "bookmarks", component: DatasetDashboardComponent, data: {filter: 'bookmark', crumb: 'dss.bookmarks'}}
 ];
