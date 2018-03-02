@@ -11,6 +11,7 @@ GET      /api/store/credentials                                       controller
 GET      /api/store/credentialAccounts                                controllers.CredentialStore.listAllCredentialAccounts
 POST     /api/store/credential                                        controllers.CredentialStore.addCredentialAccount
 PUT      /api/store/credential                                        controllers.CredentialStore.updateCredentialAccount
+PUT      /api/store/credential/sync                                   controllers.CredentialStore.syncCredentialAccount
 DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
 
 #CloudCred

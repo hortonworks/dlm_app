@@ -137,6 +137,12 @@
             }
           }
         }
+      ],
+      "clusters": [
+        {
+          "clusterId": 1,
+          "isInSyn": true
+        }
       ]
     }
   ]

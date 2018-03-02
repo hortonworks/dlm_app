@@ -206,7 +206,7 @@
     "menuItem": {
       "overview": "Overview",
       "clusters": "Clusters",
-      "cloud_stores": "Cloud Accounts",
+      "cloud_stores": "Cloud Credentials",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
@@ -402,9 +402,9 @@
       }
     },
     "cloud_stores": {
-      "header": "Cloud Accounts",
+      "header": "Cloud Credentials",
       "content": {
-        "no_accounts": "No Accounts",
+        "no_accounts": "No Credentials",
         "no_containers": "No Containers",
         "table": {
           "actions": "ACTIONS",
@@ -417,7 +417,7 @@
           "aws_account_id": "AWS ACCOUNT ID",
           "expired_account": "Cloud credentials invalid. Edit these credentials to continue using them.",
           "edit": {
-            "title": "Edit Cloud Account",
+            "title": "Edit Cloud Credential",
             "success_notification": {
               "title": "Success",
               "body": "Cloud credential updated successfully"
@@ -428,7 +428,7 @@
             }
           },
           "add": {
-            "title": "Add Cloud Account",
+            "title": "Add Cloud Credential",
             "provider": "Cloud Provider",
             "name" : {
               "label" : "Name",
@@ -449,10 +449,10 @@
             },
             "validate": "Validate",
             "validating": "Validating",
-            "invalid_form": "Error: Cannot save cloud account since form is in invalid state",
+            "invalid_form": "Error: Cannot save cloud credential since form is in invalid state",
             "success_notification": {
               "title": "Success",
-              "body": "Cloud Account added successfully!"
+              "body": "Cloud Credential added successfully!"
             }
           }
         }
