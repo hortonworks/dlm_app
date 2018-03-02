@@ -557,7 +557,7 @@ do_confirm_stop(){
     then
          destroy_all_but_state
     else
-        printf "\nContainers are not destroyed.\n"
+        printf "\nContainers are not stopped.\n"
         exit -1
     fi
 }
