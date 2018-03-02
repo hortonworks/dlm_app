@@ -28,6 +28,8 @@ import {CloudAccountsPoliciesTableComponent} from './components/cloud-account-po
 import {PrevJobsComponent} from '../policies/components/prev-jobs/prev-jobs.component';
 import {MomentModule} from 'angular2-moment';
 import {PipesModule} from 'pipes/pipes.module';
+import { NotificationService } from 'services/notification.service';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 describe('CloudAccountsComponent', () => {
   let component: CloudAccountsComponent;
@@ -61,7 +63,9 @@ describe('CloudAccountsComponent', () => {
         PrevJobsComponent
       ],
       providers: [
-        CloudAccountService
+        CloudAccountService,
+        NotificationService,
+        AsyncActionsService
       ]
     })
       .compileComponents();

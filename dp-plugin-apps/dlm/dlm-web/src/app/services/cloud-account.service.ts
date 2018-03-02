@@ -18,6 +18,12 @@ import {
   CloudAccount
 } from 'models/cloud-account.model';
 import { AddAccountModalState, AddAccountModalActions } from 'pages/cloud-accounts/components/add-account-modal/add-account-modal.type';
+import { ProgressState } from 'models/progress-state.model';
+import { CRUD_ACTIONS } from 'constants/api.constant';
+import { ToastNotification } from 'models/toast-notification.model';
+import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { TranslateService } from '@ngx-translate/core';
+import { NotificationService } from 'services/notification.service';
 
 @Injectable()
 export class CloudAccountService {
@@ -26,7 +32,11 @@ export class CloudAccountService {
     action: AddAccountModalActions.HIDE
   });
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    private t: TranslateService,
+    private notificationService: NotificationService
+  ) { }
 
   fetchAccounts(): Observable<any> {
     return this.httpClient.get<any>('store/credentials');
@@ -45,6 +55,22 @@ export class CloudAccountService {
     });
   }
 
+  notifyOnCRUD(progressState: ProgressState, action: CRUD_ACTIONS) {
+    const translateKey = action.toLowerCase();
+    const translateLevel = progressState.success ? 'success_notification' :
+      progressState.status > 200 ? 'error_notification' : 'warn_notification';
+    const notificationType = progressState.status > 200 ? NOTIFICATION_TYPES.ERROR : NOTIFICATION_TYPES.WARNING;
+    const notification: ToastNotification = {
+      type: notificationType,
+      title: this.t.instant(`page.cloud_stores.content.accounts.${translateKey}.${translateLevel}.title`),
+      body: this.t.instant(`page.cloud_stores.content.accounts.${translateKey}.${translateLevel}.body`)
+    };
+    if (progressState.success) {
+      notification.type = NOTIFICATION_TYPES.SUCCESS;
+    }
+    this.notificationService.create(notification);
+  }
+
   addCloudStore(cloudStore: AddCloudStoreRequestBody): Observable<any> {
     return this.httpClient.post('store/credential', cloudStore);
   }
@@ -59,5 +85,9 @@ export class CloudAccountService {
 
   fetchCloudAccountsStatus() {
     return this.httpClient.get<CloudAccountsStatusResponse>('cloud/accounts/status');
+  }
+
+  deleteCloudStore(cloudAccountId): Observable<any> {
+    return this.httpClient.delete(`store/credential/${cloudAccountId}`);
   }
 }

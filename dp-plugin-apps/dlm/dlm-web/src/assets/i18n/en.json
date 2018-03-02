@@ -425,6 +425,26 @@
             "error_notification": {
               "title": "Failure",
               "body": "Failed to update cloud credential."
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "Beacon clusters associated with credential can be unreachable."
+            }
+          },
+          "delete": {
+            "title": "Delete Credential Account",
+            "body": "Are you sure you want to delete credential account {{accountName}}?",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential deleted successfully"
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to delete cloud credential."
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "Beacon clusters associated with credential can be unreachable."
             }
           },
           "add": {

@@ -40,6 +40,7 @@ import { getError } from 'utils/http-util';
 import { uniqValidator } from 'utils/form-util';
 import { isEmpty } from 'utils/object-utils';
 import { AsyncActionsService } from 'services/async-actions.service';
+import { CRUD_ACTIONS } from 'constants/api.constant';
 
 const ADD_CLOUD_FORM_REQUEST_ID = '[ADD_CLOUD_FORM] RESET_PROGRESS_REQUEST';
 const ACCOUNTS_REQUEST = '[ADD_CLOUD_FORM] ACCOUNTS_REQUEST';
@@ -327,20 +328,10 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     this.isEditButtonDisabled = true;
     this.asyncActions.dispatch(updateCloudStore(requestPayload))
       .subscribe(progressState => {
-        let notification: ToastNotification = {
-          type: NOTIFICATION_TYPES.ERROR,
-          title: this.t.instant('page.cloud_stores.content.accounts.edit.error_notification.title'),
-          body: this.t.instant('page.cloud_stores.content.accounts.edit.error_notification.body')
-        };
-        if (progressState.success) {
-          notification = {
-            type: NOTIFICATION_TYPES.SUCCESS,
-            title: this.t.instant('page.cloud_stores.content.accounts.edit.success_notification.title'),
-            body: this.t.instant('page.cloud_stores.content.accounts.edit.success_notification.body')
-          };
+        this.cloudAccountService.notifyOnCRUD(progressState, CRUD_ACTIONS.UPDATE);
+        if (progressState.status === 200) {
           this.cloudAccountService.closeAddAccountModal();
         }
-        this.notificationService.create(notification);
         this.isEditButtonDisabled = false;
         this.isSaveInProgress = false;
         this.cdRef.markForCheck();

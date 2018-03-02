@@ -18,5 +18,5 @@ export const ActionTypes = {
 export const confirmNextAction =
   (nextAction: ActionWithPayload<any>, confirmationOptions: ConfirmationOptions = confirmationOptionsDefaults) => ({
     type: ActionTypes.CONFIRM_NEXT_ACTION,
-    payload: { nextAction, confirmationOptions }
+    payload: { nextAction, confirmationOptions: {...confirmationOptionsDefaults, ...confirmationOptions} }
   });

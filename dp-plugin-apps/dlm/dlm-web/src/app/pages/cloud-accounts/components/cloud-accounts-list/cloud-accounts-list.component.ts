@@ -123,10 +123,14 @@ export class CloudAccountsListComponent implements OnInit {
     this.tableComponent.toggleRowDetail(account);
   }
 
-  handleSelectedAction({cloudAccount, action}) {
+  handleSelectedAction({cloudAccount, action}: {cloudAccount: CloudAccount, action: any}) {
+    const account: CloudAccount = {
+      id: cloudAccount.id,
+      accountDetails: cloudAccount.accountDetails
+    };
     switch (action.type) {
       case ACTION_TYPES.DELETE:
-        this.removeAccount.emit(cloudAccount);
+        this.removeAccount.emit(account);
         break;
       case ACTION_TYPES.EDIT:
         this.edit(cloudAccount);
