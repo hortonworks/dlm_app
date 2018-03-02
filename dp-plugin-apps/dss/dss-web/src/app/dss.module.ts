@@ -16,6 +16,7 @@ import {CommentsModule} from './shared/comments/comments.module';
 import {BaseDssRequestOptions} from './dss-request-options';
 import {MdlService} from './services/mdl.service';
 import {MdlDirective} from './shared/directives/mdl.directive';
+import {DssAppEvents} from './services/dss-app-events';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -50,6 +51,7 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
       MdlService,
       TranslateStore,
       TranslateService,
+      DssAppEvents,
       AuthenticationService,
       {
         provide: APP_INITIALIZER,
