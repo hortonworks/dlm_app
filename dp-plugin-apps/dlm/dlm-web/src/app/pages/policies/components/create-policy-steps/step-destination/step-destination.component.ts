@@ -19,15 +19,14 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { POLICY_TYPES, WIZARD_STEP_ID } from 'constants/policy.constant';
-import { getStep, getSteps } from 'selectors/create-policy.selector';
+import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES } from 'constants/policy.constant';
+import { getSteps } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
-import { S3 } from 'constants/cloud.constant';
+import { S3, CLUSTER } from 'constants/policy.constant';
 import { mapToList } from 'utils/store-util';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Subscription } from 'rxjs/Subscription';
-
-const CLUSTER = 'CLUSTER';
+import { getClusterEntities } from 'utils/policy-util';
 
 @Component({
   selector: 'dlm-step-destination',
@@ -54,7 +53,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   general: any = {};
   WIZARD_STEP_ID = WIZARD_STEP_ID;
   POLICY_TYPES = POLICY_TYPES;
-  DESTINATION_TYPES = [CLUSTER, S3];
+  SOURCE_TYPES = SOURCE_TYPES;
   /**
    * List of field-names related to cluster (source or destination)
    *
@@ -89,7 +88,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       if (this.source.cluster) {
         const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => +cluster.id === +this.source.cluster).length);
         if (pairings.length) {
-          const clusterEntities = this.getClusterEntities(pairings);
+          const clusterEntities = getClusterEntities(pairings);
           // Remove source cluster from the entities
           delete clusterEntities[this.source.cluster];
           return mapToList(clusterEntities);
@@ -108,19 +107,6 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       const status = this.beaconStatuses.find(c => c.clusterId === cluster.id);
       return status ? status.beaconAdminStatus.replication_cloud_fs : false;
     }).map(cluster => this.clusterToListOption(cluster));
-  }
-
-  getClusterEntities(pairings) {
-    return pairings.reduce((entities: { [id: number]: {} }, entity: Pairing) => {
-      const getClusters = (pairing) => {
-        return pairing.pair.reduce((clusters: {}, cluster) => {
-          return Object.assign({}, clusters, {
-            [cluster.id]: this.clusterToListOption(cluster)
-          });
-        }, {});
-      };
-      return Object.assign({}, entities, getClusters(entity));
-    }, {});
   }
 
   clusterToListOption(cluster) {
@@ -142,15 +128,15 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   get destinationTypes() {
     const sourceClusterId = this.source.cluster;
     const onlyCluster = [{
-      label: this.CLUSTER,
-      value: this.CLUSTER
+      label: SOURCE_TYPES.CLUSTER,
+      value: SOURCE_TYPES.CLUSTER
     }];
     if (this.general.type === POLICY_TYPES.HIVE || this.source.type === this.S3) {
       return onlyCluster;
     }
     const status = this.beaconStatuses.find(c => c.clusterId === sourceClusterId);
     const replicationCloudFS = status ? status.beaconAdminStatus.replication_cloud_fs : false;
-    return replicationCloudFS ? this.DESTINATION_TYPES.map(dt => ({label: dt, value: dt})) : onlyCluster;
+    return replicationCloudFS ? Object.keys(this.SOURCE_TYPES).map(dt => ({label: dt, value: dt})) : onlyCluster;
   }
 
   constructor(private store: Store<State>, private formBuilder: FormBuilder, private t: TranslateService) {}
@@ -159,9 +145,9 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     return this.formBuilder.group({
       destination: this.formBuilder.group({
         type: ['', Validators.required],
-        cluster: [''],
-        cloudAccount: [''],
-        s3endpoint: [''],
+        cluster: ['', Validators.required],
+        cloudAccount: ['', Validators.required],
+        s3endpoint: ['', Validators.required],
         path: ['', Validators.required],
       })
     });

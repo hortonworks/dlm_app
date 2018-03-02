@@ -37,6 +37,7 @@ import { loadDatabases } from 'actions/hivelist.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { merge } from 'utils/object-utils';
 import { wizardResetStep } from 'actions/policy.action';
+import { getClusterEntities } from 'utils/policy-util';
 
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
@@ -94,7 +95,7 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
   }
 
   get sourceClusters() {
-    return mapToList(this.getClusterEntities(this.pairings));
+    return mapToList(getClusterEntities(this.pairings));
   }
 
   get sourceCloudAccounts() {
@@ -112,13 +113,6 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
     const cluster = {label: this.SOURCE_TYPES.CLUSTER, value: this.SOURCE_TYPES.CLUSTER};
     const s3 = {label: this.SOURCE_TYPES.S3, value: this.SOURCE_TYPES.S3};
     return this.isHivePolicy() ? [cluster] : [s3, cluster];
-  }
-
-  static clusterToListOption(cluster) {
-    return {
-      label: `${cluster.name} (${cluster.dataCenter})`,
-      value: cluster.id
-    };
   }
 
   constructor(private store: Store<State>, private formBuilder: FormBuilder, private t: TranslateService) {}
@@ -178,19 +172,6 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
 
   isHivePolicy() {
     return this.general && 'type' in this.general && this.general['type'] === POLICY_TYPES.HIVE;
-  }
-
-  getClusterEntities(pairings) {
-    return pairings.reduce((entities: { [id: number]: {} }, entity: Pairing) => {
-      const getClusters = (pairing) => {
-        return pairing.pair.reduce((clusters: {}, cluster) => {
-          return Object.assign({}, clusters, {
-            [cluster.id]: StepSourceComponent.clusterToListOption(cluster)
-          });
-        }, {});
-      };
-      return Object.assign({}, entities, getClusters(entity));
-    }, {});
   }
 
   handleHdfsPathChange(path) {
