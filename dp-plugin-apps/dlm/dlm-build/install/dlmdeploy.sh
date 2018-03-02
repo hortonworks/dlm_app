@@ -66,7 +66,6 @@ read_master_password_safely() {
 }
 
 check_master_password_validity(){
-    echo "$MASTER_PASSWORD"
     docker run \
         --rm \
         --entrypoint /scripts/check-master-password.sh \
