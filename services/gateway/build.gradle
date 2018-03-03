@@ -8,6 +8,7 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
+import com.github.jk1.license.render.*
 
 buildscript {
     repositories {
@@ -68,4 +69,8 @@ dependencies {
     compile 'org.springframework.cloud:spring-cloud-starter-ribbon'
     compile 'org.springframework.cloud:spring-cloud-starter-feign'
     testCompile 'junit:junit:4.12'
+}
+
+licenseReport {
+    renderer = new CsvReportRenderer()
 }

@@ -39,6 +39,19 @@ collect_scala_licenses() {
     popd
 }
 
+generate_java_licenses() {
+    pushd ${PROJECT_HOME}
+    local GATEWAY_DIR=services/gateway
+    cd ${GATEWAY_DIR}
+    local GATEWAY_LICENSES_FILE_PATH=../../dp-build/build/licenses/gradle_licenses.txt
+    log "Generating licenses from java sources"
+    rm -rf ${GATEWAY_DIR}/build/reports/dependency-license
+    gradle clean generateLicenseReport
+    mv build/reports/dependency-license/licenses.csv ${GATEWAY_LICENSES_FILE_PATH}
+    log "Licenses generated from java sources"
+    popd
+}
+
 generate_npm_licenses() {
     pushd ${PROJECT_HOME}
     cd dp-web
@@ -49,12 +62,13 @@ generate_npm_licenses() {
     popd
 }
 
-run_scala_license_checks() {
+run_license_checks() {
+    local LICENSE_TYPE=$1
     pushd ${PROJECT_HOME}
     cd tools/license-tools
     sbt package
     sbt "run check_licenses \
-            ../../dp-build/build/licenses/scala_licenses.txt \
+            ../../dp-build/build/licenses/${LICENSE_TYPE}_licenses.txt \
             src/main/resources/approved_licenses.txt \
             src/main/resources/prohibited_licenses.txt \
             src/main/resources/license_mapping.txt"
@@ -63,5 +77,8 @@ run_scala_license_checks() {
 
 generate_scala_licenses
 collect_scala_licenses
+generate_java_licenses
 generate_npm_licenses
-run_scala_license_checks
+run_license_checks scala
+run_license_checks npm
+run_license_checks gradle
