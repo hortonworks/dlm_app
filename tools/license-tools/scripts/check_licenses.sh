@@ -10,16 +10,9 @@
 #  */
 #
 set -e
-echo "hello"
+
 LICENSE_CHECK_SCRIPT_DIR=`dirname ${BASH_SOURCE[0]}`
 PROJECT_HOME=${LICENSE_CHECK_SCRIPT_DIR}/../../../
-WEB_HOME=dp-web
-LICENSE_CHECK_PROJECT_HOME=${LICENSE_CHECK_SCRIPT_DIR}/../
-ALL_LICENSES_DIR_RELATIVE=dp-build/build/licenses
-
-# Name the file with .txt so that it doesn't recursively find itself causing an infinite loop.
-ALL_SCALA_LICENSES_FILE_PATH=${ALL_LICENSES_DIR_RELATIVE}/scala_licenses.txt
-NPM_LICENSES_FILE_PATH=${ALL_LICENSES_DIR_RELATIVE}/npm_licenses.txt
 
 log() {
     echo "$@"
@@ -35,17 +28,21 @@ generate_scala_licenses() {
 
 collect_scala_licenses() {
     pushd ${PROJECT_HOME}
-    mkdir -p ${ALL_LICENSES_DIR_RELATIVE}
-    rm -rf ${ALL_SCALA_LICENSES_FILE_PATH}
-    log "Collecting all scala licenses to ${ALL_SCALA_LICENSES_FILE_PATH}"
-    find . -iname *licenses.csv | xargs cat >> ${ALL_SCALA_LICENSES_FILE_PATH}
-    log "All scala licenses available at ${ALL_SCALA_LICENSES_FILE_PATH}"
+    local LICENSES_DIR=dp-build/build/licenses
+    # Name the file with .txt so that it doesn't recursively find itself causing an infinite loop.
+    local LICENSES_FILE=${LICENSES_DIR}/scala_licenses.txt
+    mkdir -p ${LICENSES_DIR}
+    rm -rf ${LICENSES_FILE}
+    log "Collecting all scala licenses to ${LICENSES_FILE}"
+    find . -iname *licenses.csv | xargs cat >> ${LICENSES_FILE}
+    log "All scala licenses available at ${LICENSES_FILE}"
     popd
 }
 
 generate_npm_licenses() {
     pushd ${PROJECT_HOME}
-    cd ${WEB_HOME}
+    cd dp-web
+    local NPM_LICENSES_FILE_PATH=../dp-build/build/licenses/npm_licenses.txt
     log "Generating licenses from npm sources"
     license-checker --csv --out ${NPM_LICENSES_FILE_PATH}
     log "Licenses generated from npm sources"
@@ -53,7 +50,8 @@ generate_npm_licenses() {
 }
 
 run_scala_license_checks() {
-    pushd ${LICENSE_CHECK_PROJECT_HOME}
+    pushd ${PROJECT_HOME}
+    cd tools/license-tools
     sbt package
     sbt "run check_licenses \
             ../../dp-build/build/licenses/scala_licenses.txt \
