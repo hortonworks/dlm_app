@@ -8,7 +8,7 @@
  */
 
 import { BaseState } from 'models/base-resource-state';
-import { BeaconCloudCred } from 'models/beacon-cloud-cred.model';
+import { BeaconCloudCred, BeaconCloudCredWithPoliciesResponse } from 'models/beacon-cloud-cred.model';
 import { toEntities } from 'utils/store-util';
 import * as fromBeacon from 'actions/beacon-cloud-cred.action';
 import {flatten} from 'utils/array-util';
@@ -26,6 +26,12 @@ export function reducer(state = initialState, action): State {
       return {
         ...state,
         entities: toEntities<BeaconCloudCred>(creds)
+      };
+    case fromBeacon.ActionTypes.LOAD_BEACON_CLOUD_CREDS_WITH_POLICIES.SUCCESS:
+      const credsWithPoliciesResponse: BeaconCloudCredWithPoliciesResponse = action.payload.response;
+      return {
+        ...state,
+        entities: toEntities<BeaconCloudCred>(credsWithPoliciesResponse.allCloudCreds, 'name')
       };
     default:
       return state;

@@ -11,13 +11,13 @@
 
 import {Routes} from "@angular/router";
 import {DatasetDashboardComponent} from "./views/dashboard/dataset-dashboard.component";
-// import {DsAssetSearch} from "./views/ds-asset-search/ds-asset-search.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
 import {DsCreator} from "./views/ds-create/ds-creator.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {AssetViewComponent} from './views/asset-view/asset-view.component';
 import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
 import {CommentsComponent} from "../../shared/comments/comments.component";
+import {AssetCollectionEditComponent} from './views/asset-collection-edit/asset-collection-edit.component';
 
 export const routes: Routes = [{
   path: '',
@@ -70,4 +70,11 @@ export const routes: Routes = [{
     component: NodeDetailsComponent,
     outlet: 'sidebar'
   }]
+}, {
+		path: "bookmarks",
+		component: DatasetDashboardComponent,
+		data: {
+			filter: 'bookmark',
+			crumb: 'dss.bookmarks'
+		}
 }];

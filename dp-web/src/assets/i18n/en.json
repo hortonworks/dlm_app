@@ -434,6 +434,11 @@
     "cluster.ambari.status.unexpected-response-for-prereq-call": "Unexpected Response from Ambari, expected 403 or 401. Please verify the exact errors from DataPlane logs.",
     "cluster.ambari.status.connection-refused": "Connection to remote address was refused. Please check if Ambari is up and reachable from DataPlane host. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1946' target=\"_blank\">Learn More</a>",
 
+    "cluster.ambari.status.detail.0-clusters-on-ambari": "There are no clusters attached to this Ambari instance. Please check logs for more information.",
+    "cluster.ambari.status.detail.more-than-1-clusters-on-ambari": "There are more than one clusters attached to this Ambari instance. Please check logs for more information.",
+    "cluster.ambari.status.detail.access-detail-rights-unavailable": "User does not have required rights to access this cluster. Please ask your Ambari administrator to grant required rights.",
+    "cluster.ambari.status.detail.missing-data": "Unknown error: One of Knox URL or Token is unavailable.. Please check logs for more information.",
+
     "cluster.ambari.status.knox.public-key-corrupted-or-bad-auth": "We were unable to authenticate the logged-in user with Knox on HDP cluster. Please verify that trust between Knox and DataPlane has been setup correctly. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1995' target=\"blank\">Learn More</a>",
     "cluster.ambari.status.knox.ranger-rights-unavailable": "User does not have required rights to access Knox on this HDP cluster. Please ensure that logged-in user has required privileges granted. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1995' target=\"blank\">Learn More</a>",
     "cluster.ambari.status.knox.configuration-error": "Knox has not been setup for DataPlane correctly. Please verify Knox gateway logs on HDP cluster for more information. <a href='https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/troubleshooting_dps_installation.html#d6e1995' target=\"blank\">Learn More</a>",

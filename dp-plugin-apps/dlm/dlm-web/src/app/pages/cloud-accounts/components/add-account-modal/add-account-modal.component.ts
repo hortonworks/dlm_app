@@ -20,21 +20,23 @@ import { getAllAccounts, getCloudStoreProgress } from 'selectors/cloud-account.s
 import { CloudAccount, Progress } from 'models/cloud-account.model';
 import { Observable } from 'rxjs/Observable';
 import { loadAccounts } from 'actions/cloud-account.action';
+import { AddAccountModalActions, AddAccountModalState } from 'pages/cloud-accounts/components/add-account-modal/add-account-modal.type';
+import { isEmpty } from 'utils/object-utils';
 
 @Component({
   selector: 'dlm-add-account-modal',
   styleUrls: ['./add-account-modal.component.scss'],
   template: `
     <dlm-modal-dialog #addAccountModalDialog
-      [title]=" 'page.cloud_stores.content.accounts.add.title' "
+      [title]="title"
       [modalSize]="modalSize"
       [showFooter]="false"
       [showOk]="false"
-      [showCancel]="false"
-      (onClose)="initForm()">
+      [showCancel]="false">
       <dlm-modal-dialog-body *ngIf="addAccountModalDialog.childModal.isShown">
         <dlm-add-cloud-form
           #addCloudForm
+          [account]="account$ | async"
           [accounts]="accounts$ | async"
           [progress]="progress$ | async">
         </dlm-add-cloud-form>
@@ -43,13 +45,14 @@ import { loadAccounts } from 'actions/cloud-account.action';
   `
 })
 export class AddAccountModalComponent implements OnInit, OnDestroy {
+  private subscriptions: Subscription[] = [];
   @ViewChild('addAccountModalDialog') addAccountModalDialog: ModalDialogComponent;
-  @ViewChild('addCloudForm') addCloudFormComponent: AddCloudFormComponent;
 
+  account$: Observable<CloudAccount>;
   progress$: Observable<Progress>;
   accounts$: Observable<CloudAccount[]>;
-  private listener$: Subscription;
   modalSize = ModalSize.FIXED400;
+  title = 'page.cloud_stores.content.accounts.add.title';
 
   constructor(private t: TranslateService,
               private cloudAccountService: CloudAccountService,
@@ -60,26 +63,33 @@ export class AddAccountModalComponent implements OnInit, OnDestroy {
     // Listen for changes in the service
     this.store.dispatch(loadAccounts());
     this.accounts$ = this.store.select(getAllAccounts);
-    this.listener$ = this.cloudAccountService.showAddAccountModal$
-      .subscribe(action => {
-        if (action === 'show') {
+    this.account$ = this.cloudAccountService.addAccountModalState$.asObservable()
+      .pluck<AddAccountModalState, CloudAccount>('account');
+    const modalState$ = this.cloudAccountService.addAccountModalState$;
+    const updateModalVisibility = modalState$
+      .subscribe(nextState => {
+        const { action } = nextState;
+        if (action === AddAccountModalActions.SHOW) {
           this.addAccountModalDialog.show();
-        } else if (action === 'close') {
+        } else if (action === AddAccountModalActions.HIDE) {
           this.addAccountModalDialog.hide();
         }
       });
+    const updateModalTitle = modalState$.subscribe(nextState => {
+      const { account } = nextState;
+      this.title = isEmpty(account || {}) ? 'page.cloud_stores.content.accounts.add.title' :
+        'page.cloud_stores.content.accounts.edit.title';
+    });
     this.progress$ = this.store.select(getCloudStoreProgress);
+    this.subscriptions.push(updateModalVisibility);
+    this.subscriptions.push(updateModalTitle);
   }
 
   ngOnDestroy() {
-    this.listener$.unsubscribe();
+    this.subscriptions.forEach(s => s && s.unsubscribe());
   }
 
   public show(): void {
     this.addAccountModalDialog.show();
-  }
-
-  initForm() {
-    this.addCloudFormComponent.initForm();
   }
 }

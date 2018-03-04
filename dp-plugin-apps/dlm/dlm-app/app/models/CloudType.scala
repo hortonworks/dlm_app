@@ -35,6 +35,7 @@ object CloudCredentialType extends Enumeration {
   val WASB_TOKEN = Value("WASB_TOKEN")
   val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
   val S3_TOKEN = Value("S3_TOKEN")
+  val IAM_ROLE = Value("IAM_ROLE")
   val ADLS_STS = Value("ADLS_STS")
 
   implicit val cloudCredentialTypeFormat = new Format[CloudCredentialType] {
@@ -56,5 +57,17 @@ object CloudAccountProvider extends Enumeration {
   implicit val cloudAccountProviderFormat = new Format[CloudAccountProvider] {
     def reads(json: JsValue) = JsSuccess(CloudAccountProvider.withName(json.as[String]))
     def writes(myEnum: CloudAccountProvider) = JsString(myEnum.toString)
+  }
+}
+
+object CloudAccountStatus extends Enumeration {
+  type CloudAccountStatus = Value
+
+  val ACTIVE = Value("ACTIVE")
+  val EXPIRED = Value("EXPIRED")
+
+  implicit val cloudAccountStatusFormat = new Format[CloudAccountStatus] {
+    def reads(json: JsValue) = JsSuccess(CloudAccountStatus.withName(json.as[String]))
+    def writes(myEnum: CloudAccountStatus) = JsString(myEnum.toString)
   }
 }

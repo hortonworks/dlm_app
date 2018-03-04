@@ -38,6 +38,10 @@ class BookmarkRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     db.run(Bookmarks.filter(t => (t.objectId === objectId && t.objectType === objectType)).delete)
   }
 
+  def getBookmarkInfoForObjListQuery(objectIds: Seq[Long], userId: Long, objectType: String) = {
+    Bookmarks.filter(t => (t.objectId.inSet(objectIds) && t.userId === userId && t.objectType === objectType)).groupBy(a => (a.objectId, a.id))
+  }
+
   final class BookmarksTable(tag: Tag) extends Table[Bookmark](tag, Some("dataplane"), "bookmarks") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

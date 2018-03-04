@@ -58,7 +58,8 @@ export const updateLoadingProgress = (request: ProgressState, action): ProgressS
       success: false,
       error: true,
       errorMessage: action.payload.error,
-      response: null
+      response: null,
+      status: action.payload.error.status
     };
   }
   return request;

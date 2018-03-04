@@ -9,13 +9,8 @@
   ~  */
   -->
 
-<router-outlet name="sidebar"></router-outlet>
 <div *ngIf="!dsModel">Loading ... </div>
 <div *ngIf="dsModel" class="dsFullView borderBox flex-grid" [class.showSummary]="showSummary">
-
-
-
-
 
   <div class="flex-main">
     <div class="hwx-white-bg" style="padding: 15px; height: 83px;">
@@ -49,6 +44,7 @@
         <li data-tab="Assets" class="active">Assets</li>
       </ul>
 
+    <div>
       <div>
         <ds-assets-list-style1 [dsModel]="dsModel"
                                [applicableActions]="applicableListActions"
@@ -76,58 +72,6 @@
     </div>
     <div style="clear: both;"></div>
 
-  </div>
-  <div class="summaryWidgetCont flex-side flex-side-right hwx-white-bg">
-    <div class="grapic-holder" style="height: 83px;">
-      <img src="{{assetPrefix}}/assets/images/collection-banners/red1.png">
-      <span class="rating">{{this.avgRating.toFixed(1)}}<i class="fa fa-star"></i></span>
-    </div>
-    <div class="flex-grid flex-summary">
-      <div class="flex-summary-item view-icon" (click)='onFavIconClick()'>
-        <i class="fa fa-heart" [ngClass] = "{'marked': dsModel.favouriteId}"></i> <span>{{getFavCount(dsModel.favouriteCount)}}</span>
-      </div>
-      <div class="flex-summary-item view-icon" (click)='viewComments()'>
-        <i class="fa fa-comments"></i>
-      </div>
-      <div class="flex-summary-item view-icon" (click)='onBookmarkIconClick()'>
-        <i class="fa fa-bookmark" [ngClass] = "{'marked': dsModel.bookmarkId}"></i>
-      </div>
-    </div>
-    <div class="flex-summary-vertical">
-      <div class="flex-summary-item flex-grid">
-        <div class="utility-space flex-side-left">
-          <i class="fa fa-user-circle-o fa-2x"></i>
-        </div>
-        <div class="primary-space">
-          <span class="key">Created By</span>
-          <span class="value">{{dsModel.creatorName}}</span>
-        </div>
-      </div>
-      <div class="flex-summary-item">
-        <span class="key">Datalake</span>
-        <span class="value">{{dsModel.datalakeName}}</span>
-      </div>
-      <div class="flex-summary-item">
-        <span class="key">Tags</span>
-        <span class="value">
-                  <span class="color-tag color-b" *ngFor="let tag of dsModel.tags">{{tag}}</span>
-              </span>
-      </div>
-      <div class="flex-summary-item" *ngIf="systemTags.length">
-        <span class="key">System Tags</span>
-        <div class="value">
-          <span class="color-tag color-c" *ngFor="let tag of systemTags">{{tag}}</span>
-        </div>
-      </div>
-      <div class="flex-summary-item">
-        <span class="key">Created On</span>
-        <span class="value">{{dsModel.createdOn}}</span>
-      </div>
-      <div class="flex-summary-item">
-        <span class="key">Last Modified</span>
-        <span class="value">{{dsModel.lastModified}}</span>
-      </div>
-    </div>
   </div>
 
   <div *ngIf="showPopup" class="popup borderBox">

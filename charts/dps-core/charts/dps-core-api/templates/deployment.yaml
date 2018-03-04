@@ -1,0 +1,52 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name:  {{ template "projectName" . }}-{{.Release.Name}}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ template "projectName" . }}
+    version: {{ .Chart.Version }}
+    dpVersion: {{ .Values.global.dpVersion }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "projectName" . }}
+      release: {{ .Release.Name }}
+      type: deployment-pod
+  template:
+    metadata:
+      labels:
+        app: {{ template "projectName" . }}
+        release: {{ .Release.Name }}
+        type: deployment-pod
+    spec:
+      containers:
+        name: dp-app
+        image: {{ .Values.global.registry }}/{{ .Values.global.hwxRepository }}/{{ .Values.dpApp.image.name }}:{{ .Values.global.dpVersion }}
+        imagePullPolicy: {{ .Values.dpApp.imagePullPolicy }}
+        ports:
+          - containerPort: 8080
+        env:
+          - name: CONSUL_HOST
+            value: {{ .Values.consul.app.name }}-{{ .Release.Name }}-service.{{ .Values.global.namespace }}.svc.cluster.local
+          - name: CERTIFICATE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dp-knox-secret-{{ .Release.Name }}
+                key: CERTIFICATE_PASSWORD
+          - name: KEYSTORE_PATH
+            value: {{ .Values.global.dpKeystorePath }}
+          - name: KEYSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: dp-knox-secret-{{ .Release.Name }}
+                key: KNOX_MASTER_PASSWORD
+          - name: USE_TLS
+            value: {{ .Values.global.useTls | quote }}
+        volumeMounts:
+          - mountPath: {{ .Values.global.certsDir }}
+            name: dp-certs-volume

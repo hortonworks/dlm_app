@@ -17,7 +17,7 @@
     <span class="persona-name">Data Steward Studio</span>
   </div>
 
-  <span class="sidenav-item" *ngFor="let nav of navItems; let i = index" [ngClass]="{'active': activeTabName === nav.tabName}" [attr.id]="'persona_side_nav_item_'+i" (click)="navigateToURL(nav)">
+  <span class="sidenav-item" *ngFor="let nav of navItems; let i = index" [ngClass]="{'active': activeTabName === nav.name}" [attr.id]="'persona_side_nav_item_'+i" (click)="navigateToURL(nav)">
     <i *ngIf="nav.iconClassName != ''" [ngClass]="'fa ' +  nav.iconClassName" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ nav.name }} </span>
   </span>
 

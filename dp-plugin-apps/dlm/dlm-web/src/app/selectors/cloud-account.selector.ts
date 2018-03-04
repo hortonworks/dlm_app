@@ -12,7 +12,7 @@ import { mapToList } from 'utils/store-util';
 import { getCloudAccounts } from './root.selector';
 import { getContainersGroupedByAccounts } from './cloud-container.selector';
 import {getAllPolicies} from './policy.selector';
-import {getAllBeaconCloudCreds} from './beacon-cloud-cred.selector';
+import {getEntities as getBeaconCloudEntities} from './beacon-cloud-cred.selector';
 import {groupByKey} from 'utils/array-util';
 
 export const getEntities = (type) => createSelector(getCloudAccounts, state => state[type].entities);
@@ -30,20 +30,27 @@ export const getAllAccountsWithContainers =
     }));
 
 export const getAllAccountsWithPolicies =
-  createSelector(getAllAccounts, getAllPolicies, getAllBeaconCloudCreds, (accounts, policies, beaconCloudCreds) => {
-    const groupedBeaconCloudCreds = groupByKey(beaconCloudCreds, 'name');
+  createSelector(getAllAccounts, getBeaconCloudEntities, (accounts, beaconCloudCreds) => {
     return accounts.map(a => {
-      const beaconCloudCred = groupedBeaconCloudCreds[a.accountDetails.accountName];
+      const beaconCloudCred = beaconCloudCreds[a.id];
       if (!beaconCloudCred) {
         return a;
       }
-      const beaconCloudCredIds = beaconCloudCred.map(b => b.id);
-      const _policies = policies.filter(p => beaconCloudCredIds.includes(p.customProperties.cloudCred));
       return {
         ...a,
-        policies: _policies
+        policies: beaconCloudCred.policies || []
       };
     });
   });
 
 export const getCloudStoreProgress = createSelector(getCloudAccounts, state => state.progress);
+
+export const getAccountsStatusEntities = createSelector(getCloudAccounts, state => state.status.entities);
+export const getAllAccountsStatuses = createSelector(getAccountsStatusEntities, entities => mapToList(entities));
+
+export const getFullAccountsInfo = createSelector(getAllAccountsWithPolicies, getAccountsStatusEntities, (accounts, statuses) => {
+  return accounts.map(account => ({
+    ...account,
+    status: statuses[account.id] && statuses[account.id].status
+  }));
+});

@@ -11,7 +11,7 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
-import java.io.File
+import java.io.{File, IOException}
 import java.nio.file.Paths
 
 import org.scalamock.scalatest.AsyncMockFactory
@@ -51,4 +51,17 @@ class KeyStoreManagerSpec extends AsyncFlatSpec with AsyncMockFactory with Match
     res.failure.exception shouldBe a [CredentialNotFoundInKeystoreException]
   }
 
+  "keyStoreManager" should "throw IOException if key store password is incorrect" in {
+    val ksManager = new KeyStoreManager(keyStoreFilePath, "incorrectpass")
+    val res = ksManager.read("DPSPlatform.test123", Set("username","password"))
+    assert(res.isFailure === true)
+    res.failure.exception shouldBe a [IOException]
+  }
+
+  "keyStoreManager" should "throw IOException if key store path is incorrect" in {
+    val ksManager = new KeyStoreManager("incorrect/path", keyStorePassword)
+    val res = ksManager.read("DPSPlatform.test123", Set("username","password"))
+    assert(res.isFailure === true)
+    res.failure.exception shouldBe a [IOException]
+  }
 }

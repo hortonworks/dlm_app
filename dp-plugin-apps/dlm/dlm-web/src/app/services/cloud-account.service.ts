@@ -11,32 +11,83 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody } from 'models/cloud-account.model';
+import {
+  AddCloudStoreRequestBody,
+  ValidateCredentialsRequestBody,
+  CloudAccountsStatusResponse,
+  CloudAccount
+} from 'models/cloud-account.model';
+import { AddAccountModalState, AddAccountModalActions } from 'pages/cloud-accounts/components/add-account-modal/add-account-modal.type';
+import { ProgressState } from 'models/progress-state.model';
+import { CRUD_ACTIONS } from 'constants/api.constant';
+import { ToastNotification } from 'models/toast-notification.model';
+import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { TranslateService } from '@ngx-translate/core';
+import { NotificationService } from 'services/notification.service';
 
 @Injectable()
 export class CloudAccountService {
 
-  showAddAccountModal$: BehaviorSubject<any> = new BehaviorSubject('');
+  addAccountModalState$: BehaviorSubject<AddAccountModalState> = new BehaviorSubject({
+    action: AddAccountModalActions.HIDE
+  });
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(
+    private httpClient: HttpClient,
+    private t: TranslateService,
+    private notificationService: NotificationService
+  ) { }
 
   fetchAccounts(): Observable<any> {
     return this.httpClient.get<any>('store/credentials');
   }
 
-  showAddAccountModal() {
-    this.showAddAccountModal$.next('show');
+  showAddAccountModal(account: CloudAccount = {} as CloudAccount) {
+    this.addAccountModalState$.next({
+      action: AddAccountModalActions.SHOW,
+      account
+    });
   }
 
   closeAddAccountModal() {
-    this.showAddAccountModal$.next('close');
+    this.addAccountModalState$.next({
+      action: AddAccountModalActions.HIDE
+    });
+  }
+
+  notifyOnCRUD(progressState: ProgressState, action: CRUD_ACTIONS) {
+    const translateKey = action.toLowerCase();
+    const translateLevel = progressState.success ? 'success_notification' :
+      progressState.status > 200 ? 'error_notification' : 'warn_notification';
+    const notificationType = progressState.status > 200 ? NOTIFICATION_TYPES.ERROR : NOTIFICATION_TYPES.WARNING;
+    const notification: ToastNotification = {
+      type: notificationType,
+      title: this.t.instant(`page.cloud_stores.content.accounts.${translateKey}.${translateLevel}.title`),
+      body: this.t.instant(`page.cloud_stores.content.accounts.${translateKey}.${translateLevel}.body`)
+    };
+    if (progressState.success) {
+      notification.type = NOTIFICATION_TYPES.SUCCESS;
+    }
+    this.notificationService.create(notification);
   }
 
   addCloudStore(cloudStore: AddCloudStoreRequestBody): Observable<any> {
     return this.httpClient.post('store/credential', cloudStore);
   }
 
+  updateCloudStore(cloudStore: AddCloudStoreRequestBody): Observable<any> {
+    return this.httpClient.put('store/credential', cloudStore);
+  }
+
   validateCredentials(credentials: ValidateCredentialsRequestBody): Observable<any> {
     return this.httpClient.post('cloud/userIdentity', credentials);
+  }
+
+  fetchCloudAccountsStatus() {
+    return this.httpClient.get<CloudAccountsStatusResponse>('cloud/accounts/status');
+  }
+
+  deleteCloudStore(cloudAccountId): Observable<any> {
+    return this.httpClient.delete(`store/credential/${cloudAccountId}`);
   }
 }

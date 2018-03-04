@@ -102,7 +102,8 @@ object RequestEntities {
                                       `tde.sameKey`: Option[Boolean], description: Option[String], sourceSnapshotRetentionAgeLimit: Option[Long],
                                       sourceSnapshotRetentionNumber: Option[Long], targetSnapshotRetentionAgeLimit: Option[Long],
                                       targetSnapshotRetentionNumber: Option[Long], retryAttempts: Option[Long], retryDelay: Option[Long])
-  case class CloudCredRequest(name: Option[String], provider: Option[String], `s3.access.key`: Option[String], `s3.secret.key`: Option[String], `s3.encryption.key`: Option[String] = None)
+  case class CloudCredRequest(name: Option[String], provider: Option[String], `s3.access.key`: Option[String],
+                              `s3.secret.key`: Option[String], `s3.encryption.key`: Option[String] = None)
 }
 
 object JsonFormatters {

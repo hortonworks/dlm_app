@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -44,6 +45,7 @@ import static org.springframework.cloud.commons.httpclient.ApacheHttpClientConne
 })
 @SpringBootApplication
 @EnableZuulProxy
+@EnableDiscoveryClient
 @EnableFeignClients
 public class RouteService {
   private static final Logger logger = LoggerFactory.getLogger(RouteService.class);

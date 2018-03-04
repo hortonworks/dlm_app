@@ -15,9 +15,14 @@
   [showFooter]="showFooter"
   [limit]="1000"
   [rows]="accounts"
-  [rowDetailHeight]="600"
+  [rowDetailHeight]="rowDetailHeight"
+  [rowClass]="rowClass"
   [rowDetailTemplate]="rowDetailRef">
 </dlm-table>
+
+<ng-template #statusCell let-account="row">
+  <i *ngIf="isExpiredAccount(account)" class="fa fa-2x fa-exclamation-triangle text-danger"></i>
+</ng-template>
 
 <ng-template #providerCell let-account="row" let-index="rowIndex">
   <div>
@@ -27,9 +32,11 @@
 </ng-template>
 
 <ng-template #policiesCell let-account="row" let-index="rowIndex">
-  <div [attr.qe-attr]="'cloud-account-policies' + index">
+  <div [attr.qe-attr]="'cloud-account-policies' + index" class="is-text-large">
     <span *ngIf="account.policies?.length; else noPolicies" class="actionable" (click)="toggleRowDetails(account)">
-      {{account.policies.length}}<span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isAccountActive(account), 'fa-caret-down': !isAccountActive(account)}"></span>
+      {{account.policies.length}}
+      <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-chevron-up': isAccountActive(account), 'fa-chevron-down': !isAccountActive(account)}">
+      </span>
     </span>
     <ng-template #noPolicies>
       <span class="fa fa-minus"></span>
@@ -38,34 +45,37 @@
 </ng-template>
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
-  <ng-template #accountTemplate>
-        <span *ngIf="account.accountDetails.credentialType === S3_TOKEN; else iamRole">
-       {{account.accountDetails.userName}}<br>{{account.accountDetails.accountName}}
-     </span>
-    <ng-template #iamRole>
-      {{'page.cloud_stores.content.accounts.iam_role' | translate}}<br>{{account.accountDetails.accountName}}
-    </ng-template>
-  </ng-template>
-  <div
-    class="userName"
-    [tooltip]="accountTemplate"
+  <div class="userName is-text-large"
+    [tooltip]="isExpiredAccount(account) ? ('page.cloud_stores.content.accounts.expired_account' | translate) : ''"
     [attr.qe-attr]="'cloud-account-id-' + index">
     {{account.id}}
   </div>
   <div class="userDetails">
     <span
+      class="iamRole"
+      [attr.qe-attr]="'cloud-account-account-iamRole-' + index"
+      *ngIf="account.accountDetails.credentialType === IAM_ROLE">
+      {{'page.cloud_stores.content.accounts.iam_role' | translate}}
+    </span>
+    <span
       class="userName"
       [attr.qe-attr]="'cloud-account-account-userName-' + index"
-      [tooltip]="accountTemplate"
+      [tooltip]="('page.cloud_stores.content.accounts.iam_username' | translate)"
       *ngIf="account.accountDetails.userName">
       {{account.accountDetails.userName}}
     </span>
     <span
       class="accountName"
       [attr.qe-attr]="'cloud-account-account-name-' + index"
+      [tooltip]="('page.cloud_stores.content.accounts.aws_account_id' | translate)"
       *ngIf="account.accountDetails.accountName">
       | {{account.accountDetails.accountName}}
     </span>
+  </div>
+  <div *ngIf="isExpiredAccount(account)">
+    <button type="button" class="btn btn-secondary btn-xs" (click)="edit(account)">
+      {{'common.edit' | translate}}
+    </button>
   </div>
 </ng-template>
 

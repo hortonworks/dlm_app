@@ -12,3 +12,10 @@ export const POLL_INTERVAL = 8000;
 // this is default value to get all policies within single request
 // todo: remove this with server side pagination
 export const ALL_POLICIES_COUNT = 200;
+
+export enum CRUD_ACTIONS {
+  CREATE = 'CREATE',
+  READ   = 'READ',
+  UPDATE = 'UPDATE',
+  DELETE = 'DELETE'
+}

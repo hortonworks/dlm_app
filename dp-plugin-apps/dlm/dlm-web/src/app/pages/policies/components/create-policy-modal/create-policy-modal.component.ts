@@ -27,6 +27,7 @@ import { loadBeaconAdminStatus } from 'actions/beacon.action';
 import { getAllBeaconAdminStatuses } from 'selectors/beacon.selector';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { loadClusters } from 'actions/cluster.action';
+import { wizardResetAllSteps } from 'actions/policy.action';
 import { getAllClusters } from 'selectors/cluster.selector';
 import { Cluster } from 'models/cluster.model';
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
@@ -48,33 +49,23 @@ const ADMIN_STATUS_REQUEST = '[CREATE POLICY] ADMIN_STATUS_REQUEST';
       [showFooter]="false"
       [showOk]="false"
       [showCancel]="false"
+      [subtitleText]="'page.policies.subpage.create_policy.help_text' | translate"
+      [subtitleLink]="'page.policies.subpage.create_policy.help_url' | translate"
       (onClose)="handleCloseModal()">
       <dlm-modal-dialog-body>
         <dlm-progress-container [progressState]="overallProgress$ | async">
           <div>
-            <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
-              <dlm-create-policy-wizard
-                [accounts]="accounts$ | async"
-                [clusters]="clusters$ | async"
-                [containers]="containersGrouped$ | async"
-                [containersList]="containers$ | async"
-                [beaconStatuses]="beaconStatuses$ | async"
-                [pairings]="pairings$ | async"
-                [sourceClusterId]="sourceClusterId"
-                (onCancel)="handleOnCancel($event)"
-                >
-              </dlm-create-policy-wizard>
-            </div>
-            <ng-template #noPairs>
-              <div>
-                <div class="alert alert-warning" role="alert">
-                  {{ "page.pairings.content.no_pairs" | translate}}
-                  <button type="button" class="btn btn-primary" [routerLink]="'/pairings/create'">
-                    {{ "page.pairings.create_button_text" | translate }}
-                  </button>
-                </div>
-              </div>
-            </ng-template>
+            <dlm-create-policy-wizard
+              [accounts]="accounts$ | async"
+              [clusters]="clusters$ | async"
+              [containers]="containersGrouped$ | async"
+              [containersList]="containers$ | async"
+              [beaconStatuses]="beaconStatuses$ | async"
+              [pairings]="pairings$ | async"
+              [sourceClusterId]="sourceClusterId"
+              (onCancel)="handleOnCancel($event)"
+              >
+            </dlm-create-policy-wizard>
           </div>
         </dlm-progress-container>
       </dlm-modal-dialog-body>
@@ -131,6 +122,7 @@ export class CreatePolicyModalComponent implements OnInit, OnDestroy {
   }
 
   handleCloseModal() {
+    this.store.dispatch(wizardResetAllSteps());
     this.router.navigate(['/policies']);
   }
 

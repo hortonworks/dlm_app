@@ -7,9 +7,20 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+import { Policy } from 'models/policy.model';
+
 export interface BeaconCloudCred {
   id: string;
   name: string;
   provider: string;
   clusterId: string;
+  policies?: Policy;
+}
+
+export interface BeaconCloudCredWithPoliciesResponse {
+  unreachableBeacon: any[];
+  allCloudCreds: {
+    name: string;
+    policies: Policy[];
+  }[];
 }

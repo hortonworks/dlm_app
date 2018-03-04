@@ -66,6 +66,9 @@ import {CommentService} from '../../services/comment.service';
 import {RatingService} from "../../services/rating.service";
 import {FavouriteService} from "../../services/favourite.service";
 import {BookmarkService} from "../../services/bookmark.service";
+import {AssetCollectionEditComponent} from './views/asset-collection-edit/asset-collection-edit.component';
+import {OverviewComponent} from './views/asset-collection-edit/overview/overview.component';
+import {ProfilerService} from "app/services/profiler.service";
 
 @NgModule({
   declarations: [
@@ -98,6 +101,8 @@ import {BookmarkService} from "../../services/bookmark.service";
     AuditVisualizationComponent,
     AssetTagPolicyViewComponent,
     AssetResourcePolicyViewComponent,
+    AssetCollectionEditComponent,
+    OverviewComponent
   ],
   entryComponents: [QueryFilter],
   imports: [
@@ -133,7 +138,9 @@ import {BookmarkService} from "../../services/bookmark.service";
     BasicQueryEditor,
     AdvanceQueryEditor,
     QueryFilter,
-    SearchWidget
+    SearchWidget,
+    AssetCollectionEditComponent,
+    OverviewComponent
   ],
   providers: [
     RichDatasetService,
@@ -148,7 +155,8 @@ import {BookmarkService} from "../../services/bookmark.service";
     CommentService,
     RatingService,
     FavouriteService,
-    BookmarkService
+    BookmarkService,
+    ProfilerService
   ]
 })
 export class DatasetSharedModule {

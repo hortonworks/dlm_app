@@ -8,10 +8,8 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-unset SEPARATE_KNOX_CONFIG
-unset KNOX_CONFIG_USING_CREDS
 
-unset USE_EXT_DB
+unset USE_EXTERNAL_DB
 unset DATABASE_URI
 unset DATABASE_USER
 unset DATABASE_PASS
@@ -21,8 +19,8 @@ unset USE_TEST_LDAP
 
 unset USE_TLS
 unset USE_PROVIDED_CERTIFICATES
-unset PUBLIC_KEY_L
-unset PRIVATE_KEY_L
+unset DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH
+unset DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH
 unset CERTIFICATE_PASSWORD
 
 unset USER_ADMIN_PASSWORD

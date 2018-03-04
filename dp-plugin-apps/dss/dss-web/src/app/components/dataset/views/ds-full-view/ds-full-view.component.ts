@@ -12,9 +12,8 @@
 import {Component, OnInit, ViewChild, ElementRef, isDevMode} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as DialogPolyfill from 'dialog-polyfill';
-import {Bookmark, Favourite, RichDatasetModel} from "../../models/richDatasetModel";
+import {RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
-import {DsTagsService} from "../../services/dsTagsService";
 import {DataSetService} from "../../../../services/dataset.service";
 import {
   AssetListActionsEnum,
@@ -22,11 +21,6 @@ import {
   AssetSetQueryModel,
   DsAssetList
 } from "../ds-assets-list/ds-assets-list.component";
-import {AuthUtils} from "../../../../shared/utils/auth-utils";
-import {FavouriteService} from "../../../../services/favourite.service";
-import {BookmarkService} from "../../../../services/bookmark.service";
-import {RatingService} from "../../../../services/rating.service";
-import {DataSet} from "../../../../models/data-set";
 
 @Component({
   selector: "ds-full-view",
@@ -41,7 +35,6 @@ export class DsFullView implements OnInit {
   applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT, AssetListActionsEnum.DELETE];
   dsAssetQueryModel: AssetSetQueryModel;
   clusterId: any;
-  showSummary : boolean = true;
   selectionAllowed : boolean = false;
   showPopup: boolean = false;
   hidePopupActionButtons: boolean = false;
@@ -55,10 +48,6 @@ export class DsFullView implements OnInit {
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
-              private tagService: DsTagsService,
-              private favouriteService: FavouriteService,
-              private bookmarkService: BookmarkService,
-              private ratingService: RatingService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -73,23 +62,19 @@ export class DsFullView implements OnInit {
         this.dsAssetQueryModel = new AssetSetQueryModel([
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
-        this.tagService.listAtlasTags(+params["id"]).subscribe(tags => this.systemTags=tags)
-        this.getAverageRating(params["id"]);
       });
-    this.ratingService.dataChanged$.subscribe(avgRating => {
-      this.avgRating = avgRating;
-    });
   }
   get confirmationStickerText() {
     return `${Math.abs(this.assetCountDiff)} Assets successfully ${(this.assetCountDiff < 0)?"removed from":"added to"} ${this.dsModel.name}.`;
   }
+
   updateDsModel = (rData) => {
     this.assetCountDiff = rData.counts.hiveCount - this.dsModel.counts.hiveCount;
     this.showConfirmationSticker=true;
     setTimeout(()=>this.showConfirmationSticker=false, 3000);
     this.dsModel = rData;
     this.dsAssetList.clearSelection();
-    this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
+    // this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
   }
 
   private onAction(action: AssetListActionsEnum) {
@@ -148,88 +133,6 @@ export class DsFullView implements OnInit {
     this.dialogConfirm.nativeElement.close();
   }
 
-  getFavCount(id){
-    if(this.dsModel.favouriteCount){
-      return this.dsModel.favouriteCount;
-    }
-    return 0;
-  }
-
-  onFavIconClick(){
-    let userId = Number(AuthUtils.getUser().id)
-    if(!this.dsModel.favouriteId){
-      let favourite = new Favourite();
-      favourite.userId = userId;
-      favourite.objectId = this.dsModel.id;
-      favourite.objectType = this.objectType;
-      this.favouriteService.add(favourite).subscribe(favWithTotal => {
-        this.dsModel.favouriteId = favWithTotal.favourite.id;
-        this.dsModel.favouriteCount = favWithTotal.totalFavCount;
-      })
-    }else{
-      this.favouriteService.delete(this.dsModel.favouriteId, this.dsModel.id, this.objectType).subscribe(msg => {
-        this.dsModel.favouriteId = null;
-        this.dsModel.favouriteCount = msg.totalFavCount;
-      })
-    }
-  }
-
-  onBookmarkIconClick(){
-    let userId = Number(AuthUtils.getUser().id)
-    if(!this.dsModel.bookmarkId){
-      let bookmark = new Bookmark();
-      bookmark.userId = userId;
-      bookmark.objectType = this.objectType;
-      bookmark.objectId = this.dsModel.id;
-      this.bookmarkService.add(bookmark).subscribe(bm => {
-        this.dsModel.bookmarkId = bm.id;
-      })
-    }else{
-      this.bookmarkService.delete(this.dsModel.bookmarkId).subscribe(_ => {
-        this.dsModel.bookmarkId = null;
-      })
-    }
-  }
-
-  onLockClick(){
-    if(this.isLoggedInUser(this.dsModel.creatorId)){
-      let dataset = new DataSet();
-      dataset.id = this.dsModel.id;
-      dataset.createdBy = this.dsModel.creatorId;
-      dataset.createdOn = this.dsModel.createdOn;
-      dataset.dpClusterId = this.dsModel.datalakeId; // this datalakeId is actually dpClusterId of dataset
-      dataset.datalakeId = this.dsModel.datalakeId;
-      dataset.description = this.dsModel.description;
-      dataset.lastModified = this.dsModel.lastModified;
-      dataset.name = this.dsModel.name;
-      dataset.active = this.dsModel.active;
-      dataset.version = this.dsModel.version;
-      dataset.customProps = this.dsModel.customProps;
-      dataset.sharedStatus = (this.dsModel.sharedStatus % 2) + 1;
-      this.dataSetService.update(dataset).subscribe( ds => {
-        this.dsModel.sharedStatus = ds.sharedStatus;
-        this.dsModel.lastModified = ds.lastModified;
-      })
-    }
-  }
-
-  isLoggedInUser(datasetUserId: number){
-    return Number(AuthUtils.getUser().id) === datasetUserId;
-  }
-
-  viewComments(){
-    this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true, queryParams: { returnURl: this.router.url }});
-  }
-
-  getAverageRating(datasetId: string) {
-    this.ratingService.getAverage(datasetId, this.objectType).subscribe( averageAndVotes => {
-      this.avgRating = averageAndVotes.average;
-    });
-  }
-  toggleSummaryWidget () {
-    this.showSummary = !this.showSummary;
-  }
-
   popupActionCancel() {
     this.showPopup = false;
   }
@@ -252,5 +155,4 @@ export class DsFullView implements OnInit {
       this.updateDsModel(rdata);  
     })
   }
-
 }

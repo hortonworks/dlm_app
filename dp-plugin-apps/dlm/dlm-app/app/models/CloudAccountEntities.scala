@@ -43,7 +43,7 @@ object CloudAccountEntities {
   trait CloudAccountDetails {
     def provider: String
     def credentialType: Option[CloudCredentialType]
-    def accountName: String
+    def accountName: Option[String]
   }
   @SerialVersionUID(1234)
   case class CloudAccountWithCredentials(id: String, accountCredentials: CloudAccountCredentials, accountDetails: CloudAccountDetails) extends Serializable
@@ -62,6 +62,7 @@ object CloudAccountEntities {
     def reads(json: JsValue): JsResult[CloudAccountCredentials] = {
       def from(name: CloudCredentialType, data: JsObject): JsResult[CloudAccountCredentials] = name match {
         case S3_TOKEN  => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
+        case IAM_ROLE => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
         case WASB_TOKEN  => Json.fromJson[WASBAccountCredential](data)(Json.format[WASBAccountCredential])
         case WASB_SAS_TOKEN => Json.fromJson[WASBAccountCredentialSAS](data)(Json.format[WASBAccountCredentialSAS])
         case ADLS_STS => Json.fromJson[ADLSAccountCredentials](data)(Json.format[ADLSAccountCredentials])

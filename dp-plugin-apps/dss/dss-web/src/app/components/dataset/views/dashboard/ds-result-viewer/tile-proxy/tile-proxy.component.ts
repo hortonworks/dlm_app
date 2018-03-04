@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, Input, Output, EventEmitter} from "@angular/core";
+import {Component, Input, Output, EventEmitter, isDevMode} from "@angular/core";
 import {Router} from "@angular/router";
 import {RichDatasetModel} from "../../../../models/richDatasetModel";
 
@@ -23,6 +23,8 @@ export class DsTileProxy {
 
   @Input() dsModel: RichDatasetModel;
   @Output() onDeleteDataset: EventEmitter<number> = new EventEmitter();
+
+  assetPrefix = isDevMode() ? ' ' : 'dss';
 
   constructor(private router: Router) {
   }
@@ -44,4 +46,19 @@ export class DsTileProxy {
   deleteDataset(datasetId: number) {
     this.onDeleteDataset.emit(datasetId);
   }
+
+  getAggregateValue(val){
+    if(val){
+      return val;
+    }
+    return 0;
+  }
+
+  displayAssetCount(counts){
+    if(counts && counts.hiveCount){
+      return counts.hiveCount
+    }
+    return 0;
+  }
+
 }

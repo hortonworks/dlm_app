@@ -72,8 +72,10 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
       .map{ res =>
         res.status match {
           case 200 => (res.json \ "results").as[String]
-          case _ =>
-            mapResponseToError(res)
+          case _ => {
+            val logMsg = s"Db-Client RatingServiceImpl: In deleteByObjectRef method, result status ${res.status}"
+            mapResponseToError(res,Option(logMsg))
+          }
         }
       }
   }
@@ -88,7 +90,10 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToRating(res: WSResponse) = {
     res.status match {
       case 200 => (res.json \ "results").validate[Rating].get
-      case _ => mapResponseToError(res)
+      case _ => {
+        val logMsg = s"Db-Client RatingServiceImpl: In mapToRating method, result status ${res.status}"
+        mapResponseToError(res,Option(logMsg))
+      }
     }
   }
 
@@ -96,7 +101,10 @@ class RatingServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 =>
         (res.json \ "results").as[JsObject]
-      case _ => mapResponseToError(res)
+      case _ => {
+        val logMsg = s"Db-Client RatingServiceImpl: In mapResultsGeneric method, result status ${res.status}"
+        mapResponseToError(res,Option(logMsg))
+      }
     }
   }
 }

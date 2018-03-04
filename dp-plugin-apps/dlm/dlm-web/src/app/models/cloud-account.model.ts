@@ -9,6 +9,11 @@
 
 import { CloudContainer } from './cloud-container.model';
 
+export enum AccountStatus {
+  Expired = 'EXPIRED',
+  Active = 'ACTIVE'
+}
+
 export interface CloudAccount {
   id: string;
   accountDetails: CloudAccountDetails;
@@ -29,8 +34,8 @@ export interface AddCloudStoreRequestBody {
 
 export interface AddCloudAccountDetails {
   provider: string;
-  accountName: string;
-  userName: string;
+  accountName?: string;
+  userName?: string;
 }
 
 export interface ValidateCredentialsResponse {
@@ -48,8 +53,8 @@ export interface HttpProgress {
 
 export interface ValidateCredentialsRequestBody {
   credentialType: string;
-  accessKeyId: string;
-  secretAccessKey: string;
+  accessKeyId?: string;
+  secretAccessKey?: string;
 }
 
 export interface Progress {
@@ -61,3 +66,10 @@ export interface CloudAccountAction {
   label: string;
   type: string;
 }
+
+export interface CloudAccountStatus {
+  name: string;
+  status: AccountStatus;
+}
+
+export type CloudAccountsStatusResponse = CloudAccountStatus[];

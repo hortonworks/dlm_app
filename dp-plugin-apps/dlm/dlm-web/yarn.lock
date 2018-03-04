@@ -4257,10 +4257,6 @@ ngx-clipboard@^8.1.3:
   dependencies:
     ngx-window-token "0.0.4"
 
-ngx-ui-switch@^1.4.9:
-  version "1.4.9"
-  resolved "https://registry.yarnpkg.com/ngx-ui-switch/-/ngx-ui-switch-1.4.9.tgz#cf41513d7b4c3477a5c2feafea9756920d576b4c"
-
 ngx-window-token@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/ngx-window-token/-/ngx-window-token-0.0.4.tgz#47e7aaa465411c4ab5f7ba17601bc593c956c736"

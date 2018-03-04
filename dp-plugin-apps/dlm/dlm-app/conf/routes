@@ -11,17 +11,20 @@ GET      /api/store/credentials                                       controller
 GET      /api/store/credentialAccounts                                controllers.CredentialStore.listAllCredentialAccounts
 POST     /api/store/credential                                        controllers.CredentialStore.addCredentialAccount
 PUT      /api/store/credential                                        controllers.CredentialStore.updateCredentialAccount
+PUT      /api/store/credential/sync                                   controllers.CredentialStore.syncCredentialAccount
 DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
 
 #CloudCred
 GET     /api/cluster/:clusterId/credId/:credId                        controllers.CloudCred.retrieveById(clusterId: Long, credId: String)
 GET     /api/cluster/:clusterId/credName/:credName                    controllers.CloudCred.retrieveByName(clusterId: Long, credName: String)
 GET     /api/cluster/cloudCredentials                                 controllers.CloudCred.listAllCloudCred
+GET     /api/cluster/cloudCredWithPolicies                            controllers.CloudCred.listAllCloudCredWithPolicies
 
 #Cloud
 GET      /api/cloud/account/:accountId/mountpoints                        controllers.Cloud.listAllMountPoints(accountId: String)
 GET      /api/cloud/account/:accountId/mountpoint/:mountPoint/files       controllers.Cloud.listFiles(accountId: String, mountPoint: String)
 GET      /api/cloud/account/:cloudAccountId                               controllers.Cloud.checkUserIdentity(cloudAccountId: String)
+GET      /api/cloud/accounts/status                                       controllers.Cloud.checkAllCredStatus
 POST     /api/cloud/userIdentity                                          controllers.Cloud.getUserIdentity
 GET      /api/cloud/account/:accountId/bucket/:bucketName/policy          controllers.Cloud.getBucketPolicy(accountId: String, bucketName: String)
 
@@ -78,6 +81,6 @@ GET     /api/clusters/:clusterId/yarn/queues                      controllers.Ya
 # static resources
 # @TODO: Replace `/usr/dlm-web` with env variable DLM_WEB_HOME
 #        which will be set in prod env and will be referred in `StaticAssets.at` method
-GET      /                                                        controllers.StaticAssets.at(path="/usr/dlm-web", file="index.html")
-GET     /dlm/*file                                                controllers.StaticAssets.at(path="/usr/dlm-web", file)
-GET     /*file                                                    controllers.StaticAssets.at(path="/usr/dlm-web", file)
+GET      /                                                        controllers.StaticAssets.atDlmPath(file = "index.html")
+GET     /dlm/*file                                                controllers.StaticAssets.atDlmPath(file)
+GET     /*file                                                    controllers.StaticAssets.atDlmPath(file)

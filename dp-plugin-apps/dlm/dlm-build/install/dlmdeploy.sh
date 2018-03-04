@@ -55,25 +55,6 @@ destroy() {
 read_master_password() {
     echo "Enter previously entered master password for DataPlane Service: "
     read -s MASTER_PASSWD
-
-    if [ "${#MASTER_PASSWD}" -lt 6 ]; then
-        echo "Password needs to be at least 6 characters long."
-        exit 1
-    fi
-
-    echo "Reenter password: "
-    read -s MASTER_PASSWD_VERIFY
-
-    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-    then
-       echo "Password did not match. Reenter password:"
-       read -s MASTER_PASSWD_VERIFY
-       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-       then
-        echo "Password did not match"
-        exit 1
-       fi
-    fi
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
@@ -84,8 +65,18 @@ read_master_password_safely() {
    fi
 }
 
+check_master_password_validity(){
+    docker run \
+        --rm \
+        --entrypoint /scripts/check-master-password.sh \
+        --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
+        --volume /usr/dp/current/core/bin/certs:/dp-shared \
+        hortonworks/dp-migrate:$VERSION
+}
+
 init_app() {
     read_master_password_safely
+    check_master_password_validity
     docker start dlm-app >> install.log 2>&1 || \
         docker run \
             --name dlm-app \

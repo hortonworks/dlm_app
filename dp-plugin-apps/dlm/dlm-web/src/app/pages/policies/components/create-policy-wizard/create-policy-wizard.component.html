@@ -41,28 +41,28 @@
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.DESTINATION">
               <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
                 <div wizard-content-body>
-                  Select Destination
+                  <dlm-step-destination
+                    #destination [accounts]="accounts" [clusters]="clusters" [pairings]="pairings"
+                    (onFormValidityChange)="handleFormValidityChange($event)">
+                  </dlm-step-destination>
                 </div>
               </dlm-wizard-content>
             </ng-template>
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SCHEDULE">
               <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
                 <div wizard-content-body>
-                  Schedule
+                  <dlm-step-schedule
+                    #schedule
+                    (onFormValidityChange)="handleFormValidityChange($event)">
+                  </dlm-step-schedule>
                 </div>
               </dlm-wizard-content>
             </ng-template>
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.ADVANCED">
               <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
                 <div wizard-content-body>
-                  Advanced Settings
-                </div>
-              </dlm-wizard-content>
-            </ng-template>
-            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.REVIEW">
-              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
-                <div wizard-content-body>
-                  Review
+                  <dlm-step-advanced #advanced
+                                   (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-advanced>
                 </div>
               </dlm-wizard-content>
             </ng-template>

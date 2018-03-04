@@ -73,6 +73,9 @@ class RatingRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     db.run(Ratings.filter(m =>(m.objectId === objectId && m.objectType === objectType)).delete)
   }
 
+  def getRatingForListQuery(objectIds: Seq[Long], objectType:String)={
+    Ratings.filter(t => (t.objectId.inSet(objectIds) && t.objectType === objectType)).groupBy(a => a.objectId)
+  }
 
   final class RatingsTable(tag: Tag) extends Table[Rating](tag, Some("dataplane"), "ratings") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)

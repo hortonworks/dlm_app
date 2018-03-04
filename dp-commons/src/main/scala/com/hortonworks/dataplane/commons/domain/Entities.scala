@@ -334,7 +334,9 @@ object Entities {
                          counts: Seq[DataAssetCount],
                          favouriteId: Option[Long]= None,
                          favouriteCount: Option[Int] = None,
-                         bookmarkId: Option[Long]= None)
+                         bookmarkId: Option[Long]= None,
+                         totalComments: Option[Int] = None,
+                         avgRating: Option[Float] = None)
 
   case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
 

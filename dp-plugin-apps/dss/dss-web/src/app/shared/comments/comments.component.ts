@@ -192,11 +192,13 @@ export class CommentsComponent implements OnInit {
         newCommentObject.parentCommentId = this.parentCommentWithUser.comment.id;
         this.parentCommentWithUser.isReplyVisible = false;
         this.commentService.add(newCommentObject).subscribe(_ => {
+          this.commentService.dataChanged.next(true);
           this.toggleAndGetReplies(this.parentCommentWithUser);
           this.removeReply();
         });
       }else {
         this.commentService.add(newCommentObject).subscribe(_ => {
+          this.commentService.dataChanged.next(true);
           if(this.isEdgeInViewport()){
             this.getComments(false,this.offset,this.size);
           }else{
@@ -306,4 +308,5 @@ export class CommentsComponent implements OnInit {
       }, 1000);
     }
   }
+
 }

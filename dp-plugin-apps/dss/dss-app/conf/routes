@@ -14,7 +14,7 @@ GET           /api/query-attributes                                  controllers
 
 # DatasetTags
 # ===========================================
-GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search: Option[String])
+GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount
 GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName: String)
 GET           /api/dataset/:datasetId/atlas-tags                     controllers.DataSets.getUniqueTagsFromAssetsOfDataset(datasetId: String)
 
@@ -83,6 +83,7 @@ GET           /api/ranger/:clusterId/policies                         controller
 # ===========================================
 POST          /api/comments                                           controllers.Comments.addComments
 GET           /api/comments                                           controllers.Comments.getByObjectRef(objectId: String, objectType: String)
+GET           /api/comments/actions/count                             controllers.Comments.getCommentsCount(objectId: Long, objectType: String)
 DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
 PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
 GET           /api/comments/:parentId/replies                         controllers.Comments.getByParentId(parentId: String)
@@ -90,8 +91,8 @@ GET           /api/comments/:parentId/replies                         controller
 # ratings
 # ===========================================
 POST         /api/ratings                                             controllers.Ratings.add
-GET          /api/ratings                                             controllers.Ratings.get
-GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
+GET          /api/ratings                                             controllers.Ratings.get(objectId: String, objectType: String)
+GET          /api/ratings/actions/average                             controllers.Ratings.getAverage(objectId: String, objectType: String)
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
 #favourites api

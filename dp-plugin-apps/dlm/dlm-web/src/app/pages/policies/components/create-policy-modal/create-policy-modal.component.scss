@@ -7,3 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+dlm-modal-dialog /deep/ h4.modal-title {
+  small {
+    font-size: 60%;
+  }
+}

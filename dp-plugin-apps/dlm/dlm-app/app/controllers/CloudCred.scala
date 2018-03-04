@@ -61,8 +61,24 @@ class CloudCred @Inject() (
   def listAllCloudCred() = AuthenticatedAction.async { request =>
     Logger.info("Received retrieve cloud credential request")
     implicit val token = request.token
+    val queryStringMap = Map(("numResults","200"))
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
     beaconService.getAllCloudCreds(queryString).map {
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(credCloudResponse) => Ok(Json.toJson(credCloudResponse))
+
+    }
+  }
+
+  /**
+    * Get the cloud credential details
+    */
+  def listAllCloudCredWithPolicies = AuthenticatedAction.async { request =>
+    Logger.info("Received retrieve cloud credential request")
+    implicit val token = request.token
+    val queryStringMap = Map(("numResults","200"))
+    val queryString : Map[String,String] = queryStringMap.map { case (k,v) => k -> v.mkString }
+    beaconService.getAllCloudCredsWithPolicies(queryString).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(credCloudResponse) => Ok(Json.toJson(credCloudResponse))
 

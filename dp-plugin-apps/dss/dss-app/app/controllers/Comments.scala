@@ -104,6 +104,23 @@ class Comments @Inject()(@Named("commentService") val commentService: CommentSer
     }
   }
 
+  def getCommentsCount(objectId: Long, objectType: String) = Action.async { req =>
+    Logger.info("Comments-Controller: Received get comments count by object-reference request")
+    val objectTypes = config.getStringSeq("dp.comments.object.types").getOrElse(Nil)
+    if(!objectTypes.contains(objectType)){
+      Logger.warn(s"Comments-Controller: Comment for object type $objectType is not supported")
+      Future.successful(BadRequest)
+    }
+    else{
+      commentService
+        .getCommentsCount(objectId, objectType)
+        .map { commentsCount =>
+        Ok(Json.toJson(commentsCount))
+      }
+        .recover(apiErrorWithLog(e => Logger.error(s"Comments-Controller: Getting Comments count with object Id $objectId and object Type $objectType failed with message ${e.getMessage}", e)))
+    }
+  }
+
   def getByParentId(parentId: String) = Action.async { req =>
     Logger.info("Comments-Controller: Received get comment by parent Id request")
     commentService.getByParentId(parentId,req.rawQueryString)

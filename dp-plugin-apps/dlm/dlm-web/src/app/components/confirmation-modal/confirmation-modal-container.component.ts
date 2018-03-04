@@ -43,5 +43,6 @@ export class ConfirmationModalContainerComponent implements OnInit {
     if (modalState.nextAction) {
       this.store.dispatch(modalState.nextAction);
     }
+    modalState.confirmationOptions.callback();
   }
 }

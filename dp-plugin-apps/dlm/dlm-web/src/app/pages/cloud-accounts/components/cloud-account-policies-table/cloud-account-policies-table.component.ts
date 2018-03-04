@@ -17,12 +17,12 @@ import {Policy} from 'models/policy.model';
 import {ColumnMode} from '@swimlane/ngx-datatable';
 import {Router} from '@angular/router';
 import {TableFooterOptions} from 'common/table/table-footer/table-footer.type';
+import { TableTheme } from 'common/table/table-theme.type';
 
 @Component({
   selector: 'dlm-cloud-account-policies-table',
   templateUrl: './cloud-account-policies-table.component.html',
   styleUrls: ['./cloud-account-policies-table.component.scss'],
-  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CloudAccountsPoliciesTableComponent implements OnInit {
@@ -34,7 +34,8 @@ export class CloudAccountsPoliciesTableComponent implements OnInit {
   @ViewChild('endTimeCellTemplate') endTimeCellTemplate: TemplateRef<any>;
   @ViewChild('lastJobTimeCellTemplate') lastJobTimeCellTemplate: TemplateRef<any>;
   columns = [];
-  columnMode = ColumnMode.flex;
+  columnMode = ColumnMode.force;
+  tableTheme = TableTheme.Transparent;
 
   tableFooterOptions = {
     showPageSizeMenu: false
@@ -45,47 +46,29 @@ export class CloudAccountsPoliciesTableComponent implements OnInit {
 
   ngOnInit() {
     this.columns = [
+      TableComponent.paddingColumn(25),
       {
         prop: 'displayStatus',
         name: this.t.instant('common.status.self'),
         cellClass: 'text-cell',
         headerClass: 'text-header',
-        cellTemplate: this.verbStatusCellTemplate,
-        flexGrow: 4
+        cellTemplate: this.verbStatusCellTemplate
       },
       {
         prop: 'name',
         cellClass: 'text-cell',
         headerClass: 'text-header',
         name: this.t.instant('common.name'),
-        cellTemplate: this.policyNameCellTemplate,
-        flexGrow: 4
+        cellTemplate: this.policyNameCellTemplate
       },
       {
         cellTemplate: this.prevJobsCellTemplate,
         cellClass: 'text-cell',
         headerClass: 'text-header',
         name: this.t.instant('page.jobs.prev_jobs'),
-        sortable: false,
-        flexGrow: 3
+        sortable: false
       },
-      {
-        cellTemplate: this.lastJobTimeCellTemplate,
-        prop: 'jobs.0.endTime',
-        cellClass: 'text-cell',
-        headerClass: 'text-header',
-        name: this.t.instant('common.last_job'),
-        sortable: false,
-        flexGrow: 3
-      },
-      {
-        cellTemplate: this.endTimeCellTemplate,
-        cellClass: 'text-cell',
-        headerClass: 'text-header',
-        name: this.t.instant('common.end_time'),
-        sortable: false,
-        flexGrow: 4
-      },
+      TableComponent.paddingColumn(25)
     ];
   }
 

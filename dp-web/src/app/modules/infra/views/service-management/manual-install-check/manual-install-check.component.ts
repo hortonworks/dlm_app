@@ -63,7 +63,7 @@ export class ManualInstallCheckComponent implements OnInit {
         this.lake = lake;
       });
       Observable.forkJoin(
-        this.clusterService.listByLakeId({lakeId: this.dpClusterId}),
+        this.clusterService.listByLakeId(this.dpClusterId),
         this.addOnAppService.getServiceByName(this.service),
         this.addOnAppService.getServiceDependencies(this.service),
         this.lakeService.getDiscoveredServices(this.dpClusterId)
@@ -123,7 +123,7 @@ export class ManualInstallCheckComponent implements OnInit {
     this.failedServices = [];
     this.successfulServices = [];
     Observable.forkJoin(
-      this.clusterService.listByLakeId({lakeId: this.dpClusterId}),
+      this.clusterService.listByLakeId(this.dpClusterId),
       this.lakeService.getDiscoveredServices(this.dpClusterId)).subscribe(responses => {
       let cluster = responses[0][0];
       let discoveredService: any[] = responses[1];

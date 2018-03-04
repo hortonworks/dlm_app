@@ -157,7 +157,7 @@ object Webservice {
 
     def search(searchText: String, size: Option[Long]): Future[Either[Errors, Seq[Category]]]
 
-    def listWithCount(search:Option[String], userId: Long): Future[Either[Errors, Seq[CategoryCount]]]
+    def listWithCount(queryString: String, userId: Long): Future[Either[Errors, Seq[CategoryCount]]]
 
     def listWithCount(categoryName: String): Future[Either[Errors, CategoryCount]]
 
@@ -228,6 +228,8 @@ object Webservice {
     def deleteByObjectRef(objectId: String, objectType: String): Future[String]
 
     def getByParentId(parentId: String, queryString: String): Future[Seq[CommentWithUser]]
+
+    def getCommentsCount(objectId: Long, objectType: String): Future[JsObject]
 
   }
 

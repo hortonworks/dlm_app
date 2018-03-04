@@ -10,9 +10,10 @@
  */
 
 import {Component, ViewChild, ElementRef, OnInit, HostBinding, isDevMode} from '@angular/core';
-import {Router} from '@angular/router';
+import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {DpAppNavigation} from 'dps-apps';
 import {navigation} from '../../_nav';
+import {DssAppEvents} from '../../services/dss-app-events';
 
 @Component({
   selector: 'dss-collapsible-nav',
@@ -28,20 +29,44 @@ export class CollapsibleNavComponent implements OnInit {
   @ViewChild('personaNavSrc') personaNavSrc: ElementRef;
   @HostBinding('class.dss-sidebar-collapsed') collapseSideNav = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,
+              private dssAppEvents: DssAppEvents) {}
 
   ngOnInit() {
+    //this.activeTabName = this.navItems[0].name;
     DpAppNavigation.init({
         srcElement: this.personaNavSrc.nativeElement,
         assetPrefix: '/assets/images'
     });
+    this.router.events.subscribe( event => {
+      if (event instanceof NavigationEnd) {
+        this.setActiveNavFromBrowserLocation()
+      }
+    });
+  }
+
+  setActiveNavFromBrowserLocation() {
+    const items = JSON.parse(JSON.stringify(this.navItems));
+    const currentURL = window.location.pathname;
+    for (let i = 0; i < items.length; i++) {
+      const nav = items[i];
+      if (nav.children && nav.children.length > 0) {
+        items.push(...nav.children);
+      }
+      if (nav.url === currentURL) {
+        this.activeTabName = nav.name;
+        break;
+      }
+    }
   }
 
   toggleNav() {
     this.collapseSideNav = !this.collapseSideNav;
+    setTimeout(() => this.dssAppEvents.setSideNavCollapsed(this.collapseSideNav), 300);
   }
 
   navigateToURL(nav) {
+    this.activeTabName = nav.name;
     this.router.navigateByUrl(nav.url);
   }
 }

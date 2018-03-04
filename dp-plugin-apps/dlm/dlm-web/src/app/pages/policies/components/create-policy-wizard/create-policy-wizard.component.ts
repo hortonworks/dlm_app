@@ -9,7 +9,7 @@
 
 import {
   Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
-  HostBinding, ChangeDetectionStrategy, OnDestroy, ViewChild, AfterViewInit, ViewChildren, QueryList
+  HostBinding, ChangeDetectionStrategy, OnDestroy, ViewChild, AfterViewInit
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -22,11 +22,12 @@ import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Cluster } from 'models/cluster.model';
 import { Step } from 'models/wizard.model';
 import { getAllSteps } from 'selectors/create-policy.selector';
-import { WIZARD_STEP_ID } from 'constants/policy.constant';
+import { WIZARD_STEP_ID, WIZARD_STATE } from 'constants/policy.constant';
 import { wizardSaveStep, wizardMoveToStep } from 'actions/policy.action';
 import { StepGeneralComponent } from '../create-policy-steps/step-general/step-general.component';
 import { StepSourceComponent } from '../create-policy-steps/step-source/step-source.component';
-import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
+import { StepScheduleComponent } from '../create-policy-steps/step-schedule/step-schedule.component';
+import { StepAdvancedComponent } from '../create-policy-steps/step-advanced/step-advanced.component';
 
 @Component({
   selector: 'dlm-create-policy-wizard',
@@ -53,6 +54,9 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   @Output() onCancel = new EventEmitter<any>();
   @ViewChild('general') general: StepGeneralComponent;
   @ViewChild('source') source: StepSourceComponent;
+  @ViewChild('destination') destination: StepSourceComponent;
+  @ViewChild('schedule') schedule: StepScheduleComponent;
+  @ViewChild('advanced') advanced: StepAdvancedComponent;
   @HostBinding('class') className = 'dlm-create-policy-wizard';
 
   viewChildStepIdMap = {};
@@ -94,7 +98,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
     this.wizardStepsSubscription = this.wizardSteps$.subscribe(steps => {
       this._steps = steps;
       if (steps && steps.length) {
-        const activeIndex = steps.findIndex(step => step.state === 'active');
+        const activeIndex = steps.findIndex(step => step.state === WIZARD_STATE.ACTIVE);
         this.activeStepId = steps[activeIndex].id;
       }
     });
@@ -103,7 +107,10 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   ngAfterViewInit() {
     this.viewChildStepIdMap = {
       [this.WIZARD_STEP_ID.GENERAL]: this.general,
-      [this.WIZARD_STEP_ID.SOURCE]: this.source
+      [this.WIZARD_STEP_ID.SOURCE]: this.source,
+      [this.WIZARD_STEP_ID.DESTINATION]: this.destination,
+      [this.WIZARD_STEP_ID.SCHEDULE]: this.schedule,
+      [this.WIZARD_STEP_ID.ADVANCED]: this.advanced
     };
   }
 
@@ -112,12 +119,16 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   }
 
   handleNextButtonClick(event) {
-    this.store.dispatch(wizardSaveStep(this.activeStepId, this.viewChildStepIdMap[this.activeStepId].getFormValue()));
+    // temporary. todo remove when destination-step is ready
+    const v = this.viewChildStepIdMap[this.activeStepId] ? this.viewChildStepIdMap[this.activeStepId].getFormValue() : {};
+    this.store.dispatch(wizardSaveStep(this.activeStepId, v));
   }
 
   handleBackButtonClick(event) {
     if (!this.isBackButtonDisabled && this.activeStepId !== null) {
       const previousStepId = this._getStepById(this.activeStepId).previousStepId;
+      // Handle form valid state by setting it to the previous step's form valid state
+      this.updateFormValidStateTo(previousStepId);
       this.store.dispatch(wizardMoveToStep(previousStepId));
     }
   }
@@ -127,7 +138,13 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   }
 
   handleSelectTab(tab, step: Step) {
+    // Handle form valid state by setting it to the selected step's form valid state
+    this.updateFormValidStateTo(step.id);
     this.store.dispatch(wizardMoveToStep(step.id));
+  }
+
+  updateFormValidStateTo(stepId: string) {
+    this.handleFormValidityChange(this.viewChildStepIdMap[stepId].isFormValid());
   }
 
   trackByFn(step: Step): string {

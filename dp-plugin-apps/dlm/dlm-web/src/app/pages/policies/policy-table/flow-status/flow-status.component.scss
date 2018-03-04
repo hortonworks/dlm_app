@@ -57,7 +57,7 @@ $hex-size: 20px;
         color: white;
       }
       &:not(.active) {
-        @include hexagon($hex-size, transparent, 1px solid $light-grey);
+        @include hexagon($hex-size, transparent, 1, $light-grey);
         color: $link-color;
         width: 21px; // hacky but fix hexagon with border
       }

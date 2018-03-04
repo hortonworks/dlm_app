@@ -12,19 +12,16 @@
     <div class="container-fluid">
       <div class="row">
         <div class="form-section col-xs-12">
-          <div class="form-section-title">
-            {{'page.policies.form.sections.general' | translate}}
-          </div>
           <fieldset>
-
             <!-- POLICY NAME -->
             <dlm-form-field
-              [label]="'page.policies.form.fields.policy_name' | translate"
+              [label]="'page.policies.form.fields.policy_name.label' | translate"
               [required]="true"
               [maxLengthValue]="64">
               <input
                 type="text"
                 class="form-control"
+                [placeholder]="'page.policies.form.fields.policy_name.placeholder' | translate"
                 qe-attr="policy-name"
                 formField
                 formControlName="name" />
@@ -36,11 +33,12 @@
 
             <!-- POLICY DESCRIPTION -->
             <dlm-form-field
-              [label]="'page.policies.form.fields.policy_description' | translate"
-              [maxLengthValue]="512">
+              [label]="'page.policies.form.fields.policy_description.label' | translate"
+              [maxLengthValue]="256">
               <textarea
                 rows="4"
                 class="form-control"
+                [placeholder]="'page.policies.form.fields.policy_description.placeholder' | translate"
                 qe-attr="policy-description"
                 formField
                 formControlName="description">
@@ -59,13 +57,14 @@
                 <div class="col-xs-6">
                   <dlm-radio-button
                     qe-attr="policy-type"
+                    [type]="'service_icons'"
                     [items]="storageTypes"
                     formControlName="type">
                   </dlm-radio-button>
                 </div>
               </div>
               <div class="row" *ngIf="isHDFSPolicy()">
-                <label class="col-xs-12">
+                <label class="col-xs-12 help-text">
                   <dlm-help-link
                     id="enable_snapshot"
                     [linkTo]="'page.policies.form.help.snapshot_url' | translate"
