@@ -36,7 +36,7 @@ class QueryAssets @Inject()(
     @Named("atlasService") val atlasService: AtlasService,
     @Named("dataAssetService") val assetService: DataAssetService) extends Controller {
 
-  def search(clusterId: String) = AuthenticatedAction.async(parse.json) { request =>
+  def search(clusterId: String, datasetId: Option[String]) = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Received get cluster atlas search request")
     implicit val token = request.token
     request.body
@@ -44,8 +44,7 @@ class QueryAssets @Inject()(
       .map { filters =>
         val future = for {
           results <- atlasService.searchQueryAssets(clusterId, filters)
-          enhancedResults <- doEnhanceAssetsWithOwningDataset(clusterId,
-                                                              results)
+          enhancedResults <- doEnhanceAssetsWithOwningDataset(clusterId.toLong, datasetId, results)
         } yield enhancedResults
 
         future
@@ -59,9 +58,7 @@ class QueryAssets @Inject()(
 
   }
 
-  private def doEnhanceAssetsWithOwningDataset(
-      clusterIdAsString: String,
-      atlasEntities: Either[Errors, AtlasEntities])
+  private def doEnhanceAssetsWithOwningDataset(clusterId: Long, datasetId: Option[String], atlasEntities: Either[Errors, AtlasEntities])
     : Future[Either[Errors, Seq[Entity]]] = {
     atlasEntities match {
       case Left(errors) => Future.successful(Left(errors))
@@ -69,16 +66,17 @@ class QueryAssets @Inject()(
         val entities = atlasEntities.entities.getOrElse(Nil)
         val assetIds
           : Seq[String] = entities.filter(_.guid.nonEmpty) map (_.guid.get)
-        val clusterId = clusterIdAsString.toLong
         assetService
           .findManagedAssets(clusterId, assetIds)
           .map {
             case Left(errors) => Left(errors)
             case Right(relationships) => {
+              val relations = datasetId match {
+                case None => relationships
+                case Some(dsId) => relationships.filter(_.datasetId == dsId.toLong)
+              }
               val enhanced = entities.map { cEntity =>
-                val cRelationship =
-                  relationships.find(_.guid == cEntity.guid.get)
-                cRelationship match {
+                relations.find(_.guid == cEntity.guid.get) match {
                   case None => cEntity
                   case Some(relationship) =>
                     cEntity.copy(

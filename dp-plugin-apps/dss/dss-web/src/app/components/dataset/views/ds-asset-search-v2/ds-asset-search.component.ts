@@ -22,6 +22,7 @@ import {DsAssetsService} from "../../services/dsAssetsService";
 export class DsAssetSearchV2 implements OnInit {
 
 	@Input() clusterId:number;
+	@Input() datasetId:number;
 	@Input() showBelongsToColumn = false;
 
 	@Output("addNotification") addNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();

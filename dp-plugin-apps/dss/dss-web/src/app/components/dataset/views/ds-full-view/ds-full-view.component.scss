@@ -299,12 +299,25 @@
     margin-left: 10px;
 }
 
+.flex-summary .key {
+    display: inline-block;
+    width: 100%;
+    font-size: 12px;
+}
+.flex-summary .value {
+    display: inline-block;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 5px;
+}
+
 .flex-main {
   flex-grow: 1;
   -webkit-font-smoothing: antialiased;
 }
 
-.confirmationSticker {
+.errorSticker, .confirmationSticker {
   position: fixed;
   z-index: 1000;
   background-color: #1eb475;
@@ -314,4 +327,31 @@
   left: 50%;
   top: 35px;
   transform: translate(-50%, 0px);
+}
+
+.errorSticker {
+  background-color:#EF6162;
+}
+.ActionButtonCont {
+  padding:10px 0px;
+}
+.ActionButtonCont > button {
+  margin:0 5px 0 0;
+}
+
+.emptyCollectionMessaging {
+  padding: 15px 15px 45px 15px;
+}
+.emptyCollectionMessaging .button-container {
+  padding:0px;
+}
+
+.popup {
+  padding: 60px 0 0 50px;
+  background: transparent;
+}
+
+.popup > .opaque {
+  border-top:2px solid $bgGray;
+  border-radius: 0px;
 }

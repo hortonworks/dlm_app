@@ -45,6 +45,7 @@ export class DsAssetSearch {
 
   @Input() hideActionButtons : boolean = false;
   @Input() clusterId:number;
+  @Input() datasetId:number;
   @Input() showBelongsToColumn = false;
   @Output("addNotification") addNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();

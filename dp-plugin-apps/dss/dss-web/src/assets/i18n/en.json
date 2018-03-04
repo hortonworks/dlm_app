@@ -196,7 +196,7 @@
         "add": "Add"
       },
       "asset-list": {
-        "starAssetmessage": "Few assets listed above already belong to other asset collections."
+        "starAssetmessage": "Few assets listed above are already part of the collection."
       },
       "dashboard": {
         "tag-nav": {

@@ -147,6 +147,32 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       .recoverWith(apiError)
   }
 
+  def beginEdit (datasetId: Long) = Action.async(parse.json) { req =>
+    req.body
+      .validate[String]
+      .map { userId =>
+        datasetRepo
+          .beginEdit(datasetId, userId.toLong)
+          .map(c => success(linkData(c)))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def saveEdit (datasetId: Long) = Action.async(parse.json) { req =>
+    datasetRepo
+      .saveEdit(datasetId)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
+  }
+
+  def revertEdit (datasetId: Long) = Action.async(parse.json) { req =>
+    datasetRepo
+      .revertEdit(datasetId)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
+  }
+
   def addWithAsset = Action.async(parse.json) { req =>
     req.body
       .validate[DatasetCreateRequest]

@@ -15,10 +15,12 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.{AssetsAndCounts, DataAsset}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json, Reads}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+
+
 
 @Singleton
 class DataAssetRepo @Inject()(
@@ -27,22 +29,24 @@ class DataAssetRepo @Inject()(
 
   import profile.api._
 
-  val DatasetAssets = TableQuery[DatasetAssetTable]
+  val AllDatasetAssets = TableQuery[DatasetAssetTable]
+  def DatasetAssets = AllDatasetAssets.filter(_.state === "Active")
+  def DatasetEditAssets = AllDatasetAssets.filter(_.editFlag === "Mark_Add")
 
-  def allWithDatasetId(datasetId: Long, queryName: String, offset: Long, limit: Long): Future[AssetsAndCounts] = {
+
+  def allWithDatasetId(datasetId: Long, queryName: String, offset: Long, limit: Long, state: Option[String]): Future[AssetsAndCounts] = {
+    val baseTableQuery = if (state.getOrElse("") == "Edit") DatasetEditAssets else DatasetAssets
     db.run(for {
-      count <- DatasetAssets.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).length.result
-      assets <- DatasetAssets.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).drop(offset).take(limit).to[List].result
+      count <- baseTableQuery.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).length.result
+      assets <- baseTableQuery.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).drop(offset).take(limit).to[List].result
     } yield (assets, count)).map {
       case (assets, count) => AssetsAndCounts(assets, count)
     }
   }
 
-
-
   def insert(dataAsset: DataAsset): Future[DataAsset] = {
     db.run {
-      DatasetAssets returning DatasetAssets += dataAsset
+      AllDatasetAssets returning AllDatasetAssets += dataAsset
     }
   }
 
@@ -75,6 +79,10 @@ class DataAssetRepo @Inject()(
 
     def datasetId = column[Option[Long]]("dataset_id")
 
+    def state = column[Option[String]]("state")
+
+    def editFlag = column[Option[String]]("edit_flag")
+
     def * =
       (id,
         assetType,
@@ -82,8 +90,12 @@ class DataAssetRepo @Inject()(
         guid,
         assetProperties,
         clusterId,
-        datasetId) <> ((DataAsset.apply _).tupled, DataAsset.unapply)
+        datasetId,
+        state,
+        editFlag) <> ((DataAsset.apply _).tupled, DataAsset.unapply)
 
   }
 
 }
+
+

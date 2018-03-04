@@ -51,3 +51,10 @@ CREATE TABLE IF NOT EXISTS dataplane.bookmarks (
 --Index on bookmarks table
 CREATE INDEX idx_dp_bookmarks_user_id on dataplane.bookmarks(user_id);
 CREATE INDEX idx_dp_bookmarks_objId_objType on dataplane.bookmarks(object_id, object_type);
+
+CREATE TABLE IF NOT EXISTS dataplane.dataset_edit_details (
+  id           BIGSERIAL PRIMARY KEY,
+  dataset_id   BIGINT REFERENCES dataplane.datasets (id)              NOT NULL,
+  edited_by    BIGINT REFERENCES dataplane.users (id)                 NOT NULL,
+  edit_begin   TIMESTAMP DEFAULT now()                                NOT NULL
+);

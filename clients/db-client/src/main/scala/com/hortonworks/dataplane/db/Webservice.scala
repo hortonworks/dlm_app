@@ -136,13 +136,19 @@ object Webservice {
 
     def removeAllAssets(id: Long) : Future[RichDataset]
 
+    def beginEdition(id: Long, userId: Long) : Future[RichDataset]
+
+    def saveEdition(id: Long) : Future[RichDataset]
+
+    def cancelEdition(id: Long) : Future[RichDataset]
+
     def listRichDataset(queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 
-    def getRichDatasetById(id: Long,userId:Long): Future[Either[Errors, RichDataset]]
+    def getRichDatasetById(id: Long,userId:Long): Future[RichDataset]
 
     def listRichDatasetByTag(tagName: String, queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 
-    def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long): Future[Either[Errors, AssetsAndCounts]]
+    def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long, state: String): Future[Either[Errors, AssetsAndCounts]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 

@@ -203,7 +203,13 @@ CREATE TABLE IF NOT EXISTS dataplane.data_asset (
   guid             VARCHAR(100) NOT NULL,
   asset_properties JSON       NOT NULL,
   dataset_id       BIGINT REFERENCES dataplane.datasets (id) ON DELETE CASCADE DEFAULT NULL,
-  cluster_id       BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
+  cluster_id       BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL,
+  state            VARCHAR(32)                                NOT NULL DEFAULT 'Edit',
+  edit_flag        VARCHAR(32)                                NOT NULL DEFAULT 'Mark_Add',
+
+  CONSTRAINT unique_guid_and_dataset_id_constraint UNIQUE (guid, dataset_id),
+  CHECK (state IN ('Active','Edit')),
+  CHECK (edit_flag IN ('Mark_Add','Mark_Delete'))
 );
 
 -- Since datasets are boxes, we will need to store details

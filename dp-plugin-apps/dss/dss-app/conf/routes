@@ -8,7 +8,7 @@ GET     /metrics                                              controllers.Status
 
 # Atlas API Search
 # ===========================================
-POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String)
+POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String, datasetId: Option[String])
 GET           /api/query-attributes                                  controllers.QueryAttributes.list(clusterId: String)
 
 
@@ -62,9 +62,12 @@ POST          /api/add-selected-atlas-assets                         controllers
 
 # DatasetAssets
 # ===========================================
-GET           /api/dataset/:datasetId/assets                         controllers.DataSets.getDataAssetsByDatasetId(datasetId: String, queryName: String, offset: Long, limit: Long)
+GET           /api/dataset/:datasetId/assets                         controllers.DataSets.getDataAssetsByDatasetId(datasetId: String, queryName: String, offset: Long, limit: Long, state: Option[String])
 DELETE        /api/dataset/:datasetId/allassets                      controllers.DataSets.removeAllAssetsFromDataset(datasetId: Long)
 DELETE        /api/dataset/:datasetId/assets                         controllers.DataSets.removeAssetsFromDataset(datasetId: Long)
+POST          /api/dataset/:datasetId/begin-edit                     controllers.DataSets.beginDatasetEdit(datasetId: Long)
+POST          /api/dataset/:datasetId/save-edit                      controllers.DataSets.saveDatasetEdit(datasetId: Long)
+POST          /api/dataset/:datasetId/cancel-edit                    controllers.DataSets.revertDatasetEdit(datasetId: Long)
 
 # DpProfiler
 # ===========================================
