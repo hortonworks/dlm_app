@@ -32,6 +32,19 @@
           </div>
         </div>
         <div class="utility-space" *ngIf="dsModel.version">
+          <span class="right-button" style="margin-right:15px;">
+            <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon" style="padding:2px;">
+              <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i>
+            </button>
+            <ul mdl class="mdl-menu mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+dsModel.id">
+              <li class="mdl-menu__item" (click)="onDeleteDataset()">
+              <span>
+                <i class="fa__fa-close--icon fa fa-trash-o"></i>
+                {{"common.delete" | translate}}
+              </span>
+              </li>
+            </ul>
+          </span>
           <!-- <button class="btn btn-circle" type="button"><i class="fa fa-ellipsis-v"></i></button> -->
           <button class="btn btn-circle" type="button" (click)="toggleSummaryWidget()" style="position: relative;">
             <i class="fa fa-circle-thin" style="position: absolute; top: 6px; right: -5px; font-size: .8em"></i>
@@ -53,10 +66,12 @@
 
     <div style="margin-top: 15px;" class="tabs menu">
       <ul onclick="function(){}" *ngIf="dsModel.version">
-        <li data-tab="Dashboard" class="">Dashboard</li>
-        <li data-tab="Assets" class="active">Assets</li>
+        <li data-tab="Dashboard" [class.active]="selectedTab == tabEnum.OVERVIEW" (click)="selectedTab = tabEnum.OVERVIEW">Overview</li>
+        <li data-tab="Assets" [class.active]="selectedTab == tabEnum.ASSETS" (click)="selectedTab = tabEnum.ASSETS">Assets</li>
       </ul>
-
+    </div>
+    <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW"> </dss-overview>
+    <div *ngIf="selectedTab == tabEnum.ASSETS">
       <div *ngIf="dsModel.counts.hiveCount">
         <ds-assets-list-style1 [dsModel]="dsModel"
                                [applicableActions]="applicableListActions"
@@ -98,7 +113,7 @@
   </div>
   <div class="summaryWidgetCont flex-side flex-side-right hwx-white-bg" *ngIf="dsModel.version">
     <div class="grapic-holder" style="height: 83px;">
-      <img src="{{assetPrefix}}/assets/images/collection-banners/red1.png">
+      <img src="{{assetPrefix}}/assets/images/collection-banners/dsimg{{dsModel.id%7}}.png">
       <span class="rating">{{this.avgRating.toFixed(1)}}<i class="fa fa-star"></i></span>
     </div>
     <div class="flex-grid flex-summary">
@@ -151,12 +166,12 @@
 
   <div *ngIf="showPopup" class="popup borderBox">
     <div class="opaque">
-      <asset-search 
+      <asset-search
         [hideActionButtons]="hidePopupActionButtons"
-        [showBelongsToColumn]="true" 
-        [clusterId]="dsModel.clusterId" 
-        [datasetId]="dsModel.id" 
-        (addNotification)="popupActionAdd($event)" 
+        [showBelongsToColumn]="true"
+        [clusterId]="dsModel.clusterId"
+        [datasetId]="dsModel.id"
+        (addNotification)="popupActionAdd($event)"
         (cancelNotification)="popupActionCancel()"
         #dsAssetSearch ></asset-search>
     </div>

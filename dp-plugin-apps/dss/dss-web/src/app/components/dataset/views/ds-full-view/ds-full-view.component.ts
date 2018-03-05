@@ -29,6 +29,10 @@ import {BookmarkService} from "../../../../services/bookmark.service";
 import {RatingService} from "../../../../services/rating.service";
 import {DataSet} from "../../../../models/data-set";
 
+export enum Tabs {
+  OVERVIEW, ASSETS
+}
+
 @Component({
   selector: "ds-full-view",
   styleUrls: ["./ds-full-view.component.scss"],
@@ -39,6 +43,9 @@ export class DsFullView implements OnInit {
   @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
   @ViewChild("dsAssetList") dsAssetList: DsAssetList;
   @ViewChild("dsAssetSearch") dsAssetSearch: DsAssetSearch;
+  
+  tabEnum = Tabs;
+  selectedTab = Tabs.ASSETS;  
   dsModel: RichDatasetModel = null;
   applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
