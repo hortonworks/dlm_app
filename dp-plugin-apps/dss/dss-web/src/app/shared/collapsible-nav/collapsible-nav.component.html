@@ -17,9 +17,15 @@
     <span class="persona-name">Data Steward Studio</span>
   </div>
 
-  <span class="sidenav-item" *ngFor="let nav of navItems; let i = index" [ngClass]="{'active': activeTabName === nav.name}" [attr.id]="'persona_side_nav_item_'+i" (click)="navigateToURL(nav)">
-    <i *ngIf="nav.iconClassName != ''" [ngClass]="'fa ' +  nav.iconClassName" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ nav.name }} </span>
-  </span>
+  <div #currentNav *ngFor="let nav of navItems; let i = index" [attr.id]="'persona_side_nav_item_'+i"
+       (click)="onSideNavClick($event, nav, currentNav)" (mouseenter)="onSideNavMouseEnter(nav, currentNav)"  (mouseleave)="onSideNavMouseLeave(nav, currentNav)">
+    <div class="sidenav-item" [ngClass]="{'active': activeTabName === nav.name}">
+      <i *ngIf="nav.iconClassName != ''" [ngClass]="'fa ' +  nav.iconClassName" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ nav.name }} </span>
+    </div>
+    <div class="sidenav-item-name-children" *ngFor="let childNav of nav.children" [ngClass]="{'hide-menu': nav.hidden }">
+      <span class="sidenav-item" [ngClass]="{'active': activeTabName === childNav.name}" (click)="onSideNavClick($event, childNav, currentNav)"> {{ childNav.name }} </span>
+    </div>
+  </div>
 
   <div id="persona_side_nav_expander" class="expander" (click)="toggleNav()">
     <i *ngIf="!collapseSideNav" class="fa fa-angle-double-left"></i>

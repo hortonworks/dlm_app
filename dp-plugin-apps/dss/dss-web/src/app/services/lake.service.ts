@@ -44,6 +44,13 @@ export class LakeService {
       .catch(HttpUtil.handleError);
   }
 
+  listAsPromise(): Promise<Lake[]> {
+    return this.http
+    .get(this.url, new RequestOptions(HttpUtil.getHeaders()))
+    .map(HttpUtil.extractData)
+    .toPromise();
+  }
+
   insert(lake: Lake): Observable<Lake> {
     return this.http
       .post(`${this.url}`, lake, new RequestOptions(HttpUtil.getHeaders()))

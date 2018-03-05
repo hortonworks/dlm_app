@@ -14,6 +14,7 @@ import {Chart} from 'nvd3';
 import {ProfilerService} from '../../../../../services/profiler.service';
 import {AssetCollectionDashboard} from '../../../../../models/asset-collection-dashboard';
 import {DssAppEvents} from "app/services/dss-app-events";
+import {chartColors} from '../../../../../shared/utils/constants';
 
 declare let d3: any;
 declare let nv: any;
@@ -61,7 +62,7 @@ export class OverviewComponent implements OnInit {
     const topUsersData = [
       {
         'key': '',
-        'color': '#2DB075',
+        'color': chartColors.GREEN,
         'values': this.assetCollectionDashboard.topUsers.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
       }
     ];
@@ -106,7 +107,7 @@ export class OverviewComponent implements OnInit {
         return d.y
       })
       .donut(true)
-      .color(['#2DB075', '#2891C0'])
+      .color([chartColors.GREEN, chartColors.BLUE])
       .labelFormat((val) => `${val}%`)
       .labelType('percent');
 
@@ -128,7 +129,7 @@ export class OverviewComponent implements OnInit {
     const distributionByTagData = [
       {
         'key': '',
-        'color': '#2DB075',
+        'color': chartColors.GREEN,
         'values': this.assetCollectionDashboard.assetDistribution.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
       }
     ];
@@ -173,7 +174,7 @@ export class OverviewComponent implements OnInit {
       })
       .donut(true)
       .title('')
-      .color(['#2DB075', '#2891C0'])
+      .color([chartColors.GREEN, chartColors.BLUE])
       .labelFormat((val) => `${val}%`)
       .labelType('percent');
 
@@ -210,7 +211,7 @@ export class OverviewComponent implements OnInit {
           area: true,
           values: this.assetCollectionDashboard.usersAccessingSecureData.stats.map(stat => ({'x': stat.key, 'y': stat.value})),
           key: 'User Accessing Secure Data',
-          color: '  #2DB075',
+          color: chartColors.GREEN,
           fillOpacity: .1
         }
       ];

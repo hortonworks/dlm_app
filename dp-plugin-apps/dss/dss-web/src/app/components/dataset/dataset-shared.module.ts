@@ -61,7 +61,6 @@ import {routes} from "./dataset.routes";
 import {CommentsModule} from '../../shared/comments/comments.module';
 import {DatasetTagService} from "app/services/tag.service";
 import {DataSetService} from '../../services/dataset.service';
-import {LakeService} from '../../services/lake.service';
 import {CommentService} from '../../services/comment.service';
 import {RatingService} from "../../services/rating.service";
 import {FavouriteService} from "../../services/favourite.service";
@@ -116,7 +115,7 @@ import {ProfilerService} from "app/services/profiler.service";
     DropdownModule,
     TabsModule,
     LineageModule,
-    RouterModule.forChild(routes),
+    RouterModule,
     MyDateRangePickerModule,
     CommentsModule
   ],
@@ -151,7 +150,6 @@ import {ProfilerService} from "app/services/profiler.service";
     RangerService,
     DatasetTagService,
     DataSetService,
-    LakeService,
     CommentService,
     RatingService,
     FavouriteService,

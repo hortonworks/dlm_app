@@ -216,8 +216,17 @@
         "top-10-users": "Top 10 users",
         "sensitive-vs-non-sensitive": "Sensitive Vs Non Sensitive",
         "asset-distribution-by-sensitive-tag": "Asset Distribution by Sensitive Tag",
-        "no-of-quires-running-sensitive-data": "# of Queries Running Sensitive Data"
-
+        "no-of-quires-running-sensitive-data": "# of Queries Running Sensitive Data",
+        "users-accessing-sensitive-data": "Users Accessing Sensitive Data"
+      },
+      "data-lake-dashboard": {
+        "no-of-total-assets" : "# of Total Assets",
+        "profiled-vs-non-profiled" : "Profiled Vs Non Profiled",
+        "sensitive-data" : "Sensitive Data",
+        "profiler-jobs-in-last-24hr" : "Profiler Jobs in Last 24Hr",
+        "secure-data" : "Secure Data",
+        "top-10-asset-collections-last-24hr" : "Top 10 Asset Collections Last 24Hr",
+        "top-10-assets-last-24hr" : "Top 10 Assets Last 24Hr"
       }
     },
     "comments": {
@@ -232,6 +241,7 @@
   },
   "routes": {
     "dss": "Data Steward",
+    "dashboard": "Dashboard",
     "dss.assets.cAsset": "Asset Details",
     "dss.collections": "Asset Collections",
     "dss.bookmarks": "Bookmarks",

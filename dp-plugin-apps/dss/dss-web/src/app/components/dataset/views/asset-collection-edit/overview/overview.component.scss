@@ -9,27 +9,13 @@
  *
  */
 @import "../../../../../../styles/variables";
+@import "../../../../../../styles/charts";
 
-.overview-cards-container {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-between;
-  align-items: stretch;
 
-  .overview-card {
-    border: 1px solid #E7E7E7;
-    border-radius: 2px;
-    flex-grow: 1;
-    margin: 0px 5px;
-    padding: 15px;
-    background: #FFFFFF;
-  }
-}
-
-.overview-cards-container.summary {
+.charts-cards-container.summary {
   height: 120px;
 
-  .overview-card {
+  .charts-card {
     min-width: 150px;
   }
 
@@ -45,34 +31,6 @@
     font-size: 28px;
     line-height: 75px;
     text-align: center;
-  }
-}
-
-.overview-cards-container.two-col {
-  margin-top: 10px;
-
-  .overview-card {
-    min-height: 320px;
-  }
-
-  .title {
-    color: $shuttle-gray;
-    font-weight: 400;
-    font-size: 16px;
-  }
-}
-
-.overview-cards-container.one-col {
-  margin-top: 10px;
-
-  .overview-card {
-    min-height: 320px;
-  }
-
-  .title {
-    color: $shuttle-gray;
-    font-weight: 400;
-    font-size: 16px;
   }
 }
 
