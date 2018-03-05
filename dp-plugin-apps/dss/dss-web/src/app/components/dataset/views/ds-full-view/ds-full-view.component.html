@@ -132,7 +132,7 @@
                   <span class="color-tag color-b" *ngFor="let tag of dsModel.tags">{{tag}}</span>
               </span>
       </div>
-      <div class="flex-summary-item" *ngIf="systemTags.length">
+      <div class="flex-summary-item" *ngIf="!EditState && systemTags.length">
         <span class="key">System Tags</span>
         <div class="value">
           <span class="color-tag color-c" *ngFor="let tag of systemTags">{{tag}}</span>

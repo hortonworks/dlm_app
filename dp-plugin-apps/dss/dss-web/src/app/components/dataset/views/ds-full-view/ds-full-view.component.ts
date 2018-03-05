@@ -108,9 +108,9 @@ export class DsFullView implements OnInit {
     this.assetCountDiff = rData.counts.hiveCount - this.dsModel.counts.hiveCount;
     this.dsModel = rData;
     this.dsAssetList && this.dsAssetList.clearSelection();
-    this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
     this.setEditState();
 
+    !this.EditState && this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
     this.EditState && this.assetCountDiff && (this.showConfirmationSticker=true);
     setTimeout(()=>this.showConfirmationSticker=false, 4000);
   }
