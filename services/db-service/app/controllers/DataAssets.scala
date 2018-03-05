@@ -25,8 +25,8 @@ class DataAssets @Inject()(dataAssetRepo: DataAssetRepo)(implicit exec: Executio
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long) = Action.async {
-    dataAssetRepo.allWithDatasetId(datasetId, queryName, offset, limit).map(aNc => success(linkData(aNc))).recoverWith(apiError)
+  def allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long, state: Option[String]) = Action.async {
+    dataAssetRepo.allWithDatasetId(datasetId, queryName, offset, limit, state).map(aNc => success(linkData(aNc))).recoverWith(apiError)
   }
 
 

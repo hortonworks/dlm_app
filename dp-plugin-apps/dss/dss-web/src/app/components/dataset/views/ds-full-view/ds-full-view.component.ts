@@ -12,8 +12,9 @@
 import {Component, OnInit, ViewChild, ElementRef, isDevMode} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import * as DialogPolyfill from 'dialog-polyfill';
-import {RichDatasetModel} from "../../models/richDatasetModel";
+import {Bookmark, Favourite, RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
+import {DsTagsService} from "../../services/dsTagsService";
 import {DataSetService} from "../../../../services/dataset.service";
 import {
   AssetListActionsEnum,
@@ -21,6 +22,16 @@ import {
   AssetSetQueryModel,
   DsAssetList
 } from "../ds-assets-list/ds-assets-list.component";
+import {DsAssetSearch} from "../ds-asset-search/ds-asset-search.component";
+import {AuthUtils} from "../../../../shared/utils/auth-utils";
+import {FavouriteService} from "../../../../services/favourite.service";
+import {BookmarkService} from "../../../../services/bookmark.service";
+import {RatingService} from "../../../../services/rating.service";
+import {DataSet} from "../../../../models/data-set";
+
+export enum Tabs {
+  OVERVIEW, ASSETS
+}
 
 @Component({
   selector: "ds-full-view",
@@ -31,15 +42,33 @@ export class DsFullView implements OnInit {
 
   @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
   @ViewChild("dsAssetList") dsAssetList: DsAssetList;
+  @ViewChild("dsAssetSearch") dsAssetSearch: DsAssetSearch;
+  
+  tabEnum = Tabs;
+  selectedTab = Tabs.ASSETS;  
   dsModel: RichDatasetModel = null;
-  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT, AssetListActionsEnum.DELETE];
+  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
-  clusterId: any;
-  selectionAllowed : boolean = false;
+  dsId: string;
+  showSummary : boolean = true;
+  EditState : boolean = false;
   showPopup: boolean = false;
+  hidePopupActionButtons: boolean = false;
+  showConfirmationSticker: boolean = false;
+  showErrorSticker: boolean = false;
+  systemTags: string[] = [];
+  objectType: string = "assetCollection";
+  avgRating: number = 0;
+  assetCountDiff:number = 0;
+
+  assetPrefix = isDevMode() ? ' ' : 'dss';
 
   constructor(private richDatasetService: RichDatasetService,
               private dataSetService: DataSetService,
+              private tagService: DsTagsService,
+              private favouriteService: FavouriteService,
+              private bookmarkService: BookmarkService,
+              private ratingService: RatingService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -47,32 +76,69 @@ export class DsFullView implements OnInit {
   ngOnInit() {
     this.activeRoute.params
       .subscribe(params => {
-        this.clusterId = params["id"];
-        this.richDatasetService
-          .getById(+params["id"])
-          .subscribe(dsObj => this.dsModel = dsObj);
+        this.dsId = params["id"];
+        this.loadDsModel();
         this.dsAssetQueryModel = new AssetSetQueryModel([
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
+        this.tagService.listAtlasTags(+params["id"]).subscribe(tags => this.systemTags=tags)
+        this.getAverageRating(params["id"]);
+      });
+    this.ratingService.dataChanged$.subscribe(avgRating => {
+      this.avgRating = avgRating;
+    });
+  }
+  loadDsModel () {
+    this.richDatasetService
+      .getById(+this.dsId, this.EditState)
+      .subscribe(dsObj => {
+        this.dsModel = dsObj
+        this.setEditState();
       });
   }
-
-  updateDsModel = (rData) => {
-    this.dsModel = rData;
-    this.dsAssetList.clearSelection();
-    // this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
+  setEditState () {
+    console.log(this.dsModel.editDetails);
+    if(this.isEditInProgress() && this.dsModel.editDetails.editorId == Number(AuthUtils.getUser().id)){
+      this.applicableListActions = [AssetListActionsEnum.REMOVE, AssetListActionsEnum.ADD];
+      this.EditState = true;
+      return;
+    }
+    this.applicableListActions = [AssetListActionsEnum.EDIT];
+    this.EditState = false;
+    // setTimeout(() =>this.dsAssetList.freshFetch(),0);
   }
+  get confirmationStickerText() {
+    return `${Math.abs(this.assetCountDiff)} ${(this.assetCountDiff < 0)?"":"new"} Assets ${(this.assetCountDiff != 0)?"successfully":""} ${(this.assetCountDiff < 0)?"removed from":"added to"} ${this.dsModel.name}.`;
+  }
+  updateDsModel = (rData) => {
 
+    this.assetCountDiff = rData.counts.hiveCount - this.dsModel.counts.hiveCount;
+    this.dsModel = rData;
+    this.dsAssetList && this.dsAssetList.clearSelection();
+    this.setEditState();
+
+    !this.EditState && this.tagService.listAtlasTags(+rData["id"]).subscribe(tags => this.systemTags=tags)
+    this.EditState && this.assetCountDiff && (this.showConfirmationSticker=true);
+    setTimeout(()=>this.showConfirmationSticker=false, 4000);
+  }
+  isEditInProgress() {
+    const utcTstamp = new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60000).getTime();
+    return (this.dsModel.editDetails && ((utcTstamp - new Date(this.dsModel.editDetails.editBegin).getTime())/1000 <= 15*60))
+  }
   private onAction(action: AssetListActionsEnum) {
     if(action === AssetListActionsEnum.DELETE)
       return this.onDeleteDataset();
     if(action === AssetListActionsEnum.EDIT){
-      this.applicableListActions = [AssetListActionsEnum.REMOVE, AssetListActionsEnum.ADD, AssetListActionsEnum.DONE];
-      return this.selectionAllowed = true;
+      if(this.isEditInProgress()){
+        this.showErrorSticker=true;
+        setTimeout(()=> this.showErrorSticker=false, 4000);
+        return;
+      }
+      this.richDatasetService
+        .beginEdit(this.dsModel.id)
+        .subscribe(this.updateDsModel)
     }
     if(action === AssetListActionsEnum.DONE){
-      this.applicableListActions = [AssetListActionsEnum.EDIT, AssetListActionsEnum.DELETE];
-      return this.selectionAllowed = false;
     }
     if (action == AssetListActionsEnum.REMOVE) {
       if(this.dsAssetList.checkedAllState())
@@ -119,11 +185,116 @@ export class DsFullView implements OnInit {
     this.dialogConfirm.nativeElement.close();
   }
 
+  getFavCount(id){
+    if(this.dsModel.favouriteCount){
+      return this.dsModel.favouriteCount;
+    }
+    return 0;
+  }
+
+  onCancelEdition () {
+    this.richDatasetService.cancelEdition(this.dsModel.id)
+      .subscribe(rModel => {
+        if(!this.dsModel.version)
+          this.router.navigate(["dss/collections"]);
+        this.updateDsModel(rModel);
+      })
+  }
+
+  onSaveEdition () {
+    this.richDatasetService.saveEdition(this.dsModel.id)
+      .subscribe(rModel => {
+        if(!this.dsModel.version)
+          this.router.navigate(["dss/collections"]);
+        this.updateDsModel(rModel);
+      })    
+  }
+
+  onFavIconClick(){
+    let userId = Number(AuthUtils.getUser().id)
+    if(!this.dsModel.favouriteId){
+      let favourite = new Favourite();
+      favourite.userId = userId;
+      favourite.objectId = this.dsModel.id;
+      favourite.objectType = this.objectType;
+      this.favouriteService.add(favourite).subscribe(favWithTotal => {
+        this.dsModel.favouriteId = favWithTotal.favourite.id;
+        this.dsModel.favouriteCount = favWithTotal.totalFavCount;
+      })
+    }else{
+      this.favouriteService.delete(this.dsModel.favouriteId, this.dsModel.id, this.objectType).subscribe(msg => {
+        this.dsModel.favouriteId = null;
+        this.dsModel.favouriteCount = msg.totalFavCount;
+      })
+    }
+  }
+
+  onBookmarkIconClick(){
+    let userId = Number(AuthUtils.getUser().id)
+    if(!this.dsModel.bookmarkId){
+      let bookmark = new Bookmark();
+      bookmark.userId = userId;
+      bookmark.objectType = this.objectType;
+      bookmark.objectId = this.dsModel.id;
+      this.bookmarkService.add(bookmark).subscribe(bm => {
+        this.dsModel.bookmarkId = bm.id;
+      })
+    }else{
+      this.bookmarkService.delete(this.dsModel.bookmarkId).subscribe(_ => {
+        this.dsModel.bookmarkId = null;
+      })
+    }
+  }
+
+  onLockClick(){
+    if(this.isLoggedInUser(this.dsModel.creatorId)){
+      let dataset = new DataSet();
+      dataset.id = this.dsModel.id;
+      dataset.createdBy = this.dsModel.creatorId;
+      dataset.createdOn = this.dsModel.createdOn;
+      dataset.dpClusterId = this.dsModel.datalakeId; // this datalakeId is actually dpClusterId of dataset
+      dataset.datalakeId = this.dsModel.datalakeId;
+      dataset.description = this.dsModel.description;
+      dataset.lastModified = this.dsModel.lastModified;
+      dataset.name = this.dsModel.name;
+      dataset.active = this.dsModel.active;
+      dataset.version = this.dsModel.version;
+      dataset.customProps = this.dsModel.customProps;
+      dataset.sharedStatus = (this.dsModel.sharedStatus % 2) + 1;
+      this.dataSetService.update(dataset).subscribe( ds => {
+        this.dsModel.sharedStatus = ds.sharedStatus;
+        this.dsModel.lastModified = ds.lastModified;
+      })
+    }
+  }
+
+  isLoggedInUser(datasetUserId: number){
+    return Number(AuthUtils.getUser().id) === datasetUserId;
+  }
+
+  viewComments(){
+    this.router.navigate([{outlets: {'sidebar': ['comments','assetCollection',true]}}], { relativeTo: this.activeRoute, skipLocationChange: true, queryParams: { returnURl: this.router.url }});
+  }
+
+  getAverageRating(datasetId: string) {
+    this.ratingService.getAverage(datasetId, this.objectType).subscribe( averageAndVotes => {
+      this.avgRating = averageAndVotes.average;
+    });
+  }
+  toggleSummaryWidget () {
+    this.showSummary = !this.showSummary;
+  }
+
   popupActionCancel() {
     this.showPopup = false;
   }
 
-  popupActionDone(asqm: AssetSetQueryModel) {
+  popupActionDone() {
+    this.showPopup = false;
+  }
+
+  popupActionAdd(asqm: AssetSetQueryModel) {
+    this.hidePopupActionButtons = true;
     let futureRdataSet;
 
     if(asqm.selectionList.length)
@@ -131,10 +302,11 @@ export class DsFullView implements OnInit {
     else
       futureRdataSet = this.richDatasetService.addAssets(this.dsModel.id, this.dsModel.clusterId, [asqm], asqm.exceptionList);
 
-    futureRdataSet.subscribe(rData => {
-      this.updateDsModel(rData)
-      // this.assetSetQueryModelsForAddition.push(asqm);
-      this.showPopup = false;
+    futureRdataSet.subscribe(rdata=> {
+      this.hidePopupActionButtons = false;
+      this.updateDsModel(rdata);  
+      this.dsAssetSearch.dsAssetList.freshFetch();
     })
   }
+
 }

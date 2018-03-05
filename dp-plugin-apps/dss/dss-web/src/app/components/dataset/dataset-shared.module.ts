@@ -34,6 +34,7 @@ import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
 import {DsAssetListStyle1} from "./views/ds-assets-list/styled/style1";
 import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holder.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
+import {DsCreator} from "./views/ds-create/ds-creator.component";
 import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.component";
 import {UniqueDatasetNameValidator} from "./directives/validators";
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
@@ -76,6 +77,7 @@ import {ProfilerService} from "app/services/profiler.service";
     DsTileProxy,
     DsFullView,
     DsEditor,
+    DsCreator,
     DsInfoHolder,
     DsAssetsHolder,
     DsSummaryHolder,
@@ -124,6 +126,7 @@ import {ProfilerService} from "app/services/profiler.service";
     DsTileProxy,
     DsFullView,
     DsEditor,
+    DsCreator,
     DsInfoHolder,
     DsAssetsHolder,
     DsSummaryHolder,

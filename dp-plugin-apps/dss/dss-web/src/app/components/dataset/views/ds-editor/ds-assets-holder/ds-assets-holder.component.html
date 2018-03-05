@@ -17,7 +17,7 @@
 <ds-assets-list *ngIf="showList && !showPopup"
                 [dsModel]="dsModel"
                 [applicableActions]="applicableListActions"
-                [selectionAllowed]="true"
+                [Editable]="true"
                 [queryModels]="assetSetQueryModelsForAddition"
                 [clusterId]="dsModel.clusterId"
                 (onAction)="onListAction($event)"

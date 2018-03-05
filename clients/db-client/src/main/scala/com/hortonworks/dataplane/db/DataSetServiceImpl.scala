@@ -91,6 +91,28 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDataset1)
   }
 
+  def beginEdition(id: Long, userId:Long) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$id/begin-edit")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(userId.toString()))
+      .map(mapToRichDataset1)
+  }
+
+  def saveEdition(id: Long) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$id/save-edit")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(id))
+      .map(mapToRichDataset1)
+  }
+
+  def cancelEdition(id: Long) : Future[RichDataset] = {
+    ws.url(s"$url/datasets/$id/revert-edit")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(id))
+      .map(mapToRichDataset1)
+  }
+
+
   def listRichDataset(queryString: String, userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
     ws.url(s"$url/richdatasets?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
@@ -98,11 +120,11 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDatasets)
   }
 
-  def getRichDatasetById(id: Long,userId:Long): Future[Either[Errors, RichDataset]] = {
+  def getRichDatasetById(id: Long,userId:Long): Future[RichDataset] = {
     ws.url(s"$url/richdatasets/$id?userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToRichDataset)
+      .map(mapToRichDataset1)
   }
 
   def listRichDatasetByTag(tagName: String, queryString: String,userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
@@ -112,8 +134,8 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDatasets)
   }
 
-  def getDataAssetByDatasetId(id:Long, queryName: String, offset: Long, limit: Long) : Future[Either[Errors, AssetsAndCounts]] = {
-    ws.url(s"$url/dataassets/$id?queryName=$queryName&offset=$offset&limit=$limit")
+  def getDataAssetByDatasetId(id:Long, queryName: String, offset: Long, limit: Long, state: String) : Future[Either[Errors, AssetsAndCounts]] = {
+    ws.url(s"$url/dataassets/$id?queryName=$queryName&offset=$offset&limit=$limit&state=$state")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToDataAssetsAndCount)
@@ -193,6 +215,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToRichDataset1(res: WSResponse): RichDataset = {
     res.status match {
       case 200 => (res.json \ "results" \\ "data").head.validate[RichDataset].get
+      case 404 => throw new NoSuchElementException(res.status.toString)
       case _ => throw new Exception(res.status.toString)
     }
   }

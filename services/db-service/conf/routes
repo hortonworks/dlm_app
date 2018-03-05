@@ -151,6 +151,9 @@ POST          /datasets                                                      con
 POST          /datasets/:datasetId/addassets                                 controllers.Datasets.addAssets(datasetId:Long)
 DELETE        /datasets/:datasetId/assets                                    controllers.Datasets.removeAssets(datasetId: Long, ids: Seq[String])
 DELETE        /datasets/:datasetId/removeallassets                           controllers.Datasets.removeAllAssets(datasetId:Long)
+POST          /datasets/:datasetId/begin-edit                                controllers.Datasets.beginEdit(datasetId:Long)
+POST          /datasets/:datasetId/save-edit                                 controllers.Datasets.saveEdit(datasetId:Long)
+POST          /datasets/:datasetId/revert-edit                               controllers.Datasets.revertEdit(datasetId:Long)
 POST          /datasetswithassets                                            controllers.Datasets.addWithAsset
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
@@ -191,7 +194,7 @@ POST          /datasets/details                                              con
 DELETE        /datasets/details/:id                                          controllers.DatasetDetailsCtrl.delete(id:Long)
 
 #Data Asset Api
-GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long)
+GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long, state: Option[String])
 GET           /dataassets/guid/:guid                                         controllers.DataAssets.loadFromGuid(guid: String)
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)

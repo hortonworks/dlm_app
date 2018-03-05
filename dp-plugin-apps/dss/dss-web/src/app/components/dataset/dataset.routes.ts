@@ -12,23 +12,69 @@
 import {Routes} from "@angular/router";
 import {DatasetDashboardComponent} from "./views/dashboard/dataset-dashboard.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
+import {DsCreator} from "./views/ds-create/ds-creator.component";
+import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {AssetViewComponent} from './views/asset-view/asset-view.component';
 import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
 import {CommentsComponent} from "../../shared/comments/comments.component";
 import {AssetCollectionEditComponent} from './views/asset-collection-edit/asset-collection-edit.component';
 
-export const routes: Routes = [
-  {path: '', pathMatch: 'full', redirectTo: 'collections'},
-  {path: "collections", data: {crumb: 'dss.collections'}, children: [
-    {path: '', pathMatch: 'full', component: DatasetDashboardComponent, data: {crumb: undefined}},
-    {path: "add", component: DsEditor, data: {crumb: 'dss.collections.add'}},
-    {path: ":id", component: AssetCollectionEditComponent, data: {crumb: 'dss.collections.cCollection'}, children: [
-      {path: 'comments/:objectType/:isRatingEnabled', component: CommentsComponent, outlet: 'sidebar'}
-    ]},
-    {path: ":id/edit", component: DsEditor, data: {crumb: 'dss.collections.cCollection.edit'}}
-  ]},
-  {path: "clusters/:clusterId/assets/:guid", component: AssetViewComponent, data: {crumb: 'dss.assets.cAsset'}, children: [
-    {path: 'nodes/:guidOfNode', component: NodeDetailsComponent, outlet: 'sidebar'}
-  ]},
-  {path: "bookmarks", component: DatasetDashboardComponent, data: {filter: 'bookmark', crumb: 'dss.bookmarks'}}
-];
+export const routes: Routes = [{
+  path: '',
+  pathMatch: 'full',
+  redirectTo: 'collections'
+}, {
+  path: "collections",
+  data: {
+    crumb: 'dss.collections'
+  },
+  children: [{
+    path: '',
+    pathMatch: 'full',
+    component: DatasetDashboardComponent,
+    data: {
+      crumb: undefined
+    },
+  }, {
+    path: "add",
+    component: DsCreator,
+    data: {
+      crumb: 'dss.collections.add'
+    }
+  }, {
+    path: ":id",
+    component: DsFullView,
+    data: {
+      crumb: 'dss.collections.cCollection'
+    },
+    children: [{
+      path: 'comments/:objectType/:isRatingEnabled',
+      component: CommentsComponent,
+      outlet: 'sidebar'
+    }]
+  }, {
+    path: ":id/edit",
+    component: DsEditor,
+    data: {
+      crumb: 'dss.collections.cCollection.edit'
+    }
+  }]
+}, {
+  path: "clusters/:clusterId/assets/:guid",
+  component: AssetViewComponent,
+  data: {
+    crumb: 'dss.assets.cAsset'
+  },
+  children: [{
+    path: 'nodes/:guidOfNode',
+    component: NodeDetailsComponent,
+    outlet: 'sidebar'
+  }]
+}, {
+		path: "bookmarks",
+		component: DatasetDashboardComponent,
+		data: {
+			filter: 'bookmark',
+			crumb: 'dss.bookmarks'
+		}
+}];

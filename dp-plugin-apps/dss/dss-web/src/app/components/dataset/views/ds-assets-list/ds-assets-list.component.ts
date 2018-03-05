@@ -46,12 +46,13 @@ export class DsAssetList implements OnInit {
   @Input() hideTabs: boolean = false;
   @Input() hideSearch: boolean = false;
   @Input() innerListScrollable: boolean = false;
-  @Input() selectionAllowed: boolean = true;
+  @Input() Editable: boolean = true;
   @Input() queryModels: (ASQM | ASQM[]);
   @Input() avoidLoadingOnInit: boolean = false;
   @Input() searchText: string = "";
   @Input() typeFilter: AssetTypeEnum = AssetTypeEnum.ALL;
   @Input() clusterId:number;
+  @Input() datasetId:number;
   @Input() allowAssetNavigation : boolean = true;
   @Input() showBelongsToColumn : boolean = false;
 
@@ -120,6 +121,7 @@ export class DsAssetList implements OnInit {
   clearResults() {
     this.dsAssets = [];
     this.totalPages = this.assetsCount = 0;
+    this.clearSelection();
   }
 
   clearSelection () {
@@ -148,7 +150,7 @@ export class DsAssetList implements OnInit {
 
     //TODO there must be a separate count query with all filters instead of hard coding assetsCount
     asqms = this.getQueryModelsForAssetService(false);
-    this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize, this.clusterId)
+    this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize, this.clusterId, this.datasetId, this.Editable)
       .subscribe(assetsNcounts => {
         this.dsAssets = assetsNcounts.assets;
         if(assetsNcounts.count !== null) {
