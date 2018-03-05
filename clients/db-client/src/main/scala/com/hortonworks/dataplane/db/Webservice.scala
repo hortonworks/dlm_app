@@ -365,6 +365,7 @@ object Webservice {
     def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
     def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]]
   }
+
   trait SkuService extends  DbClientService {
     def getAllSkus():Future[Either[Errors,Seq[Sku]]]
     def getSku(name:String): Future[Either[Errors,Sku]]

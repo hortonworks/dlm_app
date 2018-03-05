@@ -59,7 +59,7 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def getLinkedClusters(
       dpClusterId: Long): Future[Either[Errors, Seq[Cluster]]] = {
-    ws.url(s"$url/dp/clusters/$dpClusterId/clusters")
+    ws.url(s"$url/dpclusters/$dpClusterId/clusters")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToClusters)
