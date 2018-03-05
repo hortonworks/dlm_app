@@ -27,7 +27,7 @@ source_dp_config () {
 
 init_network() {
     IS_NETWORK_PRESENT="false"
-    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    docker network inspect --format "{{title .ID}}" dp >> "$DSS_PATH"/install.log 2>&1 && IS_NETWORK_PRESENT="true"
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
@@ -80,7 +80,7 @@ destroy() {
 }
 
 init_app() {
-    docker start dss-app >> install.log 2>&1 || \
+    docker start dss-app >> "$DSS_PATH"/install.log 2>&1 || \
         docker run -it \
             --name dss-app \
             --network dp \
@@ -130,13 +130,13 @@ print_version() {
 }
 
 usage() {
-   source $(pwd)/help.sh
+   source "$DSS_PATH"/help.sh
    exit -1
 }
 
 if [ $# -lt 1 ] || [ ${@:$#} == "--help" ]
 then
-    source $(pwd)/help.sh "$@"
+    source "$DSS_PATH"/help.sh "$@"
     exit 0;
 else
     VERSION=$(print_version)

@@ -32,7 +32,7 @@ CONSUL_HOST="$CONSUL_CONTAINER"
 
 init_network() {
     IS_NETWORK_PRESENT="false"
-    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    docker network inspect --format "{{title .ID}}" dp >> "$DP_PATH"/install.log 2>&1 && IS_NETWORK_PRESENT="true"
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
@@ -255,10 +255,10 @@ import_certs() {
     fi
 
     mkdir -p certs
-    rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
-    cp "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" $(pwd)/certs/ssl-cert.pem
-    rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
-    cp "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" $(pwd)/certs/ssl-key.pem
+    rm -f "$DP_PATH"/certs/ssl-cert.pem 2> /dev/null
+    cp "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" "$DP_PATH"/certs/ssl-cert.pem
+    rm -f "$DP_PATH"/certs/ssl-key.pem 2> /dev/null
+    cp "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" "$DP_PATH"/certs/ssl-key.pem
     echo "Certificates were copied successfully."
 
     read_user_supplied_certificate_password

@@ -9,6 +9,9 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
+
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 set -e
 
 init_call() {
@@ -16,7 +19,7 @@ init_call() {
         --rm \
         --entrypoint /scripts/keystore-update.sh \
         --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
-        --volume $(pwd)/certs:/dp-shared \
+        --volume "$DP_PATH"/certs:/dp-shared \
         hortonworks/dp-migrate:$VERSION init
 
     echo "Keystore initialized successfully"

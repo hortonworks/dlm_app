@@ -17,8 +17,9 @@
 #       POSTGRES_PASSWORD: dp_admin
 #       POSTGRES_USER: dp_admin
 #       POSTGRES_DB: dataplane
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-docker start dp-database >> install.log 2>&1 || \
+docker start dp-database >> "$DP_PATH"/install.log 2>&1 || \
     docker run \
         --name dp-database \
         --network dp \

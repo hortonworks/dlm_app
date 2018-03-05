@@ -26,7 +26,7 @@ source_dp_config () {
 
 init_network() {
     IS_NETWORK_PRESENT="false"
-    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    docker network inspect --format "{{title .ID}}" dp >> "$DLM_PATH"/install.log 2>&1 && IS_NETWORK_PRESENT="true"
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
@@ -78,7 +78,7 @@ check_master_password_validity(){
 init_app() {
     read_master_password_safely
     check_master_password_validity
-    docker start dlm-app >> install.log 2>&1 || \
+    docker start dlm-app >> "$DLM_PATH"/install.log 2>&1 || \
         docker run \
             --name dlm-app \
             --network dp \
