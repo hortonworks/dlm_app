@@ -17,7 +17,7 @@ object API {
   val users = "/users"
   val roles = "/roles"
   val locations = "/locations"
-  val dpClusters = "dpclusters"
+  val dpClusters = "/dpclusters"
   val clusters = "/clusters"
   val datasets = "/datasets"
   val workspaces = "/workspaces"
