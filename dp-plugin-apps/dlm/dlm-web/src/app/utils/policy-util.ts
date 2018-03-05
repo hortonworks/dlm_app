@@ -52,7 +52,7 @@ export const parsePolicyId = (policyId: string): ParsedPolicyId => {
   };
 };
 
-const clusterToListOption = cluster => {
+export const clusterToListOption = cluster => {
   return {
     label: `${cluster.name} (${cluster.dataCenter})`,
     value: cluster.id

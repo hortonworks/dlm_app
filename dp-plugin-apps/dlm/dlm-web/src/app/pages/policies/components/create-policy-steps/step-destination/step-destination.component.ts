@@ -26,7 +26,7 @@ import { S3, CLUSTER } from 'constants/policy.constant';
 import { mapToList } from 'utils/store-util';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Subscription } from 'rxjs/Subscription';
-import { getClusterEntities } from 'utils/policy-util';
+import { getClusterEntities, clusterToListOption } from 'utils/policy-util';
 
 @Component({
   selector: 'dlm-step-destination',
@@ -106,14 +106,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     return this.clusters.filter(cluster => {
       const status = this.beaconStatuses.find(c => c.clusterId === cluster.id);
       return status ? status.beaconAdminStatus.replication_cloud_fs : false;
-    }).map(cluster => this.clusterToListOption(cluster));
-  }
-
-  clusterToListOption(cluster) {
-    return {
-      label: `${cluster.name} (${cluster.dataCenter})`,
-      value: cluster.id
-    };
+    }).map(cluster => clusterToListOption(cluster));
   }
 
   /**
@@ -162,11 +155,11 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     const destinationControls = this.form.controls.destination['controls'];
     const subscription = destinationControls.type.valueChanges.subscribe(type => {
       let toEnable = [], toDisable = [];
-      if (type === S3) {
+      if (type === SOURCE_TYPES.S3) {
         toEnable = this.s3Fields;
         toDisable = this.clusterFields;
       }
-      if (type === CLUSTER) {
+      if (type === SOURCE_TYPES.CLUSTER) {
         toEnable = this.clusterFields;
         toDisable = this.s3Fields;
       }
@@ -185,7 +178,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
         controls.path.disable();
       }
       this.source = source.value && source.value.source || {};
-      if (this.source.type === CLUSTER) {
+      if (this.source.type === SOURCE_TYPES.CLUSTER) {
         this.form.patchValue({
           destination: {
             path: this.source.directories
