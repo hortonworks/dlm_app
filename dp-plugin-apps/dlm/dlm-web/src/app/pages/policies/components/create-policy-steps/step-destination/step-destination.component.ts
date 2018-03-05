@@ -22,7 +22,6 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES } from 'constants/policy.constant';
 import { getSteps } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
-import { S3, CLUSTER } from 'constants/policy.constant';
 import { mapToList } from 'utils/store-util';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Subscription } from 'rxjs/Subscription';
@@ -46,8 +45,6 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   @Output() onFormValidityChange = new EventEmitter<boolean>();
   @HostBinding('class') className = 'dlm-step-destination';
 
-  CLUSTER = CLUSTER;
-  S3 = S3;
   form: FormGroup;
   source: any = {};
   general: any = {};
@@ -84,7 +81,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
 
   get destinationClusters() {
     const sourceType = this.source.type;
-    if (sourceType === CLUSTER) {
+    if (sourceType === SOURCE_TYPES.CLUSTER) {
       if (this.source.cluster) {
         const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => +cluster.id === +this.source.cluster).length);
         if (pairings.length) {
@@ -124,7 +121,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       label: SOURCE_TYPES.CLUSTER,
       value: SOURCE_TYPES.CLUSTER
     }];
-    if (this.general.type === POLICY_TYPES.HIVE || this.source.type === this.S3) {
+    if (this.general.type === POLICY_TYPES.HIVE || this.source.type === SOURCE_TYPES.S3) {
       return onlyCluster;
     }
     const status = this.beaconStatuses.find(c => c.clusterId === sourceClusterId);
