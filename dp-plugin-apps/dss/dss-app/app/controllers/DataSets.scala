@@ -11,7 +11,7 @@
 
 package controllers
 
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime}
 import javax.inject.Inject
 
 import com.google.inject.name.Named
@@ -235,7 +235,7 @@ class DataSets @Inject()(
       edtOptn    <- dataSetService.getRichDatasetById(datasetId, req.user.id.get).map{rDset =>rDset.editDetails}
       needRevert <- Future.successful(edtOptn match {
         case None => false
-        case Some(edtDtl) => edtDtl.editBegin.get.isBefore(LocalDateTime.now().minusMinutes(15))
+        case Some(edtDtl) => edtDtl.editBegin.get.isBefore(LocalDateTime.now(Clock.systemUTC()).minusMinutes(15))
       })
       _     <- Future.successful(if(needRevert) Logger.info("Need to REVERT stale inprogress edit process"))
       rDSet <- Future.successful(if(needRevert) dataSetService.cancelEdition(datasetId))

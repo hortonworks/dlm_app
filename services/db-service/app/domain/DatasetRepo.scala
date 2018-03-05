@@ -11,7 +11,7 @@
 
 package domain
 
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime}
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
@@ -163,7 +163,7 @@ class DatasetRepo @Inject()(
       }
         // DB References will make sure datasetId and userId are valid
       _ <- datasetEditDetailsRepo.Table returning datasetEditDetailsRepo.Table +=
-        DatasetEditDetails(None, datasetId, userId, Some(LocalDateTime.now()))
+        DatasetEditDetails(None, datasetId, userId, Some(LocalDateTime.now(Clock.systemUTC())))
     } yield ()
     db.run(query.transactionally).flatMap {
       case _ => getRichDataset(Datasets.filter(_.id === datasetId), None, None, Some(userId)).map(_.head)

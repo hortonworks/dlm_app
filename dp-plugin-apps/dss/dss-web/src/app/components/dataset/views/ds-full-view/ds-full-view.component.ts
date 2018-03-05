@@ -115,7 +115,8 @@ export class DsFullView implements OnInit {
     setTimeout(()=>this.showConfirmationSticker=false, 4000);
   }
   isEditInProgress() {
-      return (this.dsModel.editDetails && ((new Date().getTime() - new Date(this.dsModel.editDetails.editBegin).getTime())/1000 <= 15*60))
+    const utcTstamp = new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60000).getTime();
+    return (this.dsModel.editDetails && ((utcTstamp - new Date(this.dsModel.editDetails.editBegin).getTime())/1000 <= 15*60))
   }
   private onAction(action: AssetListActionsEnum) {
     if(action === AssetListActionsEnum.DELETE)
