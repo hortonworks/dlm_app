@@ -42,7 +42,7 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
                                         d.validate[Cluster].get
                                     })
       case 404 => Left(Errors(Seq(Error(404, "Cluster not found"))))
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -53,7 +53,7 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
           res,
           r => (r.json \ "results" \\ "data").head.validate[Cluster].get)
       case 404 => Left(Errors(Seq(Error(404, "Cluster not found"))))
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 

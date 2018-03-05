@@ -100,7 +100,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
             (r.json \ "results" \\ "data").map { d =>
               d.validate[DataplaneCluster].get
             })
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -112,7 +112,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
           r =>
             (r.json \ "results" \\ "data").head.validate[DataplaneCluster].get)
       case 404 => createEmptyErrorResponse
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -123,7 +123,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
           res,
           r =>
             (r.json \ "results" \\ "data").map{services => services.validate[ClusterService].get})
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -132,7 +132,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         Right(true)
       case 400 => Right(false)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -140,7 +140,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => Right(true)
       case 404 => Right(false)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 

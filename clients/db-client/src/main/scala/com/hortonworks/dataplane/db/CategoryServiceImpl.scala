@@ -91,7 +91,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
         Right((res.json \ "results").as[Seq[JsValue]].map { d =>
           d.validate[Category].get
         })
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -101,7 +101,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
         extractEntity[Category](
           res,
           r => (r.json \\ "results").head.validate[Category].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -111,7 +111,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
         Right(((res.json \ "results").as[Seq[JsValue]].map { d =>
           d.validate[CategoryCount].get
         }))
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -121,7 +121,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
         extractEntity[CategoryCount](
           res,
           r => (r.json \\ "results").head.validate[CategoryCount].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 }

@@ -55,14 +55,14 @@ class DataAssetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToDataAsset(res: WSResponse): Either[Errors, DataAsset] = {
     res.status match {
       case 200 => extractEntity[DataAsset](res, r => (r.json \ "results" \ "data").validate[DataAsset].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   private def mapToEntityDatasetRelationship(res: WSResponse): Either[Errors, Seq[EntityDatasetRelationship]] = {
     res.status match {
       case 200 => extractEntity[Seq[EntityDatasetRelationship]](res, r => (r.json \ "results").validate[Seq[EntityDatasetRelationship]].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 

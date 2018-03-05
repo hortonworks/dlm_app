@@ -67,14 +67,14 @@ class DataSetCategoryServiceImpl  (config: Config)(implicit ws: WSClient)
             (r.json \ "results" \\ "data").map { d =>
               d.validate[DatasetCategory].get
             })
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   private def mapToDataSetCategory(res: WSResponse) = {
     res.status match {
       case 200 => extractEntity[DatasetCategory](res, r =>(r.json \ "results" \\ "data")(0).validate[DatasetCategory].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 }

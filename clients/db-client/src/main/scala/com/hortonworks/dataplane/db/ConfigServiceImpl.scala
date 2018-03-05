@@ -71,7 +71,7 @@ class ConfigServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToConfigWithError(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[DpConfig].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 

@@ -58,7 +58,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
           res,
           r =>
             (r.json \ "results" \\ "data").head.validate[ClusterService].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -70,7 +70,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
                                             (r.json \ "results" \\ "data").head
                                               .validate[ClusterServiceHost]
                                               .get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -81,7 +81,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
           res,
           r =>
             (r.json \ "results" \\ "data").head.validate[ClusterServiceWithConfigs].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -94,7 +94,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
             (r.json \ "results" \\ "data").map {
               _.validate[ClusterServiceWithConfigs].get
             })
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 

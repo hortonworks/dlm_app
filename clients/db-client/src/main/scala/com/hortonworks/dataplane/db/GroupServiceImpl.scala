@@ -42,13 +42,13 @@ class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupServi
   private def mapToGroupInfos(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[GroupsList].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   private def mapToGroups(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Seq[Group]].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -68,7 +68,7 @@ class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupServi
   private def mapToGroupInfo(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[GroupInfo].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -79,7 +79,7 @@ class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupServi
       .map { res =>
         res.status match {
           case 200 => Right(true)
-          case _ => mapErrors(res)
+          case _ => mapError(res)
         }
       }
   }
@@ -91,7 +91,7 @@ class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupServi
       .map { res =>
         res.status match {
           case 200 => Right((res.json \ "results").validate[GroupInfo].get)
-          case _ => mapErrors(res)
+          case _ => mapError(res)
         }
       }
   }
@@ -103,7 +103,7 @@ class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupServi
       .map { res =>
         res.status match {
           case 200 => Right((res.json \ "results").validate[Seq[String]].get)
-          case _ => mapErrors(res)
+          case _ => mapError(res)
         }
       }
   }

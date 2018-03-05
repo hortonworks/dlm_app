@@ -32,7 +32,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def loadUser(username: String): Future[Either[Errors, User]] = {
+  override def loadUser(username: String): Future[Either[Error, User]] = {
     ws.url(s"$url/users?username=$username")
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -41,7 +41,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  override def loadUserById(id: String): Future[Either[Errors, User]] = {
+  override def loadUserById(id: String): Future[Either[Error, User]] = {
     ws.url(s"$url/users/$id")
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -53,89 +53,89 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => Right((res.json \ "results").validate[UserInfo].get)
       case 404 => createEmptyErrorResponse
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   private def mapToSuccess(res: WSResponse) = {
     res.status match {
       case 200 =>{ Right((res.json \ "results"));Right(true
       )}
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   private def mapToOneUser(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[User].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   private def mapToUser(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").head.validate[User].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   private def mapToUsers(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Seq[User]].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   private def mapToUsersWithRoles(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[UsersList].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   def mapToRole(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Role].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   def mapToRoles(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Seq[Role]].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   private def mapToUserRoles(res: WSResponse) = {
     res.status match {
       case 200 =>Right((res.json \ "results").validate[UserRoles].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   private def mapToUserRole(res: WSResponse) = {
     res.status match {
       case 200 =>Right((res.json \ "results").validate[UserRole].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   private  def mapToUserGroupInfo(res:WSResponse)={
     res.status match {
       case 200 => Right((res.json \ "results").validate[UserGroupInfo].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   private def mapToUserContext(res: WSResponse) = {
     res.status match {
       case 200 =>Right((res.json \ "results").validate[UserContext].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
   private def mapAddUserWithRolesResponse(res:WSResponse)={
     res.status match {
       case 200 =>Right((res.json \ "results").validate[UserInfo].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
-  override def getUserRoles(userName: String): Future[Either[Errors, UserRoles]] = {
+  override def getUserRoles(userName: String): Future[Either[Error, UserRoles]] = {
     ws.url(s"$url/users/role/$userName")
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -146,21 +146,21 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
 
 
 
-  override def addUser(user: User): Future[Either[Errors, User]] = {
+  override def addUser(user: User): Future[Either[Error, User]] = {
     ws.url(s"$url/users")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(user))
       .map(mapToUser)
   }
 
-  override def updateUser(user: User): Future[Either[Errors, User]] = {
+  override def updateUser(user: User): Future[Either[Error, User]] = {
     ws.url(s"$url/users/${user.id}")
       .withHeaders("Accept" -> "application/json")
       .put(Json.toJson(user))
       .map(mapToOneUser)
   }
 
-  override def addUserWithRoles(userInfo: UserInfo): Future[Either[Errors, UserInfo]] = {
+  override def addUserWithRoles(userInfo: UserInfo): Future[Either[Error, UserInfo]] = {
     ws.url(s"$url/users/withroles")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userInfo))
@@ -168,14 +168,14 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
 
   }
 
-  override  def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]={
+  override  def getUserDetail(userName:String): Future[Either[Error,UserInfo]]={
     ws.url(s"$url/users/detail/$userName")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToUserInfo)
   }
 
-  override def addRole(role: Role): Future[Either[Errors, Role]] = {
+  override def addRole(role: Role): Future[Either[Error, Role]] = {
     ws.url(s"$url/roles")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(role))
@@ -183,13 +183,13 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def addUserRole(
-      userRole: UserRole): Future[Either[Errors, UserRole]] = {
+      userRole: UserRole): Future[Either[Error, UserRole]] = {
     ws.url(s"$url/users/role")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userRole))
       .map(mapToUserRole(_))
   }
-  override  def getUsers(): Future[Either[Errors,Seq[User]]]={
+  override  def getUsers(): Future[Either[Error,Seq[User]]]={
     ws.url(s"$url/users")
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -198,7 +198,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  override  def getUsersWithRoles(offset: Option[String], pageSize: Option[String], searchTerm: Option[String]): Future[Either[Errors,UsersList]]={
+  override  def getUsersWithRoles(offset: Option[String], pageSize: Option[String], searchTerm: Option[String]): Future[Either[Error,UsersList]]={
     ws.url(s"$url/users/all")
       .withQueryString("offset" -> offset.getOrElse("0"), "pageSize" -> pageSize.getOrElse("10"), "searchTerm" -> searchTerm.getOrElse("") )
       .withHeaders("Accept" -> "application/json")
@@ -209,7 +209,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
 
-  override  def getRoles():  Future[Either[Errors,Seq[Role]]]={
+  override  def getRoles():  Future[Either[Error, Seq[Role]]]={
     ws.url(s"$url/roles")
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -217,19 +217,19 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  override def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]= {
+  override def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Error, Boolean]]= {
     ws.url(s"$url/users/updateActiveAndRoles")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userInfo))
       .map { res =>
         res.status match {
           case 200 => Right(true)
-          case _ =>mapErrors(res)
+          case _ =>mapError(res)
         }
       }
   }
 
-  override def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]={
+  override def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Error,UserGroupInfo]]={
     ws.url(s"$url/users/withgroups")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userGroupInfo))
@@ -237,13 +237,13 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
 
-  override def updateUserWithGroups(userLdapGroups: UserLdapGroups): Future[Either[Errors,UserContext]]= {
+  override def updateUserWithGroups(userLdapGroups: UserLdapGroups): Future[Either[Error,UserContext]]= {
     ws.url(s"$url/users/withgroups")
       .withHeaders("Accept" -> "application/json")
       .put(Json.toJson(userLdapGroups))
       .map(mapToUserContext)
   }
-  override def getUserContext(userName:String): Future[Either[Errors,UserContext]] ={
+  override def getUserContext(userName:String): Future[Either[Error,UserContext]] ={
     ws.url(s"$url/users/$userName/usercontext")
       .withHeaders("Accept" -> "application/json")
       .get()

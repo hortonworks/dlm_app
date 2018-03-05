@@ -148,7 +148,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToDataSets(res: WSResponse) = {
     res.status match {
       case 200 => extractEntity[Seq[Dataset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[Dataset].get })
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -162,14 +162,14 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToDataSet(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "result" \\ "data") (0).validate[Dataset].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
   private def mapToLong(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Long].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -178,7 +178,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 => Right((res.json \ "results" \ "data").validate[DatasetAndCategories].get)
       case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
       case 409 => Left(Errors(Seq(Error(409, "Conflict"))))
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -186,7 +186,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => Right((res.json \ "results" \\ "data").head.validate[RichDataset].get)
       case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -202,7 +202,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => extractEntity[Seq[RichDataset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[RichDataset].get })
       case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -210,7 +210,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => extractEntity[AssetsAndCounts](res, r => (r.json \ "results" \\ "data").head.validate[AssetsAndCounts].get)
       case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 

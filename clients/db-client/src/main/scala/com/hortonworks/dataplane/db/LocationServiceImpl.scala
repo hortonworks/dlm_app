@@ -50,7 +50,7 @@ class LocationServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 =>
         extractEntity[Seq[Location]](res, r => (r.json \ "results").validate[Seq[Location]].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 
@@ -58,7 +58,7 @@ class LocationServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 =>
         extractEntity[Location](res, r => (r.json \ "results").validate[Location].get)
-      case _ => mapErrors(res)
+      case _ => mapError(res)
     }
   }
 }
