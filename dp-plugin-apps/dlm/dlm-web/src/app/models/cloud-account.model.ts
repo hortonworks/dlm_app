@@ -8,16 +8,29 @@
  */
 
 import { CloudContainer } from './cloud-container.model';
+import { Policy } from 'models/policy.model';
+import { CloudAccountSyncStatus } from 'models/beacon-cloud-cred.model';
+import { CRUD_ACTIONS } from 'constants/api.constant';
 
 export enum AccountStatus {
   Expired = 'EXPIRED',
   Active = 'ACTIVE'
 }
 
+export enum CloudAccountActions {
+  SYNC = 'SYNC'
+}
+
 export interface CloudAccount {
   id: string;
   accountDetails: CloudAccountDetails;
   containers?: CloudContainer[];
+}
+
+export interface CloudAccountUI extends CloudAccount {
+  policies: Policy[];
+  status: AccountStatus;
+  clusters: CloudAccountSyncStatus[];
 }
 
 export interface CloudAccountDetails {

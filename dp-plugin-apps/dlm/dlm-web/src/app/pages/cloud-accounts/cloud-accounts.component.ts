@@ -10,10 +10,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { CloudAccount } from 'models/cloud-account.model';
+import { CloudAccount, CloudAccountActions } from 'models/cloud-account.model';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers';
-import { loadAccounts, loadAccountsStatus, deleteCloudStore } from 'actions/cloud-account.action';
+import { loadAccounts, loadAccountsStatus, deleteCloudStore, syncCloudStore } from 'actions/cloud-account.action';
 import { getFullAccountsInfo } from 'selectors/cloud-account.selector';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
@@ -53,6 +53,14 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
       title = `${title} [${this._accounts.length}]`;
     }
     return title;
+  }
+
+  private refreshAccounts(): void {
+    [
+      loadAccounts(),
+      loadBeaconCloudCredsWithPolicies(),
+      loadAccountsStatus()
+    ].forEach(action => this.store.dispatch(action));
   }
 
   constructor(
@@ -96,6 +104,14 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
       body: this.t.instant('page.cloud_stores.content.accounts.delete.body', { accountName: account.id }),
       callback: callback(account)
     }));
+  }
+
+  handleSyncAccount(account: CloudAccount): void {
+    this.asyncActions.dispatch(syncCloudStore(account))
+      .subscribe(progressState => {
+        this.cloudAccountService.notifyOnCRUD(progressState, CloudAccountActions.SYNC);
+        this.refreshAccounts();
+      });
   }
 
   ngOnDestroy() {

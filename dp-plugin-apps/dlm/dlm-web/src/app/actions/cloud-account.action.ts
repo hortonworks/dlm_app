@@ -20,7 +20,8 @@ export const ActionTypes = {
   RESET_ADD_CLOUD_PROGRESS_STATE: type('RESET_ADD_CLOUD_PROGRESS_STATE'),
   LOAD_ACCOUNTS_STATUS: requestType('LOAD_ACCOUNTS_STATUS'),
   UPDATE_CLOUD_STORE: requestType('UPDATE_CLOUD_STORE'),
-  DELETE_CLOUD_STORE: requestType('DELETE_CLOUD_STORE')
+  DELETE_CLOUD_STORE: requestType('DELETE_CLOUD_STORE'),
+  SYNC_CLOUD_STORE: requestType('SYNC_CLOUD_STORE')
 };
 
 export const loadAccounts = (requestId?): ActionWithPayload<any> => ({
@@ -104,5 +105,13 @@ export const {
   deleteCloudStoreSuccess,
   deleteCloudStoreFailure
 } = createRequestAction(ActionTypes.DELETE_CLOUD_STORE, {
+  start: (cloudAccount, meta = {}) => ({ meta, cloudAccount })
+});
+
+export const {
+  syncCloudStore,
+  syncCloudStoreSuccess,
+  syncCloudStoreFailure
+} = createRequestAction(ActionTypes.SYNC_CLOUD_STORE, {
   start: (cloudAccount, meta = {}) => ({ meta, cloudAccount })
 });

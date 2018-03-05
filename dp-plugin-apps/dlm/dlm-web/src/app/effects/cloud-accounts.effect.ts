@@ -24,7 +24,9 @@ import {
   updateCloudStoreSuccess,
   updateCloudStoreFailure,
   deleteCloudStoreFailure,
-  deleteCloudStoreSuccess
+  deleteCloudStoreSuccess,
+  syncCloudStoreFailure,
+  syncCloudStoreSuccess
 } from 'actions/cloud-account.action';
 
 @Injectable()
@@ -103,6 +105,19 @@ export class CloudAccountsEffects {
       })
       .catch(err => Observable.of(deleteCloudStoreFailure(err, payload.meta))));
 
+  @Effect()
+  syncCloudStore$: Observable<any> = this.actions$
+    .ofType(accountActions.SYNC_CLOUD_STORE.START)
+    .map(toPayload)
+    .switchMap(payload => this.accountService
+      .syncCloudStore(payload.cloudAccount)
+      .map(response => {
+        if (response.errors.length) {
+          return syncCloudStoreFailure(response.errors, payload.meta);
+        }
+        return syncCloudStoreSuccess(response, payload.meta);
+      })
+      .catch(err => Observable.of(syncCloudStoreFailure(err, payload.meta))));
 
   constructor(private actions$: Actions, private accountService: CloudAccountService) {}
 }

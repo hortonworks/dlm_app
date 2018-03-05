@@ -17,6 +17,7 @@
     "saving": "Saving",
     "update": "Update",
     "updating": "Updating",
+    "sync": "Sync",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "duration": "Duration",
@@ -416,6 +417,7 @@
           "iam_username": "IAM USERNAME",
           "aws_account_id": "AWS ACCOUNT ID",
           "expired_account": "Cloud credentials invalid. Edit these credentials to continue using them.",
+          "out_of_sync_account": "{{clusters}} clusters not updated with revised credentials. Sync revised credentials to all clusters",
           "edit": {
             "title": "Edit Cloud Credential",
             "success_notification": {
@@ -473,6 +475,20 @@
             "success_notification": {
               "title": "Success",
               "body": "Cloud Credential added successfully!"
+            }
+          },
+          "sync": {
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential synced successfully!"
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "Beacon clusters associated with credential can be unreachable."
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to sync cloud credential."
             }
           }
         }

@@ -12,7 +12,7 @@ import {
   ChangeDetectorRef, HostBinding, EventEmitter, Output
 } from '@angular/core';
 import { ColumnMode } from '@swimlane/ngx-datatable';
-import { CloudAccount, AccountStatus } from 'models/cloud-account.model';
+import { CloudAccount, AccountStatus, CloudAccountUI } from 'models/cloud-account.model';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
@@ -32,6 +32,7 @@ export class CloudAccountsListComponent implements OnInit {
 
   @Output() removeAccount = new EventEmitter<CloudAccount>();
   @Output() editAccount = new EventEmitter<CloudAccount>();
+  @Output() syncAccount = new EventEmitter<CloudAccount>();
 
   @Input() accounts: CloudAccount[] = [];
 
@@ -65,6 +66,13 @@ export class CloudAccountsListComponent implements OnInit {
       type: ACTION_TYPES.DELETE
     }
   ];
+
+  private getAccountBody(account: CloudAccountUI): CloudAccount {
+    return {
+      id: account.id,
+      accountDetails: account.accountDetails
+    };
+  }
 
   constructor(private t: TranslateService, private cdRef: ChangeDetectorRef) {}
 
@@ -105,13 +113,35 @@ export class CloudAccountsListComponent implements OnInit {
     ];
   }
 
-  isExpiredAccount(account): boolean {
+  isExpiredAccount(account: CloudAccountUI): boolean {
     return account.status === AccountStatus.Expired;
   }
 
-  rowClass = (row): {[className: string]: boolean} => {
+  isOutOfSync({clusters = []}: CloudAccountUI): boolean {
+    return clusters.some(cluster => cluster.isInSync === false);
+  }
+
+  hasError(account: CloudAccountUI): boolean {
+    return this.isExpiredAccount(account) || this.isOutOfSync(account);
+  }
+
+  errorMessage(account: CloudAccountUI): string {
+    if (this.hasError(account)) {
+      if (this.isExpiredAccount(account)) {
+        return this.t.instant('page.cloud_stores.content.accounts.expired_account');
+      } else if (this.isOutOfSync(account)) {
+        return this.t.instant('page.cloud_stores.content.accounts.out_of_sync_account', {
+          clusters: account.clusters.filter(c => c.isInSync === false).length
+        });
+      }
+      return '';
+    }
+    return '';
+  }
+
+  rowClass = (account: CloudAccountUI): {[className: string]: boolean} => {
     return {
-      'card-danger': this.isExpiredAccount(row)
+      'card-danger': this.hasError(account)
     };
   }
 
@@ -123,11 +153,8 @@ export class CloudAccountsListComponent implements OnInit {
     this.tableComponent.toggleRowDetail(account);
   }
 
-  handleSelectedAction({cloudAccount, action}: {cloudAccount: CloudAccount, action: any}) {
-    const account: CloudAccount = {
-      id: cloudAccount.id,
-      accountDetails: cloudAccount.accountDetails
-    };
+  handleSelectedAction({cloudAccount, action}: {cloudAccount: CloudAccountUI, action: any}) {
+    const account: CloudAccount = this.getAccountBody(cloudAccount);
     switch (action.type) {
       case ACTION_TYPES.DELETE:
         this.removeAccount.emit(account);
@@ -141,5 +168,9 @@ export class CloudAccountsListComponent implements OnInit {
 
   edit(account) {
     this.editAccount.emit(account);
+  }
+
+  sync(account) {
+    this.syncAccount.emit(this.getAccountBody(account));
   }
 }

@@ -27,7 +27,8 @@
             <dlm-cloud-accounts-list
               [accounts]="tableData$ | async"
               (editAccount)="handleEditAccount($event)"
-              (removeAccount)="handleRemoveAccount($event)">
+              (removeAccount)="handleRemoveAccount($event)"
+              (syncAccount)="handleSyncAccount($event)">
             </dlm-cloud-accounts-list>
           </div>
           <ng-template #noAccounts>

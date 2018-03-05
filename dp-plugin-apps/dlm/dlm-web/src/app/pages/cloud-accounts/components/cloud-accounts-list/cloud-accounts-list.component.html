@@ -21,7 +21,7 @@
 </dlm-table>
 
 <ng-template #statusCell let-account="row">
-  <i *ngIf="isExpiredAccount(account)" class="fa fa-2x fa-exclamation-triangle text-danger"></i>
+  <i *ngIf="hasError(account)" class="fa fa-2x fa-exclamation-triangle text-danger"></i>
 </ng-template>
 
 <ng-template #providerCell let-account="row" let-index="rowIndex">
@@ -46,7 +46,7 @@
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
   <div class="userName is-text-large"
-    [tooltip]="isExpiredAccount(account) ? ('page.cloud_stores.content.accounts.expired_account' | translate) : ''"
+    [tooltip]="errorMessage(account)"
     [attr.qe-attr]="'cloud-account-id-' + index">
     {{account.id}}
   </div>
@@ -72,11 +72,18 @@
       | {{account.accountDetails.accountName}}
     </span>
   </div>
-  <div *ngIf="isExpiredAccount(account)">
+  <div *ngIf="isExpiredAccount(account); else outOfSync">
     <button type="button" class="btn btn-secondary btn-xs" (click)="edit(account)">
       {{'common.edit' | translate}}
     </button>
   </div>
+  <ng-template #outOfSync>
+    <div *ngIf="isOutOfSync(account)">
+      <button type="button" class="btn btn-secondary btn-xs" (click)="sync(account)">
+        {{'common.sync' | translate}}
+      </button>
+    </div>
+  </ng-template>
 </ng-template>
 
 <ng-template #actionsCell let-account="row" let-index="rowIndex">

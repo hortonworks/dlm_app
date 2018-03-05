@@ -38,7 +38,8 @@ export const getAllAccountsWithPolicies =
       }
       return {
         ...a,
-        policies: beaconCloudCred.policies || []
+        policies: beaconCloudCred.policies || [],
+        clusters: beaconCloudCred.clusters || []
       };
     });
   });
