@@ -81,7 +81,8 @@ object Entities {
   case class CloudCredentialStatus(name: String, status: CloudAccountStatus)
   case class CloudCredPoliciesEither(cloudCred: Either[BeaconApiErrors, CloudCredsBeaconResponse], policies: Either[BeaconApiErrors, Seq[PoliciesDetailResponse]])
   case class CloudCredPolicies(cloudCred: CloudCredsBeaconResponse, policies: Seq[PoliciesDetails])
-  case class CloudCredWithPolicies(name: String, policies: Seq[PoliciesDetails])
+  case class ClusterCred(clusterId: Long, isInSync: Boolean = true)
+  case class CloudCredWithPolicies(name: String, policies: Seq[PoliciesDetails], clusters: Seq[ClusterCred])
   case class CloudCredWithPoliciesResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredWithPolicies])
   case class CloudCredsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredsBeaconResponse])
   case class CloudCredsUpdateResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq())
@@ -133,6 +134,9 @@ object JsonFormatters {
 
   implicit val cloudCredentialStatusReads = Json.reads[CloudCredentialStatus]
   implicit val cloudCredentialStatusWrites = Json.writes[CloudCredentialStatus]
+
+  implicit val clusterCredReads = Json.reads[ClusterCred]
+  implicit val clusterCredWrites = Json.writes[ClusterCred]
 
   implicit val cloudCredWithPoliciesReads = Json.reads[CloudCredWithPolicies]
   implicit val cloudCredWithPoliciesWrites = Json.writes[CloudCredWithPolicies]

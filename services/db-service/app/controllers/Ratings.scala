@@ -39,9 +39,12 @@ class Ratings @Inject()(ratingRepo: RatingRepo)(implicit exec: ExecutionContext)
           .add(rating)
           .map { rt =>
             success(rt)
-          }.recoverWith(apiError)
+          }.recoverWith(apiErrorWithLog(e => Logger.error(s"Ratings Controller: Adding of rating $rating failed with message ${e.getMessage}",e)))
       }
-      .getOrElse(Future.successful(BadRequest))
+      .getOrElse{
+        Logger.warn("Ratings Controller: Failed to map request to Rating entity")
+        Future.successful(BadRequest("Failed to map request to Rating entity"))
+      }
   }
 
   def getAverage(objectId: Long, objectType: String) = Action.async { req =>
@@ -49,7 +52,7 @@ class Ratings @Inject()(ratingRepo: RatingRepo)(implicit exec: ExecutionContext)
     ratingRepo.getAverage(objectId,objectType)
       .map{ avgAndTotalVotes =>
         success(Json.obj("average" -> avgAndTotalVotes._1, "votes" -> avgAndTotalVotes._2))
-      }.recoverWith(apiError)
+      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Ratings Controller: Get average with object id $objectId & object type $objectType failed with message ${e.getMessage}",e)))
   }
 
   def update(id: String) = Action.async(parse.json) { req =>
@@ -62,10 +65,13 @@ class Ratings @Inject()(ratingRepo: RatingRepo)(implicit exec: ExecutionContext)
             .update(id.toLong,ratingTuple._2,ratingTuple._1)
             .map { rt =>
               success(rt)
-            }.recoverWith(apiError)
+            }.recoverWith(apiErrorWithLog(e => Logger.error(s"Ratings Controller: Update rating with rating id $id and rating object $ratingTuple failed with message ${e.getMessage}",e)))
         }
       }
-      .getOrElse(Future.successful(BadRequest))
+      .getOrElse{
+        Logger.warn("Ratings Controller: Failed to map request to Rating tuple")
+        Future.successful(BadRequest("Failed to map request to Rating tuple"))
+      }
   }
 
   def get(objectId: Long, objectType: String, userId: Long) = Action.async { req =>
@@ -73,13 +79,14 @@ class Ratings @Inject()(ratingRepo: RatingRepo)(implicit exec: ExecutionContext)
     ratingRepo.get(userId,objectId,objectType)
       .map{ rt =>
         success(rt)
-      }.recoverWith(apiError)
+      }.recoverWith(apiErrorWithLog(e => Logger.error(s"Ratings Controller: Get rating with user id $userId , object id $objectId and object type $objectType failed with message ${e.getMessage}",e)))
   }
 
   def delete(objectId: Long, objectType: String) = Action.async { req =>
     Logger.info("db-service Ratings Controller: Received delete ratings by object reference request")
     val numOfRowsDel = ratingRepo.deleteByObjectRef(objectId,objectType)
-    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted")).recoverWith(apiError)
+    numOfRowsDel.map(i => success(s"Success: ${i} row/rows deleted"))
+      .recoverWith(apiErrorWithLog(e => Logger.error(s"Ratings Controller: Delete rating with object id $objectId and object type $objectType failed with message ${e.getMessage}",e)))
   }
 
   implicit val tupledRatingWithUserReads = (

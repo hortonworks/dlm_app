@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export const markAllTouched = (form: FormGroup): void => {
   if (!form.controls) {
@@ -19,3 +19,13 @@ export const markAllTouched = (form: FormGroup): void => {
     markAllTouched(<FormGroup>control);
   });
 };
+
+export function uniqValidator(values): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors => {
+    const {value} = control;
+    if (!value) {
+      return null;
+    }
+    return values.includes(value) ? {uniqValidator: {name: value}} : null;
+  };
+}

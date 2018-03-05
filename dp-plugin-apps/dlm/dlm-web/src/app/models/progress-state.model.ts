@@ -15,5 +15,6 @@ export interface ProgressState {
   errorMessage?: any;
   actionType?: string;
   response?: any;
+  status?: number;
   [key: string]: any;
 }

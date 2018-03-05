@@ -16,6 +16,7 @@ import { groupByKey } from 'utils/array-util';
 import { AdlsAccount } from 'models/adls-account.model';
 import { Progress, HttpProgress, CloudAccountStatus, CloudAccountsStatusResponse } from 'models/cloud-account.model';
 import { PROGRESS_STATUS } from 'constants/status.constant';
+import { omit } from 'utils/object-utils';
 
 export interface State {
   WASB: BaseState<WasbAccount>;
@@ -150,6 +151,18 @@ export function reducer(state: State = initialState, action): State {
         ...state,
         status: {
           entities: Object.assign({}, state.status.entities, toEntities<CloudAccountStatus>(statuses, 'name'))
+        }
+      };
+    }
+    case fromCloudAccount.ActionTypes.DELETE_CLOUD_STORE.SUCCESS: {
+      if (!action.payload.response) {
+        return state;
+      }
+      const { id, accountDetails: {provider} } = action.payload.response;
+      return {
+        ...state,
+        [provider]: {
+          entities: Object.assign({}, omit(state[provider].entities, id))
         }
       };
     }

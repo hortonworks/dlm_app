@@ -30,7 +30,8 @@ export class CloudAccountsListComponent implements OnInit {
 
   IAM_ROLE = IAM_ROLE;
 
-  @Output() editAccount = new EventEmitter();
+  @Output() removeAccount = new EventEmitter<CloudAccount>();
+  @Output() editAccount = new EventEmitter<CloudAccount>();
 
   @Input() accounts: CloudAccount[] = [];
 
@@ -122,12 +123,19 @@ export class CloudAccountsListComponent implements OnInit {
     this.tableComponent.toggleRowDetail(account);
   }
 
-  handleSelectedAction({cloudAccount, action}) {
+  handleSelectedAction({cloudAccount, action}: {cloudAccount: CloudAccount, action: any}) {
+    const account: CloudAccount = {
+      id: cloudAccount.id,
+      accountDetails: cloudAccount.accountDetails
+    };
     switch (action.type) {
       case ACTION_TYPES.DELETE:
-        // TODO: Add action
+        this.removeAccount.emit(account);
+        break;
       case ACTION_TYPES.EDIT:
         this.edit(cloudAccount);
+        break;
+      default:
     }
   }
 

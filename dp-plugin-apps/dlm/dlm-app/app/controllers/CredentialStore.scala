@@ -59,7 +59,18 @@ class CredentialStore @Inject()(
     Logger.info("Received update cloud credential request")
     implicit val token = request.token
     request.body.validate[CloudAccountWithCredentials].map { credentialAccount =>
-      beaconService.updateCloudCreds(credentialAccount).map {
+      beaconService.updateDlmStoreAndCloudCreds(credentialAccount).map {
+        case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
+        case Right(dlmApiErrors) => Ok(Json.toJson(dlmApiErrors))
+      }
+    }.getOrElse(Future.successful(BadRequest))
+  }
+
+  def syncCredentialAccount = AuthenticatedAction.async (parse.json) { request =>
+    Logger.info("Received sync cloud credential request")
+    implicit val token = request.token
+    request.body.validate[CloudAccountWithCredentials].map { credentialAccount =>
+      beaconService.syncCloudCred(credentialAccount).map {
         dlmApiErrors => Ok(Json.toJson(dlmApiErrors))
       }
     }.getOrElse(Future.successful(BadRequest))
@@ -70,7 +81,7 @@ class CredentialStore @Inject()(
     implicit val token = request.token
     beaconService.deleteCloudCreds(cloudAccountId).map {
       case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
-      case Right(response) => Ok(JsonResponses.statusOk)
+      case Right(dlmApiErrors) => Ok(Json.toJson(dlmApiErrors))
     }
   }
 }

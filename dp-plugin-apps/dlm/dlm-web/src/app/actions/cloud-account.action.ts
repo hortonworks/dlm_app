@@ -11,14 +11,16 @@ import { requestType } from 'utils/type-action';
 import { ActionWithPayload } from 'actions/actions.type';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody } from 'models/cloud-account.model';
-import { type } from 'utils/type-action';
+import { type, createRequestAction } from 'utils/type-action';
 
 export const ActionTypes = {
   LOAD_ACCOUNTS: requestType('LOAD_ACCOUNTS'),
   ADD_CLOUD_STORE: requestType('ADD_CLOUD_STORE'),
   VALIDATE_CREDENTIALS: requestType('VALIDATE_CREDENTIALS'),
   RESET_ADD_CLOUD_PROGRESS_STATE: type('RESET_ADD_CLOUD_PROGRESS_STATE'),
-  LOAD_ACCOUNTS_STATUS: requestType('LOAD_ACCOUNTS_STATUS')
+  LOAD_ACCOUNTS_STATUS: requestType('LOAD_ACCOUNTS_STATUS'),
+  UPDATE_CLOUD_STORE: requestType('UPDATE_CLOUD_STORE'),
+  DELETE_CLOUD_STORE: requestType('DELETE_CLOUD_STORE')
 };
 
 export const loadAccounts = (requestId?): ActionWithPayload<any> => ({
@@ -69,6 +71,20 @@ export const resetAddCloudProgressState = (requestId): ActionWithPayload<any> =>
   payload: {requestId}
 });
 
+export const updateCloudStore = (cloudStore: AddCloudStoreRequestBody, meta = {}): ActionWithPayload<any> => ({
+  type: ActionTypes.UPDATE_CLOUD_STORE.START,
+  payload: {cloudStore, meta}
+});
+
+export const updateCloudStoreSuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.UPDATE_CLOUD_STORE.SUCCESS,
+  payload: { response, meta }
+});
+
+export const updateCloudStoreFailure = (error, meta): ActionFailure => ({
+  type: ActionTypes.UPDATE_CLOUD_STORE.FAILURE,
+  payload: { error, meta }
+});
 
 export const loadAccountsStatus = (meta = {}): ActionWithPayload<any> => ({
   type: ActionTypes.LOAD_ACCOUNTS_STATUS.START, payload: {meta}
@@ -81,4 +97,12 @@ export const loadAccountsStatusSuccess = (statuses, meta = {}): ActionSuccess =>
 export const loadAccountsStatusFail = (error, meta = {}): ActionFailure => ({
   type: ActionTypes.LOAD_ACCOUNTS_STATUS.FAILURE,
   payload: {error, meta}
+});
+
+export const {
+  deleteCloudStore,
+  deleteCloudStoreSuccess,
+  deleteCloudStoreFailure
+} = createRequestAction(ActionTypes.DELETE_CLOUD_STORE, {
+  start: (cloudAccount, meta = {}) => ({ meta, cloudAccount })
 });

@@ -12,10 +12,15 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ActionWithPayload } from 'actions/actions.type';
 import { confirmationOptionsDefaults, ConfirmationOptions } from 'components/confirmation-modal/confirmation-options.type';
 
+export interface ConfirmationModalState {
+  isVisible: boolean;
+  nextAction: ActionWithPayload<any>;
+  confirmationOptions: ConfirmationOptions;
+}
 @Injectable()
 export class ConfirmationService {
 
-  state$ = new BehaviorSubject<any>({
+  state$ = new BehaviorSubject<ConfirmationModalState>({
     isVisible: false,
     nextAction: null,
     confirmationOptions: confirmationOptionsDefaults

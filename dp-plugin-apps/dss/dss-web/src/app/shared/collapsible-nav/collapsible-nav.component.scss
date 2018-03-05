@@ -100,7 +100,7 @@
     text-decoration: none;
     font-weight: normal;
     display: block;
-    transition: 0.3s;
+    transition: $layout-transition-time;
     color: $submarine;
     cursor: pointer;
     white-space: nowrap;

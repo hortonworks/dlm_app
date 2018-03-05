@@ -184,7 +184,14 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
     this.toggleMenu();
   }
 
-  toggleMenu() {
+  toggleMenu(): void {
+    if (this.disabled) {
+      return;
+    }
     this.showMenu = !this.showMenu;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 }

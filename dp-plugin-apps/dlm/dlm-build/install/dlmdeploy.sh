@@ -67,17 +67,12 @@ read_master_password_safely() {
 }
 
 check_master_password_validity(){
-      if keytool \
-            -list \
-            -storetype jceks \
-            -keystore /usr/dp/current/core/bin/certs/dp-keystore.jceks \
-            -storepass "$MASTER_PASSWORD" \
-            -alias "dummy"  &> /dev/null; then
-            echo "Verification Successful. Initialising DLM..."
-      else
-            echo "Master password is incorrect. Please try again."
-            exit 1
-      fi
+    docker run \
+        --rm \
+        --entrypoint /scripts/check-master-password.sh \
+        --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
+        --volume /usr/dp/current/core/bin/certs:/dp-shared \
+        hortonworks/dp-migrate:$VERSION
 }
 
 init_app() {

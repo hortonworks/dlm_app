@@ -8,10 +8,11 @@
  */
 
 export interface ConfirmationOptions {
-  title: string;
-  body: string;
-  confirmBtnText: string;
-  cancelBtnText: string;
+  title?: string;
+  body?: string;
+  confirmBtnText?: string;
+  cancelBtnText?: string;
+  callback?: (...args) => any;
 }
 
 export const confirmationOptionsDefaults = <ConfirmationOptions>{
@@ -19,5 +20,6 @@ export const confirmationOptionsDefaults = <ConfirmationOptions>{
   body: 'common.modal.confirmation.body',
   confirmBtnText: 'common.ok',
   cancelBtnText: 'common.cancel',
-  qeAttr: 'confirmation-modal'
+  qeAttr: 'confirmation-modal',
+  callback: () => true
 };

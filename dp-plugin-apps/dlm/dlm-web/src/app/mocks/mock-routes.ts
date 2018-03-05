@@ -66,6 +66,18 @@ export const routes: MockRoute[] = [
   // cloud accounts
   new MockRoute('store/credentials', 'cloud_credentials.json'),
 
+  // update cloud account
+  new MockRoute('store/credential', (request) => {
+    const { body } = request;
+    if (body.id === 'fails-on-edit') {
+      return 'update_cloud_credential_failure.json';
+    }
+    return 'update_cloud_credential.json';
+  }, 'PUT'),
+
+  // delete cloud account
+  new MockRoute('store/credential/:cloudAccountId', 'delete_cloud_credential.json', 'DELETE'),
+
   // beacon cloud accounts with policies
   new MockRoute('cluster/cloudCredWithPolicies', 'cloud_cred_with_policies.json'),
 

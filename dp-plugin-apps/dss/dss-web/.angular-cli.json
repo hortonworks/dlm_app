@@ -22,6 +22,7 @@
         "../node_modules/roboto-npm-webfont/light/style.css",
         "../node_modules/dps-apps/dist/dp-app-navigation.css",
         "../node_modules/font-awesome/css/font-awesome.css",
+        "../node_modules/nvd3/build/nv.d3.css",
         "../node_modules/material-design-icons/iconfont/material-icons.css",
         "vendor.scss",
         "styles.scss"
