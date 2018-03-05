@@ -9,6 +9,7 @@
 
 import { Policy } from 'models/policy.model';
 import { POLICY_UI_STATUS, POLICY_STATUS } from 'constants/status.constant';
+import { Pairing } from '../models/pairing.model';
 
 export const isEnded = (policy: Policy) => policy.uiStatus === POLICY_UI_STATUS.ENDED;
 export const activateDisabled = (policy: Policy) => policy.status === POLICY_STATUS.RUNNING || isEnded(policy);
@@ -49,4 +50,24 @@ export const parsePolicyId = (policyId: string): ParsedPolicyId => {
     clusterName,
     dataCenter
   };
+};
+
+export const clusterToListOption = cluster => {
+  return {
+    label: `${cluster.name} (${cluster.dataCenter})`,
+    value: cluster.id
+  };
+};
+
+export const getClusterEntities = pairings => {
+  return pairings.reduce((entities: { [id: number]: {} }, entity: Pairing) => {
+    const getClusters = (pairing) => {
+      return pairing.pair.reduce((clusters: {}, cluster) => {
+        return Object.assign({}, clusters, {
+          [cluster.id]: clusterToListOption(cluster)
+        });
+      }, {});
+    };
+    return Object.assign({}, entities, getClusters(entity));
+  }, {});
 };

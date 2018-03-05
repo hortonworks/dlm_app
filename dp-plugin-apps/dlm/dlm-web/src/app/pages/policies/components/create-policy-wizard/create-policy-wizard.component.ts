@@ -9,7 +9,7 @@
 
 import {
   Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
-  HostBinding, ChangeDetectionStrategy, OnDestroy, ViewChild, AfterViewInit
+  HostBinding, ChangeDetectionStrategy, OnDestroy, ViewChild, AfterViewInit, ViewChildren, QueryList
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
@@ -26,6 +26,7 @@ import { WIZARD_STEP_ID, WIZARD_STATE } from 'constants/policy.constant';
 import { wizardSaveStep, wizardMoveToStep } from 'actions/policy.action';
 import { StepGeneralComponent } from '../create-policy-steps/step-general/step-general.component';
 import { StepSourceComponent } from '../create-policy-steps/step-source/step-source.component';
+import { StepDestinationComponent } from '../create-policy-steps/step-destination/step-destination.component';
 import { StepScheduleComponent } from '../create-policy-steps/step-schedule/step-schedule.component';
 import { StepAdvancedComponent } from '../create-policy-steps/step-advanced/step-advanced.component';
 
@@ -54,7 +55,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   @Output() onCancel = new EventEmitter<any>();
   @ViewChild('general') general: StepGeneralComponent;
   @ViewChild('source') source: StepSourceComponent;
-  @ViewChild('destination') destination: StepSourceComponent;
+  @ViewChild('destination') destination: StepDestinationComponent;
   @ViewChild('schedule') schedule: StepScheduleComponent;
   @ViewChild('advanced') advanced: StepAdvancedComponent;
   @HostBinding('class') className = 'dlm-create-policy-wizard';
@@ -119,9 +120,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   }
 
   handleNextButtonClick(event) {
-    // temporary. todo remove when destination-step is ready
-    const v = this.viewChildStepIdMap[this.activeStepId] ? this.viewChildStepIdMap[this.activeStepId].getFormValue() : {};
-    this.store.dispatch(wizardSaveStep(this.activeStepId, v));
+    this.store.dispatch(wizardSaveStep(this.activeStepId, this.viewChildStepIdMap[this.activeStepId].getFormValue()));
   }
 
   handleBackButtonClick(event) {

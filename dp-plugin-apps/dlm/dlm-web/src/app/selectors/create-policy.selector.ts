@@ -26,6 +26,7 @@ const getStepsList = createSelector(getEntities, mapToList);
 export const getAllSteps = createSelector(getStepsList, sortSteps);
 
 export const getStep = (stepId) => createSelector(getEntities, entities => entities[stepId]);
+export const getSteps = (...stepIds) => createSelector(getEntities, entities => stepIds.map(stepId => entities[stepId]));
 
 const stepValue = stepId => entities => entities[stepId] && 'value' in entities[stepId] ? entities[stepId]['value'] : {};
 

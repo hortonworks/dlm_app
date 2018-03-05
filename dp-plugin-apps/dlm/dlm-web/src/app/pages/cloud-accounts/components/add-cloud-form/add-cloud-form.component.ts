@@ -19,11 +19,12 @@ import { CloudAccountService } from 'services/cloud-account.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SelectOption } from 'components/forms/select-field';
 import {
-   CREDENTIAL_TYPE_LABELS,
-   S3_TYPE_VALUES, S3_TOKEN,
-   IAM_ROLE,
-   CLOUD_PROVIDER_LABELS,
-   CLOUD_PROVIDER_VALUES
+  CREDENTIAL_TYPE_LABELS,
+  S3_TYPE_VALUES,
+  S3_TOKEN,
+  IAM_ROLE,
+  CLOUD_PROVIDER_LABELS,
+  CLOUD_PROVIDER_VALUES
 } from 'constants/cloud.constant';
 import { loadAccounts } from 'actions/cloud-account.action';
 import { addCloudStore, validateCredentials, resetAddCloudProgressState, updateCloudStore } from 'actions/cloud-account.action';
