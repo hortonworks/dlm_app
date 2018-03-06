@@ -26,7 +26,7 @@ import { SummaryTreeItem } from 'models/policy.model';
           <i class="fa fa-fw fa-circle"></i>
         </span>
       </li>
-      <li class="summary-tree-item" *ngFor="let item of items">
+      <li [attr.qe-attr]="'summary-tree-item-' + i" class="summary-tree-item" *ngFor="let item of items; let i = index;">
         <span class="step-icon">
           <i [ngClass]="['fa', 'fa-fw', item?.iconClass]"></i>
         </span>
