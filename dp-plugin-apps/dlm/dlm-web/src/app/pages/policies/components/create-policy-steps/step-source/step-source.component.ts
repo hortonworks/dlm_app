@@ -9,7 +9,7 @@
 
 import {
   Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
-  HostBinding, ChangeDetectionStrategy, OnDestroy
+  HostBinding, ChangeDetectionStrategy, OnDestroy, AfterViewInit
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -47,13 +47,14 @@ const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
+export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, StepComponent {
 
   @Input() pairings: Pairing[] = [];
   @Input() containers: any = {};
   @Input() accounts: CloudAccount[] = [];
   @Input() clusters: Cluster[] = [];
   @Input() containersList: CloudContainer[] = [];
+  @Input() sourceClusterId = 0;
   @Output() onFormValidityChange = new EventEmitter<boolean>();
   @HostBinding('class') className = 'dlm-step-source';
 
@@ -150,6 +151,17 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
     this.subscribeToSourceCluster();
     this.setupDatabaseChanges(this.form);
     this.subscriptions.push(formSubscription);
+  }
+
+  ngAfterViewInit() {
+    if (this.sourceClusterId) {
+      this.form.patchValue({
+        source: {
+          type: this.SOURCE_TYPES.CLUSTER,
+          cluster: Number(this.sourceClusterId)
+        }
+      });
+    }
   }
 
   isFormValid() {
