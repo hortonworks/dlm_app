@@ -38,12 +38,13 @@ export class NotificationEffects {
         this.notification.create(options);
       }
       if (isFailureAction(action) && NOTIFICATION_TYPES.ERROR in payload.meta.notification) {
-        const translated = this.translateOptions(payload.meta.notification[NOTIFICATION_TYPES.ERROR]);
+        const errorNotification = notification[NOTIFICATION_TYPES.ERROR];
+        const translated = this.translateOptions(errorNotification);
         const options = {
           ...translated,
           type: NOTIFICATION_TYPES.ERROR,
           body: translated.body || this.getErrorBody(action),
-          contentType: notification.contentType || NOTIFICATION_CONTENT_TYPE.MODAL_LINK,
+          contentType: errorNotification.contentType || NOTIFICATION_CONTENT_TYPE.MODAL_LINK,
           id: genId()
         };
         this.notification.create(options);

@@ -61,6 +61,12 @@
     }
   }
 
+  .card-disabled {
+    .provider {
+      background-color: $grey-color;
+    }
+  }
+
   span.left-arrow {
     font-size: 15px;
     color: #A0A0A0;

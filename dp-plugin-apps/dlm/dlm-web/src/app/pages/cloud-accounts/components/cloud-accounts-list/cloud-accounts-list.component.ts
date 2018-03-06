@@ -33,6 +33,7 @@ export class CloudAccountsListComponent implements OnInit {
   @Output() removeAccount = new EventEmitter<CloudAccount>();
   @Output() editAccount = new EventEmitter<CloudAccount>();
   @Output() syncAccount = new EventEmitter<CloudAccount>();
+  @Output() deleteUnregisteredAccount = new EventEmitter<CloudAccount>();
 
   @Input() accounts: CloudAccount[] = [];
 
@@ -121,6 +122,10 @@ export class CloudAccountsListComponent implements OnInit {
     return clusters.some(cluster => cluster.isInSync === false);
   }
 
+  isUnregistered(account: CloudAccountUI): boolean {
+    return account.status === AccountStatus.Unregistered;
+  }
+
   hasError(account: CloudAccountUI): boolean {
     return this.isExpiredAccount(account) || this.isOutOfSync(account);
   }
@@ -141,7 +146,8 @@ export class CloudAccountsListComponent implements OnInit {
 
   rowClass = (account: CloudAccountUI): {[className: string]: boolean} => {
     return {
-      'card-danger': this.hasError(account)
+      'card-danger': this.hasError(account),
+      'card-disabled': this.isUnregistered(account)
     };
   }
 
@@ -172,5 +178,9 @@ export class CloudAccountsListComponent implements OnInit {
 
   sync(account) {
     this.syncAccount.emit(this.getAccountBody(account));
+  }
+
+  deleteUnregistered(account) {
+    this.deleteUnregisteredAccount.emit(this.getAccountBody(account));
   }
 }

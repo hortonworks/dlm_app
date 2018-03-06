@@ -21,7 +21,8 @@ export const ActionTypes = {
   LOAD_ACCOUNTS_STATUS: requestType('LOAD_ACCOUNTS_STATUS'),
   UPDATE_CLOUD_STORE: requestType('UPDATE_CLOUD_STORE'),
   DELETE_CLOUD_STORE: requestType('DELETE_CLOUD_STORE'),
-  SYNC_CLOUD_STORE: requestType('SYNC_CLOUD_STORE')
+  SYNC_CLOUD_STORE: requestType('SYNC_CLOUD_STORE'),
+  DELETE_UNREGISTERED_STORE: requestType('DELETE_UNREGISTERED_STORE')
 };
 
 export const loadAccounts = (requestId?): ActionWithPayload<any> => ({
@@ -114,4 +115,15 @@ export const {
   syncCloudStoreFailure
 } = createRequestAction(ActionTypes.SYNC_CLOUD_STORE, {
   start: (cloudAccount, meta = {}) => ({ meta, cloudAccount })
+});
+
+export const {
+  deleteUnregisteredStore,
+  deleteUnregisteredStoreSuccess,
+  deleteUnregisteredStoreFailure,
+} = createRequestAction(ActionTypes.DELETE_UNREGISTERED_STORE, {
+  start: (cloudAccount, meta = {}) => ({
+    cloudAccount,
+    meta
+  })
 });

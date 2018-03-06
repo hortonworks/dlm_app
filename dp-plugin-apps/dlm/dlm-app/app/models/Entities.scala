@@ -82,7 +82,7 @@ object Entities {
   case class CloudCredPoliciesEither(cloudCred: Either[BeaconApiErrors, CloudCredsBeaconResponse], policies: Either[BeaconApiErrors, Seq[PoliciesDetailResponse]])
   case class CloudCredPolicies(cloudCred: CloudCredsBeaconResponse, policies: Seq[PoliciesDetails])
   case class ClusterCred(clusterId: Long, isInSync: Boolean = true)
-  case class CloudCredWithPolicies(name: String, policies: Seq[PoliciesDetails], clusters: Seq[ClusterCred])
+  case class CloudCredWithPolicies(name: String, policies: Seq[PoliciesDetails], clusters: Seq[ClusterCred], cloudCred: Option[CloudCredResponse])
   case class CloudCredWithPoliciesResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredWithPolicies])
   case class CloudCredsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredsBeaconResponse])
   case class CloudCredsUpdateResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq())

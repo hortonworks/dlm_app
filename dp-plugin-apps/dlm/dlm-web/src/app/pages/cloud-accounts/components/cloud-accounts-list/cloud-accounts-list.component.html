@@ -87,13 +87,16 @@
 </ng-template>
 
 <ng-template #actionsCell let-account="row" let-index="rowIndex">
-  <dlm-cloud-account-actions
+  <dlm-cloud-account-actions *ngIf="!isUnregistered(account); else deleteAccount"
     [attr.qe-attr]="'cloud-account-actions-' + index"
     [rowId]="account.id"
     [cloudAccount]="account"
     [cloudAccountActions]="cloudAccountActions"
     (handler)="handleSelectedAction($event)">
   </dlm-cloud-account-actions>
+  <ng-template #deleteAccount>
+    <i class="fa fa-trash fa-2x text-primary actionable" (click)="deleteUnregistered(account)"></i>
+  </ng-template>
 </ng-template>
 
 <ng-template let-account="row" ngx-datatable-row-detail-template #rowDetailRef>

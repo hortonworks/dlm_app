@@ -428,6 +428,7 @@
     },
     "cloud_stores": {
       "header": "Cloud Credentials",
+      "unregistered_header": "Partially Deleted Credentials",
       "content": {
         "no_accounts": "No Credentials",
         "no_containers": "No Containers",

@@ -26,7 +26,9 @@ import {
   deleteCloudStoreFailure,
   deleteCloudStoreSuccess,
   syncCloudStoreFailure,
-  syncCloudStoreSuccess
+  syncCloudStoreSuccess,
+  deleteUnregisteredStoreSuccess,
+  deleteUnregisteredStoreFailure
 } from 'actions/cloud-account.action';
 
 @Injectable()
@@ -118,6 +120,16 @@ export class CloudAccountsEffects {
         return syncCloudStoreSuccess(response, payload.meta);
       })
       .catch(err => Observable.of(syncCloudStoreFailure(err, payload.meta))));
+
+  @Effect()
+  deleteUnregisteredCloudStore$: Observable<any> = this.actions$
+    .ofType(accountActions.DELETE_UNREGISTERED_STORE.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.accountService.deleteUnregisteredStore(payload.cloudAccount)
+        .map(response => deleteUnregisteredStoreSuccess(response, payload.meta))
+        .catch(err => Observable.of(deleteUnregisteredStoreFailure(err, payload.meta)));
+    });
 
   constructor(private actions$: Actions, private accountService: CloudAccountService) {}
 }

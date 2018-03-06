@@ -13,8 +13,8 @@ import { Subscription } from 'rxjs/Subscription';
 import { CloudAccount, CloudAccountActions } from 'models/cloud-account.model';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers';
-import { loadAccounts, loadAccountsStatus, deleteCloudStore, syncCloudStore } from 'actions/cloud-account.action';
-import { getFullAccountsInfo } from 'selectors/cloud-account.selector';
+import { loadAccounts, loadAccountsStatus, deleteCloudStore, syncCloudStore, deleteUnregisteredStore } from 'actions/cloud-account.action';
+import { getFullAccountsInfo, getUnregisteredDLMCreds } from 'selectors/cloud-account.selector';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
 import { CloudAccountService } from 'services/cloud-account.service';
@@ -27,6 +27,8 @@ import { confirmNextAction } from 'actions/confirmation.action';
 import { noop } from 'actions/app.action';
 import { AsyncActionsService } from 'services/async-actions.service';
 import { CRUD_ACTIONS } from 'constants/api.constant';
+import { contains } from 'utils/array-util';
+import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 
 const ACCOUNTS_REQUEST = '[CLOUD STORES] ACCOUNTS_REQUEST';
 const BEACON_ACCOUNTS_REQUEST = '[CLOUD STORES] BEACON CLOUD CREDS';
@@ -42,6 +44,7 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
 
   accounts$: Observable<CloudAccount[]>;
   beaconCloudCreds$: Observable<BeaconCloudCred[]>;
+  unregisteredAccounts$: Observable<BeaconCloudCred[]>;
   overallProgress$: Observable<ProgressState>;
   _accounts: CloudAccount[];
   accountsSubscription$: Subscription;
@@ -73,6 +76,7 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
     this.beaconCloudCreds$ = this.store.select(getAllBeaconCloudCreds);
     this.overallProgress$ = this.store.select(getMergedProgress(ACCOUNTS_REQUEST, BEACON_ACCOUNTS_REQUEST, ACCOUNTS_STATUS_REQUEST));
     this.tableData$ = this.accounts$;
+    this.unregisteredAccounts$ = this.store.select(getUnregisteredDLMCreds);
   }
 
   ngOnInit() {
@@ -110,6 +114,25 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
     this.asyncActions.dispatch(syncCloudStore(account))
       .subscribe(progressState => {
         this.cloudAccountService.notifyOnCRUD(progressState, CloudAccountActions.SYNC);
+        this.refreshAccounts();
+      });
+  }
+
+  handleDeleteUnregisteredAccount(account: CloudAccount): void {
+    const notification = {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: 'page.cloud_stores.content.accounts.delete.success_notification.title',
+        body: 'page.cloud_stores.content.accounts.delete.success_notification.body'
+      },
+      [NOTIFICATION_TYPES.ERROR]: {
+        title: 'page.cloud_stores.content.accounts.delete.error_notification.title',
+        body: 'page.cloud_stores.content.accounts.delete.error_notification.body',
+        contentType: NOTIFICATION_CONTENT_TYPE.INLINE
+      },
+      levels: [NOTIFICATION_TYPES.SUCCESS, NOTIFICATION_TYPES.ERROR]
+    };
+    this.asyncActions.dispatch(deleteUnregisteredStore(account, {notification}))
+      .subscribe(_ => {
         this.refreshAccounts();
       });
   }

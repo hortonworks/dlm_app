@@ -40,6 +40,24 @@
           </ng-template>
         </div>
       </div>
+      <div *ngIf="(unregisteredAccounts$ | async)?.length > 0">
+        <div class="row">
+          <div class="col-md-12">
+            <dlm-page-header
+              [title]="('page.cloud_stores.unregistered_header' | translate) + '[' + (unregisteredAccounts$ | async).length + ']'"
+              [isFlexCenter]="true">
+            </dlm-page-header>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 cloud-accounts-list-container">
+            <dlm-cloud-accounts-list
+              [accounts]="unregisteredAccounts$ | async"
+              (deleteUnregisteredAccount)="handleDeleteUnregisteredAccount($event)">
+            </dlm-cloud-accounts-list>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </dlm-progress-container>

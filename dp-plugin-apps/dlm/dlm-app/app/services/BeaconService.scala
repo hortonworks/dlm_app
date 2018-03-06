@@ -1164,12 +1164,12 @@ class BeaconService @Inject()(
                                       val cloudCredName = cloudCredResponse.name
                                       val cloudCredWithSameName = acc.find(x => x.name == cloudCredName)
                                       cloudCredWithSameName match {
-                                        case None => acc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster), List(ClusterCred(clusterId)))
+                                        case None => acc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster), List(ClusterCred(clusterId)), Some(cloudCredResponse))
                                         case Some(cloudCredWithPolicies) =>
                                           val index = acc.indexOf(cloudCredWithPolicies)
                                           val updatedPoliciesList = cloudCredWithPolicies.policies :+ nextPolicyInCluster
                                           val updatedClusterList = cloudCredWithPolicies.clusters :+ ClusterCred(clusterId)
-                                          acc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList))
+                                          acc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList, cloudCredWithPolicies.cloudCred))
                                       }
                                   }
                               }
@@ -1183,7 +1183,7 @@ class BeaconService @Inject()(
                   val dlmCloudCred = cloudAccounts.accounts.foldLeft(List(): List[CloudCredWithPolicies]) {
                     (acc, next) => {
                       allCloudCredentials.find(x => x.name == next.id) match {
-                        case None => acc :+ CloudCredWithPolicies(next.id, List(), List())
+                        case None => acc :+ CloudCredWithPolicies(next.id, List(), List(), None)
                         case Some(cloudCredWithPolicies) => acc
                       }
                     }

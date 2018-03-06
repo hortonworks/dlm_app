@@ -95,4 +95,8 @@ export class CloudAccountService {
   syncCloudStore(cloudAccount): Observable<any> {
     return this.httpClient.put(`store/credential/sync`, cloudAccount);
   }
+
+  deleteUnregisteredStore(cloudAccount): Observable<any> {
+    return this.httpClient.delete(`store/beaconCredential/${cloudAccount.id}`);
+  }
 }
