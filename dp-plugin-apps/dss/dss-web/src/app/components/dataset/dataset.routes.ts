@@ -21,12 +21,12 @@ import {AssetCollectionEditComponent} from './views/asset-collection-edit/asset-
 
 export const routes: Routes = [
   { path: 'dss/collections',  data: {crumb: 'dss.collections'}, children: [
-      {path: "add", component: DsEditor, data: {crumb: 'dss.collections.add'}},
-      {path: ":id", component: DsFullView, /* component: DsFullView,*/ data: {crumb: 'dss.collections.cCollection'}, children: [
-          {path: 'comments/:objectType/:isRatingEnabled', component: CommentsComponent, outlet: 'sidebar'}
-      ]},
-      {path: ":id/edit", component: DsEditor, data: {crumb: 'dss.collections.cCollection.edit'}},
-      {path: '', pathMatch: 'full', component: DatasetDashboardComponent, data: {crumb: undefined}},
+    {path: "add", component: DsCreator, data: {crumb: 'dss.collections.add'}},
+    {path: ":id", component: DsFullView, data: {crumb: 'dss.collections.cCollection'}, children: [
+      {path: 'comments/:objectType/:isRatingEnabled', component: CommentsComponent, outlet: 'sidebar'}
+    ]},
+    {path: ":id/edit", component: DsEditor, data: {crumb: 'dss.collections.cCollection.edit'}},
+    {path: '', pathMatch: 'full', component: DatasetDashboardComponent, data: {crumb: undefined}},
   ]},
   {path: "clusters/:clusterId/assets/:guid", component: AssetViewComponent, data: {crumb: 'dss.assets.cAsset'}, children: [
       {path: 'nodes/:guidOfNode', component: NodeDetailsComponent, outlet: 'sidebar'}

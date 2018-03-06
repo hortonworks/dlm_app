@@ -32,7 +32,7 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
               .then((lakes) => {
                 let dashboard = navigation.find(n => (n.name === 'Dashboard'));
                 lakes = lakes.sort((a, b) => a.name.localeCompare(b.name));
-                dashboard.children = lakes.map(lake => ({name: lake.name, url: `/dss/data-lake-dashboard/${lake.id}`, iconClassName: ''}));
+                dashboard.children = lakes.map(lake => ({name: `${lake.name}, ${lake.dcName}`, url: `/dss/data-lake-dashboard/${lake.id}`, iconClassName: ''}));
               });
 }
 

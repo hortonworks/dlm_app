@@ -81,14 +81,14 @@ export class CollapsibleNavComponent implements OnInit {
   }
 
   onSideNavMouseEnter(nav, children) {
-    let childMenu = children.getElementsByClassName('sidenav-item-name-children')[0];
+    let childMenu = children.getElementsByClassName('sidenav-item-children')[0];
     if (this.collapseSideNav && childMenu) {
       childMenu.classList.add('active');
     }
   }
 
   onSideNavMouseLeave(nav, children) {
-    let childMenu = children.getElementsByClassName('sidenav-item-name-children')[0];
+    let childMenu = children.getElementsByClassName('sidenav-item-children')[0];
     if (this.collapseSideNav && childMenu) {
       childMenu.classList.remove('active');
     }

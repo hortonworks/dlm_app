@@ -22,8 +22,10 @@
     <div class="sidenav-item" [ngClass]="{'active': activeTabName === nav.name}">
       <i *ngIf="nav.iconClassName != ''" [ngClass]="'fa ' +  nav.iconClassName" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ nav.name }} </span>
     </div>
-    <div class="sidenav-item-name-children" *ngFor="let childNav of nav.children" [ngClass]="{'hide-menu': nav.hidden }">
-      <span class="sidenav-item" [ngClass]="{'active': activeTabName === childNav.name}" (click)="onSideNavClick($event, childNav, currentNav)"> {{ childNav.name }} </span>
+    <div class="sidenav-item-children">
+      <div class="sidenav-item-name-children" *ngFor="let childNav of nav.children" [ngClass]="{'hide-menu': nav.hidden }">
+        <span class="sidenav-item" [ngClass]="{'active': activeTabName === childNav.name}" (click)="onSideNavClick($event, childNav, currentNav)"> {{ childNav.name }} </span>
+      </div>
     </div>
   </div>
 
