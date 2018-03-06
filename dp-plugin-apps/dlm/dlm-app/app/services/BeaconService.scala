@@ -1033,6 +1033,36 @@ class BeaconService @Inject()(
     p.future
   }
 
+  /**
+    * Delete cloud credential from all existing beacon clusters
+    * @param cloudCredName
+    * @param token
+    * @return
+    */
+  def deleteBeaconCredential(cloudCredName: String)
+                      (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors,DlmApiErrors]] = {
+    val p: Promise[Either[DlmApiErrors,DlmApiErrors]] = Promise()
+    val queryString = Map(("numResults","200"))
+    getAllCloudCreds(queryString).map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(cloudCredsDetailResponse) =>
+        val filteredCloudCreds = cloudCredsDetailResponse.allCloudCreds.filter(x => x.cloudCreds.cloudCred.exists(item => item.name == cloudCredName))
+        if (filteredCloudCreds.isEmpty) {
+          p.success(Right(DlmApiErrors(cloudCredsDetailResponse.unreachableBeacon)))
+        } else {
+          Future.sequence(filteredCloudCreds.map(x => {
+            beaconCloudCredService.deleteCloudCred(x.beaconUrl, x.clusterId, x.cloudCreds.cloudCred.head.id)
+          })).map({
+            cloudCredUpdateResponse => {
+              val failedResponses: Seq[BeaconApiErrors] = cloudCredUpdateResponse.filter(_.isLeft).map(_.left.get)
+              p.success(Right(DlmApiErrors(failedResponses ++ cloudCredsDetailResponse.unreachableBeacon)))
+            }
+          })
+        }
+    }
+    p.future
+  }
+
 
   /**
     * Get cloud credentials from all beacon clusters

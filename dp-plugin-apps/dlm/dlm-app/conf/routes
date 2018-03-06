@@ -13,6 +13,7 @@ POST     /api/store/credential                                        controller
 PUT      /api/store/credential                                        controllers.CredentialStore.updateCredentialAccount
 PUT      /api/store/credential/sync                                   controllers.CredentialStore.syncCredentialAccount
 DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
+DELETE   /api/store/beaconCredential/:cloudAccountId                  controllers.CredentialStore.deleteBeaconCredential(cloudAccountId: String)
 
 #CloudCred
 GET     /api/cluster/:clusterId/credId/:credId                        controllers.CloudCred.retrieveById(clusterId: Long, credId: String)
