@@ -121,7 +121,7 @@
         <i class="fa fa-heart" [ngClass] = "{'marked': dsModel.favouriteId}"></i> <span>{{getFavCount(dsModel.favouriteCount)}}</span>
       </div>
       <div class="flex-summary-item view-icon" (click)='viewComments()'>
-        <i class="fa fa-comments"></i>
+        <i class="fa fa-comments"></i><span> {{getAggregateValue(dsModel.totalComments)}}</span>
       </div>
       <div class="flex-summary-item view-icon" (click)='onBookmarkIconClick()'>
         <i class="fa fa-bookmark" [ngClass] = "{'marked': dsModel.bookmarkId}"></i>

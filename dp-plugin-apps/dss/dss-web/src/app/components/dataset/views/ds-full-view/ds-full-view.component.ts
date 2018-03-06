@@ -281,6 +281,14 @@ export class DsFullView implements OnInit {
       this.avgRating = averageAndVotes.average;
     });
   }
+
+  getAggregateValue(val){
+    if(val){
+      return val;
+    }
+    return 0;
+  }
+  
   toggleSummaryWidget () {
     this.showSummary = !this.showSummary;
   }
