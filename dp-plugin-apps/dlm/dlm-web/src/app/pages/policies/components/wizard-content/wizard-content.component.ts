@@ -22,8 +22,13 @@ import {
       <h4 class="step-title">{{stepIndex}}. {{stepLabel}}</h4>
       <p class="step-description" *ngIf="stepDescription">{{stepDescription}}</p>
       <div class="panel panel-default">
-        <div class="panel-body">
-          <ng-content select="[wizard-content-body]"></ng-content>
+        <div class="panel-body" [ngClass]="{'with-summary': showSummary}">
+          <div class="panel-content">
+            <ng-content select="[wizard-content-body]"></ng-content>
+          </div>
+          <div class="summary-panel" *ngIf="showSummary">
+            <ng-content select="[wizard-content-summary]"></ng-content>
+          </div>
         </div>
       </div>
     </div>
@@ -34,6 +39,7 @@ export class WizardContentComponent {
   @Input() stepLabel: string;
   @Input() stepIndex: number;
   @Input() stepDescription: string;
+  @Input() showSummary = true;
   @HostBinding('class') className = 'dlm-wizard-content';
 
   constructor() {}

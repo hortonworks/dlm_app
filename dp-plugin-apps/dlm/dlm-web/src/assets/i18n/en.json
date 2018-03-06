@@ -47,6 +47,9 @@
     "job": "Job",
     "jobs": "Jobs",
     "start_time": "Start Time",
+    "starting": "starting",
+    "starting_now": "starting now",
+    "until": "until",
     "end_time": "End Time",
     "clusters": "Clusters",
     "cluster": "Cluster",
@@ -83,31 +86,52 @@
     "frequency": {
       "self": "Frequency",
       "yearly": {
-        "plural": "Every {{num}}y",
+        "plural": {
+          "short": "Every {{num}}y",
+          "detailed": "Every {{num}} years"
+        },
         "singular": "Every year"
       },
       "monthly": {
-        "plural": "Every {{num}}m",
+        "plural": {
+          "short": "Every {{num}}m",
+          "detailed": "Every {{num}} months"
+        },
         "singular": "Every month"
       },
       "weekly": {
-        "plural": "Every {{num}}w",
+        "plural": {
+          "short": "Every {{num}}w",
+          "detailed": "Every {{num}} weeks"
+        },
         "singular": "Every week"
       },
       "daily": {
-        "plural": "Every {{num}}d",
+        "plural": {
+          "short": "Every {{num}}d",
+          "detailed": "Every {{num}} days"
+        },
         "singular": "Every day"
       },
       "hourly": {
-        "plural": "Every {{num}}h",
+        "plural": {
+          "short": "Every {{num}}h",
+          "detailed": "Every {{num}} hours"
+        },
         "singular": "Every hour"
       },
       "minutely": {
-        "plural": "Every {{num}}m",
+        "plural": {
+          "short": "Every {{num}}m",
+          "detailed": "Every {{num}} minutes"
+        },
         "singular": "Every minute"
       },
       "secondly": {
-        "plural": "Every {{num}}s",
+        "plural": {
+          "short": "Every {{num}}s",
+          "detailed": "Every {{num}} seconds"
+        },
         "singular": "Every second"
       },
       "every": "Every",

@@ -9,7 +9,8 @@
 
 import { Policy } from 'models/policy.model';
 import { POLICY_UI_STATUS, POLICY_STATUS } from 'constants/status.constant';
-import { Pairing } from '../models/pairing.model';
+import { Pairing } from 'models/pairing.model';
+import { Step } from 'models/wizard.model';
 
 export const isEnded = (policy: Policy) => policy.uiStatus === POLICY_UI_STATUS.ENDED;
 export const activateDisabled = (policy: Policy) => policy.status === POLICY_STATUS.RUNNING || isEnded(policy);
@@ -23,6 +24,15 @@ export interface ParsedPolicyId {
   clusterName: string;
   dataCenter: string;
 }
+
+export const getStepById = (steps: Step[], stepId: string): Step => {
+  let step = null;
+  const filtered = steps.filter(_step => _step.id === stepId);
+  if (filtered && filtered.length) {
+    step = filtered[0];
+  }
+  return step;
+};
 
 // "policyId": "/beaconsource/beaconsource/beacontarget/beacontarget/hdfsdr/0/1494924228843/000000002"
 export const parsePolicyId = (policyId: string): ParsedPolicyId => {
@@ -70,4 +80,10 @@ export const getClusterEntities = pairings => {
     };
     return Object.assign({}, entities, getClusters(entity));
   }, {});
+};
+
+export const isStepIdBefore = (steps: Step[], stepIdOne: string, stepIdTwo: string): boolean => {
+  const stepOne = getStepById(steps, stepIdOne);
+  const stepTwo = getStepById(steps, stepIdTwo);
+  return stepOne.index < stepTwo.index;
 };
