@@ -22,6 +22,7 @@ import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Cluster } from 'models/cluster.model';
 import { Step } from 'models/wizard.model';
 import { getAllSteps } from 'selectors/create-policy.selector';
+import { getStepById } from 'utils/policy-util';
 import { WIZARD_STEP_ID, WIZARD_STATE } from 'constants/policy.constant';
 import { wizardSaveStep, wizardMoveToStep } from 'actions/policy.action';
 import { StepGeneralComponent } from '../create-policy-steps/step-general/step-general.component';
@@ -65,8 +66,8 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   get getNextButtonText() {
     let nextButtonText = '';
     if (this.activeStepId !== null) {
-      const nextStepId = this._getStepById(this.activeStepId).nextStepId;
-      nextButtonText =  nextStepId !== null ? this._getStepById(nextStepId).label : 'Create Policy';
+      const nextStepId = getStepById(this._steps, this.activeStepId).nextStepId;
+      nextButtonText =  nextStepId !== null ? getStepById(this._steps, nextStepId).label : 'Create Policy';
     }
     return nextButtonText;
   }
@@ -74,22 +75,13 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   get isBackButtonDisabled() {
     let isBackButtonDisabled = false;
     if (this.activeStepId !== null) {
-      isBackButtonDisabled = this._getStepById(this.activeStepId).previousStepId === null;
+      isBackButtonDisabled = getStepById(this._steps, this.activeStepId).previousStepId === null;
     }
     return isBackButtonDisabled;
   }
 
   handleFormValidityChange(isValid) {
     this.isFormValid = isValid;
-  }
-
-  _getStepById(stepId: string): Step {
-    let step = null;
-    const filtered = this._steps.filter(_step => _step.id === stepId);
-    if (filtered && filtered.length) {
-      step = filtered[0];
-    }
-    return step;
   }
 
   constructor(private store: Store<State>) {}
@@ -125,7 +117,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
 
   handleBackButtonClick(event) {
     if (!this.isBackButtonDisabled && this.activeStepId !== null) {
-      const previousStepId = this._getStepById(this.activeStepId).previousStepId;
+      const previousStepId = getStepById(this._steps, this.activeStepId).previousStepId;
       // Handle form valid state by setting it to the previous step's form valid state
       this.updateFormValidStateTo(previousStepId);
       this.store.dispatch(wizardMoveToStep(previousStepId));

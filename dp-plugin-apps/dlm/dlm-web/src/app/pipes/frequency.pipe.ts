@@ -12,19 +12,22 @@ import * as moment from 'moment-timezone';
 import { TranslateService } from '@ngx-translate/core';
 
 const {isInteger} = Number;
+export const SHORT = 'short';
+export const DETAILED = 'detailed';
 
 @Pipe({name: 'frequency'})
 export class FrequencyPipe implements PipeTransform {
 
-  private _fmt(num, type) {
-    const tKey = `common.frequency.${type}.plural`;
+  private _fmt(num, type, expression) {
+    const noun = num === 1 ? 'singular' : 'plural';
+    const tKey = noun === 'singular' ? `common.frequency.${type}.${noun}` : `common.frequency.${type}.${noun}.${expression}`;
     return this.t.instant(tKey, {num});
   }
 
   constructor(private t: TranslateService) {
   }
 
-  transform(frequency: number): string {
+  transform(frequency: number, expression = SHORT): string {
     const duration = moment.duration(frequency * 1000);
     const seconds = duration.asSeconds();
     const minutes = duration.asMinutes();
@@ -34,25 +37,25 @@ export class FrequencyPipe implements PipeTransform {
     const months = duration.asMonths();
     const years = duration.asYears();
     if (isInteger(years)) {
-      return this._fmt(years, 'yearly');
+      return this._fmt(years, 'yearly', expression);
     }
     if (isInteger(months)) {
-      return this._fmt(months, 'monthly');
+      return this._fmt(months, 'monthly', expression);
     }
     if (isInteger(weeks)) {
-      return this._fmt(weeks, 'weekly');
+      return this._fmt(weeks, 'weekly', expression);
     }
     if (isInteger(days)) {
-      return this._fmt(days, 'daily');
+      return this._fmt(days, 'daily', expression);
     }
     if (isInteger(hours)) {
-      return this._fmt(hours, 'hourly');
+      return this._fmt(hours, 'hourly', expression);
     }
     if (isInteger(minutes)) {
-      return this._fmt(minutes, 'minutely');
+      return this._fmt(minutes, 'minutely', expression);
     }
     if (isInteger(seconds)) {
-      return this._fmt(seconds, 'secondly');
+      return this._fmt(seconds, 'secondly', expression);
     }
   }
 }

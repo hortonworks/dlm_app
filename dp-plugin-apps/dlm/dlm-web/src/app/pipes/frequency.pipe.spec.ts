@@ -12,7 +12,6 @@ import { async, getTestBed, TestBed } from '@angular/core/testing';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpModule, Http } from '@angular/http';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -44,13 +43,13 @@ describe('FrequencyPipe', () => {
 
   describe('#transform', () => {
     [
-      {input: 60, output: 'Every 1m'},
+      {input: 60, output: 'Every minute'},
       {input: 60 * 2, output: 'Every 2m'},
-      {input: 3600, output: 'Every 1h'},
+      {input: 3600, output: 'Every hour'},
       {input: 3600 * 2, output: 'Every 2h'},
-      {input: 3600 * 24, output: 'Every 1d'},
+      {input: 3600 * 24, output: 'Every day'},
       {input: 3600 * 24 * 2, output: 'Every 2d'},
-      {input: 3600 * 24 * 7, output: 'Every 1w'},
+      {input: 3600 * 24 * 7, output: 'Every week'},
       {input: 3600 * 24 * 7 * 2, output: 'Every 2w'}
     ].forEach(test => {
       it(`${test.input} -> ${test.output}`, () => {

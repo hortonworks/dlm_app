@@ -103,3 +103,9 @@ export interface CustomProperties {
   targetSnapshotRetentionNumber?: string;
   sourceSnapshotRetentionAgeLimit?: string;
 }
+
+export interface SummaryTreeItem {
+  label: string;
+  value: string;
+  iconClass: string;
+}

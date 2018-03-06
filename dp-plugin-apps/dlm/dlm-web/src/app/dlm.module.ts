@@ -129,9 +129,7 @@ import { PolicyInfoComponent } from './pages/policies/policy-table/policy-info/p
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
 import { PolicyServiceFilterComponent } from './pages/policies/components/policy-service-filter/policy-service-filter.component';
-import { RadioButtonComponent } from './common/radio-button/radio-button.component';
-import { CheckboxComponent } from './common/checkbox/checkbox.component';
-import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
+
 import { PolicyDetailsComponent } from './pages/policies/policy-details/policy-details.component';
 import { PrevJobsComponent } from './pages/policies/components/prev-jobs/prev-jobs.component';
 import { SelectCloudDestinationComponent } from './pages/policies/components/select-cloud-destination/select-cloud-destination.component';
@@ -147,10 +145,6 @@ import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-d
 import { TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
 
-import { TableComponent } from './common/table/table.component';
-import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
-import { TableFilterComponent } from './common/table/table-filter/table-filter.component';
-import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 import { TabsComponent } from './common/tabs/tabs.component';
@@ -170,6 +164,8 @@ import { CreatePolicyModalComponent } from 'pages/policies/components/create-pol
 import { CreatePolicyWizardComponent } from 'pages/policies/components/create-policy-wizard/create-policy-wizard.component';
 import { WizardContentComponent } from 'pages/policies/components/wizard-content/wizard-content.component';
 import { CreatePolicyStepsModule } from './pages/policies/components/create-policy-steps/create-policy-steps.module';
+import { WizardSummaryComponent } from './pages/policies/components/create-policy-wizard-summary/create-policy-wizard-summary.component';
+import { SummaryTreeComponent } from './pages/policies/components/summary-tree/summary-tree.component';
 
 @NgModule({
   imports: [
@@ -283,7 +279,9 @@ import { CreatePolicyStepsModule } from './pages/policies/components/create-poli
     AddCloudFormComponent,
     CreatePolicyModalComponent,
     CreatePolicyWizardComponent,
-    WizardContentComponent
+    WizardContentComponent,
+    WizardSummaryComponent,
+    SummaryTreeComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

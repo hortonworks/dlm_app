@@ -24,7 +24,7 @@
           </ng-template>
           <div [ngSwitch]="step?.id">
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.GENERAL">
-              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label" [showSummary]="false">
                 <div wizard-content-body>
                   <dlm-step-general #general (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-general>
                 </div>
@@ -35,6 +35,9 @@
                 <div wizard-content-body>
                   <dlm-step-source #source [accounts]="accounts" [clusters]="clusters" [pairings]="pairings"
                                    (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-source>
+                </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.SOURCE"></dlm-wizard-summary-content>
                 </div>
               </dlm-wizard-content>
             </ng-template>
@@ -49,6 +52,9 @@
                     [beaconStatuses]="beaconStatuses"
                     (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-destination>
                 </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.DESTINATION" [clusters]="clusters"></dlm-wizard-summary-content>
+                </div>
               </dlm-wizard-content>
             </ng-template>
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SCHEDULE">
@@ -59,6 +65,9 @@
                     (onFormValidityChange)="handleFormValidityChange($event)">
                   </dlm-step-schedule>
                 </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.SCHEDULE" [clusters]="clusters"></dlm-wizard-summary-content>
+                </div>
               </dlm-wizard-content>
             </ng-template>
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.ADVANCED">
@@ -66,6 +75,9 @@
                 <div wizard-content-body>
                   <dlm-step-advanced #advanced
                                    (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-advanced>
+                </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.ADVANCED" [clusters]="clusters"></dlm-wizard-summary-content>
                 </div>
               </dlm-wizard-content>
             </ng-template>

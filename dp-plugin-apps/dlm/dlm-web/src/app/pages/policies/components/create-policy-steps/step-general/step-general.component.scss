@@ -24,6 +24,9 @@ $active-border-color: $link-color;
   &:not(.active) {
     @include hexagon($hex-size, transparent, $border_width, $border_color);
   }
+  &.white-border {
+    @include hexagon($hex-size, transparent, $border_width, $white-color);
+  }
   i {
     position: relative;
     z-index: 2;
