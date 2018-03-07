@@ -10,6 +10,5 @@ fi
     -Ddp.services.hdp.proxy.consul.host=${CONSUL_HOST} \
     -Ddp.keystore.path=${KEYSTORE_PATH} \
     -Ddp.keystore.password=${KEYSTORE_PASSWORD} \
-    -Ddp.service.ambari.single.node.cluster=${SINGLE_NODE_CLUSTER} \
     -Djsse.enableSNIExtension=false \
     "$@"

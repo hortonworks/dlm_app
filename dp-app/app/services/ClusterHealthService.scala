@@ -17,7 +17,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterHost, NameNodeInfo}
 import com.hortonworks.dataplane.commons.domain.Constants._
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
-import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, DpClusterService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, DpClusterService}
 import models.ClusterHealthData
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,7 +25,6 @@ import scala.concurrent.Future
 
 @Singleton
 class ClusterHealthService @Inject()(
-    @Named("clusterService") val clusterService: ClusterService,
     @Named("clusterHostsService") val clusterHostsService: ClusterHostsService,
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     @Named("clusterComponentsService") val clusterComponentService: ClusterComponentService) {
