@@ -88,8 +88,7 @@ export class PolicyService {
   }
 
   private getManagePolicyUrl(policy: Policy): string {
-    const clusterId = policy.targetClusterResource.id || policy.sourceClusterResource.id;
-    return `clusters/${clusterId}/policy/${policy.name}`;
+    return `clusters/${policy.clusterResourceForRequests.id}/policy/${policy.name}`;
   }
 
   deletePolicy(payload: Policy): Observable<any> {
