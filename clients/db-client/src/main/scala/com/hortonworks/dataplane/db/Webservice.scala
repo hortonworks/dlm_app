@@ -278,28 +278,21 @@ object Webservice {
   // Maps to ClusterService
   trait ClusterComponentService extends DbClientService {
 
-    def create(
-                clusterService: ClusterData): Future[Either[Errors, ClusterData]]
+    def create(clusterService: ClusterData): Future[Either[Errors, ClusterData]]
 
-    def getServiceByName(
-                          clusterId: Long,
-                          serviceName: String): Future[Either[Errors, ClusterData]]
+    def getServiceByName(clusterId: Long, serviceName: String): Future[Either[Errors, ClusterData]]
 
-    def updateServiceByName(
-                             clusterData: ClusterData): Future[Either[Errors, Boolean]]
+    def updateServiceByName(clusterData: ClusterData): Future[Either[Errors, Boolean]]
 
-    def addClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
-    : Future[Seq[Either[Errors, ClusterServiceHost]]]
+    def addClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq()): Future[Seq[Either[Errors, ClusterServiceHost]]]
 
-    def updateClusterHosts(
-                            clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
-    : Future[Seq[Either[Errors, Boolean]]]
+    def updateClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq()): Future[Seq[Either[Errors, Boolean]]]
 
-    def getEndpointsForCluster(
-                                clusterId: Long,
-                                service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
+    def getEndpointsForCluster(clusterId: Long, service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
 
     def getAllServiceEndpoints(serviceName: String): Future[Either[Errors, Seq[ClusterServiceWithConfigs]]]
+
+    def getServiceEndpointForCluster(clusterId:String, serviceId: String): Future[String]
   }
 
   trait ClusterHostsService extends DbClientService {

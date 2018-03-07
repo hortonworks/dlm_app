@@ -63,8 +63,7 @@ object AppModule extends AbstractModule {
         .withTrustManagerConfig(
           TrustManagerConfig().withTrustStoreConfigs(scala.collection.immutable
             .Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
-      if (config.getBoolean(
-            "dp.services.ssl.config.disable.hostname.verification"))
+      if (config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
         settings.withLoose(s.loose.withDisableHostnameVerification(true))
       else
         settings

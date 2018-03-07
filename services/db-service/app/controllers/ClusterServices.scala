@@ -13,7 +13,7 @@ package controllers
 
 import javax.inject._
 
-import domain.API.{clusters, dpClusters}
+import domain.API.{clusters}
 import domain.{ClusterServiceHostsRepo, ClusterServiceRepo}
 import com.hortonworks.dataplane.commons.domain.Entities.{
   ClusterService,
