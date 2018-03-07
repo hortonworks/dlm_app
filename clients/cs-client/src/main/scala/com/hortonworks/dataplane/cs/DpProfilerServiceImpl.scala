@@ -48,7 +48,7 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       case 200 =>
         (res.json \ "results").as[JsObject]
       case _ => {
-        val logMsg = s"Cs-Client DpProfilerServiceImpl: In mapToResultsGeneric method, result status ${res.status}"
+        val logMsg = s"Cs-Client DpProfilerServiceImpl: In mapToResultsGeneric method, result status ${res.status} and result body ${res.body}"
         mapResponseToError(res,Option(logMsg))
       }
     }
