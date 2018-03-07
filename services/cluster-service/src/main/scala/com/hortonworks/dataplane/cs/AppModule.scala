@@ -281,6 +281,7 @@ object AppModule extends AbstractModule {
         dpProfilerRoute.jobStatus ~
         dpProfilerRoute.jobDelete ~
         dpProfilerRoute.startAndScheduleJob ~
+        dpProfilerRoute.datasetAssetMapping ~
         dpProfilerRoute.scheduleInfo ~
         dpProfilerRoute.auditResults ~
         dpProfilerRoute.auditActions ~
