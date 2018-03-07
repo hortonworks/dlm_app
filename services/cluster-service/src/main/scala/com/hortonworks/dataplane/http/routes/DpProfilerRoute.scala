@@ -87,7 +87,7 @@ class DpProfilerRoute @Inject()(
         post {
           entity(as[JsObject]) { js =>
             var assetIds = (js \ "assetIds").as[Seq[String]]
-            onComplete(doDatsetAssetMapping(clusterId, assetIds, datasetname)) {
+            onComplete(doDatasetAssetMapping(clusterId, assetIds, datasetname)) {
               case Success(res) => res.status match {
                 case 200 => complete(success(res.json))
                 case 404 => complete(StatusCodes.NotFound, notFound)
@@ -324,7 +324,7 @@ class DpProfilerRoute @Inject()(
     }
   }
 
-  private def doDatsetAssetMapping(clusterId: Long, assetIds: Seq[String], datasetName: String): Future[WSResponse] = {
+  private def doDatasetAssetMapping(clusterId: Long, assetIds: Seq[String], datasetName: String): Future[WSResponse] = {
     val postData = Json.obj(
       "datasetName" -> datasetName,
       "assetIds" -> assetIds
@@ -336,7 +336,7 @@ class DpProfilerRoute @Inject()(
       urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset")
       echo <- Future.successful(println(s"url to hit for dataset-asset mapping $urlToHit"))
       response <- ws.url(urlToHit)
-        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .withHeaders("Accept" -> "application/json")
         .post(postData)
     } yield {
       response
