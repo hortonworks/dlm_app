@@ -26,7 +26,6 @@ export class ServiceErrorComponent implements OnInit {
 
   ngOnInit() {
     this.errorType = this.route.snapshot.params['type'];
-    console.log(this.errorType)
   }
 
 }
