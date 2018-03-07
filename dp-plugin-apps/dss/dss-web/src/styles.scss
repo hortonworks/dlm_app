@@ -220,3 +220,10 @@ a:hover {
 :-ms-input-placeholder {
   color: $dusty-gray;
 }
+
+// nvd3 overrides
+
+.nvd3.nv-noData {
+  font-size: 13px;
+  font-weight: 400;
+}

@@ -10,22 +10,24 @@
  */
 
 import {Injectable} from "@angular/core";
-import {Http, RequestOptions} from "@angular/http";
+import {Http} from "@angular/http";
 import {Observable} from "rxjs";
-import {HttpUtil} from "../shared/utils/httpUtil";
-import {DatasetTag} from "../models/dataset-tag";
-import {AssetCollectionDashboard} from '../models/asset-collection-dashboard';
 import {DataLakeDashboard} from '../models/data-lake-dashboard';
+import {ProfilerMetricRequest} from '../models/profiler-metric-request';
+import {ProfilerMetricResponse} from '../models/profiler-metric-response';
 
 @Injectable()
 export class ProfilerService {
   constructor(private http: Http) {
   }
 
-  assetCollectionStats(...statsFor: string[]): Observable<AssetCollectionDashboard> {
-    const url = '';
+  assetCollectionStats(profilerMetricRequest: ProfilerMetricRequest): Observable<ProfilerMetricResponse> {
+    const url = '/api/dpProfiler/metrics';
+    // return this.http.post(url, profilerMetricRequest, new RequestOptions(HttpUtil.getHeaders()))
+    //             .map(HttpUtil.extractData);
+
     return Observable.create(observer => {
-      observer.next(AssetCollectionDashboard.getData());
+      observer.next(ProfilerMetricResponse.getData());
       observer.complete();
     });
   }

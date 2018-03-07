@@ -65,12 +65,12 @@
     </div>
 
     <div style="margin-top: 15px;" class="tabs menu">
-      <ul onclick="function(){}" *ngIf="dsModel.version">
+      <ul *ngIf="dsModel.version">
         <li data-tab="Dashboard" [class.active]="selectedTab == tabEnum.OVERVIEW" (click)="selectedTab = tabEnum.OVERVIEW">Overview</li>
         <li data-tab="Assets" [class.active]="selectedTab == tabEnum.ASSETS" (click)="selectedTab = tabEnum.ASSETS">Assets</li>
       </ul>
     </div>
-    <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW"> </dss-overview>
+    <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW" [clusterId]="dsModel.clusterId"> </dss-overview>
     <div *ngIf="selectedTab == tabEnum.ASSETS">
       <div *ngIf="dsModel.counts.hiveCount">
         <ds-assets-list-style1 [dsModel]="dsModel"

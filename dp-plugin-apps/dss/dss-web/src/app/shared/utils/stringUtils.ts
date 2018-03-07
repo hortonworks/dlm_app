@@ -14,6 +14,11 @@ export class StringUtils {
     return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
   };
 
+  public static centerEllipses(str: string, n: number) {
+    const len =  Math.floor((n - 3)/ 2);
+    return (str.length > n) ? (str.substr(0, len) + '...' + str.substr(len * -1)) : str;
+  }
+
   public static cleanupUri(url: string): string {
     if (!url || url.length === 0) {
       return '';
@@ -57,6 +62,7 @@ export class StringUtils {
     let i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i)) + ' ' + sizes[i];
   }
+
   public static getFlattenedObjects(obj: any): string {
     let objArray = Object.keys(obj).map((key) => {
       if (!obj[key]) {
@@ -72,4 +78,5 @@ export class StringUtils {
     });
     return objArray.join(', ');
   }
+
 }

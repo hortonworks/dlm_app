@@ -62,7 +62,10 @@
     "serviceDisabledMessage": "This service has not been enabled by your Admin. Please contact your DataPlane Administrator to enable it.",
     "invalidUser": "You are not an authorized DataPlane user. Please contact your DataPlane Administrator.",
     "noMatch": "No Match found...",
-    "searching": "Searching..."
+    "searching": "Searching...",
+    "unable-to-fetch-chart-data": "Unable to fetch data for plotting the chart",
+    "no-chart-data": "Data not available for plotting the chart"
+
   },
   "pages": {
     "signin" :{
@@ -217,7 +220,10 @@
         "sensitive-vs-non-sensitive": "Sensitive Vs Non Sensitive",
         "asset-distribution-by-sensitive-tag": "Asset Distribution by Sensitive Tag",
         "no-of-quires-running-sensitive-data": "# of Queries Running Sensitive Data",
-        "users-accessing-sensitive-data": "Users Accessing Sensitive Data"
+        "users-accessing-sensitive-data": "Sensitive Data Accesses",
+        "times-user-accessed-any-data": "# of times user accessed any data",
+        "tables-in-asset-collection-with-tag": "# of tables in asset collection with this tag",
+        "times-secure-data-accessed": "# of times Secure Data is accessed"
       },
       "data-lake-dashboard": {
         "no-of-total-assets" : "# of Total Assets",
