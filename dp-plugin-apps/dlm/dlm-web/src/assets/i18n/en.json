@@ -429,6 +429,7 @@
     "cloud_stores": {
       "header": "Cloud Credentials",
       "unregistered_header": "Partially Deleted Credentials",
+      "unregistered_hint": "Cloud credentials not registered to DLM application but being used for replication policies",
       "content": {
         "no_accounts": "No Credentials",
         "no_containers": "No Containers",

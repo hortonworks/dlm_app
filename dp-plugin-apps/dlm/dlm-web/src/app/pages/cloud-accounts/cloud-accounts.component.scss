@@ -7,10 +7,26 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+@import '../../styles/variables';
+
 .fixed-500 {
   width: 500px;
 }
 
 .cloud-accounts-list-container {
   padding-left: 30px;
+}
+
+.unregistered-accounts-section {
+  .dlm-page-header {
+    /deep/ {
+      .fa-info-circle {
+        color: $black-color;
+      }
+
+      bs-tooltip-container {
+        width: 240px;
+      }
+    }
+  }
 }
