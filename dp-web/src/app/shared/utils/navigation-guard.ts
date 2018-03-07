@@ -14,6 +14,7 @@ import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router} from '
 import {RbacService} from '../../services/rbac.service';
 import {AuthenticationService} from '../../services/authentication.service';
 import {AuthUtils} from './auth-utils';
+import {ServiceErrorType} from "./enums";
 
 @Injectable()
 export class NavigationGuard implements CanActivate {
@@ -30,7 +31,7 @@ export class NavigationGuard implements CanActivate {
       this.router.navigate(['/unauthorized']);
       return false;
     } else if (!this.rbacService.isServiceEnabled(state.url)) {
-      this.router.navigate(['/service-notenabled']);
+      this.router.navigate(['/service-error', ServiceErrorType.NOT_ENABLED]);
       return false;
     } else {
       return true;

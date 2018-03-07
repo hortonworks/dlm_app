@@ -63,7 +63,7 @@ export class DialogBox {
           dialog.parentElement.removeChild(dialog);
         });
       } else {
-        dialog.querySelector('.btn-hwx-default').addEventListener('click', function (e) {
+        dialog.querySelector('.btn-hwx-primary').addEventListener('click', function (e) {
           eventEmitter.emit(true);
           dialog.close();
           dialog.parentElement.removeChild(dialog);

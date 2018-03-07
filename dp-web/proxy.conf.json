@@ -7,6 +7,10 @@
     "target": "http://localhost:8762",
     "secure": false
   },
+  "/health": {
+    "target": "http://localhost:8762",
+    "secure": false
+  },
   "/knox": {
     "target": "https://localhost:8443",
     "secure": false,

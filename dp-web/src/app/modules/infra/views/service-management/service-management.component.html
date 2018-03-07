@@ -78,7 +78,7 @@
         <div data-se-group="services__availableServices" *ngFor="let service of availableServices; let i = index" class="service-item pull-left">
           <div class="logo-wrapper borderBox" title="{{ service.skuName }}">
             <img class="logo-img" [attr.src]="'assets/images/' + service.skuName +'-logo-blue.png'" alt=""/>
-            <button
+            <button *ngIf="!service.fetchingStatus && service.installed"
               id="enable-{{service.skuName}}-btn"
               data-se="services__availableServices-enable-button"
               type="button"
@@ -86,9 +86,39 @@
               [routerLink]="['/infra/services', service.skuName, 'verify']">
               {{"pages.services.labels.enable" | translate}}
             </button>
+            <button *ngIf="!service.fetchingStatus && !service.installed"
+              id="enable-{{service.skuName}}-btn"
+              data-se="services__availableServices-enable-button"
+              type="button"
+              class="btn-hwx-primary action-btn"
+              (click)="showMessage(service)">
+              {{"pages.services.labels.install" | translate}}
+            </button>
+            <button *ngIf="!service.fetchingStatus && service.installed && !service.healthy"
+              id="enable-{{service.skuName}}-btn"
+              data-se="services__availableServices-enable-button"
+              type="button"
+              class="btn-hwx-primary action-btn"
+              (click)="showWarning(service)">
+              {{"pages.services.labels.enable" | translate}}
+            </button>
+            <button *ngIf="service.fetchingStatus"
+              id="enable-{{service.skuName}}-btn"
+              data-se="services__availableServices-enable-button"
+              type="button"
+              class="btn-hwx-primary action-btn">
+              <i class="fa fa fa-spinner fa-spin"></i>
+            </button>
           </div>
           <div class="service-name hwx-desc"> {{ service.sku.description }}</div>
-          <div class="version hwx-inline-desc">v1.0.0</div>
+          <div class="version hwx-inline-desc">v1.0.0
+            <span class="pull-right">
+              <i class="fa fa fa-spinner fa-spin" *ngIf="service.fetchingStatus" title="Fetching service status.."></i>
+              <i class="fa fa-circle not-installed" *ngIf="!service.fetchingStatus && !service.installed" title="Service is not yet installed"></i>
+              <i class="fa fa-exclamation-triangle unhealthy" *ngIf="!service.fetchingStatus && service.installed && !service.healthy" title="Service is installed but not healthy"></i>
+              <i class="fa fa-check-circle installed" *ngIf="!service.fetchingStatus && service.installed && service.healthy" title="Service is installed"></i>
+            </span>
+          </div>
        </div>
      </div>
     </div>

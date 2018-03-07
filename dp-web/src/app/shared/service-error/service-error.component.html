@@ -9,8 +9,14 @@
   ~  */
   -->
 
-<div class="error-notification-bar">
+<div *ngIf="errorType == errorTypeRef.NOT_ENABLED" class="error-notification-bar">
   <i class="fa fa-times-circle pull-left"></i>
   <div class="text-medium">{{"common.serviceDisabled" | translate}}</div>
   <div class="text-small-1">{{"common.serviceDisabledMessage" | translate}}</div>
+</div>
+
+<div *ngIf="errorType == errorTypeRef.NOT_INSTALLED" class="error-notification-bar">
+  <i class="fa fa-times-circle pull-left"></i>
+  <div class="text-medium">{{"pages.services.labels.serviceNotInstalled" | translate}}</div>
+  <div class="text-small-1" [innerHTML]="'pages.services.description.verificationPageLoadError'| translate"></div>
 </div>

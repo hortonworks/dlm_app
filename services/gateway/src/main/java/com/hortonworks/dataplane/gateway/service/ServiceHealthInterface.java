@@ -8,13 +8,14 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
+package com.hortonworks.dataplane.gateway.service;
 
-export enum Sort {
-  ASC,
-  DSC
-}
+import feign.RequestLine;
+import org.springframework.http.ResponseEntity;
 
-export enum ServiceErrorType {
-  NOT_ENABLED,
-  NOT_INSTALLED
+public interface ServiceHealthInterface {
+
+  @RequestLine("GET /health")
+  ResponseEntity<Void> getHealth();
+
 }

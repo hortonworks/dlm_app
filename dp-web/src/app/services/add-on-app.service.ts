@@ -24,7 +24,15 @@ export class AddOnAppService {
   serviceEnabled = new Subject<string>();
   serviceEnabled$ = this.serviceEnabled.asObservable();
 
+  statusCheckUri = 'health';
+
   constructor(private http: Http) {
+  }
+  getServiceStatus(appName): Observable<any>{
+    return this.http
+      .get(`${this.statusCheckUri}/${appName}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
   getServiceDependencies(appName): Observable<AppDependency> {
