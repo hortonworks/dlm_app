@@ -8,11 +8,14 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-
-import {Routes} from '@angular/router';
+import {Routes} from "@angular/router";
+import {DataLakeDashboardComponent} from './data-lake-dashboard.component';
 
 export const routes: Routes = [
-  {path: '', pathMatch: 'full', redirectTo: 'dss/collections'},
-  {path: '**', pathMatch: 'full', redirectTo: 'dss/collections'},
-  {path: 'dss', pathMatch: 'full', redirectTo: 'dss/collections'}
+  { path: 'dss/data-lake-dashboard', children: [
+      {path: '', pathMatch: 'full', component: DataLakeDashboardComponent},
+      {path: ':id', component: DataLakeDashboardComponent, pathMatch: 'full', data: {crumb: 'dashboard'}}
+  ]}
 ];
+
+

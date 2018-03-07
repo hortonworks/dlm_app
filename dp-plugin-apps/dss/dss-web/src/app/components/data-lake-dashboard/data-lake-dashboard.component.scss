@@ -8,11 +8,24 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
+@import '../../../styles/variables';
+@import '../../../styles/charts';
 
-import {Routes} from '@angular/router';
+.data-lake-container {
+  padding: 15px 30px;
+}
 
-export const routes: Routes = [
-  {path: '', pathMatch: 'full', redirectTo: 'dss/collections'},
-  {path: '**', pathMatch: 'full', redirectTo: 'dss/collections'},
-  {path: 'dss', pathMatch: 'full', redirectTo: 'dss/collections'}
-];
+.total-assets {
+  font-size: 2.4em;
+  font-weight: 500;
+}
+
+.charts-cards-container {
+  .charts-card {
+    min-height: 350px;
+  }
+}
+
+:host ::ng-deep .nv-multiBarWithLegend .tick line {
+  stroke: transparent;
+}

@@ -15,6 +15,7 @@ import {Observable} from "rxjs";
 import {HttpUtil} from "../shared/utils/httpUtil";
 import {DatasetTag} from "../models/dataset-tag";
 import {AssetCollectionDashboard} from '../models/asset-collection-dashboard';
+import {DataLakeDashboard} from '../models/data-lake-dashboard';
 
 @Injectable()
 export class ProfilerService {
@@ -25,6 +26,14 @@ export class ProfilerService {
     const url = '';
     return Observable.create(observer => {
       observer.next(AssetCollectionDashboard.getData());
+      observer.complete();
+    });
+  }
+
+  dataLakeStats(dataLakeId: number): Observable<DataLakeDashboard> {
+    const url = '';
+    return Observable.create(observer => {
+      observer.next(DataLakeDashboard.getData());
       observer.complete();
     });
   }
