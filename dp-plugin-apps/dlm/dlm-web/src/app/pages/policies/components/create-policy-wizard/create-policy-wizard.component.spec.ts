@@ -23,6 +23,7 @@ import {JobService} from 'services/job.service';
 import {WizardSummaryComponent} from '../create-policy-wizard-summary/create-policy-wizard-summary.component';
 import {SummaryTreeComponent} from '../summary-tree/summary-tree.component';
 import {FrequencyPipe} from 'pipes/frequency.pipe';
+import { TranslateService } from '@ngx-translate/core';
 
 describe('CreatePolicyWizardComponent', () => {
   let component: CreatePolicyWizardComponent;
@@ -47,6 +48,7 @@ describe('CreatePolicyWizardComponent', () => {
         SummaryTreeComponent
       ],
       providers: [
+        TranslateService,
         NavbarService,
         PolicyService,
         JobService,

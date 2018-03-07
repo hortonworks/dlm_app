@@ -13,17 +13,12 @@ import { Effect, Actions, toPayload } from '@ngrx/effects';
 import * as RouterActions from 'actions/router.action';
 import { PolicyService } from 'services/policy.service';
 import { JobService } from 'services/job.service';
-import { ToastNotification } from 'models/toast-notification.model';
-import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 
 import {
   loadPoliciesSuccess, loadPoliciesFail, createPolicyFail, createPolicySuccess, ActionTypes as policyActions,
   deletePolicySuccess, deletePolicyFail, suspendPolicyFail, suspendPolicySuccess, resumePolicySuccess, resumePolicyFail,
-  loadLastJobsSuccess, loadLastJobsFailure
+  loadLastJobsSuccess, loadLastJobsFailure, wizardResetAllSteps
 } from 'actions/policy.action';
-import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
-import { resetFormValue } from 'actions/form.action';
-import { truncate } from 'pipes/truncate.pipe';
 
 @Injectable()
 export class PolicyEffects {
@@ -47,7 +42,7 @@ export class PolicyEffects {
         .mergeMap(response => [
           createPolicySuccess(response, payload.meta),
           new RouterActions.Go({path: ['/policies']}),
-          resetFormValue(POLICY_FORM_ID)
+          wizardResetAllSteps()
         ])
         .catch(err => Observable.of(createPolicyFail(err, payload.meta)));
     });

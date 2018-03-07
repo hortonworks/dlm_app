@@ -67,11 +67,13 @@ export interface PolicyDefinition {
   sourceCluster: string;
   targetCluster: string;
   sourceDataset: string;
+  targetDataset: string;
   frequencyInSec: number;
   startTime?: string;
   endTime?: string;
   queueName?: string;
   distcpMapBandwidth?: number;
+  cloudCred?: string;
 }
 
 export interface PolicyPayload {
