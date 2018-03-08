@@ -26,6 +26,12 @@ export class AddOnAppService {
 
   constructor(private http: Http) {
   }
+  getServiceStatus(appName): Observable<any>{
+    return this.http
+      .get(`${this.uri}/health/${appName}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
 
   getServiceDependencies(appName): Observable<AppDependency> {
     return this.http

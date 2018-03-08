@@ -22,6 +22,7 @@ import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.cs._
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
+import services.ConsulHealthService
 
 class Module extends AbstractModule {
   def configure() = {
@@ -184,6 +185,13 @@ class Module extends AbstractModule {
   @Named("skuService")
   def provideSkuService(implicit ws: WSClient,configuration: Configuration): SkuService = {
     new SkuServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("healthService")
+  def provideHealthService(implicit ws: WSClient,configuration: Configuration): ConsulHealthService = {
+    new ConsulHealthService(configuration.underlying)
   }
 
 }

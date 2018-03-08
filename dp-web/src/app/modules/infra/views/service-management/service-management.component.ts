@@ -17,6 +17,8 @@ import {LakeService} from '../../../../services/lake.service';
 import {Observable} from 'rxjs/Observable';
 import {ClusterService} from '../../../../services/cluster.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
+import {DialogBox, DialogType} from "../../../../shared/utils/dialog-box";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'dp-service-management',
@@ -28,7 +30,7 @@ export class ServiceManagementComponent implements OnInit {
   clusters: any[] = [];
 
   allServices: AddOnAppInfo[] = [];
-  availableServices: AddOnAppInfo[] = [];
+  availableServices: any[] = [];
   enabledAppDetails: EnabledAppDetails[] = [];
 
   showNotification = false;
@@ -37,6 +39,7 @@ export class ServiceManagementComponent implements OnInit {
 
   constructor(private router: Router,
               private route: ActivatedRoute,
+              private translateService: TranslateService,
               private addOnAppService: AddOnAppService,
               private lakeService: LakeService,
               private clusterService: ClusterService) {
@@ -45,7 +48,21 @@ export class ServiceManagementComponent implements OnInit {
   ngOnInit() {
     this.addOnAppService.getAllServices().subscribe((services) => {
       this.allServices = services;
-      this.availableServices = this.allServices.filter(service => service.enabled === false);
+      this.allServices.forEach(service => {
+        if(service.enabled === true){
+          return;
+        }
+        let availableService = Object.assign({}, service, {fetchingStatus:true, installed: false, healthy: false});
+        this.availableServices.push(availableService);
+        this.addOnAppService.getServiceStatus(service.skuName).subscribe(response => {
+          availableService.fetchingStatus = false;
+          availableService.installed = response.installed;
+          availableService.healthy = response.healthy;
+        }, error => {
+          availableService.fetchingStatus = false;
+          console.error(error);
+        });
+      });
     });
     this.addOnAppService.getEnabledServices().subscribe((services) => {
       services.forEach(service => {
@@ -161,6 +178,26 @@ export class ServiceManagementComponent implements OnInit {
 
   onSort(e) {
 
+  }
+
+  showMessage(service){
+    DialogBox.showErrorMessage(this.translateService.instant('common.services'),
+      this.translateService.instant('pages.services.description.serviceNotInstalled', {serviceName: service.sku.description, installationStepsLink:this.translateService.instant(`pages.services.description.${service.skuName}InstallationLink`)}),
+      this.translateService.instant('common.close'),
+      DialogType.Error);
+  }
+
+  showWarning(service){
+    DialogBox.showConfirmationMessage(this.translateService.instant('common.services'),
+      this.translateService.instant('pages.services.description.serviceNotHealthy', {serviceName: service.sku.description}),
+      this.translateService.instant('common.ok'),
+      this.translateService.instant('common.cancel'),
+      DialogType.Confirmation
+    ).subscribe(result => {
+      if(result){
+        this.router.navigate(['/infra/services', service.sku.description, 'verify'])
+      }
+    });
   }
 
 }

@@ -2,6 +2,7 @@
   "common": {
     "actions": "Actions",
     "close": "Close",
+    "ok":"OK",
     "confirm": "Confirm",
     "dashboard": "Dashboard",
     "dataplane": "DataPlane",
@@ -137,6 +138,7 @@
         "smartSenseId": "SMARTSENSE ID",
         "enabled": "ENABLED",
         "enable": "ENABLE",
+        "install": "Install",
         "next": "Next",
         "verify": "Verify",
         "verifySmartSenseId": "Verify SmartSense ID",
@@ -152,7 +154,8 @@
         "serviceEnabled":"Service Enabled successfully",
         "optional":"Optional",
         "addOptionalServices":"Add Optional Services",
-        "dpServices": "DATAPLANE SERVICES"
+        "dpServices": "DATAPLANE SERVICES",
+        "serviceNotInstalled": "Service Not Installed"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
@@ -161,6 +164,7 @@
         "installDependentService":"Please enable the dependent services on the cluster using the documentation link.",
         "verifyDependency":"After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",
+        "verificationPageLoadError":"This Service is not installed as a part of DataPlane Services. Go to <a href='/infra/services'>Services page</a> for more information",
         "verificationError": "Incorrect SmartSense ID format",
         "installationConfirmation":"All the dependent services have been installed on cluster <b>{{clusterName}}.</b>",
         "installationLink": "For detailed steps on the installation process, please visit ",
@@ -169,7 +173,11 @@
         "mandatoryDependenciesMet":"All the mandatory service dependencies are met.",
         "optionalInstallation":"Optionally, you can install the following services to perform additional functions on the cluster.",
         "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
-        "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service."
+        "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service.",
+        "dlmInstallationLink":"https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/install_dps_using_rpm_files.html",
+        "dssInstallationLink":"https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/install_dps_using_rpm_files.html",
+        "serviceNotInstalled":"{{serviceName}} is not installed as a part DataPlane Services. Please follow this <a href={{installationStepsLink}} target='_blank'>link</a> to know more information on how services can be added to DataPlane Services",
+        "serviceNotHealthy":"{{serviceName}} has been added as a DataPlane Service, but it is not running. You can still enable this service but the users might not be able to access the service. Click OK to continue."
       }
     },
     "infra": {
