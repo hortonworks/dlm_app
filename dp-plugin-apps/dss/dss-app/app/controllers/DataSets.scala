@@ -438,14 +438,14 @@ class DataSets @Inject()(
   }
 
   def delete(dataSetId: String) =  AuthenticatedAction.async { request =>
-    implicit val token = request.token
+    implicit val token: Option[HJwtToken] = request.token
     Logger.info("Received delete dataSet request")
     (for {
       dataset <- doGetDataset(dataSetId,request.user.id.get)
       cmntDelMsg <- commentService.deleteByObjectRef(dataSetId, "assetCollection")
       clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toString)
       _ <- ratingService.deleteByObjectRef(dataSetId, "assetCollection")
-      deleted <- doDeleteDataset(dataset.id.get.toString)
+      deleted <- doDeleteDataset(dataset,clusterId)
       jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
       _ <- doDeleteProfilers(clusterId, jobName)
     }  yield {
@@ -548,13 +548,23 @@ class DataSets @Inject()(
       }
   }
 
-  private def doDeleteDataset(datasetId: String): Future[Long] = {
+  private def doDeleteDataset(dataset: Dataset, clusterId: String)(implicit token: Option[HJwtToken]): Future[Long] = {
     dataSetService
-      .delete(datasetId.toString)
+      .delete(dataset.id.get.toString)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
-        case Right(deleted) => Future.successful(deleted)
+        case Right(deleted) => {
+          deleteDatasetAssetMapping(deleted, clusterId, dataset.name)
+          Future.successful(deleted)
+        }
       }
+  }
+
+  def deleteDatasetAssetMapping(rowsDeleted: Long, clusterId: String, datasetName: String)(implicit token: Option[HJwtToken]) = {
+
+    if (rowsDeleted > 0) dpProfilerService.datasetAssetMapping(clusterId, Seq.empty[String], datasetName)
+      .recover(apiErrorWithLog(e => Logger.error(s"Datasets-Controller: Delete Mapping of dataset $datasetName on profiler_agent failed with message ${e.getMessage}", e)))
+
   }
 
   private def doDeleteProfilers(clusterId: String, jobName: String)(implicit token:Option[HJwtToken]): Future[Boolean] = {
