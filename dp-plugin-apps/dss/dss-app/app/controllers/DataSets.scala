@@ -253,10 +253,19 @@ class DataSets @Inject()(
     Logger.info("Received request to SAVE dataset edit process")
     dataSetService
       .saveEdition(datasetId)
-      .map(rDataset =>
-        // TODO Modify Profiler data
+      .map { rDataset =>
+        dataSetService.getDataAssetByDatasetId(rDataset.dataset.id.get, "",0, Integer.MAX_VALUE -1,"").map {
+            case Left(errors) => InternalServerError(Json.toJson(errors))
+            case Right(assetsandcount) => {
+              val assetIds = assetsandcount.assets.map { asset =>
+                ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
+              }
+              dpProfilerService.datasetAssetMapping(rDataset.clusterId.toString, assetIds, rDataset.dataset.name)
+                .recover(apiErrorWithLog(e => Logger.error(s"Datasets-Controller: Mapping of dataset $rDataset and assets $assetIds on profiler_agent failed with message ${e.getMessage}", e)))
+            }
+        }
         Ok(Json.toJson(rDataset))
-      )
+      }
       .recoverWith({
         case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
       })
