@@ -62,19 +62,12 @@ describe('PoliciesComponent', () => {
       declarations: [
         PoliciesComponent,
         PolicyTableComponent,
-        TableComponent,
-        TableFooterComponent,
         PolicyInfoComponent,
-        CheckboxComponent,
-        ActionColumnComponent,
         FlowStatusComponent,
-        CheckboxColumnComponent,
         PolicyDetailsComponent,
         JobsTableComponent,
-        TableFilterComponent,
         PolicyServiceFilterComponent,
-        PrevJobsComponent,
-        HdfsBrowserComponent
+        PrevJobsComponent
       ],
       providers: [
         AsyncActionsService,

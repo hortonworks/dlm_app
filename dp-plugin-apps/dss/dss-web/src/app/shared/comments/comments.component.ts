@@ -92,6 +92,7 @@ export class CommentsComponent implements OnInit {
     this.ratingService.getAverage(this.objectId,this.objectType).subscribe( averageAndVotes => {
       this.totalVotes = averageAndVotes.votes;
       this.averageRating = averageAndVotes.average;
+      this.ratingService.dataChanged.next(this.averageRating);
     });
   }
 
@@ -191,11 +192,13 @@ export class CommentsComponent implements OnInit {
         newCommentObject.parentCommentId = this.parentCommentWithUser.comment.id;
         this.parentCommentWithUser.isReplyVisible = false;
         this.commentService.add(newCommentObject).subscribe(_ => {
+          this.commentService.dataChanged.next(true);
           this.toggleAndGetReplies(this.parentCommentWithUser);
           this.removeReply();
         });
       }else {
         this.commentService.add(newCommentObject).subscribe(_ => {
+          this.commentService.dataChanged.next(true);
           if(this.isEdgeInViewport()){
             this.getComments(false,this.offset,this.size);
           }else{
@@ -305,4 +308,5 @@ export class CommentsComponent implements OnInit {
       }, 1000);
     }
   }
+
 }

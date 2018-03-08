@@ -28,8 +28,8 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
-  listByLakeId({ lakeId }): Observable<Cluster[]>{
-    const uri = lakeId ? `${this.uri}?lakeId=${lakeId}` : this.uri;
+  listByLakeId(lakeId: any): Observable<Cluster[]>{
+    const uri = `${this.uri}?dpClusterId=${lakeId}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -85,7 +85,7 @@ export class ClusterService {
 
   getClusterInfo(clusterDetailRequest:ClusterDetailRequest) :Observable<Cluster> {
     return this.http
-      .post(`api/clusters/details`,clusterDetailRequest, new RequestOptions(HttpUtil.getHeaders()))
+      .post(`api/ambari/details`,clusterDetailRequest, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

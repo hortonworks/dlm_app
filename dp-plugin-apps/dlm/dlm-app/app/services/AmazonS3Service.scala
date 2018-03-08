@@ -10,12 +10,12 @@
 package services
 
 import com.amazonaws.AmazonClientException
-import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient
-import com.amazonaws.services.identitymanagement.model.GetUserPolicyRequest
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClient
-import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import com.amazonaws.services.securitytoken.{AWSSecurityTokenService, AWSSecurityTokenServiceClientBuilder}
+import com.amazonaws.services.securitytoken.model.{AWSSecurityTokenServiceException, GetCallerIdentityRequest}
+import com.amazonaws.regions.Regions
+import com.amazonaws.regions.Region
 import com.typesafe.scalalogging.Logger
 import models.AmazonS3Entities.{BucketPolicy, PolicyJsValueStatement, PolicyStatement, S3AccountCredential, S3AccountDetails, S3FileItem, S3FileListResponse, StatementPrincipal, StatementPrincipals}
 import models.AmazonS3Entities.Error.AmazonS3Error
@@ -23,8 +23,9 @@ import models.CloudAccountEntities.Error.GenericError
 import com.google.inject.{Inject, Singleton}
 import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors}
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
-import models.{AmazonS3Entities, CloudAccountProvider, CloudCredentialType}
+import models.{AmazonS3Entities, CloudAccountProvider, CloudAccountStatus, CloudCredentialType}
 import models.CloudResponseEntities.{FileListItem, FileListResponse, MountPointDefinition, MountPointsResponse}
+import models.Entities.CloudCredentialStatus
 import play.api.http.Status.BAD_GATEWAY
 import play.api.libs.json
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -48,16 +49,25 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
     if (splitted.length > 1 || path.length - splitted(0).length == 1) "DIRECTORY" else "FILE"
   }
 
+  private def getRegion : String = {
+    Regions.getCurrentRegion match {
+      case region : Region => region.getName
+      case _ => Region.getRegion(Regions.DEFAULT_REGION).getName
+    }
+  }
+
   private def createBasicClient(credential: S3AccountCredential): BasicAWSCredentials = {
-    new BasicAWSCredentials(credential.accessKeyId, credential.secretAccessKey)
+    new BasicAWSCredentials(credential.accessKeyId.get, credential.secretAccessKey.get)
   }
 
-  private def createS3Client(credential: S3AccountCredential): AmazonS3Client = {
-    new AmazonS3Client(createBasicClient(credential))
+  private def createS3Client(credential: S3AccountCredential): AmazonS3 = {
+    AmazonS3ClientBuilder.standard().withRegion(getRegion)
+      .withCredentials(new AWSStaticCredentialsProvider(createBasicClient(credential))).build()
   }
 
-  private def createSTSClient(credential: S3AccountCredential): AWSSecurityTokenServiceClient = {
-    new AWSSecurityTokenServiceClient(createBasicClient(credential))
+  private def createSTSClient(credential: S3AccountCredential): AWSSecurityTokenService = {
+    AWSSecurityTokenServiceClientBuilder.standard().withRegion(getRegion)
+      .withCredentials(new AWSStaticCredentialsProvider(createBasicClient(credential))).build()
   }
 
   def getUserIdentity(credential: CloudAccountCredentials) : Future[Either[AmazonS3Error, CloudAccountDetails]] = {
@@ -70,7 +80,7 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
       val userName = arn.substring(userNameIndex)
       val accountId = callerIdentityResult.getAccount
       Future.successful(Right(S3AccountDetails(CloudAccountProvider.S3.toString, Some(CloudCredentialType.S3_TOKEN),
-        accountId, userName)))
+        Some(accountId), Some(userName))))
     } catch {
       case ex : AmazonClientException =>
         logger.error(ex.getMessage)
@@ -166,17 +176,22 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
   }
 
 
-  override def checkUserIdentityValid(accountId: String) : Future[Either[GenericError, Unit]] = {
+  override def checkUserIdentityValid(accountId: String) : Future[Either[GenericError, CloudCredentialStatus]] = {
     dlmKeyStore.getCloudAccount(accountId) map {
       case Right(result) =>
         val credential = result.accountCredentials.asInstanceOf[S3AccountCredential]
         val awsStsClient = createSTSClient(credential)
         try {
-          Right(awsStsClient.getCallerIdentity(new GetCallerIdentityRequest))
+          val callerIdentity = awsStsClient.getCallerIdentity(new GetCallerIdentityRequest)
+          Right(CloudCredentialStatus(accountId, CloudAccountStatus.ACTIVE))
         } catch {
-          case ex : AmazonClientException =>
+          case ex : AWSSecurityTokenServiceException =>
             logger.error(ex.getMessage)
-            Left(GenericError(ex.getMessage))
+            if (ex.getStatusCode == 403) {
+              Right(CloudCredentialStatus(accountId, CloudAccountStatus.EXPIRED))
+            } else {
+              Left(GenericError(ex.getMessage))
+            }
         }
       case Left(error) => Left(GenericError(error.message))
     }

@@ -15,6 +15,9 @@
     "show": "Show",
     "save": "Save",
     "saving": "Saving",
+    "update": "Update",
+    "updating": "Updating",
+    "sync": "Sync",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "duration": "Duration",
@@ -44,6 +47,9 @@
     "job": "Job",
     "jobs": "Jobs",
     "start_time": "Start Time",
+    "starting": "starting",
+    "starting_now": "starting now",
+    "until": "until",
     "end_time": "End Time",
     "clusters": "Clusters",
     "cluster": "Cluster",
@@ -59,6 +65,7 @@
     "yes": "Yes",
     "no": "No",
     "not_applicable": "Not Applicable",
+    "last_job": "Last Job",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
       "unknown": "Something went wrong.",
@@ -79,31 +86,52 @@
     "frequency": {
       "self": "Frequency",
       "yearly": {
-        "plural": "Every {{num}}y",
+        "plural": {
+          "short": "Every {{num}}y",
+          "detailed": "Every {{num}} years"
+        },
         "singular": "Every year"
       },
       "monthly": {
-        "plural": "Every {{num}}m",
+        "plural": {
+          "short": "Every {{num}}m",
+          "detailed": "Every {{num}} months"
+        },
         "singular": "Every month"
       },
       "weekly": {
-        "plural": "Every {{num}}w",
+        "plural": {
+          "short": "Every {{num}}w",
+          "detailed": "Every {{num}} weeks"
+        },
         "singular": "Every week"
       },
       "daily": {
-        "plural": "Every {{num}}d",
+        "plural": {
+          "short": "Every {{num}}d",
+          "detailed": "Every {{num}} days"
+        },
         "singular": "Every day"
       },
       "hourly": {
-        "plural": "Every {{num}}h",
+        "plural": {
+          "short": "Every {{num}}h",
+          "detailed": "Every {{num}} hours"
+        },
         "singular": "Every hour"
       },
       "minutely": {
-        "plural": "Every {{num}}m",
+        "plural": {
+          "short": "Every {{num}}m",
+          "detailed": "Every {{num}} minutes"
+        },
         "singular": "Every minute"
       },
       "secondly": {
-        "plural": "Every {{num}}s",
+        "plural": {
+          "short": "Every {{num}}s",
+          "detailed": "Every {{num}} seconds"
+        },
         "singular": "Every second"
       },
       "every": "Every",
@@ -203,7 +231,7 @@
     "menuItem": {
       "overview": "Overview",
       "clusters": "Clusters",
-      "cloud_stores": "Cloud Accounts",
+      "cloud_stores": "Cloud Credentials",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
@@ -399,18 +427,56 @@
       }
     },
     "cloud_stores": {
-      "header": "Cloud Accounts",
+      "header": "Cloud Credentials",
+      "unregistered_header": "Partially Deleted Credentials",
+      "unregistered_hint": "Cloud credentials not registered to DLM application but being used for replication policies",
       "content": {
-        "no_accounts": "No Accounts",
+        "no_accounts": "No Credentials",
         "no_containers": "No Containers",
         "table": {
           "actions": "ACTIONS",
-          "user_details": "CREDENTIAL"
+          "user_details": "CREDENTIAL",
+          "policies": "POLICIES"
         },
         "accounts": {
-          "iam_role": "IAM Role",
+          "iam_role": "IAM ROLE",
+          "iam_username": "IAM USERNAME",
+          "aws_account_id": "AWS ACCOUNT ID",
+          "expired_account": "Cloud credentials invalid. Edit these credentials to continue using them.",
+          "out_of_sync_account": "{{clusters}} clusters not updated with revised credentials. Sync revised credentials to all clusters",
+          "edit": {
+            "title": "Edit Cloud Credential",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential updated successfully"
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to update cloud credential."
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "Beacon clusters associated with credential can be unreachable."
+            }
+          },
+          "delete": {
+            "title": "Delete Credential Account",
+            "body": "Are you sure you want to delete credential account {{accountName}}?",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential deleted successfully"
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to delete cloud credential."
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "Beacon clusters associated with credential can be unreachable."
+            }
+          },
           "add": {
-            "title": "Add Cloud Account",
+            "title": "Add Cloud Credential",
             "provider": "Cloud Provider",
             "name" : {
               "label" : "Name",
@@ -429,14 +495,26 @@
               "keys": "Access & Secret Key",
               "role": "IAM Role"
             },
-            "username": "IAM USERNAME",
-            "account_id": "ACCOUNT ID",
             "validate": "Validate",
             "validating": "Validating",
-            "invalid_form": "Error: Cannot save cloud account since form is in invalid state",
+            "invalid_form": "Error: Cannot save cloud credential since form is in invalid state",
             "success_notification": {
               "title": "Success",
-              "body": "Cloud Account added successfully!"
+              "body": "Cloud Credential added successfully!"
+            }
+          },
+          "sync": {
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential synced successfully!"
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "Beacon clusters associated with credential can be unreachable."
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to sync cloud credential."
             }
           }
         }
@@ -513,14 +591,21 @@
         },
         "no_containers": "No containers",
         "fields": {
-          "policy_name": "Policy Name",
-          "policy_description": "Description",
+          "policy_name": {
+            "label": "Policy Name",
+            "placeholder": "Enter a unique name for the policy"
+          },
+          "policy_description": {
+            "label": "Description",
+            "placeholder": "Enter a description for the policy"
+          },
           "sourceCluster": {
             "self": "Source Cluster"
           },
           "destinationCluster": {
             "self": "Destination Cluster",
             "default": "Select a Source Cluster first",
+            "path": "Destination Path",
             "noPair": "No paired cluster available for the selected source cluster"
           },
           "destination_type": "Destination Type",

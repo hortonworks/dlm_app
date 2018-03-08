@@ -9,7 +9,6 @@
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {CommonComponentsModule} from 'components/common-components.module';
-import {UiSwitchModule} from 'ngx-ui-switch';
 import {CloudAccountsComponent} from './cloud-accounts.component';
 import {CloudAccountsListComponent} from './components/cloud-accounts-list/cloud-accounts-list.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
@@ -17,19 +16,20 @@ import {configureComponentTest} from 'testing/configure';
 import {RouterTestingModule} from '@angular/router/testing';
 import {ModalModule, BsDropdownModule} from 'ngx-bootstrap';
 import {HortonStyleModule} from 'common/horton-style.module';
-import {TableComponent} from 'common/table/table.component';
-import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
 import {MockTranslateLoader} from 'mocks/mock-translate-loader';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {CloudAccountActionsComponent} from './components/cloud-account-actions/cloud-account-actions.component';
 import {AddCloudFormComponent} from './components/add-cloud-form/add-cloud-form.component';
 import {AddAccountModalComponent} from './components/add-account-modal/add-account-modal.component';
-import {CheckboxColumnComponent} from 'components/table-columns';
-import {ActionColumnComponent} from 'components/table-columns/action-column';
-import {CheckboxComponent} from 'common/checkbox/checkbox.component';
 import {CloudAccountService} from 'services/cloud-account.service';
 import {TooltipModule} from 'ngx-bootstrap';
+import {CloudAccountsPoliciesTableComponent} from './components/cloud-account-policies-table/cloud-account-policies-table.component';
+import {PrevJobsComponent} from '../policies/components/prev-jobs/prev-jobs.component';
+import {MomentModule} from 'angular2-moment';
+import {PipesModule} from 'pipes/pipes.module';
+import { NotificationService } from 'services/notification.service';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 describe('CloudAccountsComponent', () => {
   let component: CloudAccountsComponent;
@@ -39,7 +39,6 @@ describe('CloudAccountsComponent', () => {
     configureComponentTest({
       imports: [
         RouterTestingModule,
-        UiSwitchModule,
         TooltipModule,
         ModalModule.forRoot(),
         TranslateModule.forRoot({
@@ -50,22 +49,23 @@ describe('CloudAccountsComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         CommonComponentsModule,
-        HortonStyleModule
+        HortonStyleModule,
+        MomentModule,
+        PipesModule
       ],
       declarations: [
         CloudAccountsComponent,
         CloudAccountsListComponent,
-        TableComponent,
-        TableFooterComponent,
         CloudAccountActionsComponent,
         AddCloudFormComponent,
         AddAccountModalComponent,
-        CheckboxColumnComponent,
-        ActionColumnComponent,
-        CheckboxComponent
+        CloudAccountsPoliciesTableComponent,
+        PrevJobsComponent
       ],
       providers: [
-        CloudAccountService
+        CloudAccountService,
+        NotificationService,
+        AsyncActionsService
       ]
     })
       .compileComponents();

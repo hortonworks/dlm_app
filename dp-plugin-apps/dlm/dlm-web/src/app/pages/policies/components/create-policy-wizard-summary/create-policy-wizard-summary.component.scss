@@ -1,0 +1,28 @@
+/*!
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
+$hexagon-width: 70;
+
+.summary-panel-content {
+  .icon-wrapper {
+    height: 45px;
+    .icon-shifted {
+      top: -40px;
+      left: calc(50% - #{$hexagon-width / 2}px);
+    }
+  }
+  .service-name {
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .dlm-summary-tree {
+    position: relative;
+    top: -60px;
+  }
+}

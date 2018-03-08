@@ -13,18 +13,20 @@ import { HttpRequest } from '@angular/common/http/src/request';
 
 const MOCK_FILES_PREFIX = '/assets/data/dlm/';
 
+type FileHandler = (request: HttpRequest<any>) => string;
+
 /**
  * Generates route to mock request's response by url and method with predefined
  * json file.
  * Note that all request method will be overridden to Get.
  *
  * @param  {string}        url      path to mock prefix /api/dlm will be added
- * @param  {string}        jsonFile json file to respond with, root dir is assets/data/dlm
+ * @param  {string|FileHandler}        jsonFileOrHandler json file to respond with, root dir is assets/data/dlm
  * @param  {RequestMethod} [method]   request method
  */
 export class MockRoute {
   apiPrefix = API_PREFIX;
-  constructor(private url: string, private jsonFile: string, private method?: string) {
+  constructor(private url: string, private jsonFileOrHandler: string|FileHandler, private method?: string) {
     this.url = this.apiPrefix + url;
     if (!method) {
       this.method = 'GET';
@@ -67,8 +69,10 @@ export class MockRoute {
   }
 
   toRequest(originalRequest: HttpRequest<any>): HttpRequest<any> {
+    const file = typeof this.jsonFileOrHandler === 'function' ?
+      this.jsonFileOrHandler(originalRequest) : this.jsonFileOrHandler;
     const request = originalRequest.clone({
-      url: MOCK_FILES_PREFIX + this.jsonFile,
+      url: MOCK_FILES_PREFIX + file,
       method: 'GET'
     });
     return request;

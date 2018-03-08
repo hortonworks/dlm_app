@@ -11,13 +11,13 @@
 
 package com.hortonworks.dataplane.commons.service.api
 
-import java.io.{FileInputStream, FileOutputStream, InputStream, OutputStream}
+import java.io._
 import java.nio.file.{Path, Paths}
 import java.security.KeyStore
 import javax.crypto.spec.SecretKeySpec
 
 import scala.collection.mutable
-import scala.util.{Try}
+import scala.util.Try
 
 case class KeystoreReloadEvent()
 
@@ -28,7 +28,7 @@ class KeyStoreManager(private val storePath: String, private val storePassword: 
   private val watcher = new ThreadFileMonitor(Paths.get(storePath)) {
     override def onChange(path: Path): Unit = {
       keystore = load(storePath, storePassword)
-
+      
       // publishing event
       publish(KeystoreReloadEvent())
     }

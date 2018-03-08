@@ -8,13 +8,13 @@ GET     /metrics                                              controllers.Status
 
 # Atlas API Search
 # ===========================================
-POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String)
+POST          /api/query-assets                                      controllers.QueryAssets.search(clusterId: String, datasetId: Option[String])
 GET           /api/query-attributes                                  controllers.QueryAttributes.list(clusterId: String)
 
 
 # DatasetTags
 # ===========================================
-GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search: Option[String])
+GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount
 GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName: String)
 GET           /api/dataset/:datasetId/atlas-tags                     controllers.DataSets.getUniqueTagsFromAssetsOfDataset(datasetId: String)
 
@@ -62,9 +62,12 @@ POST          /api/add-selected-atlas-assets                         controllers
 
 # DatasetAssets
 # ===========================================
-GET           /api/dataset/:datasetId/assets                         controllers.DataSets.getDataAssetsByDatasetId(datasetId: String, queryName: String, offset: Long, limit: Long)
+GET           /api/dataset/:datasetId/assets                         controllers.DataSets.getDataAssetsByDatasetId(datasetId: String, queryName: String, offset: Long, limit: Long, state: Option[String])
 DELETE        /api/dataset/:datasetId/allassets                      controllers.DataSets.removeAllAssetsFromDataset(datasetId: Long)
 DELETE        /api/dataset/:datasetId/assets                         controllers.DataSets.removeAssetsFromDataset(datasetId: Long)
+POST          /api/dataset/:datasetId/begin-edit                     controllers.DataSets.beginDatasetEdit(datasetId: Long)
+POST          /api/dataset/:datasetId/save-edit                      controllers.DataSets.saveDatasetEdit(datasetId: Long)
+POST          /api/dataset/:datasetId/cancel-edit                    controllers.DataSets.revertDatasetEdit(datasetId: Long)
 
 # DpProfiler
 # ===========================================
@@ -85,6 +88,7 @@ GET           /api/ranger/:clusterId/policies                         controller
 # ===========================================
 POST          /api/comments                                           controllers.Comments.addComments
 GET           /api/comments                                           controllers.Comments.getByObjectRef(objectId: String, objectType: String)
+GET           /api/comments/actions/count                             controllers.Comments.getCommentsCount(objectId: Long, objectType: String)
 DELETE        /api/comments/:id                                       controllers.Comments.deleteCommentById(id: String)
 PATCH         /api/comments/:id                                       controllers.Comments.updateComments(id: String)
 GET           /api/comments/:parentId/replies                         controllers.Comments.getByParentId(parentId: String)
@@ -92,8 +96,8 @@ GET           /api/comments/:parentId/replies                         controller
 # ratings
 # ===========================================
 POST         /api/ratings                                             controllers.Ratings.add
-GET          /api/ratings                                             controllers.Ratings.get
-GET          /api/ratings/actions/average                             controllers.Ratings.getAverage
+GET          /api/ratings                                             controllers.Ratings.get(objectId: String, objectType: String)
+GET          /api/ratings/actions/average                             controllers.Ratings.getAverage(objectId: String, objectType: String)
 PATCH        /api/ratings/:id                                         controllers.Ratings.update(id: String)
 
 #favourites api

@@ -10,6 +10,7 @@
 import { Component, OnInit, Input, Output, forwardRef, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { RadioItem } from './radio-button';
+import {POLICY_TYPES} from 'constants/policy.constant';
 
 export const CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR: any = {
   provide: NG_VALUE_ACCESSOR,
@@ -35,6 +36,19 @@ export const CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR: any = {
         {{radio.label}}
       </label>
     </div>
+    <div *ngIf="type === 'service_icons'" class="dlm-radio-group service-icons">
+      <div class="service-icon" *ngFor="let radio of items" (click)="selectValue(radio)">
+        <span class="hexagon-service-icon"
+        [ngClass]="{'hexagon-warning': isHdfs(radio), 'hexagon-success': isHive(radio),
+        'hexagon-default': radio.value !== selectedValue, 'active': radio.value === selectedValue}">
+          <i class="fa" [ngClass]="{'fa-file hdfs': isHdfs(radio), 'fa-database hive': isHive(radio)}"></i>
+        </span>
+        <input type="radio" [value]="radio.value" [checked]="radio.value === selectedValue">
+        <div class="service-label">
+          {{radio.label}}
+        </div>
+      </div>
+    </div>
   `,
   styleUrls: ['./radio-button.component.scss'],
   providers: [CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR],
@@ -46,6 +60,8 @@ export class RadioButtonComponent implements OnInit, ControlValueAccessor {
   @Input() type = 'radio';
   @Input() disabled = false;
   @Output() change = new EventEmitter<RadioItem>();
+  POLICY_TYPES = POLICY_TYPES;
+
   onChange = (_: any) => {};
 
   constructor() { }
@@ -69,5 +85,13 @@ export class RadioButtonComponent implements OnInit, ControlValueAccessor {
     this.selectedValue = radio.value;
     this.onChange(this.selectedValue);
     this.change.emit(radio);
+  }
+
+  isHdfs(radio: RadioItem) {
+    return radio.value === POLICY_TYPES.HDFS;
+  }
+
+  isHive(radio: RadioItem) {
+    return radio.value === POLICY_TYPES.HIVE;
   }
 }

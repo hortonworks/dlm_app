@@ -1,0 +1,82 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<div class="form-container">
+  <form class="basic-form policy-form" [formGroup]="form">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="form-section col-xs-12">
+          <fieldset>
+            <!-- POLICY NAME -->
+            <dlm-form-field
+              [label]="'page.policies.form.fields.policy_name.label' | translate"
+              [required]="true"
+              [maxLengthValue]="64">
+              <input
+                type="text"
+                class="form-control"
+                [placeholder]="'page.policies.form.fields.policy_name.placeholder' | translate"
+                qe-attr="policy-name"
+                formField
+                formControlName="name" />
+              <dlm-field-error *ngIf="form.get('name').hasError('nameValidator')">
+                {{'forms.validation_errors.namePattern' | translate}}
+              </dlm-field-error>
+            </dlm-form-field>
+            <!-- POLICY NAME END -->
+
+            <!-- POLICY DESCRIPTION -->
+            <dlm-form-field
+              [label]="'page.policies.form.fields.policy_description.label' | translate"
+              [maxLengthValue]="256">
+              <textarea
+                rows="4"
+                class="form-control"
+                [placeholder]="'page.policies.form.fields.policy_description.placeholder' | translate"
+                qe-attr="policy-description"
+                formField
+                formControlName="description">
+              </textarea>
+            </dlm-form-field>
+            <!-- POLICY DESCRIPTION END -->
+
+            <!-- POLICY TYPE -->
+            <div class="form-group">
+              <div class="row">
+                <label class="col-xs-6">
+                  {{'page.policies.form.fields.service' | translate}}
+                </label>
+              </div>
+              <div class="row">
+                <div class="col-xs-6">
+                  <dlm-radio-button
+                    qe-attr="policy-type"
+                    [type]="'service_icons'"
+                    [items]="storageTypes"
+                    formControlName="type">
+                  </dlm-radio-button>
+                </div>
+              </div>
+              <div class="row" *ngIf="isHDFSPolicy()">
+                <label class="col-xs-12 help-text">
+                  <dlm-help-link
+                    id="enable_snapshot"
+                    [linkTo]="'page.policies.form.help.snapshot_url' | translate"
+                    [linkText]="'page.policies.form.help.snapshot_text'">
+                  </dlm-help-link>
+                </label>
+              </div>
+            </div>
+            <!-- POLICY TYPE END -->
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

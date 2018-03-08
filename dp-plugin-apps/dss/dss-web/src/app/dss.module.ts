@@ -16,13 +16,24 @@ import {CommentsModule} from './shared/comments/comments.module';
 import {BaseDssRequestOptions} from './dss-request-options';
 import {MdlService} from './services/mdl.service';
 import {MdlDirective} from './shared/directives/mdl.directive';
+import {DssAppEvents} from './services/dss-app-events';
+import {LakeService} from './services/lake.service';
+import {navigation} from './_nav';
+import {DataLakeDashboardModule} from './components/data-lake-dashboard/data-lake-dashboard.module';
+import {DatasetModule} from './components/dataset/dataset.module';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
 }
 
-export function startupServiceFactory(authenticationService: AuthenticationService) {
-  return () => authenticationService.loadUser();
+export function startupServiceFactory(authenticationService: AuthenticationService, lakeService: LakeService) {
+  return () => authenticationService.loadUser()
+              .then(() => lakeService.listAsPromise())
+              .then((lakes) => {
+                let dashboard = navigation.find(n => (n.name === 'Dashboard'));
+                lakes = lakes.sort((a, b) => a.name.localeCompare(b.name));
+                dashboard.children = lakes.map(lake => ({name: `${lake.name}, ${lake.dcName}`, url: `/dss/data-lake-dashboard/${lake.id}`, iconClassName: ''}));
+              });
 }
 
 @NgModule({
@@ -34,6 +45,8 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
     CollapsibleNavModule,
     HeaderModule,
     CommentsModule,
+    DatasetModule,
+    DataLakeDashboardModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -50,11 +63,13 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
       MdlService,
       TranslateStore,
       TranslateService,
+      DssAppEvents,
       AuthenticationService,
+      LakeService,
       {
         provide: APP_INITIALIZER,
         useFactory: startupServiceFactory,
-        deps: [AuthenticationService],
+        deps: [AuthenticationService, LakeService],
         multi: true
       },
       { provide: RequestOptions,

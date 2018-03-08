@@ -25,7 +25,7 @@ object WASBEntities {
   }
 
   @SerialVersionUID(131)
-  case class WASBAccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: String) extends Serializable with CloudAccountDetails
+  case class WASBAccountDetails(provider: String, credentialType: Option[CloudCredentialType], accountName: Option[String]) extends Serializable with CloudAccountDetails
 
   @SerialVersionUID(132)
   case class WASBAccountCredential(credentialType: String, accessKey: String) extends Serializable with CloudAccountCredentials

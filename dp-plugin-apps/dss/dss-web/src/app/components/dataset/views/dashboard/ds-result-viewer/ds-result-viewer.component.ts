@@ -27,6 +27,7 @@ export class DsNavResultViewer {
   @Input() currentDsTag: DatasetTag;
   @Input() view;
   @Input() dsNameSearch:string = "";
+  @Input() bookmarkFilter: boolean = false;
   @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
 
   @Output() onViewRefresh = new EventEmitter<boolean>();
@@ -47,9 +48,10 @@ export class DsNavResultViewer {
   ) {
   }
 
-  ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    if ((changes["dsNameSearch"] && !changes["dsNameSearch"].firstChange)
-      || changes["currentDsTag"] && !changes["currentDsTag"].firstChange) {
+  ngOnChanges(changes: SimpleChange) {
+    if ((changes["dsNameSearch"] && changes["dsNameSearch"].currentValue && !changes["dsNameSearch"].firstChange) ||
+        (changes["currentDsTag"] && changes["currentDsTag"].currentValue && !changes["currentDsTag"].firstChange) ||
+        (changes["bookmarkFilter"] && changes["bookmarkFilter"].currentValue && this.currentDsTag))  {
       this.start = 1;
       this.getDataset();
     }
@@ -57,7 +59,7 @@ export class DsNavResultViewer {
 
   getDataset() {
     this.datasetModels = null;
-    this.richDatasetService.listByTag(this.currentDsTag.name, this.dsNameSearch, this.start-1, this.limit)
+    this.richDatasetService.listByTag(this.currentDsTag.name, this.dsNameSearch, this.start-1, this.limit, this.bookmarkFilter)
       .subscribe(result => this.datasetModels = result);
   }
 

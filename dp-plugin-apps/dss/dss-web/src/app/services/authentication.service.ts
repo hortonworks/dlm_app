@@ -66,7 +66,7 @@ export class AuthenticationService {
       });
   }
 
-  loadUser() {
+  loadUser(): Promise<User> {
     if (isDevMode()) {
       return this.signIn(new Credential('admin', 'admin')).toPromise();
     }

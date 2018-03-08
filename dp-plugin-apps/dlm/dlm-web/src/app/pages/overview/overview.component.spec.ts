@@ -100,13 +100,6 @@ describe('OverviewComponent', () => {
         IssuesListComponent,
         IssuesListItemComponent,
         JobsTableComponent,
-        TableComponent,
-        // JobTransferredGraphComponent,
-        TableFooterComponent,
-        TableFilterComponent,
-        CheckboxColumnComponent,
-        ActionColumnComponent,
-        CheckboxComponent,
         JobsOverviewTableComponent,
         PrevJobsComponent,
         EventMessageComponent

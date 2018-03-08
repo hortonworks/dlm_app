@@ -31,17 +31,16 @@ export class DsAssetsService {
       .catch(HttpUtil.handleError);
   }
 
-  list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number, clusterId:number): Observable<AssetsAndCount> {
-    console.log(asqms);
+  list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number, clusterId:number, datasetId:number, editable:boolean=false): Observable<AssetsAndCount> {
     let search:string = "", callDB:boolean|number = false;
     asqms.forEach(asqm => asqm.filters.forEach(filObj =>{
       if(filObj.column == "dataset.id") {callDB = filObj.value as number;}
       if(filObj.column == "name") {search = filObj.value as string;}
     }));
     if(callDB) {
-      return this.dbQuery(callDB, search, (pageNo - 1) * pageSize, pageSize);
+      return this.dbQuery(callDB, search, (pageNo - 1) * pageSize, pageSize, editable);
     }
-    return this.atlasQuery(asqms, (pageNo - 1) * pageSize, pageSize, clusterId);
+    return this.atlasQuery(asqms, (pageNo - 1) * pageSize, pageSize, clusterId, datasetId);
   }
 
   getAssetServiceQueryParam(asqms: AssetSetQueryModel[], offset:number, limit:number){
@@ -69,18 +68,18 @@ export class DsAssetsService {
     return atlasFilters;
   }
 
-  dbQuery (id: number, searchText:string, offset:number, limit:number) : Observable<AssetsAndCount> {
+  dbQuery (id: number, searchText:string, offset:number, limit:number, editable:boolean) : Observable<AssetsAndCount> {
     return this.http
-      .get(`api/dataset/${id}/assets?queryName=${searchText}&offset=${offset}&limit=${limit}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`api/dataset/${id}/assets?queryName=${searchText}&offset=${offset}&limit=${limit}&state=${(editable)?"Edit":""}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .map(rsp => this.extractAssetArrayFromDbData(rsp))
       .catch(HttpUtil.handleError)
   }
 
-  atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number) : Observable<AssetsAndCount> {
+  atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number, datasetId:number) : Observable<AssetsAndCount> {
     let postParams=this.getAssetServiceQueryParam(asqms, offset, limit);
     return this.http
-      .post(`${this.url1}?clusterId=${clusterId}`, postParams, new RequestOptions(HttpUtil.getHeaders()))
+      .post(`${this.url1}?clusterId=${clusterId}${datasetId?"&datasetId="+datasetId:""}`, postParams, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .map(rsp => this.extractAssetArrayFromAtlasData(rsp))
       .catch(HttpUtil.handleError)
@@ -102,7 +101,7 @@ export class DsAssetsService {
     let dataArr = assetsNCount.assets;
     dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
-        creationTime: "-",
+        createdTime: ent.assetProperties.createTime?((new Date(parseInt(ent.assetProperties.createTime))).toDateString()):"-",
         id: ent.guid,
         name: ent.assetProperties.name || "-",
         description : ent.assetProperties.description || "-",
@@ -120,7 +119,7 @@ export class DsAssetsService {
     let assetModelArr :DsAssetModel[] = [];
     dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
-        creationTime: "-",
+        createdTime: ent.attributes.createTime?((new Date(parseInt(ent.attributes.createTime))).toDateString()):"-",
         id: ent.guid,
         name: ent.displayText,
         description : ent.attributes.description || "-",

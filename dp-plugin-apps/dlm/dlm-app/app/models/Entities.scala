@@ -15,8 +15,10 @@ import com.hortonworks.dlm.beacon.domain.ResponseEntities._
 import play.api.libs.json.Json
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
+import models.CloudAccountStatus.CloudAccountStatus
 
 import scala.collection.immutable.Set.Set2
+import scala.concurrent.Future
 
 
 object Entities {
@@ -76,8 +78,13 @@ object Entities {
 
   case class YarnQueueDefinition(name: String, children: Seq[YarnQueueDefinition], path: String)
   case class YarnQueuesResponse(items: Seq[YarnQueueDefinition])
-
-  case class CloudCredsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), cloudCreds: Seq[CloudCredsBeaconResponse])
+  case class CloudCredentialStatus(name: String, status: CloudAccountStatus)
+  case class CloudCredPoliciesEither(cloudCred: Either[BeaconApiErrors, CloudCredsBeaconResponse], policies: Either[BeaconApiErrors, Seq[PoliciesDetailResponse]])
+  case class CloudCredPolicies(cloudCred: CloudCredsBeaconResponse, policies: Seq[PoliciesDetails])
+  case class ClusterCred(clusterId: Long, isInSync: Boolean = true)
+  case class CloudCredWithPolicies(name: String, policies: Seq[PoliciesDetails], clusters: Seq[ClusterCred], cloudCred: Option[CloudCredResponse])
+  case class CloudCredWithPoliciesResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredWithPolicies])
+  case class CloudCredsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredsBeaconResponse])
   case class CloudCredsUpdateResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq())
 }
 
@@ -124,6 +131,18 @@ object JsonFormatters {
 
   implicit val yarnQueuesResponseReads = Json.reads[YarnQueuesResponse]
   implicit val yarnQueuesResponseWrites = Json.writes[YarnQueuesResponse]
+
+  implicit val cloudCredentialStatusReads = Json.reads[CloudCredentialStatus]
+  implicit val cloudCredentialStatusWrites = Json.writes[CloudCredentialStatus]
+
+  implicit val clusterCredReads = Json.reads[ClusterCred]
+  implicit val clusterCredWrites = Json.writes[ClusterCred]
+
+  implicit val cloudCredWithPoliciesReads = Json.reads[CloudCredWithPolicies]
+  implicit val cloudCredWithPoliciesWrites = Json.writes[CloudCredWithPolicies]
+
+  implicit val cloudCredWithPoliciesResponseReads = Json.reads[CloudCredWithPoliciesResponse]
+  implicit val cloudCredWithPoliciesResponseWrites = Json.writes[CloudCredWithPoliciesResponse]
 
   implicit val cloudCredsDetailResponseReads = Json.reads[CloudCredsDetailResponse]
   implicit val cloudCredsDetailResponseWrites = Json.writes[CloudCredsDetailResponse]

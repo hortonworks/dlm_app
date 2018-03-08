@@ -1,0 +1,57 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+.charts-cards-container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: stretch;
+
+  .charts-card {
+    border: 1px solid #E7E7E7;
+    border-radius: 2px;
+    flex-grow: 1;
+    margin: 0px 5px;
+    padding: 15px;
+    background: #FFFFFF;
+
+    .title {
+      color: $shuttle-gray;
+      font-weight: 400;
+      font-size: 16px;
+    }
+  }
+
+  .charts-card:first-child {
+    margin-left: 0px;
+  }
+
+  .charts-card:last-child {
+    margin-right: 0px;
+  }
+
+  &.two-col {
+    .charts-card {
+      min-height: 320px;
+    }
+  }
+
+  &.one-col {
+    .charts-card {
+      min-height: 320px;
+    }
+
+  }
+}
+
+.card-margin-top {
+  margin-top: 10px
+}

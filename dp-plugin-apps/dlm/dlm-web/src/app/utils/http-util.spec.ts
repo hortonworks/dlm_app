@@ -49,4 +49,15 @@ describe('HTTP Util', () => {
       expect(httpUtil.getError(err)).toEqual({message: 'Failed'});
     });
   });
+
+  describe('#toSearchParams', () => {
+    it('should return HttpParams from object', () => {
+      const queryParams = { number: 1, string: 'str', object: { param: 'value' } };
+      const params = httpUtil.toSearchParams(queryParams);
+      expect(params.get('number')).toBe('1', 'number converted to string');
+      expect(params.get('string')).toBe('str', 'string is still string');
+      expect(params.get('object')).toBe(JSON.stringify(queryParams.object), 'object is stringified');
+      expect(params.keys()).toEqual(['number', 'string', 'object'], 'all keys present');
+    });
+  });
 });

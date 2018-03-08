@@ -82,7 +82,7 @@ class DpProfilerAttributes @Inject()(
     AuthenticatedAction.async { req =>
       Logger.info(s"Received getScheduleStatus for entity $clusterId $dataSetId")
       implicit val token = req.token
-      dataSetService.retrieve(dataSetId).flatMap{
+      dataSetService.retrieve(dataSetId).flatMap {
         case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(datasetAndCategories) => {
           val dataset = datasetAndCategories.dataset
@@ -153,6 +153,7 @@ class DpProfilerAttributes @Inject()(
     implicit val token: Option[Entities.HJwtToken] = request.token
     request.body.validate[ProfilerMetricRequest] match {
       case JsSuccess(simpleRequest, _) =>
+        Logger.debug(s"Received Metrics request for  $simpleRequest for user $userName ")
         AssetRetriever.getAssets(simpleRequest.context, dataSetService) flatMap {
           assets =>
             val request = AssetResolvedProfilerMetricRequest(simpleRequest.clusterId, assets, simpleRequest.metrics)

@@ -18,7 +18,7 @@ import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webservice.CommentService
 import com.typesafe.config.Config
 import play.api.Logger
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsObject, JsSuccess, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -97,6 +97,13 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToCommentWithUsers)
   }
 
+  override def getCommentsCount(objectId: Long, objectType: String): Future[JsObject] = {
+    ws.url(s"$url/comments/actions/count?objectId=$objectId&objectType=$objectType")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
+
 
   private def mapToCommentWithUser(res: WSResponse) = {
     res.status match {
@@ -114,6 +121,17 @@ class CommentServiceImpl(config: Config)(implicit ws: WSClient)
         (res.json \ "results").validate[Seq[CommentWithUser]].getOrElse(Seq())
       case _ => {
         val logMsg = s"Db-Client CommentServiceImpl: In mapToCommentWithUsers method, result status ${res.status}"
+        mapResponseToError(res,Option(logMsg))
+      }
+    }
+  }
+
+  private def mapResultsGeneric(res: WSResponse): JsObject = {
+    res.status match {
+      case 200 =>
+        (res.json \ "results").as[JsObject]
+      case _ => {
+        val logMsg = s"Db-Client CommentServiceImpl: In mapResultsGeneric method, result status ${res.status}"
         mapResponseToError(res,Option(logMsg))
       }
     }

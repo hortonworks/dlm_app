@@ -1,0 +1,91 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import "../../../../../../styles/variables";
+@import "../../../../../../styles/charts";
+
+
+.charts-cards-container.summary {
+  height: 120px;
+
+  .charts-card {
+    min-width: 150px;
+  }
+
+  .title {
+    color: $shuttle-gray;
+    font-weight: 400;
+    font-size: 16px;
+  }
+
+  .value {
+    color: $shuttle-gray;
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 75px;
+    text-align: center;
+  }
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nvd3 .nv-axis.nv-x path.domain {
+  stroke-opacity: 0;
+
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .75;
+  shape-rendering: crispEdges;
+  stroke-opacity: .75;
+}
+
+
+button.date-range {
+  font-weight: 500;
+  font-size: 13px;
+  color: #53646A;
+  border: none;
+
+  &.selected {
+    color: #FFFFFF;
+    background: #444F62;
+    border-radius: 4px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+}
+
+.bold {
+  font-weight: bold;
+}
+
+:host ::ng-deep .nvd3.nv-pie .nv-pie-title {
+  fill: #455A64;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .tick line{
+  opacity: 0;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart nv-zeroLine {
+  stroke-width: 2;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .nv-y text{
+  display:none;
+}
+
+:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .domain {
+  display:none;
+}

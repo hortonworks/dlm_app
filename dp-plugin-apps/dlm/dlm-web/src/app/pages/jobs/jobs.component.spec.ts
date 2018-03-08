@@ -45,13 +45,7 @@ describe('JobsComponent', () => {
       declarations: [
         JobsComponent,
         JobsTableComponent,
-        JobsStatusFilterComponent,
-        TableComponent,
-        TableFilterComponent,
-        TableFooterComponent,
-        CheckboxComponent,
-        CheckboxColumnComponent,
-        ActionColumnComponent
+        JobsStatusFilterComponent
       ],
       providers: [
         NavbarService,

@@ -1,0 +1,85 @@
+/*!
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
+@import '../../../../../styles/mixins.scss';
+@import '../../../../../styles/variables.scss';
+$hex-size: 70px;
+$border_width: 3;
+$border_color: #9fc3cb;
+$active-border-color: $link-color;
+
+.hexagon-service-icon {
+  text-align: center;
+  font-size: $hex-size / 2.5;
+  display: inline-block;
+  &.active {
+    @include hexagon($hex-size, transparent, $border_width, $active-border-color);
+  }
+  &:not(.active) {
+    @include hexagon($hex-size, transparent, $border_width, $border_color);
+  }
+  &.white-border {
+    @include hexagon($hex-size, transparent, $border_width, $white-color);
+  }
+  i {
+    position: relative;
+    z-index: 2;
+    color: white;
+    margin-top: 4px;
+  }
+  &.hexagon-success {
+    background-color: $hive-hexagon-color !important;
+
+    &:after {
+      border-top-color: $hive-hexagon-color !important;
+    }
+
+    &:before {
+      border-bottom-color: $hive-hexagon-color !important;
+    }
+  }
+
+  &.hexagon-warning {
+    background-color: $hdfs-hexagon-color !important;
+
+    &:after {
+      border-top-color: $hdfs-hexagon-color !important;
+    }
+
+    &:before {
+      border-bottom-color: $hdfs-hexagon-color !important;
+    }
+  }
+
+  &.hexagon-default {
+    background-color: $white-color !important;
+
+    &:after {
+      border-top-color: $white-color !important;
+    }
+
+    &:before {
+      border-bottom-color: $white-color !important;
+    }
+
+    i {
+      &.hdfs {
+        color: $hdfs-hexagon-color;
+      }
+      &.hive {
+        color: $hive-hexagon-color;
+      }
+    }
+  }
+}
+
+.help-text {
+  padding-top: 10px;
+}
+

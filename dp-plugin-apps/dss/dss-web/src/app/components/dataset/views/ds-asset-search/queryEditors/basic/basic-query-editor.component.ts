@@ -13,6 +13,8 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange
 import {TaggingWidgetTagModel} from "../../../../../../shared/tagging-widget/tagging-widget.component";
 import {AssetTypeEnum} from "../../../ds-assets-list/ds-assets-list.component";
 import {SearchWidget} from "./search-widget/search-widget.component";
+import {AssetSetQueryFilterModel, AssetSetQueryModel} from "../../../ds-assets-list/ds-assets-list.component";
+import {DsAssetsService} from "../../../../services/dsAssetsService";
 
 export class SimpleQueryObjectModel {
   type: AssetTypeEnum = AssetTypeEnum.ALL;
@@ -29,37 +31,43 @@ const TagModel = TaggingWidgetTagModel;
   templateUrl: "basic-query-editor.component.html"
 })
 export class BasicQueryEditor implements OnInit {
-  createdFilOptns: string[] = ["Whenever", "Last 30 days", "Last 60 days", "Last 90 days"];
-  typeFilOptns: string[] = ["Any", "HIVE", "HDFS"];
-  sizeFilOptns: string[] = ["Any", "> 100 rows", "> 1000 rows", "> 10000 rows"];
-  dlFilOptns: string[] = ["Any", "Lake-1", "Lake-2"];
-  ownerFilOptn: string[] = ["Whoever", "root", "Amit", "Vivek", "Kishore"];
-
+  createdFilOptns: string[] = ["Whenever", "Last 1 day", "Last 7 days", "Last 30 days"];
+  createdIndxToDaysMap: number[] = [0,1,7,30];
   createdValueIndx: number = 0;
-  typeValueIndx: number = 0;
-  sizeValueIndx: number = 0;
-  dLakeIndx: number = 0;
-  ownerIndx: number = 0;
+  ownerName:string = "";
+  dbName:string = "";
+  selectedTag:string = "";
+  searchText:string = "";
 
   filterTags: TaggingWidgetTagModel[] = [];
   filterStateFlag: boolean = false;
+  tagsAvailable: string[] = [];
 
   @ViewChild("outerCont") outerCont: ElementRef;
   @ViewChild("searchWidget") searchWidget: SearchWidget;
 
   @Input() queryObj: SimpleQueryObjectModel;
+  @Input() queryModel: AssetSetQueryModel;
+  @Input() clusterId:number;
 
   @Output("onQueryObjUpdate") notificationEmitter: EventEmitter<any> = new EventEmitter<any>();
   @Output("onHeightChange") heightEmitter: EventEmitter<number> = new EventEmitter<number>();
 
+  @ViewChild("searchInput") searchInput: ElementRef;
+
+  constructor(private assetService: DsAssetsService) {}
+
   ngOnInit() {
-    this.copyQryObjToWidget();
+    this.reset();
+    this.assetService.tagsQuery(this.clusterId).subscribe(tags => {
+      this.tagsAvailable = tags;
+    });
   }
 
-  ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    if (changes["queryObj"]) {
-      this.copyQryObjToWidget();
-    }
+  onKeyDownAtSearch(event) {
+    if(event.target.className.indexOf("searchWidgetCont") != -1)
+      this.searchInput.nativeElement.focus();
+
   }
 
   onKeyUp(event){
@@ -69,19 +77,12 @@ export class BasicQueryEditor implements OnInit {
     }
   }
 
-  copyQryObjToWidget() {
-    const enm = AssetTypeEnum, type = this.queryObj.type;
-    this.typeValueIndx = (type == enm.ALL) ? 0 : ((type == enm.HIVE) ? 1 : ((type == enm.HDFS) ? 2 : 0));
-    this.ownerIndx = 0;
+  reset() {
+    this.clear_search();
+    this.clear_ownerName();
+    this.clear_tag();
     this.createdValueIndx = 0;
-    this.sizeValueIndx = 0;
-    this.dLakeIndx = 0;
     this._fillFilterTags();
-  }
-
-  onNewSearch(text: string) {
-    this.queryObj.searchText = text;
-    this.notificationEmitter.emit("");
   }
 
   _fillFilterTags() {
@@ -89,35 +90,96 @@ export class BasicQueryEditor implements OnInit {
     if (this.createdValueIndx > 0) {
       this.filterTags.push(new TagModel(`Created: ${this.createdFilOptns[this.createdValueIndx]}`, "createdValueIndx"));
     }
-    if (this.typeValueIndx > 0) {
-      this.filterTags.push(new TagModel(`Type: ${this.typeFilOptns[this.typeValueIndx]}`, "typeValueIndx"));
+    if (this.ownerName) {
+      this.filterTags.push(new TagModel(`Owner: ${this.ownerName}`, "ownerName"));
     }
-    if (this.sizeValueIndx > 0) {
-      this.filterTags.push(new TagModel(`Size: ${this.sizeFilOptns[this.sizeValueIndx]}`, "sizeValueIndx"));
+    if (this.dbName) {
+      this.filterTags.push(new TagModel(`Db-Name: ${this.dbName}`, "dbName"));
     }
-    if (this.dLakeIndx > 0) {
-      this.filterTags.push(new TagModel(`Datalake: ${this.dlFilOptns[this.dLakeIndx]}`, "dLakeIndx"));
+    if (this.selectedTag) {
+      this.filterTags.push(new TagModel(`Tag: ${this.selectedTag}`, "tag"));
     }
-    if (this.ownerIndx > 0) {
-      this.filterTags.push(new TagModel(`Owner: ${this.ownerFilOptn[this.ownerIndx]}`, "ownerIndx"));
-    }
-  }
 
-  onFilterOptionChange() {
-    this._fillFilterTags();
-    const tmp = this.typeValueIndx, enm = AssetTypeEnum;
-    this.queryObj.type = (tmp == 0) ? enm.ALL : ((tmp == 1) ? enm.HIVE : ((tmp == 2) ? enm.HDFS : enm.ALL));
-    // this.notificationEmitter.emit("");
   }
 
   removeFilter(deletedTagObj: TaggingWidgetTagModel) {
-    this[deletedTagObj.data] = 0;
-    this.onFilterOptionChange();
+    console.log(deletedTagObj);
+    this["clear_"+deletedTagObj.data]();
+    this._fillFilterTags();
   }
 
   toggleFilterCont() {
     this.filterStateFlag = !this.filterStateFlag;
     (thisObj => setTimeout(() => thisObj.heightEmitter.emit(thisObj.outerCont.nativeElement.offsetHeight), 0))(this);
-
   }
+  hideFilterCont() {
+    this.filterStateFlag = true;
+    this.toggleFilterCont();
+  }
+
+  onCreateTimeChange() {
+    this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "createTime");
+    if(this.createdValueIndx){
+      var date = new Date();
+      date.setDate(date.getDate() - this.createdIndxToDaysMap[this.createdValueIndx]);
+      this.queryModel.filters.push({column: "createTime", operator: "gt", value: "'"+date.toISOString()+"'", dataType:"date"});
+    }
+    this._fillFilterTags();
+  }
+  clear_createdValueIndx() {
+    this.createdValueIndx=0;
+  }
+
+  onSearchChange(e) {
+    this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "name");
+    if(this.searchText){
+      this.queryModel.filters.push({column: "name", operator: "contains", value: this.searchText, dataType:"string"});
+    }
+  }
+  clear_search() {
+    this.searchText="";
+    this.onSearchChange(null);
+  }
+
+  onOwnerNameChange(e) {
+    this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "owner");
+    if(this.ownerName){
+      this.queryModel.filters.push({column: "owner", operator: "contains", value: this.ownerName, dataType:"string"});
+    }
+    this._fillFilterTags();
+  }
+  clear_ownerName() {
+    this.ownerName="";
+    this.onOwnerNameChange(null);
+  }
+
+  onDbNameChange(e) {
+    this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "db.name");
+    if(this.dbName){
+      this.queryModel.filters.push({column: "db.name", operator: "contains", value: this.dbName, dataType:"string"});
+    }
+    this._fillFilterTags();
+  }
+  clear_dbName() {
+    this.dbName="";
+    this.onOwnerNameChange(null);
+  }
+
+  onTagSelectionChange (e) {
+    this.queryModel.filters = this.queryModel.filters.filter(fil => fil.column != "tag");
+    if(this.selectedTag){
+      if(this.tagsAvailable.indexOf(this.selectedTag) == -1) {
+        this.selectedTag="";
+        this._fillFilterTags();
+        return;
+      }
+      this.queryModel.filters.push({column: "tag", operator: "equals", value: this.selectedTag, dataType:"tag"});
+    }
+    this._fillFilterTags();
+  }
+  clear_tag() {
+    this.selectedTag="";
+    this.onTagSelectionChange(null);
+  }
+
 }

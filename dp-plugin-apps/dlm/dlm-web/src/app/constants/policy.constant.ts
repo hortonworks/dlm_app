@@ -31,6 +31,22 @@ export const FRIDAY = '5';
 export const SATURDAY = '6';
 export const SUNDAY = '0';
 
+// Source and Destination Types
+export const CLUSTER = 'CLUSTER';
+export const S3 = 'S3';
+
+// Wizard step ids for Create Policy Wizard
+export const GENERAL = 'general';
+export const SOURCE = 'source';
+export const DESTINATION = 'destination';
+export const SCHEDULE = 'schedule';
+export const ADVANCED = 'advanced';
+
+// Wizard states
+export const ACTIVE = 'active';
+export const DISABLED = 'disabled';
+export const COMPLETED = 'completed';
+
 export const POLICY_TYPES = {
   HDFS,
   HIVE,
@@ -64,6 +80,11 @@ export const POLICY_TIME_UNITS = {
   WEEKS
 };
 
+export const SOURCE_TYPES = {
+  CLUSTER,
+  S3
+};
+
 export const POLICY_TYPES_LABELS = {
   [HDFS]: 'HDFS',
   [HIVE]: 'Hive',
@@ -93,4 +114,26 @@ export enum POLICY_MODES {
 export const POLICY_START = {
   START_NOW,
   ON_SCHEDULE
+};
+
+export const WIZARD_STEP_ID = {
+  GENERAL,
+  SOURCE,
+  DESTINATION,
+  SCHEDULE,
+  ADVANCED
+};
+
+export const WIZARD_STEP_LABELS = {
+  [GENERAL]: 'General',
+  [SOURCE]: 'Select Source',
+  [DESTINATION]: 'Select Destination',
+  [SCHEDULE]: 'Schedule',
+  [ADVANCED]: 'Advanced Settings (Optional)'
+};
+
+export const WIZARD_STATE = {
+  ACTIVE,
+  DISABLED,
+  COMPLETED
 };

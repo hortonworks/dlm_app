@@ -14,8 +14,10 @@ import com.microsoft.azure.storage.{CloudStorageAccount, StorageCredentialsShare
 import com.microsoft.azure.storage.blob._
 import models.CloudAccountEntities.CloudAccountWithCredentials
 import models.CloudAccountEntities.Error._
+import models.CloudAccountStatus.CloudAccountStatus
 import models.CloudResponseEntities.{FileListResponse, MountPointDefinition, MountPointsResponse}
-import models.CloudCredentialType
+import models.{CloudAccountStatus, CloudCredentialType}
+import models.Entities.CloudCredentialStatus
 import models.WASBEntities._
 
 import scala.collection.JavaConverters._
@@ -47,7 +49,7 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
           s"AccountKey=${credential.accessKey}")
       case CloudCredentialType.WASB_SAS_TOKEN =>
         val credential = cloudAccount.accountCredentials.asInstanceOf[WASBAccountCredentialSAS]
-        new CloudStorageAccount(new StorageCredentialsSharedAccessSignature(credential.token), true, null, accountDetails.accountName)
+        new CloudStorageAccount(new StorageCredentialsSharedAccessSignature(credential.token), true, null, accountDetails.accountName.get)
     }
   }
 
@@ -136,10 +138,10 @@ class WASBService @Inject()(val dlmKeyStore: DlmKeyStore) extends CloudService {
 
   // todo: need to check another way to check identity since if credential isn't valid azure-sdk
   // will throw error only after timeout
-  override def checkUserIdentityValid(accountId: String): Future[Either[GenericError, Unit]] = {
+  override def checkUserIdentityValid(accountId: String): Future[Either[GenericError, CloudCredentialStatus]] = {
     listContainers(accountId) map {
       case Left(err) => Left(mapError(err))
-      case _ => Right(())
+      case _ => Right(CloudCredentialStatus(accountId, CloudAccountStatus.ACTIVE))
     }
   }
 }

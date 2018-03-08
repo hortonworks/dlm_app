@@ -61,7 +61,7 @@
   background-color: $white;
 }
 .innerListScrollable .listCont {
-  border: 12px solid #d0d3d7;
+  border: 12px solid $bgGray;
 }
 .listCont .searchCont {
   height:34px;
@@ -123,6 +123,9 @@
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-property: background-color;
 }
+.listCont .list .listRow.disableRow{
+//  color: $bgGray;
+}
 .listCont .list .listRow:last-child {
   border-bottom: 1px solid $iron;
 }
@@ -147,7 +150,7 @@
   color: $iron;
 }
 .listCont .list .listRow .col {
-  width:13%;
+  width:15%;
   margin:0px 2%;
   overflow: hidden;
   white-space:nowrap ;
@@ -155,17 +158,7 @@
   float: left;
 }
 .listCont .list.withDsNameCom .listRow .col{
-  width:9%;
-}
-.listCont .list .listRow .col.ownerCol {
-  width:8%;
-}
-
-.listCont .list .listRow .col.descCol {
-  width:30%;
-}
-.listCont .list.withDsNameCom .listRow .col.descCol {
-  width:24%;
+  width:14%;
 }
 
 .listCont .list .listRow .checkboxCont,
@@ -184,7 +177,7 @@
 }
 .listCont .list .listRow .hiveCol > span {
   color:white;
-  background-color: $dove-gray;
+  background-color: #53646a;
   padding:3px 8px 2px;
   border-radius: 3px;
 }
@@ -198,6 +191,10 @@
   padding:3px 8px 2px;
   border-radius: 3px;
 }
+.listCont .list .listRow.disableRow .hiveCol > span {
+  //background-color: $bgGray;
+}
+
 
 .componentCont .justList {
   margin-bottom: 15px;

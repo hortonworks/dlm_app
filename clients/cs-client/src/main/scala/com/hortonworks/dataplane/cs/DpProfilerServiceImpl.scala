@@ -45,6 +45,17 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
     }
   }
 
+  private def mapToResultsGeneric(res: WSResponse): JsObject = {
+    res.status match {
+      case 200 =>
+        (res.json \ "results").as[JsObject]
+      case _ => {
+        val logMsg = s"Cs-Client DpProfilerServiceImpl: In mapToResultsGeneric method, result status ${res.status} and result body ${res.body}"
+        mapResponseToError(res,Option(logMsg))
+      }
+    }
+  }
+
   override def startProfilerJob(clusterId: String, dbName: String, tableName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
     ws.url(s"$url/cluster/$clusterId/dp-profiler/start-job/$dbName/$tableName")
       .withToken(token)
@@ -108,5 +119,12 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(metricRequest))
       .map(mapResultsGeneric)
+  }
+  override def datasetAssetMapping(clusterId: String, assetIds: Seq[String], datasetName: String)(implicit token: Option[HJwtToken]) = {
+    ws.url(s"$url/cluster/$clusterId/dpprofiler/datasetasset/$datasetName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.obj("assetIds" -> assetIds))
+      .map(mapToResultsGeneric)
   }
 }

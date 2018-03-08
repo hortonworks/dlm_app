@@ -1,0 +1,111 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
+<div class="form-container">
+  <form class="basic-form policy-form" [formGroup]="form">
+    <div class="row">
+      <fieldset formGroupName="destination">
+        <div class="col-xs-12">
+          <div class="row">
+            <!-- DESTINATION TYPE -->
+            <div class="col-xs-4">
+              <dlm-form-field
+                [label]="'page.policies.form.fields.destination_type' | translate"
+                [fieldClass]="'col-xs-12'"
+                [errorClass]=""
+                [required]="true">
+                <dlm-select-field
+                  qe-attr="policy-destination-type"
+                  formField
+                  formControlName="type"
+                  [options]="destinationTypes"
+                  [value]="destinationType">
+                </dlm-select-field>
+              </dlm-form-field>
+            </div>
+            <!-- DESTINATION TYPE END -->
+
+            <!-- DESTINATION CLUSTER -->
+            <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.CLUSTER">
+              <dlm-form-field
+                [label]="'page.policies.form.fields.destinationCluster.self' | translate"
+                [fieldClass]="'col-xs-12'"
+                [errorClass]=""
+                [required]="true">
+                <dlm-select-field
+                  qe-attr="policy-destination-cluster"
+                  formField
+                  formControlName="cluster"
+                  [options]="destinationClusters"
+                  [value]="destinationCluster">
+                </dlm-select-field>
+              </dlm-form-field>
+            </div>
+            <!-- DESTINATION CLUSTER END -->
+
+            <!-- DESTINATION PATH -->
+            <div class="col-xs-4" *ngIf="general.type === POLICY_TYPES.HDFS && form.get('destination.type').value === SOURCE_TYPES.CLUSTER">
+              <dlm-form-field
+                [label]="'page.policies.form.fields.destinationCluster.path' | translate"
+                [fieldClass]="'col-xs-12'"
+                [errorClass]=""
+                [required]="true">
+                <input
+                  qe-attr="policy-destination-path"
+                  formField
+                  class="form-control"
+                  formControlName="path">
+              </dlm-form-field>
+            </div>
+            <!-- DESTINATION PATH END -->
+
+            <!-- DESTINATION CLOUD ACCOUNT -->
+            <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.S3">
+              <dlm-form-field
+                [label]="'page.policies.form.fields.s3.account' | translate"
+                [required]="true"
+                [fieldClass]="'col-xs-12'"
+                [errorClass]="">
+                <dlm-select-field
+                  qe-attr="destination-cloud-account"
+                  formField
+                  formControlName="cloudAccount"
+                  [options]="destinationCloudAccounts"
+                  [value]="destinationCloudAccount">
+                </dlm-select-field>
+              </dlm-form-field>
+            </div>
+            <!-- DESTINATION CLOUD ACCOUNT END -->
+
+            <!-- DESTINATION S3 ENDPOINT -->
+            <div class="col-xs-4" *ngIf="form.get('destination.cloudAccount').value && form.get('destination.type').value === SOURCE_TYPES.S3">
+              <dlm-form-field
+                [label]="'page.policies.form.fields.s3.endpoint' | translate"
+                [errorClass]="'col-xs-12'"
+                [fieldClass]="'col-xs-12'"
+                [required]="true">
+                <div class="input-group">
+                  <div class="input-group-addon">{{S3}}</div>
+                  <input
+                    type="text"
+                    class="form-control"
+                    qe-attr="destinationS3endpoint"
+                    formField
+                    formControlName="s3endpoint"/>
+                </div>
+              </dlm-form-field>
+              <button type="button" class="btn btn-success pull-right">{{"page.policies.form.validateBtn" | translate}}</button>
+            </div>
+            <!-- DESTINATION S3 ENDPOINT END -->
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </form>
+</div>

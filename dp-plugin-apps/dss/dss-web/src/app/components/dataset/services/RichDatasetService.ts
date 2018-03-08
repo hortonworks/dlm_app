@@ -26,8 +26,11 @@ export class RichDatasetService {
   constructor(private http: Http) {
   }
 
-  listByTag(tagName: string, nameSearchText : string, start: number, limit: number): Observable<RichDatasetModel[]> {
+  listByTag(tagName: string, nameSearchText : string, start: number, limit: number, bookmarkFilter: boolean): Observable<RichDatasetModel[]> {
     let url = `${this.url1}/${tagName}?offset=${start}&size=${limit}`;
+    if(bookmarkFilter){
+      url = url+`&filter=bookmark`;
+    }
     nameSearchText && (url += `&search=${nameSearchText}`);
     return this.http
       .get(url, new RequestOptions(HttpUtil.getHeaders()))
@@ -36,11 +39,11 @@ export class RichDatasetService {
       .catch(HttpUtil.handleError);
   }
 
-  getById(id: number): Observable<RichDatasetModel> {
+  getById(id: number, editContext:boolean=false): Observable<RichDatasetModel> {
     return this.http
       .get(`${this.url2}/${id}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
-      .map(res => this.extractRichDataModel(res))
+      .map((res, indx) => this.extractRichDataModel(res, indx, editContext))
       .catch(HttpUtil.handleError);
   }
 
@@ -67,7 +70,7 @@ export class RichDatasetService {
       .map(this.extractRichDataModel)
       .catch(HttpUtil.handleError);
   }
-  addAssets(dSetId: number, clusterId: number, asqms: AssetSetQueryModel[], exceptions: string[] = []) : Observable<RichDatasetModel> {
+  addAssets(dSetId: number, clusterId: number, asqms: AssetSetQueryModel[], exceptions: string[] = [], editContext:boolean=true) : Observable<RichDatasetModel> {
     const postObj = {
       datasetId: dSetId,
       clusterId: clusterId,
@@ -77,11 +80,11 @@ export class RichDatasetService {
     return this.http
       .post("/api/add-atlas-assets", postObj, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
-      .map(this.extractRichDataModel)
+      .map((data, indx) =>this.extractRichDataModel(data, indx, editContext))
       .catch(HttpUtil.handleError);
   }
 
-  addSelectedAssets(dSetId: number, clusterId: number, selection: string[]) : Observable<RichDatasetModel> {
+  addSelectedAssets(dSetId: number, clusterId: number, selection: string[], editContext:boolean=true) : Observable<RichDatasetModel> {
     const postObj = {
       datasetId: dSetId,
       clusterId: clusterId,
@@ -90,19 +93,19 @@ export class RichDatasetService {
     return this.http
       .post("/api/add-selected-atlas-assets", postObj, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
-      .map(this.extractRichDataModel)
+      .map((data, indx) =>this.extractRichDataModel(data, indx, editContext))
       .catch(HttpUtil.handleError);
   }
 
-  deleteAllAssets(dSetId: number) : Observable<RichDatasetModel> {
+  deleteAllAssets(dSetId: number, editContext:boolean=true) : Observable<RichDatasetModel> {
     return this.http
       .delete(`/api/dataset/${dSetId}/allassets`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
-      .map(this.extractRichDataModel)
+      .map((data, indx) =>this.extractRichDataModel(data, indx, editContext))
       .catch(HttpUtil.handleError);
   }
 
-  deleteSelectedAssets(dSetId: number, ids: string[]) : Observable<RichDatasetModel> {
+  deleteSelectedAssets(dSetId: number, ids: string[], editContext:boolean=true) : Observable<RichDatasetModel> {
     let qStr = "";
     ids.forEach((id, indx)=>{
       if(indx) qStr = qStr + "&";
@@ -111,11 +114,35 @@ export class RichDatasetService {
     return this.http
       .delete(`/api/dataset/${dSetId}/assets?${qStr}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
+      .map((data, indx) =>this.extractRichDataModel(data, indx, editContext))
+      .catch(HttpUtil.handleError);
+  }
+
+  beginEdit(dSetId: number) : Observable<RichDatasetModel> {
+    return this.http
+      .post(`/api/dataset/${dSetId}/begin-edit`,{}, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
       .map(this.extractRichDataModel)
       .catch(HttpUtil.handleError);
   }
 
-  extractRichDataModel(data: any): RichDatasetModel { // converts RichDataset(backend case class) to RichDatasetModel
+  saveEdition(dSetId: number) : Observable<RichDatasetModel> {
+    return this.http
+      .post(`/api/dataset/${dSetId}/save-edit`,{}, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(this.extractRichDataModel)
+      .catch(HttpUtil.handleError);
+  }
+
+  cancelEdition(dSetId: number) : Observable<RichDatasetModel> {
+    return this.http
+      .post(`/api/dataset/${dSetId}/cancel-edit`,{}, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(this.extractRichDataModel)
+      .catch(HttpUtil.handleError);
+  }
+
+  extractRichDataModel(data: any, index:number, editableContext:boolean=false): RichDatasetModel { // converts RichDataset(backend case class) to RichDatasetModel
     const ASSET_TYPES = [{label: 'hiveCount', key: 'hive_table'}, {label: 'filesCount', key: 'hdfs_files'}];
 
     return {
@@ -128,10 +155,11 @@ export class RichDatasetService {
       creatorId: data.dataset.createdBy,
       createdOn: data.dataset.createdOn,
       lastModified: data.dataset.lastModified,
+      version : data.dataset.version,
       creatorName: data.user,
       favourite: (data.tags.indexOf("favourite") != -1),
       counts: ASSET_TYPES.reduce((accumulator, cAssetType) => {
-        const tAssetType = data.counts.find(cCount => cCount.assetType === cAssetType.key);
+        const tAssetType = data.counts.find(cCount => (cCount.assetType === cAssetType.key) && (editableContext?(cCount.assetState === "Edit"):true));
         accumulator[cAssetType.label] = tAssetType ? tAssetType.count : 0;
         return accumulator;
       }, {}),
@@ -140,13 +168,16 @@ export class RichDatasetService {
       favouriteId: data.favouriteId,
       favouriteCount: data.favouriteCount,
       bookmarkId: data.bookmarkId,
+      totalComments: data.totalComments,
+      avgRating: data.avgRating,
+      editDetails: data.editDetails
     } as RichDatasetModel;
   }
 
   extractRichDataArray(datas: any[]): RichDatasetModel[] {
     let retArr: RichDatasetModel[] = [];
-    datas.forEach(data => {
-      retArr.push(this.extractRichDataModel(data))
+    datas.forEach((data, indx) => {
+      retArr.push(this.extractRichDataModel(data, indx))
     });
     return retArr
   }

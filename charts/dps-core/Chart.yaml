@@ -1,0 +1,17 @@
+apiVersion: v1
+appVersion: "1.0"
+description: A Helm chart to provision DPS Core from scratch
+name: dps-core
+version: 0.1.0
+keywords:
+  - Hadoop
+  - Hortonworks
+  - Dataplane Services
+  - Data
+home: https://hortonworks.com/open-source/dps/
+icon: https://www.postgresql.org/media/img/about/press/elephant.png
+sources:
+  - https://github.com/hortonworks/dps-core
+maintainers:
+  - name: Hortonworks
+engine: gotpl

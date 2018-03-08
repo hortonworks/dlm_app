@@ -59,7 +59,7 @@ object QueriesAndSensitivityDistributionProcessor extends MultiMetricProcessor {
                  |      FROM hivesensitivity_Snapshot where CONCAT(database,'.',table) in $inClause) b ON a.table = b.table) audit_sensitivity_count""".stripMargin.replace("\n", "")
           )
           val future: Future[WSResponse] = ws.url(profilerConfigs.assetMetricsUrl)
-            .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+            .withHeaders("Accept" -> "application/json")
             .post(postData)
           future.flatMap(response => response.status match {
             case 202 =>

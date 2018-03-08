@@ -87,6 +87,28 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val datasetAssetMapping =
+    path("cluster" / LongNumber / "dpprofiler" / "datasetasset" / Segment) { (clusterId,datasetname) =>
+      extractRequest { request =>
+        post {
+          entity(as[JsObject]) { js =>
+            var assetIds = (js \ "assetIds").as[Seq[String]]
+            onComplete(doDatasetAssetMapping(clusterId, assetIds, datasetname)) {
+              case Success(res) => res.status match {
+                case 200 => complete(success(res.json))
+                case 404 => complete(StatusCodes.NotFound, notFound)
+                case _ => complete(res.status)
+              }
+              case Failure(th) => th match {
+                case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+                case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
+              }
+            }
+          }
+        }
+      }
+    }
+
   val jobStatus =
     path ("cluster" / LongNumber / "dp-profiler" / "job-status" / Segment / Segment) { (clusterId, dbName, tableName) =>
       get {
@@ -335,6 +357,25 @@ class DpProfilerRoute @Inject()(
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(Json.obj("name" -> jobName, "cronExpr" -> s"0 ${(2+(Instant.now.getEpochSecond/60)%60)%60} * * * ?", "jobTask"->postData))
       // Add 2 to current the minute(UTC) to make sure profiling starts within 2 minutes from now.
+    } yield {
+      response
+    }
+  }
+
+  private def doDatasetAssetMapping(clusterId: Long, assetIds: Seq[String], datasetName: String): Future[WSResponse] = {
+    val postData = Json.obj(
+      "datasetName" -> datasetName,
+      "assetIds" -> assetIds
+    )
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset")
+      echo <- Future.successful(println(s"url to hit for dataset-asset mapping $urlToHit"))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json")
+        .post(postData)
     } yield {
       response
     }

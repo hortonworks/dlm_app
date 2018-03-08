@@ -13,6 +13,8 @@ set -e
 
 DEFAULT_VERSION=0.0.1-latest
 CONSUL_CONTAINER="dp-consul-server"
+DSS_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 
 source_dp_config () {
     # Expected to be present in RPM deployments
@@ -25,7 +27,7 @@ source_dp_config () {
 
 init_network() {
     IS_NETWORK_PRESENT="false"
-    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    docker network inspect --format "{{title .ID}}" dp >> "$DSS_PATH"/install.log 2>&1 && IS_NETWORK_PRESENT="true"
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
@@ -47,13 +49,38 @@ list_logs() {
     docker logs dss-app
 }
 
+do_confirm_destroy(){
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will destroy all the DSS containers and the data associated with them. This action cannot be undone.\n\n"
+   local option
+   read -p "Do you want to continue? (yes/no): " option
+   if [ "$option" == "yes" ]
+    then
+        destroy
+    else
+        printf "\nContainers are not destroyed.\n"
+        exit -1
+    fi
+}
+
+do_confirm_stop(){
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will stop all the DSS containers.\n\n"
+   local option
+   read -p "Do you want to continue? (yes/no): " option
+   if [ "$option" == "yes" ]
+    then
+         stop_app
+    else
+        printf "\nContainers are not stopped.\n"
+        exit -1
+    fi
+}
 
 destroy() {
     docker rm --force dss-app
 }
 
 init_app() {
-    docker start dss-app >> install.log 2>&1 || \
+    docker start dss-app >> "$DSS_PATH"/install.log 2>&1 || \
         docker run -it \
             --name dss-app \
             --network dp \
@@ -73,7 +100,7 @@ stop_app() {
 }
 
 load_image() {
-    LIB_DIR=../lib
+    LIB_DIR="$( dirname "${DSS_PATH}" )/lib"
     if [ -d "$LIB_DIR" ]; then
         for imgFileName in $LIB_DIR/*.tar; do
             echo "Loading $imgFileName"
@@ -103,23 +130,13 @@ print_version() {
 }
 
 usage() {
-    local tabspace=20
-    echo "Usage: dssdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init | ps | logs | start | stop | destroy"
-    printf "%-${tabspace}s:%s\n" "init" "Start the application docker containers for the first time"
-    printf "%-${tabspace}s:%s\n" "start" "Start the  application docker container"
-    printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
-    printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
-    printf "%-${tabspace}s:%s\n" "logs" "Log of the application docker containers"
-    printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them"
-    printf "%-${tabspace}s:%s\n" "load" "Load image from lib directory into docker"
-    printf "%-${tabspace}s:%s\n" "upgrade" "Upgrade existing dss to current version"
-    printf "%-${tabspace}s:%s\n" "version" "Print the version of dss"
+   source "$DSS_PATH"/help.sh
+   exit -1
 }
 
-if [ $# -lt 1 ]
+if [ $# -lt 1 ] || [ ${@:$#} == "--help" ]
 then
-    usage;
+    source "$DSS_PATH"/help.sh "$@"
     exit 0;
 else
     VERSION=$(print_version)
@@ -135,7 +152,7 @@ else
            start_app
            ;;
         stop)
-           stop_app
+           do_confirm_stop
            ;;
         ps)
             ps
@@ -145,7 +162,7 @@ else
             list_logs "$@"
             ;;
         destroy)
-            destroy
+            do_confirm_destroy
             ;;
         load)
             load_image

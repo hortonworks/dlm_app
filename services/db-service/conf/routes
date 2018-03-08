@@ -151,6 +151,9 @@ POST          /datasets                                                      con
 POST          /datasets/:datasetId/addassets                                 controllers.Datasets.addAssets(datasetId:Long)
 DELETE        /datasets/:datasetId/assets                                    controllers.Datasets.removeAssets(datasetId: Long, ids: Seq[String])
 DELETE        /datasets/:datasetId/removeallassets                           controllers.Datasets.removeAllAssets(datasetId:Long)
+POST          /datasets/:datasetId/begin-edit                                controllers.Datasets.beginEdit(datasetId:Long)
+POST          /datasets/:datasetId/save-edit                                 controllers.Datasets.saveEdit(datasetId:Long)
+POST          /datasets/:datasetId/revert-edit                               controllers.Datasets.revertEdit(datasetId:Long)
 POST          /datasetswithassets                                            controllers.Datasets.addWithAsset
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
@@ -158,13 +161,13 @@ DELETE        /datasets/:datasetId                                           con
 PATCH         /datasets/:datasetId                                           controllers.Datasets.updateDatset(datasetId:String)
 
 #RichDataset
-GET           /richdatasets                                                  controllers.Datasets.allRichDataset
-GET           /richdatasets/tags/:tagName                                    controllers.Datasets.richDatasetByTag(tagName:String)
+GET           /richdatasets                                                  controllers.Datasets.allRichDataset(userId: Long, filter: Option[String], search: Option[String])
+GET           /richdatasets/tags/:tagName                                    controllers.Datasets.richDatasetByTag(tagName: String, userId: Long,filter: Option[String], search: Option[String] )
 GET           /richdatasets/:id                                              controllers.Datasets.richDatasetById(id:Long)
 
 
 #Categories Api
-GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount(search: Option[String], userId: Long)
+GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount(search: Option[String], filter: Option[String],userId: Long)
 GET           /categoriescount/:name                                         controllers.DatasetCategories.categoriesCountByName(name : String)
 
 #DatasetCategory Api
@@ -191,7 +194,7 @@ POST          /datasets/details                                              con
 DELETE        /datasets/details/:id                                          controllers.DatasetDetailsCtrl.delete(id:Long)
 
 #Data Asset Api
-GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long)
+GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long, state: Option[String])
 GET           /dataassets/guid/:guid                                         controllers.DataAssets.loadFromGuid(guid: String)
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
@@ -218,6 +221,7 @@ POST         /blacklisted-tokens                                            cont
 #comments api
 POST        /comments                                                       controllers.Comments.addComment
 GET         /comments                                                       controllers.Comments.getCommentByObjectRef(objectId: Long, objectType: String)
+GET         /comments/actions/count                                         controllers.Comments.getCommentsCount(objectId: Long, objectType: String)
 GET         /comments/:parentId/replies                                     controllers.Comments.getByParentId(parentId: Long)
 DELETE      /comments/:id                                                   controllers.Comments.deleteById(id: String, userId: Long)
 DELETE      /comments                                                       controllers.Comments.delete(objectId: Long, objectType: String)

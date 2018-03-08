@@ -12,16 +12,7 @@
 import {Routes} from '@angular/router';
 
 export const routes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'dss'
-  }, {
-    path: 'dss',
-    loadChildren: './components/dataset/dataset.module#DatasetModule',
-    data: {
-      crumb: 'dss',
-      title: 'dss',
-    }
-  }
+  {path: '', pathMatch: 'full', redirectTo: 'dss/collections'},
+  {path: '**', pathMatch: 'full', redirectTo: 'dss/collections'},
+  {path: 'dss', pathMatch: 'full', redirectTo: 'dss/collections'}
 ];

@@ -18,7 +18,17 @@ import {
   addCloudStoreFailure,
   validateCredentialsSuccess,
   validateCredentialsFailure,
-  ActionTypes as accountActions
+  ActionTypes as accountActions,
+  loadAccountsStatusSuccess,
+  loadAccountsStatusFail,
+  updateCloudStoreSuccess,
+  updateCloudStoreFailure,
+  deleteCloudStoreFailure,
+  deleteCloudStoreSuccess,
+  syncCloudStoreFailure,
+  syncCloudStoreSuccess,
+  deleteUnregisteredStoreSuccess,
+  deleteUnregisteredStoreFailure
 } from 'actions/cloud-account.action';
 
 @Injectable()
@@ -57,5 +67,69 @@ export class CloudAccountsEffects {
         })
         .catch(err => Observable.of(validateCredentialsFailure(err, payload.meta)));
     });
+
+  @Effect()
+  loadAccountsStatus$: Observable<any> = this.actions$
+    .ofType(accountActions.LOAD_ACCOUNTS_STATUS.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.accountService.fetchCloudAccountsStatus()
+        .map(statuses => loadAccountsStatusSuccess(statuses, payload.meta))
+        .catch(err => Observable.of(loadAccountsStatusFail(err, payload.meta)));
+    });
+
+  @Effect()
+  updateCloudStore$: Observable<any> = this.actions$
+    .ofType(accountActions.UPDATE_CLOUD_STORE.START)
+    .map(toPayload)
+    .switchMap(payload => this.accountService
+      .updateCloudStore(payload.cloudStore)
+      .map(response => {
+        if (response.errors.length) {
+          return updateCloudStoreFailure(response.errors, payload.meta);
+        }
+        return updateCloudStoreSuccess(payload.cloudStore, payload.meta);
+      })
+      .catch(err => Observable.of(updateCloudStoreFailure(err, payload.meta))));
+
+  @Effect()
+  deleteCloudStore$: Observable<any> = this.actions$
+    .ofType(accountActions.DELETE_CLOUD_STORE.START)
+    .map(toPayload)
+    .switchMap(payload => this.accountService
+      .deleteCloudStore(payload.cloudAccount.id)
+      .mergeMap(response => {
+        const success = deleteCloudStoreSuccess(payload.cloudAccount, payload.meta);
+        if (response.errors.length) {
+          return [deleteCloudStoreFailure(response.errors, payload.meta), success];
+        }
+        return [success];
+      })
+      .catch(err => Observable.of(deleteCloudStoreFailure(err, payload.meta))));
+
+  @Effect()
+  syncCloudStore$: Observable<any> = this.actions$
+    .ofType(accountActions.SYNC_CLOUD_STORE.START)
+    .map(toPayload)
+    .switchMap(payload => this.accountService
+      .syncCloudStore(payload.cloudAccount)
+      .map(response => {
+        if (response.errors.length) {
+          return syncCloudStoreFailure(response.errors, payload.meta);
+        }
+        return syncCloudStoreSuccess(response, payload.meta);
+      })
+      .catch(err => Observable.of(syncCloudStoreFailure(err, payload.meta))));
+
+  @Effect()
+  deleteUnregisteredCloudStore$: Observable<any> = this.actions$
+    .ofType(accountActions.DELETE_UNREGISTERED_STORE.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.accountService.deleteUnregisteredStore(payload.cloudAccount)
+        .map(response => deleteUnregisteredStoreSuccess(response, payload.meta))
+        .catch(err => Observable.of(deleteUnregisteredStoreFailure(err, payload.meta)));
+    });
+
   constructor(private actions$: Actions, private accountService: CloudAccountService) {}
 }

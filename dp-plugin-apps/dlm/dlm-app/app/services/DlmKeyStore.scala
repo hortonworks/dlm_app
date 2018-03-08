@@ -26,7 +26,6 @@ import models.{CloudAccountProvider, CloudCredentialType}
 import models.CloudAccountProvider.CloudAccountProvider
 import models.Entities.DlmApiErrors
 import models.WASBEntities.WASBAccountDetails
-import play.api.cache._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
@@ -37,7 +36,7 @@ import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class DlmKeyStore @Inject()(cache: CacheApi, keyStoreManager: KeyStoreManager) extends
+class DlmKeyStore @Inject()(keyStoreManager: KeyStoreManager) extends
   mutable.Subscriber[KeystoreReloadEvent, mutable.Publisher[KeystoreReloadEvent]] {
 
   private val logger = Logger(classOf[DlmKeyStore])
@@ -73,11 +72,11 @@ class DlmKeyStore @Inject()(cache: CacheApi, keyStoreManager: KeyStoreManager) e
               S3AccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)),
                 accountDetails.accountName, accountDetails.userName)
             case CloudAccountProvider.WASB =>
-              val accountDetails = cloudAccount.accountDetails
+              val accountDetails = cloudAccount.accountDetails.asInstanceOf[WASBAccountDetails]
               WASBAccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)),
                 accountDetails.accountName)
             case CloudAccountProvider.ADLS =>
-              val accountDetails = cloudAccount.accountDetails
+              val accountDetails = cloudAccount.accountDetails.asInstanceOf[ADLSAccountDetails]
               ADLSAccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)),
                 accountDetails.accountName)
             }

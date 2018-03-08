@@ -49,24 +49,16 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   private def isNumeric(str: String) = scala.util.Try(str.toLong).isSuccess
 
-  def allRichDataset = Action.async { req =>
-    val userId = req.getQueryString("userId")
-    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
-    else{
-      datasetRepo.getRichDataSet(req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
-        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-        .recoverWith(apiError)
-    }
+  def allRichDataset(userId: Long, filter: Option[String], searchText: Option[String]) = Action.async { req =>
+    datasetRepo.getRichDataSet(searchText, getPaginatedQuery(req), userId, filter)
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
   }
 
-  def richDatasetByTag(tagName: String) = Action.async { req =>
-    val userId = req.getQueryString("userId")
-    if(userId.isEmpty || !isNumeric(userId.get)) Future.successful(BadRequest)
-    else{
-      datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),userId.get.toLong)
-        .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
-        .recoverWith(apiError)
-    }
+  def richDatasetByTag(tagName: String, userId: Long,filter: Option[String], searchText: Option[String] ) = Action.async { req =>
+    datasetRepo.getRichDatasetByTag(tagName, searchText, getPaginatedQuery(req), userId, filter)
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
   }
 
   def richDatasetById(id: Long) = Action.async { req=>
@@ -151,6 +143,32 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
   def removeAllAssets (datasetId: Long) = Action.async { req =>
     datasetRepo
       .removeAllAssets(datasetId)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
+  }
+
+  def beginEdit (datasetId: Long) = Action.async(parse.json) { req =>
+    req.body
+      .validate[String]
+      .map { userId =>
+        datasetRepo
+          .beginEdit(datasetId, userId.toLong)
+          .map(c => success(linkData(c)))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def saveEdit (datasetId: Long) = Action.async(parse.json) { req =>
+    datasetRepo
+      .saveEdit(datasetId)
+      .map(c => success(linkData(c)))
+      .recoverWith(apiError)
+  }
+
+  def revertEdit (datasetId: Long) = Action.async(parse.json) { req =>
+    datasetRepo
+      .revertEdit(datasetId)
       .map(c => success(linkData(c)))
       .recoverWith(apiError)
   }

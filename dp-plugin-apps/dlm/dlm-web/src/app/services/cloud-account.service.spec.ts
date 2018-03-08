@@ -13,6 +13,8 @@ import { AddCloudStoreRequestBody, ValidateCredentialsRequestBody } from 'models
 import { CloudAccountService } from './cloud-account.service';
 import { configureServiceTest } from 'testing/configure';
 import { API_PREFIX } from 'constants/api.constant';
+import { NotificationService } from 'services/notification.service';
+import { NotificationsService } from 'angular2-notifications';
 
 describe('CloudAccountService', () => {
   let injector: TestBed;
@@ -22,7 +24,9 @@ describe('CloudAccountService', () => {
   beforeEach(() => {
     configureServiceTest({
       providers: [
-        CloudAccountService
+        CloudAccountService,
+        NotificationService,
+        NotificationsService
       ]
     });
 

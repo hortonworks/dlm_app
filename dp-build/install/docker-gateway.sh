@@ -22,12 +22,14 @@
 
 # mount (new) --mount type=bind,readonly=false,source=$(pwd)/certs,target=/usr/dp-app/conf/cert \
 
-docker start dp-gateway >> install.log 2>&1 || \
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker start dp-gateway >> "$DP_PATH"/install.log 2>&1 || \
     docker run \
         --name dp-gateway \
         --network dp \
         --detach \
         --env "CONSUL_HOST=$CONSUL_HOST" \
         --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
-        --volume $(pwd)/certs:/dp-shared \
+        --volume "$DP_PATH"/certs:/dp-shared \
         hortonworks/dp-gateway:$VERSION

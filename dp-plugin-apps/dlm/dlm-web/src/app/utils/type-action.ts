@@ -11,6 +11,7 @@ import { isDevMode } from '@angular/core';
 import { Action } from '@ngrx/store';
 
 import { StoreAction } from 'actions/actions.type';
+import { capitalize } from 'utils/string-utils';
 
 export const START_MARKER = '[REQUEST_START]';
 export const SUCCESS_MARKER = '[REQUEST_SUCCESS]';
@@ -20,6 +21,7 @@ export interface RequestAction {
   START: string;
   SUCCESS: string;
   FAILURE: string;
+  _NAME: string;
 }
 
 const actionsCache: { [actionName: string]: boolean} = {};
@@ -37,7 +39,8 @@ export function type<T>(actionName: T | ''): T {
 export const requestType = (actionName: string): RequestAction => ({
   START: type(`${actionName} ${START_MARKER}`),
   SUCCESS: type(`${actionName} ${SUCCESS_MARKER}`),
-  FAILURE: type(`${actionName} ${FAILURE_MARKER}`)
+  FAILURE: type(`${actionName} ${FAILURE_MARKER}`),
+  _NAME: actionName
 });
 
 export const isAction = (action: StoreAction) => action && typeof action.type === 'string' && action.type in actionsCache;
@@ -52,4 +55,58 @@ export const originalActionName = (action: StoreAction): string => {
     return null;
   }
   return splitted.slice(0, splitted.length - 1).join(' ');
+};
+
+const actionNameToMethod = (actionName: string): string => actionName.split('_').reduce((acc: string, part: string, index: number) => {
+  const converted = index === 0 ? part.toLocaleLowerCase() : capitalize(part);
+  return acc + converted;
+}, '');
+
+type RequestActionFn = (...args: any[]) => any;
+export interface RequestActionBody {
+  start?: RequestActionFn;
+  success?: RequestActionFn;
+  failure?: RequestActionFn;
+}
+export interface RequestActions {
+  [method: string]: RequestActionFn;
+}
+
+const startActionDefault = (...args) => ({ args });
+const successActionDefault = (response, meta = {}) => ({
+  response, meta
+});
+const failureActionDefault = (error, meta = {}) => ({
+  error,
+  meta
+});
+
+const makeRequestActions = (requestAction: RequestAction) => ({
+  start: (startFn = startActionDefault) => (...args) => ({
+    type: requestAction.START,
+    payload: startFn ? startFn.apply(null, args) : {}
+  }),
+  success: (successFn = successActionDefault) => (...args) => ({
+    type: requestAction.SUCCESS,
+    payload: successFn.apply(null, args)
+  }),
+  failure: (failureFn = failureActionDefault) => (...args) => ({
+    type: requestAction.FAILURE,
+    payload: failureFn.apply(null, args)
+  })
+});
+
+/**
+ * TODO: more comments and examples. Please see tests to get some insights
+ */
+export const createRequestAction = (requestAction: RequestAction, { start, success, failure }: RequestActionBody = {}): RequestActions => {
+  const actionMethod = actionNameToMethod(requestAction._NAME);
+  const successMethod = actionMethod + 'Success';
+  const failureMethod = actionMethod + 'Failure';
+  const actions = makeRequestActions(requestAction);
+  return {
+    [actionMethod]: actions.start(start),
+    [successMethod]: actions.success(success),
+    [failureMethod]: actions.failure(failure)
+  };
 };

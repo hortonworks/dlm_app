@@ -18,16 +18,16 @@
 #     environment:
 #     CONSUL_HOST: ${CONSUL_HOST}
 
-docker start dp-cluster-service >> install.log 2>&1 || \
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker start dp-cluster-service >> "$DP_PATH"/install.log 2>&1 || \
     docker run \
         --name dp-cluster-service \
         --network dp \
         --detach \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        --env "SEPARATE_KNOX_CONFIG=${SEPARATE_KNOX_CONFIG}" \
-        --env "KNOX_CONFIG_USING_CREDS=${KNOX_CONFIG_USING_CREDS}" \
         --env "KEYSTORE_PATH=/dp-shared/dp-keystore.jceks" \
         --env "KEYSTORE_PASSWORD=$MASTER_PASSWORD" \
         --env "SINGLE_NODE_CLUSTER=$SINGLE_NODE_CLUSTER" \
-        --volume $(pwd)/certs:/dp-shared \
+        --volume "$DP_PATH"/certs:/dp-shared \
         hortonworks/dp-cluster-service:$VERSION

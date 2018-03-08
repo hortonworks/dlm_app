@@ -45,7 +45,7 @@ object SensitivityDistributionProcessor extends MultiMetricProcessor with BaseRo
                |    where CONCAT(database,'.',table) in  $inClause""".stripMargin.replace("\n", "")
         )
         val future: Future[WSResponse] = ws.url(profilerConfigs.assetMetricsUrl)
-          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+          .withHeaders("Accept" -> "application/json")
           .post(postData)
         future.flatMap(response => response.status match {
           case 202 =>

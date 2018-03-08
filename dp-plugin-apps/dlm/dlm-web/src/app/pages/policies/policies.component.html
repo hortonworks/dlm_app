@@ -32,7 +32,8 @@
         <button qe-attr="add-policy" type="button"
                 class="btn btn-secondary"
                 [disabled]="!(resourceAvailability$ | async)?.canAddPolicy"
-                (click)="addPolicyClickHandler()">{{"common.add_policy" | translate }}
+                [routerLink]="['/policies/create']">
+          {{"common.add_policy" | translate }}
         </button>
       </div>
     </div>
@@ -54,28 +55,13 @@
     <ng-template #noPolicies>
       <div class="alert-wrapper">
         <div class="alert alert-warning" role="alert" qe-attr="no-policies-alert">
-          <div *ngIf="(pairings$ | async).length > 0; else noPairings">
+          <div>
             {{ "page.policies.no_policies" | translate }}
             <button type="button" class="btn btn-primary" [routerLink]="'/policies/create'">
               {{ "page.policies.create_button_text" | translate }}
             </button>
           </div>
         </div>
-      </div>
-    </ng-template>
-
-    <ng-template #noPairings>
-      <div qe-attr="no-pairings-alert"  *ngIf="(clusters$ | async).length > 1; else noClusters">
-        {{ "page.policies.no_pairings" | translate }}
-        <button type="button" class="btn btn-primary" [routerLink]="'/pairings/create'">
-          {{ "page.pairings.create_button_text" | translate }}
-        </button>
-      </div>
-    </ng-template>
-
-    <ng-template #noClusters>
-      <div qe-attr="no-clusters-alert">
-        {{ "page.policies.no_clusters" | translate }}
       </div>
     </ng-template>
   </div>

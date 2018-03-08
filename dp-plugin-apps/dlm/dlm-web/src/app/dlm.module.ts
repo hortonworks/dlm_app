@@ -20,7 +20,6 @@ import {
   BsDropdownModule,
   ProgressbarModule
 } from 'ngx-bootstrap';
-import { UiSwitchModule } from 'ngx-ui-switch';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -54,6 +53,7 @@ import { BeaconEffects } from './effects/beacon.effect';
 import { YarnEffects } from './effects/yarn.effect';
 import { CloudAccountsEffects } from './effects/cloud-accounts.effect';
 import { CloudContainersEffects } from './effects/cloud-containers.effect';
+import { BeaconCloudCredEffects } from './effects/beacon-cloud-creds.effect';
 
 import { FormEffects } from './effects/form.effect';
 import { RouterEffects } from './effects/router.effect';
@@ -116,6 +116,8 @@ import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list
 import { CloudContainerBrowserComponent } from 'components/cloud-container-browser/cloud-container-browser.component';
 import { CloudAccountActionsComponent } from './pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
 // tslint:disable-next-line
+import { CloudAccountsPoliciesTableComponent } from './pages/cloud-accounts/components/cloud-account-policies-table/cloud-account-policies-table.component';
+// tslint:disable-next-line
 import { CloudContainerBrowserBreadcrumbComponent } from 'components/cloud-container-browser/breadcrumb/cloud-container-browser-breadcrumb.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
@@ -127,9 +129,7 @@ import { PolicyInfoComponent } from './pages/policies/policy-table/policy-info/p
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
 import { PolicyServiceFilterComponent } from './pages/policies/components/policy-service-filter/policy-service-filter.component';
-import { RadioButtonComponent } from './common/radio-button/radio-button.component';
-import { CheckboxComponent } from './common/checkbox/checkbox.component';
-import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
+
 import { PolicyDetailsComponent } from './pages/policies/policy-details/policy-details.component';
 import { PrevJobsComponent } from './pages/policies/components/prev-jobs/prev-jobs.component';
 import { SelectCloudDestinationComponent } from './pages/policies/components/select-cloud-destination/select-cloud-destination.component';
@@ -145,10 +145,6 @@ import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-d
 import { TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
 
-import { TableComponent } from './common/table/table.component';
-import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
-import { TableFilterComponent } from './common/table/table-filter/table-filter.component';
-import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 import { TabsComponent } from './common/tabs/tabs.component';
@@ -164,6 +160,12 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { AsyncActionsService } from 'services/async-actions.service';
 
 import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-cloud-form/add-cloud-form.component';
+import { CreatePolicyModalComponent } from 'pages/policies/components/create-policy-modal/create-policy-modal.component';
+import { CreatePolicyWizardComponent } from 'pages/policies/components/create-policy-wizard/create-policy-wizard.component';
+import { WizardContentComponent } from 'pages/policies/components/wizard-content/wizard-content.component';
+import { CreatePolicyStepsModule } from './pages/policies/components/create-policy-steps/create-policy-steps.module';
+import { WizardSummaryComponent } from './pages/policies/components/create-policy-wizard-summary/create-policy-wizard-summary.component';
+import { SummaryTreeComponent } from './pages/policies/components/summary-tree/summary-tree.component';
 
 @NgModule({
   imports: [
@@ -175,7 +177,6 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
       initialState: {},
       metaReducers
     }),
-    UiSwitchModule,
     StoreRouterConnectingModule,
     EffectsModule.forRoot([
       ClusterEffects,
@@ -193,7 +194,8 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
       RouterEffects,
       YarnEffects,
       CloudAccountsEffects,
-      CloudContainersEffects
+      CloudContainersEffects,
+      BeaconCloudCredEffects
     ]),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
@@ -217,7 +219,8 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     BrowserAnimationsModule,
     SimpleNotificationsModule.forRoot(),
     PipesModule,
-    OverviewModule
+    OverviewModule,
+    CreatePolicyStepsModule
   ],
   declarations: [
     DlmComponent,
@@ -231,12 +234,12 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     CloudAccountsListComponent,
     CloudContainerBrowserComponent,
     CloudAccountActionsComponent,
+    CloudAccountsPoliciesTableComponent,
     CloudContainerBrowserBreadcrumbComponent,
     AddAccountModalComponent,
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,
-    HdfsBrowserComponent,
 
     PoliciesComponent,
     PolicyTableComponent,
@@ -248,7 +251,6 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     PolicyDetailsComponent,
     PolicyServiceFilterComponent,
     PrevJobsComponent,
-    SelectCloudDestinationComponent,
 
     OverviewFilterComponent,
     IssuesListComponent,
@@ -264,25 +266,22 @@ import { AddCloudFormComponent } from './pages/cloud-accounts/components/add-clo
     NavigationDropdownComponent,
     UserDropdownComponent,
     NotFoundRouteComponent,
-    RadioButtonComponent,
-    CheckboxComponent,
-    CheckboxListComponent,
     CreatePairingCardComponent,
     CreatePairingCardListComponent,
     PairingProgressCardComponent,
     PairingCardComponent,
     PairingCardListComponent,
-    TableComponent,
-    TableFooterComponent,
-    TableFilterComponent,
-    CheckboxColumnComponent,
-    ActionColumnComponent,
     NotificationsComponent,
     EventMessageComponent,
     LogModalDialogComponent,
     PersonaPopupComponent,
     TabsComponent,
-    AddCloudFormComponent
+    AddCloudFormComponent,
+    CreatePolicyModalComponent,
+    CreatePolicyWizardComponent,
+    WizardContentComponent,
+    WizardSummaryComponent,
+    SummaryTreeComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

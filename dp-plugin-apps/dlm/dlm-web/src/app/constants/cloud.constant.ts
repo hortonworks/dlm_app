@@ -11,20 +11,26 @@ export const S3_TOKEN = 'S3_TOKEN';
 export const S3 = 'S3';
 export const WASB = 'WASB';
 export const ADLS = 'ADLS';
-
-export const CREDENTIAL_TYPE_VALUES = [S3_TOKEN];
-
 export const IAM_ROLE = 'IAM_ROLE';
 export const ACCESS_KEY = 'ACCESS_KEY';
 export const S3_AUTH_TYPES = [ACCESS_KEY, IAM_ROLE];
 
 export const PROVIDERS = [S3, ADLS, WASB];
 
-export const CREDENTIAL_TYPE_LABELS = {
-  [S3_TOKEN]: 'S3',
+export const CLOUD_PROVIDER_LABELS = {
+  [S3]: 'S3',
   [WASB]: 'WASB',
   [ADLS]: 'ADLS'
 };
+
+export const CLOUD_PROVIDER_VALUES = [S3];
+
+export const CREDENTIAL_TYPE_LABELS = {
+  [S3_TOKEN]: 'Access & Secret Key',
+  [IAM_ROLE]: 'IAM Role'
+};
+
+export const S3_TYPE_VALUES = [S3_TOKEN, IAM_ROLE];
 
 export const FILE_TYPES = {
   FILE: 'FILE',

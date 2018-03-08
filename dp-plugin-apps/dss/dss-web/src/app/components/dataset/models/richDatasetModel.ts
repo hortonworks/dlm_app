@@ -36,6 +36,9 @@ export class RichDatasetModel {
   favouriteId?: number;
   favouriteCount?: number;
   bookmarkId?: number;
+  totalComments?: number;
+  avgRating?: number;
+  editDetails?: EditDetails;
 }
 
 export class Favourite {
@@ -55,4 +58,11 @@ export class Bookmark {
   userId: number;
   objectType: string;
   objectId: number;
+}
+
+export class EditDetails {
+  id: number;
+  datasetId: number;
+  editorId: number;
+  editBegin: string
 }

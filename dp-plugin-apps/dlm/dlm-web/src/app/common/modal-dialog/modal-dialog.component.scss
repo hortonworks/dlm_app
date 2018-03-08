@@ -7,11 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.close {
-  &:focus {
-    outline: 0;
-  }
-}
+$full-page-margin: 0px;
+$modal-header-height: 70px;
 
 .modal {
   // navbar has z-index 2079
@@ -33,6 +30,28 @@
   }
   &.fixed-400 {
     width: 400px;
+  }
+  &.full-page {
+    width: calc(100vw - 2 * #{$full-page-margin});
+    height: calc(100vh - 2 * #{$full-page-margin});
+    margin: $full-page-margin;
+    .modal-body {
+      max-height: calc(100vh - 2 * #{$full-page-margin} - #{$modal-header-height});
+      padding: 0;
+    }
+  }
+}
+
+.modal-header {
+  height: $modal-header-height;
+  .close {
+    margin-top: 2px;
+    margin-right: 10px;
+    font-size: 30px;
+    opacity: 0.4;
+    &:focus {
+      outline: 0;
+    }
   }
 }
 

@@ -10,6 +10,7 @@
 #  */
 #
 set -e
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 update_call() {
     local ALIAS="$1"
@@ -18,7 +19,7 @@ update_call() {
         --rm \
         --entrypoint /scripts/keystore-update.sh \
         --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
-        --volume $(pwd)/certs:/dp-shared \
+        --volume "$DP_PATH"/certs:/dp-shared \
         hortonworks/dp-migrate:$VERSION update "$@"
 
     echo "'$ALIAS' updated successfully"
@@ -29,10 +30,10 @@ update_secrets() {
 
     if [ "$ALIAS_KEY" == "ambari" ] || [ "$ALIAS_KEY" == "--all" ]; then
         if [ -z "$AMBARI_USERNAME" ] || [ -z "$AMBARI_PASSWORD" ]; then
-            echo "Please enter Ambari username:"
-            read AMBARI_USERNAME
-            echo "Please enter Ambari password:"
-            read -s AMBARI_PASSWORD
+            read -p "Please enter Ambari username:" AMBARI_USERNAME
+            echo
+            read -s -p "Please enter Ambari password:" AMBARI_PASSWORD
+            echo
         fi
         local AMBARI_ALIAS="DPSPlatform.credential.ambari"
         update_call "$AMBARI_ALIAS" "$AMBARI_USERNAME" "$AMBARI_PASSWORD"
@@ -40,10 +41,10 @@ update_secrets() {
 
     if [ "$ALIAS_KEY" == "atlas" ] || [ "$ALIAS_KEY" == "--all" ]; then
         if [ -z "$ATLAS_USERNAME" ] || [ -z "$ATLAS_PASSWORD" ]; then
-            echo "Please enter Atlas username:"
-            read ATLAS_USERNAME
-            echo "Please enter Atlas password:"
-            read -s ATLAS_PASSWORD
+            read -p "Please enter Atlas username:" ATLAS_USERNAME
+            echo
+            read -s -p "Please enter Atlas password:" ATLAS_PASSWORD
+            echo
         fi
         local ATLAS_ALIAS="DPSPlatform.credential.atlas"
         update_call "$ATLAS_ALIAS" "$ATLAS_USERNAME" "$ATLAS_PASSWORD"
@@ -51,10 +52,10 @@ update_secrets() {
 
     if [ "$ALIAS_KEY" == "ranger" ] || [ "$ALIAS_KEY" == "--all" ]; then
         if [ -z "$RANGER_USERNAME" ] || [ -z "$RANGER_PASSWORD" ]; then
-            echo "Please enter Ranger username:"
-            read RANGER_USERNAME
-            echo "Please enter Ranger password:"
-            read -s RANGER_PASSWORD
+            read -p "Please enter Ranger username:" RANGER_USERNAME
+            echo
+            read -s -p "Please enter Ranger password:" RANGER_PASSWORD
+            echo
         fi
         local RANGER_ALIAS="DPSPlatform.credential.ranger"
         update_call "$RANGER_ALIAS" "$RANGER_USERNAME" "$RANGER_PASSWORD"

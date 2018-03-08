@@ -18,7 +18,11 @@ export const ActionTypes = {
   DELETE_POLICY: requestType('DELETE_POLICY'),
   SUSPEND_POLICY: requestType('SUSPEND_POLICY'),
   RESUME_POLICY: requestType('RESUME_POLICY'),
-  LOAD_LAST_JOBS: requestType('LOAD_JOBS_FOR_POLICY')
+  LOAD_LAST_JOBS: requestType('LOAD_JOBS_FOR_POLICY'),
+  WIZARD_SAVE_STEP: type('WIZARD_SAVE_STEP'),
+  WIZARD_MOVE_TO_STEP: type('WIZARD_MOVE_TO_STEP'),
+  WIZARD_RESET_ALL_STEPS: type('WIZARD_RESET_ALL_STEPS'),
+  WIZARD_RESET_STEP: type('WIZARD_RESET_STEP')
 };
 
 export const loadPolicies = (queryParams = {}, meta = {}): ActionWithPayload<any> => ({
@@ -86,4 +90,24 @@ export const loadLastJobsSuccess = (jobs, meta = {}): ActionSuccess => ({
 export const loadLastJobsFailure = (error, meta = {}): ActionFailure => ({
   type: ActionTypes.LOAD_LAST_JOBS.FAILURE,
   payload: {error}
+});
+
+export const wizardSaveStep = (stepId, value): ActionWithPayload<any> => ({
+  type: ActionTypes.WIZARD_SAVE_STEP,
+  payload: {stepId, value}
+});
+
+export const wizardResetAllSteps = (): ActionWithPayload<any> => ({
+  type: ActionTypes.WIZARD_RESET_ALL_STEPS,
+  payload: {}
+});
+
+export const wizardResetStep = (stepId): ActionWithPayload<any> => ({
+  type: ActionTypes.WIZARD_RESET_STEP,
+  payload: {stepId}
+});
+
+export const wizardMoveToStep = (stepId: string): ActionWithPayload<any> => ({
+  type: ActionTypes.WIZARD_MOVE_TO_STEP,
+  payload: {stepId}
 });

@@ -1,0 +1,213 @@
+{
+  "unreachableBeacon": [],
+  "allCloudCreds": [
+    {
+      "name": "dev-credentials",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy1",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "default$c1",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "SUCCESS",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "SUCCESS"
+            }
+          ],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        },
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "default$c1",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "SUCCESS",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "SUCCESS"
+            },
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "FAILED",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "FAILED"
+            }
+          ],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        },
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy3",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "default$c1",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "SUCCESS",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "SUCCESS"
+            }
+          ],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "clusters": [
+        {
+          "clusterId": 1,
+          "isInSync": true
+        }
+      ]
+    },
+    {
+      "name": "out-of-sync",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "dc-Europe$c2",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "clusters": [
+        {
+          "clusterId": 2,
+          "isInSync": false
+        }
+      ]
+    },
+    {
+      "name": "unregistered",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "dc-Europe$c2",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "cloudCred": {
+        "name": "unregistered",
+        "provider": "AWS"
+      }
+    }
+  ]
+}

@@ -9,9 +9,13 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
+BRIGHT=$(tput bold)
+NORMAL=$(tput sgr0)
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 set -e
 
-source $(pwd)/config.env.sh
+source "$DP_PATH"/config.env.sh
 
 DEFAULT_VERSION=0.0.1-latest
 
@@ -19,7 +23,7 @@ CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
 DB_CONTAINER="dp-database"
 APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service $CLUSTER_SERVICE_CONTAINER dp-gateway"
 APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
-if [ "$USE_EXT_DB" == "no" ]; then
+if [ "$USE_EXTERNAL_DB" == "no" ]; then
     APP_CONTAINERS="$DB_CONTAINER $APP_CONTAINERS"
 fi
 KNOX_CONTAINER="knox"
@@ -28,36 +32,29 @@ CONSUL_HOST="$CONSUL_CONTAINER"
 
 init_network() {
     IS_NETWORK_PRESENT="false"
-    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    docker network inspect --format "{{title .ID}}" dp >> "$DP_PATH"/install.log 2>&1 && IS_NETWORK_PRESENT="true"
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
-    # This is not a clean solution and will be fixed later
-    # else
-    #     echo "Network dp already exists. Destroying all containers on network dp."
-    #     CONTAINER_LIST=$(docker container ls --all --quiet --filter "network=dp")
-    #     if [[ $(echo $CONTAINER_LIST) ]]; then
-    #         docker rm  --force $CONTAINER_LIST
-    #     fi
     fi
 }
 
 init_consul(){
     echo "Initializing Consul"
-    source $(pwd)/docker-consul.sh
+    source "$DP_PATH"/docker-consul.sh
 }
 
 generate_certs() {
     CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
 
-    source $(pwd)/docker-certificates.sh
+    source "$DP_PATH"/docker-certificates.sh
 }
 
 init_db() {
-    if [ "$USE_EXT_DB" == "yes" ]; then
+    if [ "$USE_EXTERNAL_DB" == "yes" ]; then
         echo "DataPlane Service is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
     else
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
     fi
 }
 
@@ -67,6 +64,10 @@ ps() {
 }
 
 list_logs() {
+    if [ $# -lt 1 ]; then
+        source "$DP_PATH"/help.sh "logs"
+        exit -1;
+    fi
     docker logs "$@"
 }
 
@@ -79,35 +80,34 @@ list_metrics() {
 }
 
 migrate_schema() {
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         # start database container
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
 
         # wait for database start
-        source $(pwd)/database-check.sh
+        source "$DP_PATH"/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-flyway.sh migrate
+    source "$DP_PATH"/docker-flyway.sh migrate
 }
 
 reset_db() {
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         # start database container
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
 
         # wait for database start
-        source $(pwd)/database-check.sh
+        source "$DP_PATH"/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-flyway.sh clean migrate
+    source "$DP_PATH"/docker-flyway.sh clean migrate
 }
 
 utils_add_host() {
     if [ $# -ne 2 ]; then
-        echo "Invalid arguments."
-        echo "Usage: dpdeploy.sh utils add-host <ip> <host>"
+        source "$DP_PATH"/help.sh "utils" "add-host"
         return -1
     else
         add_host_entry "$@"
@@ -126,39 +126,25 @@ add_host_entry() {
 
 utils_update_user_secret() {
     if [[ $# -ne 1  || ( "$1" != "ambari" && "$1" != "atlas" && "$1" != "ranger" ) ]]; then
-        echo "Invalid arguments."
-        echo "Usage: dpdeploy.sh utils update-user [ambari | atlas | ranger]"
+        source "$DP_PATH"/help.sh "utils" "update-user"
         return -1
     else
         update_user_entry "$@"
     fi
 }
 
-update_user_entry() {
-    if [ "$MASTER_PASSWORD" == "" ]; then
-        read_master_password
-    fi
-    source $(pwd)/keystore-manage.sh "$@"
+
+get_master_password(){
+    read -s -p "Enter previously entered master password for DataPlane Service: " MASTER_PASSWD
+    MASTER_PASSWORD="$MASTER_PASSWD"
+    echo
 }
 
-utils_reload_app_containers() {
-    # stop containers other than db, consul and knox
-    docker stop $APP_CONTAINERS_WITHOUT_DB
-
-    # start containers other than db, consul and knox
-    echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh
-
-    echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh
-
-    echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh
-
-    echo "Starting Application API"
-    source $(pwd)/docker-app.sh
-
-    echo "Restart done."
+update_user_entry() {
+    if [ "$MASTER_PASSWORD" == "" ]; then
+        get_master_password
+    fi
+    source "$DP_PATH"/keystore-manage.sh "$@"
 }
 
 destroy() {
@@ -179,40 +165,41 @@ destroy_knox() {
 init_app() {
     echo "Initializing app"
 
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
     fi
 
     echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh
+    source "$DP_PATH"/docker-gateway.sh
 
     echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh
+    source "$DP_PATH"/docker-service-db.sh
 
     echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh
+    source "$DP_PATH"/docker-service-cluster.sh
 
     echo "Starting Application API"
-    source $(pwd)/docker-app.sh
+    source "$DP_PATH"/docker-app.sh
 }
 
 read_master_password() {
-    echo "Enter master password for DataPlane Service: "
-    read -s MASTER_PASSWD
-    
+    printf "\nDataPlane Services will now setup a ${BRIGHT}Master password ${NORMAL} that is used to secure the secret storage for the system. \n"
+    printf "\n${BRIGHT}Caution: ${NORMAL}The master password can be setup only once and cannot be reset easily. You will need to provide it for various admin operations. Hence please remember what you enter here.\n\n"
+    read -s -p "Enter master password for DataPlane Service (Minimum 6 characters long): " MASTER_PASSWD
+    echo
+
     if [ "${#MASTER_PASSWD}" -lt 6 ]; then
         echo "Password needs to be at least 6 characters long."
         exit 1
     fi
 
-    echo "Reenter password: "
-    read -s MASTER_PASSWD_VERIFY
-    
+    read -s -p "Reenter password: " MASTER_PASSWD_VERIFY
+    echo
     if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
     then
-       echo "Password did not match. Reenter password:"
-       read -s MASTER_PASSWD_VERIFY
+       read -s -p "Password did not match. Reenter password:" MASTER_PASSWD_VERIFY
+       echo
        if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
        then
         echo "Password did not match"
@@ -229,12 +216,13 @@ read_admin_password_safely() {
 }
 
 read_admin_password() {
-    echo "Enter DataPlane Service admin password: "
-    read -s ADMIN_PASSWD
+    printf "\nDataPlane Services will now setup an ${BRIGHT}'admin' ${NORMAL}user who can configure LDAP, add other DataPlane Service Admins.\n"
+    printf "Setup a password for this user.\n\n"
+    read -s -p "Enter DataPlane Services admin password: " ADMIN_PASSWD
+    echo
+    read -s -p "Re-enter password: " ADMIN_PASSWD_VERIFY
+    echo
 
-    echo "Reenter password: "
-    read -s ADMIN_PASSWD_VERIFY
-    
     if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
     then
        echo "Password did not match. Reenter password:"
@@ -249,31 +237,28 @@ read_admin_password() {
 }
 
 read_user_supplied_certificate_password() {
-    echo "Please enter password used for supplied certificates:"
-    read -s CERTIFICATE_PASSWORD
+    read -s -p "Please enter password used for supplied certificates:" CERTIFICATE_PASSWORD
 }
 
 read_use_test_ldap() {
-    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
-    read USE_TEST_LDAP
+    read -p "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: " USE_TEST_LDAP
 }
 
 import_certs() {
-    if [ ! -e "$PUBLIC_KEY_L" ]; then
-        echo "Public key file not found at $PUBLIC_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+    if [ ! -e "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" ]; then
+        echo "Public key file not found at $DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH. Please try this command again after updating config.env.sh file with correct location."
         return -1
     fi
-    if [ ! -e "$PRIVATE_KEY_L" ]; then
-        echo "Private key file not found at $PRIVATE_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+    if [ ! -e "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" ]; then
+        echo "Private key file not found at $DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH. Please try this command again after updating config.env.sh file with correct location."
         return -1
     fi
 
     mkdir -p certs
-    rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
-    cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
-    rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
-    cp "$PRIVATE_KEY_L" $(pwd)/certs/ssl-key.pem
-
+    rm -f "$DP_PATH"/certs/ssl-cert.pem 2> /dev/null
+    cp "$DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH" "$DP_PATH"/certs/ssl-cert.pem
+    rm -f "$DP_PATH"/certs/ssl-key.pem 2> /dev/null
+    cp "$DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH" "$DP_PATH"/certs/ssl-key.pem
     echo "Certificates were copied successfully."
 
     read_user_supplied_certificate_password
@@ -285,8 +270,7 @@ init_certs() {
     fi
 
     if [ "$USE_PROVIDED_CERTIFICATES" != "yes" ] && [ "$USE_PROVIDED_CERTIFICATES" != "no" ]; then
-        echo "Do you have certificate to be configured? (yes/no):"
-        read USE_PROVIDED_CERTIFICATES
+        read -p "Do you have certificate to be configured? (yes/no):" USE_PROVIDED_CERTIFICATES
     fi
     if [ "$USE_PROVIDED_CERTIFICATES" == "yes" ]; then
         echo "Importing certificates..."
@@ -321,44 +305,44 @@ init_knox_and_consul() {
 
 init_knox() {
     echo "Initializing Knox"
-    
+
     if [ "$MASTER_PASSWORD" == "" ]; then
-        read_master_password
+        get_master_password
     fi
     if [ "$USE_TEST_LDAP" == "" ];then
         read_use_test_ldap
     fi
-    
+
     echo "Starting Knox"
-    source $(pwd)/docker-knox.sh
+    source "$DP_PATH"/docker-knox.sh
 }
 
 start_app() {
-    if [ "$USE_EXT_DB" == "no" ]; then
+    if [ "$USE_EXTERNAL_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
-        source $(pwd)/docker-database.sh
+        source "$DP_PATH"/docker-database.sh
     fi
 
     echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh
+    source "$DP_PATH"/docker-gateway.sh
 
     echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh
+    source "$DP_PATH"/docker-service-db.sh
 
     echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh
+    source "$DP_PATH"/docker-service-cluster.sh
 
     echo "Starting Application API"
-    source $(pwd)/docker-app.sh
+    source "$DP_PATH"/docker-app.sh
 }
 start_consul() {
     echo "Starting Consul"
-    source $(pwd)/docker-consul.sh
+    source "$DP_PATH"/docker-consul.sh
 }
 start_knox() {
     echo "Starting Knox"
     start_consul
-    source $(pwd)/docker-knox.sh
+    source "$DP_PATH"/docker-knox.sh
 }
 
 stop_app() {
@@ -377,7 +361,7 @@ stop_knox() {
 }
 
 load_images() {
-    LIB_DIR=../lib
+    LIB_DIR="$( dirname "${DP_PATH}" )/lib"
     if [ -d "$LIB_DIR" ]; then
         for imgFileName in $LIB_DIR/*.tar; do
             echo "Loading $imgFileName"
@@ -391,10 +375,10 @@ load_images() {
 
 init_keystore() {
    if [ "$MASTER_PASSWORD" == "" ]; then
-       read_master_password
+       get_master_password
    fi
-    mkdir -p $(pwd)/certs
-    source $(pwd)/keystore-initialize.sh
+    mkdir -p "$DP_PATH"/certs
+    source "$DP_PATH"/keystore-initialize.sh
 }
 
 read_master_password_safely() {
@@ -405,23 +389,39 @@ read_master_password_safely() {
 
 update_admin_password() {
     read_admin_password_safely
-    source $(pwd)/database-run-script.sh "UPDATE_ADMIN_PASSWORD" "$USER_ADMIN_PASSWORD"
+    source "$DP_PATH"/database-run-script.sh "UPDATE_ADMIN_PASSWORD" "$USER_ADMIN_PASSWORD"
 }
 
 utils_enable_config_value() {
-  source $(pwd)/database-run-script.sh "ENABLE_CONFIG" "$@"
+    if [ $# -ne 1 ]; then
+        source "$DP_PATH"/help.sh "utils" "enable-config"
+        return -1
+    else
+        source "$DP_PATH"/database-run-script.sh "ENABLE_CONFIG" "$@"
+    fi
 }
 
 utils_disable_config_value() {
-  source $(pwd)/database-run-script.sh "DISABLE_CONFIG" "$@"
+    if [ $# -ne 1 ]; then
+        source "$DP_PATH"/help.sh "utils" "disable-config"
+        return -1
+    else
+        source "$DP_PATH"/database-run-script.sh "DISABLE_CONFIG" "$@"
+    fi
 }
 
 utils_get_config_value(){
-  source $(pwd)/database-run-script.sh "GET_CONFIG" "$@"
+    if [ $# -ne 1 ]; then
+        source "$DP_PATH"/help.sh "utils" "get-config"
+        return -1
+    else
+        source "$DP_PATH"/database-run-script.sh "GET_CONFIG" "$@"
+    fi
 }
 
 
 init_all() {
+    load_images
     read_admin_password_safely
     read_master_password_safely
 
@@ -431,7 +431,7 @@ init_all() {
     update_admin_password
 
     init_knox_and_consul
-    
+
     init_keystore
 
     init_app
@@ -440,7 +440,7 @@ init_all() {
 }
 
 init_all_from_state() {
-    read_master_password_safely
+    get_master_password
     read_certs_config
 
     init_db
@@ -495,7 +495,7 @@ destroy_all_but_state() {
 
 upgrade() {
     if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
-        usage
+        source "$DP_PATH"/help.sh "upgrade"
         exit -1
     fi
 
@@ -504,28 +504,27 @@ upgrade() {
         exit -1
     fi
 
-    echo "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):"
-    read CONTINUE_MIGRATE
+    read -p "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):" CONTINUE_MIGRATE
     if [ "$CONTINUE_MIGRATE" != "yes" ]; then
         exit -1
     fi
 
-    source $(pwd)/config.clear.sh
-    read_master_password_safely
+    source "$DP_PATH"/config.clear.sh
+    get_master_password
 
     echo "Moving configuration..."
-    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
-    cp $2/config.env.sh $(pwd)/config.env.sh
+    mv "$DP_PATH"/config.env.sh "$DP_PATH"/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
+    cp $2/config.env.sh "$DP_PATH"/config.env.sh
     # sourcing again to overwrite values
-    source $(pwd)/config.env.sh
+    source "$DP_PATH"/config.env.sh
 
     echo "Moving certs directory"
-    mkdir -p $(pwd)/certs
-    cp -R $2/certs/* $(pwd)/certs
+    mkdir -p "$DP_PATH"/certs
+    cp -R $2/certs/* "$DP_PATH"/certs
 
     # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-    
+
     echo "Destroying Knox"
     docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
@@ -550,40 +549,45 @@ print_version() {
     fi
 }
 
-usage() {
-    local tabspace=20
-    echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands"
-    printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
-    printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
-    printf "%-${tabspace}s:%s\n" "utils get-config <key>" "Gets config value for the given config key"
-    printf "%-${tabspace}s:%s\n" "utils enable-config <key>" "Sets config value to true for the given config key"
-    printf "%-${tabspace}s:%s\n" "utils disable-config <key>" "Sets config value to false for the given config key"
-    printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that DataPlane will use to connect to clusters."
-    printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
-    printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
-    printf "%-${tabspace}s:%s\n" "start" "Re-initialize all container while using previous data and state"
-    printf "%-${tabspace}s:%s\n" "stop" "Destroy all containers but keep data and state"
-    printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
-    printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
-    printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
-    printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
-    printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
-    printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
-    printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
-    printf "%-${tabspace}s:%s\n" "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to current version"
-    printf "%-${tabspace}s:%s\n" "version" "Print the version of DataPlane Service"
+do_confirm_stop(){
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will stop all the DataPlane Services containers.\n\n"
+   local option
+   read -p "Do you want to continue? (yes/no): " option
+   if [ "$option" == "yes" ]
+    then
+         destroy_all_but_state
+    else
+        printf "\nContainers are not stopped.\n"
+        exit -1
+    fi
+}
+
+do_confirm_destroy(){
+   printf "\n${BRIGHT}Warning!${NORMAL}\nThis command will destroy all the DataPlane Services containers and the data associated with them. This action cannot be undone.\n\n"
+   local option
+   read -p "Do you want to continue? (yes/no): " option
+   if [ "$option" == "yes" ]
+    then
+        destroy_all_with_state
+    else
+        printf "\nContainers are not destroyed.\n"
+        exit -1
+    fi
 }
 
 VERSION=$(print_version)
 init_network
 
-if [ $# -lt 1 ]
+if [ $# -lt 1 ] || [ ${@:$#} == "--help" ]
 then
-    usage;
+    source "$DP_PATH"/help.sh "$@"
     exit 0;
 else
     case "$1" in
+        # Adding load command temporarily to enable QE changes
+        load)
+            load_images
+            ;;
         init)
             echo "Found $2"
             case "$2" in
@@ -591,12 +595,42 @@ else
                     init_all
                     ;;
                 *)
-                    usage
+                    source "$DP_PATH"/help.sh "$@"
                     ;;
             esac
             ;;
-        migrate)
-            reset_db
+        start)
+            init_all_from_state
+            ;;
+        stop)
+            do_confirm_stop
+            ;;
+        ps)
+            ps
+            ;;
+        logs)
+            shift
+            list_logs "$@"
+            ;;
+        metrics)
+            list_metrics
+            ;;
+        destroy)
+            case "$2" in
+                --all)
+                    do_confirm_destroy
+                    ;;
+                *)
+                    source "$DP_PATH"/help.sh "$@"
+                    ;;
+            esac
+            ;;
+        upgrade)
+            shift
+            upgrade "$@"
+            ;;
+        version)
+            print_version
             ;;
         utils)
             shift
@@ -621,53 +655,14 @@ else
                     shift
                     utils_disable_config_value "$@"
                     ;;
-                reload-apps)
-                    utils_reload_app_containers
-                    ;;
                 *)
                     echo "Unknown option"
-                    usage
+                    source "$DP_PATH"/help.sh "$@"
                     ;;
             esac
             ;;
-        start)
-            init_all_from_state
-            ;;
-        stop)
-            destroy_all_but_state
-            ;;
-        ps)
-            ps
-            ;;
-        logs)
-            shift
-            list_logs "$@"
-            ;;
-        metrics)
-            list_metrics
-            ;;
-        destroy)
-            case "$2" in
-                knox) destroy_knox
-                ;;
-                --all) destroy_all_with_state
-                ;;
-                *) destroy
-                ;;
-            esac
-            ;;
-        load)
-            load_images
-            ;;
-        upgrade)
-            shift
-            upgrade "$@"
-            ;;
-        version)
-            print_version
-            ;;
         *)
-            usage
+            source "$DP_PATH"/help.sh "$@"
             ;;
     esac
 fi

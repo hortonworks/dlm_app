@@ -61,6 +61,7 @@ a:hover {
 .mdl-button {
   color: $dove-gray;
   font-size: 14px;
+  min-width: 24px;
 
   &.btn-hwx-secondary:hover {
     color: $white;
@@ -77,11 +78,10 @@ a:hover {
   .fa-caret-down {
     font-size: 12px;
   }
-  .mdl-button {
-    height: 48px;
-  }
 
   & > .mdl-button {
+    padding: 0px;
+
     &:hover {
       background: transparent;
     }
@@ -93,7 +93,7 @@ a:hover {
 
     .popup-arrow-up {
       position: absolute;
-      right: 27px;
+      right: 8px;
       top: -40px;
       width: 40px;
       height: 40px;

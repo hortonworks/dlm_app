@@ -21,6 +21,7 @@ export interface PolicyUI {
   policyStatus: RequestStatus;
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;
+  clusterResourceForRequests?: Cluster;
   displayStatus: string; // translated uiStatus, need to keep it here for filtering
   uiStatus: string;
   accessMode?: POLICY_MODES;
@@ -67,11 +68,13 @@ export interface PolicyDefinition {
   sourceCluster: string;
   targetCluster: string;
   sourceDataset: string;
+  targetDataset: string;
   frequencyInSec: number;
   startTime?: string;
   endTime?: string;
   queueName?: string;
   distcpMapBandwidth?: number;
+  cloudCred?: string;
 }
 
 export interface PolicyPayload {
@@ -91,6 +94,7 @@ export interface PolicyForm {
 }
 
 export interface CustomProperties {
+  cloudCred?: string;
   distcpMapBandwidth?: string;
   targetSnapshotRetentionAgeLimit?: string;
   sourceSnapshotRetentionNumber?: string;
@@ -101,4 +105,10 @@ export interface CustomProperties {
   preservePermission?: string;
   targetSnapshotRetentionNumber?: string;
   sourceSnapshotRetentionAgeLimit?: string;
+}
+
+export interface SummaryTreeItem {
+  label: string;
+  value: string;
+  iconClass: string;
 }

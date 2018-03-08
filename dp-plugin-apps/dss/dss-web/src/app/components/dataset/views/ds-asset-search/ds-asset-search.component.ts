@@ -12,7 +12,7 @@
 import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {
   AssetSetQueryFilterModel, AssetSetQueryModel, AssetTypeEnum, AssetTypeEnumString,
-  DsAssetList
+  DsAssetList, AssetListActionsEnum
 } from "../ds-assets-list/ds-assets-list.component";
 import {AdvanceQueryEditor} from "./queryEditors/advance/advance-query-editor.component";
 import {BasicQueryEditor, SimpleQueryObjectModel} from "./queryEditors/basic/basic-query-editor.component";
@@ -20,17 +20,20 @@ import {BasicQueryEditor, SimpleQueryObjectModel} from "./queryEditors/basic/bas
 export enum DsAssetSearchTabEnum { NORMAL, ADVANCE}
 
 @Component({
-  selector: "asset-search-old",
+  selector: "asset-search",
   styleUrls: ["./ds-asset-search.component.scss"],
   templateUrl: "./ds-asset-search.component.html"
 })
-export class DsAssetSearch_Old {
+export class DsAssetSearch {
   tabEnum = DsAssetSearchTabEnum;
   activeTab = this.tabEnum.NORMAL;
   queryObj: SimpleQueryObjectModel = new SimpleQueryObjectModel("");
   queryModel: AssetSetQueryModel = new AssetSetQueryModel([]);
   showQueryResults: boolean = false;
-  hideActionButtonCont : boolean = false;
+
+  allSelected:boolean=false;
+  cherryPicked:number=0;
+  cherryDroped:number=0;
 
   @ViewChild("outerCont") outerCont: ElementRef;
   @ViewChild("tabCont") tabCont: ElementRef;
@@ -40,44 +43,46 @@ export class DsAssetSearch_Old {
   @ViewChild("basicQueryEditor") basicQueryEditor: BasicQueryEditor;
   @ViewChild("advanceQueryEditor") advanceQueryEditor: AdvanceQueryEditor;
 
+  @Input() hideActionButtons : boolean = false;
   @Input() clusterId:number;
-  @Input() saveButton = false;
+  @Input() datasetId:number;
   @Input() showBelongsToColumn = false;
-  @Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
+  @Output("addNotification") addNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 
-  onSimpleQueryObjUpdate(flag: any) {
-    this.queryModel = new AssetSetQueryModel([]);
-    if(this.queryObj.searchText){
-      this.queryModel.filters.push({column: "name", operator: "contains", value: this.queryObj.searchText, dataType:"string"});
-      // this.queryModel.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"});
-    }
-    if(!this.queryModel.filters.length) return this.onEmptySearch();
-    if (!this.showQueryResults) (setTimeout(() => this._actionSearch(), 0));
-    this.showQueryResults = true;
-
+  get showDone () {
+    return (this.allSelected || this.cherryPicked || this.cherryDroped);
   }
 
-  get showDone () {
-    switch (this.activeTab) {
-      case this.tabEnum.NORMAL :
-        if(this.queryObj.searchText) return true;
-        break;
-      case this.tabEnum.ADVANCE:
-        if(this.queryModel.filters.length) return true;
-        break;
-    }
-    return false;
+  setActiveTab (tabEnum:DsAssetSearchTabEnum) {
+    if(this.activeTab == tabEnum) return;
+    this.actionReset();
+    this.activeTab = tabEnum;
   }
 
   actionCancel() {
     this.cancelNotificationEmitter.emit();
   }
 
-  actionDone() {
-    this.hideActionButtonCont = true;
+  onListAction (action) {
+    switch (action) {
+      case AssetListActionsEnum.RELOADED :
+          // this.resultStartIndx = this.dsAssetList.pageStartIndex;
+          // this.resultEndIndx = this.dsAssetList.pageEndIndex;
+          break;  
+
+      case AssetListActionsEnum.SELECTIONCHANGE :
+          this.cherryPicked = this.cherryDroped = 0; this.allSelected=false;
+          if(this.dsAssetList.selectState !== this.dsAssetList.selStates.CHECKSOME)
+            (this.allSelected = true) && (this.cherryDroped = this.dsAssetList.selExcepList.length)
+          else
+            this.cherryPicked = this.dsAssetList.selExcepList.length
+    }
+  }
+  actionDone () {
+    if(!this.allSelected && !this.cherryPicked && !this.cherryDroped) return this.actionCancel();
     this.dsAssetList.updateQueryModels();
-    this.doneNotificationEmitter.emit(this.queryModel);
+    this.addNotificationEmitter.emit(this.queryModel);
   }
 
   actionSearch() {
@@ -88,7 +93,9 @@ export class DsAssetSearch_Old {
   _actionSearch() {
     switch (this.activeTab) {
       case this.tabEnum.NORMAL :
-        this.onSimpleQueryObjUpdate(false);
+        if(!this.queryModel.filters.length) return this.onEmptySearch();
+        this.basicQueryEditor.hideFilterCont();
+        this.dsAssetList.freshFetch();
         break;
       case this.tabEnum.ADVANCE:
         this.advanceQueryEditor.updateQueryModel();
@@ -101,19 +108,20 @@ export class DsAssetSearch_Old {
   actionReset() {
     switch (this.activeTab) {
       case this.tabEnum.NORMAL :
-        this.queryObj = new SimpleQueryObjectModel("");
+        this.basicQueryEditor.reset();
         break;
       case this.tabEnum.ADVANCE:
         this.advanceQueryEditor.reset();
         break;
     }
-    this.dsAssetList.clearResults();
+    this.dsAssetList && this.dsAssetList.clearResults();
     this.showQueryResults = false;
   }
 
   onQueryEditorResize() {
     const padding = this.queryResultCont.nativeElement.offsetTop - this.outerCont.nativeElement.offsetTop;
-    this.tabCont.nativeElement.style.marginTop = `-${(padding - 10)}px`; // -10 for padding from border
+    console.log(padding, this.queryResultCont.nativeElement.offsetTop, this.outerCont.nativeElement.offsetTop)
+    this.tabCont.nativeElement.style.marginTop = `-${padding}px`; // -10 for padding from border
     this.outerCont.nativeElement.style.paddingTop = `${padding}px`;
     this.dsAssetList && this.dsAssetList.resize();
   }

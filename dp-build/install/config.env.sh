@@ -10,7 +10,7 @@
 #
 
 # DB Configs
-USE_EXT_DB="no"
+USE_EXTERNAL_DB="no"
 # DATABASE_URI="jdbc:postgresql://host_name:5432/dataplane"
 # DATABASE_USER="<username>"
 # DATABASE_PASS="<password>"
@@ -18,12 +18,8 @@ USE_EXT_DB="no"
 # SSL Configs
 USE_TLS="true"
 USE_PROVIDED_CERTIFICATES="no"
-# PUBLIC_KEY_L="/absolute/path/of/public/key.pem"
-# PRIVATE_KEY_L="/absolute/path/of/private/key.pem"
-
-# Knox Configs
-SEPARATE_KNOX_CONFIG=false
-KNOX_CONFIG_USING_CREDS=true
+# DATAPLANE_CERTIFICATE_PUBLIC_KEY_PATH="/absolute/path/of/public/key.pem"
+# DATAPLANE_CERTIFICATE_PRIVATE_KEY_PATH="/absolute/path/of/private/key.pem"
 
 # Uncomment and set right values for below lines to enable silent install
 # USE_TEST_LDAP="yes"

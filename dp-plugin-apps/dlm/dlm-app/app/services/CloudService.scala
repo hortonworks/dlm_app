@@ -12,11 +12,12 @@ package services
 import models.CloudAccountEntities.{CloudAccountCredentials, CloudAccountDetails}
 import models.CloudAccountEntities.Error.GenericError
 import models.CloudResponseEntities.{FileListResponse, MountPointsResponse}
+import models.Entities.CloudCredentialStatus
 
 import scala.concurrent.Future
 
 trait CloudService {
-  def checkUserIdentityValid(accountId: String): Future[Either[GenericError, Unit]]
+  def checkUserIdentityValid(accountId: String): Future[Either[GenericError, CloudCredentialStatus]]
   def listFiles(accountId: String, bucketName: String, path: String) : Future[Either[GenericError, FileListResponse]]
   def listMountPoints(accountId: String): Future[Either[GenericError, MountPointsResponse]]
 }

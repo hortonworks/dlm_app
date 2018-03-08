@@ -13,6 +13,7 @@ set -e
 
 DEFAULT_VERSION=0.0.1-latest
 CONSUL_CONTAINER="dp-consul-server"
+DLM_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source_dp_config () {
     # Expected to be present in RPM deployments
@@ -25,7 +26,7 @@ source_dp_config () {
 
 init_network() {
     IS_NETWORK_PRESENT="false"
-    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    docker network inspect --format "{{title .ID}}" dp >> "$DLM_PATH"/install.log 2>&1 && IS_NETWORK_PRESENT="true"
     if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
@@ -55,25 +56,6 @@ destroy() {
 read_master_password() {
     echo "Enter previously entered master password for DataPlane Service: "
     read -s MASTER_PASSWD
-
-    if [ "${#MASTER_PASSWD}" -lt 6 ]; then
-        echo "Password needs to be at least 6 characters long."
-        exit 1
-    fi
-
-    echo "Reenter password: "
-    read -s MASTER_PASSWD_VERIFY
-
-    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-    then
-       echo "Password did not match. Reenter password:"
-       read -s MASTER_PASSWD_VERIFY
-       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-       then
-        echo "Password did not match"
-        exit 1
-       fi
-    fi
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
@@ -84,9 +66,19 @@ read_master_password_safely() {
    fi
 }
 
+check_master_password_validity(){
+    docker run \
+        --rm \
+        --entrypoint /scripts/check-master-password.sh \
+        --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
+        --volume /usr/dp/current/core/bin/certs:/dp-shared \
+        hortonworks/dp-migrate:$VERSION
+}
+
 init_app() {
     read_master_password_safely
-    docker start dlm-app >> install.log 2>&1 || \
+    check_master_password_validity
+    docker start dlm-app >> "$DLM_PATH"/install.log 2>&1 || \
         docker run \
             --name dlm-app \
             --network dp \
@@ -109,7 +101,7 @@ stop_app() {
 }
 
 load_image() {
-    LIB_DIR=../lib
+    LIB_DIR="$( dirname "${DLM_PATH}" )/lib"
     if [ -d "$LIB_DIR" ]; then
         for imgFileName in $LIB_DIR/*.tar; do
             echo "Loading $imgFileName"
