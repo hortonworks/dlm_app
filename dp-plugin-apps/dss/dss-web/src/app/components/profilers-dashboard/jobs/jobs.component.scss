@@ -1,0 +1,172 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import '../../../../styles/variables';
+@import '../../../../styles/charts';
+
+
+.flex-grid {
+    display: flex;
+    -webkit-font-smoothing: antialiased;
+}
+
+.flex-side-left {
+    margin-right: 10px;
+}
+
+.flex-main {
+    flex-grow: 1;
+}
+
+.primary-space, .flex-primary {
+    flex-grow: 1;
+}
+
+.section-white {
+    background: #fff;
+    margin: 10px 0;
+}
+
+.section-title {
+    padding: 10px;
+}
+
+.v-line-primary, .v-line-utility {
+    position: relative;
+}
+
+.hwx-subtitle {
+    font-size: 16px;
+    color: #333;
+    margin: 5px 0;
+}
+
+.section-content .section-title {
+    padding: 4px 9px;
+    background: #eee;
+    margin: 1px 1px 0 1px;
+    border-top: 1px solid #fff;
+}
+
+.hwx-subtitle {
+    font-size: 16px;
+    color: #333;
+    margin: 5px 0;
+}
+
+.tab-content table {
+    margin: 0;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.tab-content table {
+    margin: 0;
+}
+
+table th, table td {
+    text-align: left;
+    padding: 9px 10px;
+    font-size: 12px;
+}
+
+table th {
+    color: #999;
+    font-weight: normal;
+}
+
+table td {
+    border-top: 1px solid;
+}
+
+table tr td {
+    border-color: #edeced;
+}
+
+table td.numeric-column, table th.numeric-column {
+    text-align: right;
+}
+
+table tr:first-child td {
+    border-color: #cbcbcb;
+}
+
+table tr td:first-child {
+    border-left: 1px solid transparent;
+}
+
+table tr td:last-child {
+    border-right: 1px solid transparent;
+}
+
+.sortable-column {
+    cursor: pointer;
+}
+
+.sort-down:after, .sort-up:after, .sortable-column:after {
+    font-family: 'FontAwesome';
+    margin-left: 5px;
+}
+
+.sortable-column:after {
+    content: '\f0dc';
+}
+.sort-down:after {
+    color: #1491c1;
+    content: '\f0dd';
+}
+.sort-up:after {
+    color: #1491c1;
+    content: '\f0de';
+}
+
+.hwx-external {
+    color: #1491C1;
+}
+
+.hwx-error {
+    color: #EF6162;
+}
+
+.hwx-ok {
+    color: #61bb5a;
+}
+
+.tags {
+    display: inline-block;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+
+.tags > span {
+    background: #54646a;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 3px;
+    margin-right: 3px;
+}
+
+.tag > i.fa-times {
+    margin-right: 0;
+    margin-left: 10px;
+}
+
+.pull-right {
+    float: right;
+}

@@ -20,5 +20,10 @@ export const navigation: NavigationNode[] =
     name: 'Dashboard',
     children: [],
     iconClassName: 'fa-dashboard'
+  },
+  {
+    name: 'Profiler',
+    url: '/dss/profilers',
+    iconClassName: 'fa-cog'
   }
 ];
