@@ -26,7 +26,7 @@
 
 <ng-template #providerCell let-account="row" let-index="rowIndex">
   <div>
-    <span class="provider" [attr.qe-attr]="'cloud-account-provider-' + index">{{account.accountDetails.provider}}</span>
+    <span class="provider" [attr.qe-attr]="'cloud-account-provider-' + index">{{CLOUD_PROVIDER_LABELS[account.accountDetails.provider]}}</span>
     <span class="left-arrow">&#9664;</span>
   </div>
 </ng-template>

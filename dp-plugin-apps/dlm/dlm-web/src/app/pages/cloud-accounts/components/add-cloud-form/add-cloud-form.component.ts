@@ -21,7 +21,7 @@ import { SelectOption } from 'components/forms/select-field';
 import {
   CREDENTIAL_TYPE_LABELS,
   S3_TYPE_VALUES,
-  S3_TOKEN,
+  AWS_ACCESSKEY,
   IAM_ROLE,
   CLOUD_PROVIDER_LABELS,
   CLOUD_PROVIDER_VALUES
@@ -99,7 +99,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
 
   private serializeValue(formValue: AbstractControl, validationResponse: ValidateCredentialsResponse|any = {}): AddCloudStoreRequestBody {
     const authType = formValue.get('authType').value;
-    if (authType === S3_TOKEN) {
+    if (authType === AWS_ACCESSKEY) {
       if (validationResponse) {
         const {accountName, credentialType, userName, provider, payload} = validationResponse;
         return {
@@ -225,7 +225,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   }
 
   get isS3AccessKeyAuthType(): boolean {
-    return this.authType === S3_TOKEN;
+    return this.authType === AWS_ACCESSKEY;
   }
 
   get isIamRoleAuthType(): boolean {
@@ -286,7 +286,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   saveButtonHandler() {
     this.resetErrors();
     const authType = this.addCloudForm.get('authType').value;
-    if (authType === S3_TOKEN) {
+    if (authType === AWS_ACCESSKEY) {
       if (this.isValidationSuccess && this.progress.validateCredentials.response) {
         this.isSaveInProgress = true;
         const requestPayload = this.serializeValue(this.addCloudForm, this.progress.validateCredentials.response);

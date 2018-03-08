@@ -19,8 +19,8 @@ import { S3 } from 'constants/cloud.constant';
 
 export const getEntities = (type) => createSelector(getCloudAccounts, state => state[type].entities);
 export const getAllAccounts =
-  createSelector(getEntities('WASB'), getEntities('S3'), getEntities('ADLS'), (wasb, s3, adls) =>
-    [...mapToList(wasb), ...mapToList(s3), ...mapToList(adls)]);
+  createSelector(getEntities('WASB'), getEntities('AWS'), getEntities('ADLS'), (wasb, aws, adls) =>
+    [...mapToList(wasb), ...mapToList(aws), ...mapToList(adls)]);
 
 export const getAllAccountsWithContainers =
   createSelector(getAllAccounts, getContainersGroupedByAccounts, (accounts, groupedContainers) =>

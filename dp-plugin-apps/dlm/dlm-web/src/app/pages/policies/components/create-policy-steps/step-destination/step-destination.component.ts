@@ -19,7 +19,7 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS } from 'constants/policy.constant';
 import { getSteps } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
@@ -51,6 +51,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   WIZARD_STEP_ID = WIZARD_STEP_ID;
   POLICY_TYPES = POLICY_TYPES;
   SOURCE_TYPES = SOURCE_TYPES;
+  SOURCE_TYPES_LABELS = SOURCE_TYPES_LABELS;
   /**
    * List of field-names related to cluster (source or destination)
    *
@@ -72,7 +73,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   private filterCloudAccounts(provider) {
     return this.accounts
       .filter(a => a.accountDetails.provider === provider)
-      .map(a => ({label: a.accountDetails['userName'] || a.accountDetails['accountName'], value: a.id}));
+      .map(a => ({label: a.id, value: a.id}));
   }
 
   get destinationCloudAccounts() {
@@ -117,16 +118,15 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
    */
   get destinationTypes() {
     const sourceClusterId = this.source.cluster;
-    const onlyCluster = [{
-      label: SOURCE_TYPES.CLUSTER,
-      value: SOURCE_TYPES.CLUSTER
-    }];
+    const cluster = {label: this.SOURCE_TYPES_LABELS[this.SOURCE_TYPES.CLUSTER], value: this.SOURCE_TYPES.CLUSTER};
+    const s3 = {label: this.SOURCE_TYPES_LABELS[this.SOURCE_TYPES.S3], value: this.SOURCE_TYPES.S3};
+    const onlyCluster = [cluster];
     if (this.general.type === POLICY_TYPES.HIVE || this.source.type === SOURCE_TYPES.S3) {
       return onlyCluster;
     }
     const status = this.beaconStatuses.find(c => c.clusterId === sourceClusterId);
     const replicationCloudFS = status ? status.beaconAdminStatus.replication_cloud_fs : false;
-    return replicationCloudFS ? Object.keys(this.SOURCE_TYPES).map(dt => ({label: dt, value: dt})) : onlyCluster;
+    return replicationCloudFS ? [s3, cluster] : onlyCluster;
   }
 
   constructor(private store: Store<State>, private formBuilder: FormBuilder, private t: TranslateService) {}

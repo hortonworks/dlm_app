@@ -20,7 +20,7 @@ import { omit } from 'utils/object-utils';
 
 export interface State {
   WASB: BaseState<WasbAccount>;
-  S3: BaseState<AwsAccount>;
+  AWS: BaseState<AwsAccount>;
   ADLS: BaseState<AdlsAccount>;
   status: BaseState<CloudAccountStatus>;
   progress?: Progress;
@@ -30,7 +30,7 @@ export const initialState: State = {
   WASB: {
     entities: {}
   },
-  S3: {
+  AWS: {
     entities: {}
   },
   ADLS: {
@@ -61,8 +61,8 @@ export function reducer(state: State = initialState, action): State {
         WASB: {
           entities: Object.assign({}, state.WASB.entities, toEntities<WasbAccount>(accountsMap.WASB || []))
         },
-        S3: {
-          entities: Object.assign({}, state.S3.entities, toEntities<AwsAccount>(accountsMap.S3 || []))
+        AWS: {
+          entities: Object.assign({}, state.AWS.entities, toEntities<AwsAccount>(accountsMap.AWS || []))
         },
         ADLS: {
           entities: Object.assign({}, state.ADLS.entities, toEntities<AdlsAccount>(accountsMap.ADLS || []))

@@ -19,7 +19,7 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES} from 'constants/policy.constant';
+import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS} from 'constants/policy.constant';
 import { getStep } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
@@ -60,6 +60,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
 
   private tableRequestPrefix = '[StepSourceComponent] LOAD_TABLES ';
   SOURCE_TYPES = SOURCE_TYPES;
+  SOURCE_TYPES_LABELS = SOURCE_TYPES_LABELS;
   form: FormGroup;
   general: {};
   WIZARD_STEP_ID = WIZARD_STEP_ID;
@@ -111,8 +112,8 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
    * @type {{label: string, value: string}}[]
    */
   get sourceTypes() {
-    const cluster = {label: this.SOURCE_TYPES.CLUSTER, value: this.SOURCE_TYPES.CLUSTER};
-    const s3 = {label: this.SOURCE_TYPES.S3, value: this.SOURCE_TYPES.S3};
+    const cluster = {label: this.SOURCE_TYPES_LABELS[this.SOURCE_TYPES.CLUSTER], value: this.SOURCE_TYPES.CLUSTER};
+    const s3 = {label: this.SOURCE_TYPES_LABELS[this.SOURCE_TYPES.S3], value: this.SOURCE_TYPES.S3};
     return this.isHivePolicy() ? [cluster] : [s3, cluster];
   }
 
@@ -175,7 +176,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
   private filterCloudAccounts(provider) {
     return this.accounts
       .filter(a => a.accountDetails.provider === provider)
-      .map(a => ({label: a.accountDetails['userName'] || a.accountDetails['accountName'], value: a.id}));
+      .map(a => ({label: a.id, value: a.id}));
   }
 
   isHDFSPolicy() {

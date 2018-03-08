@@ -79,7 +79,7 @@ class AmazonS3Service @Inject() (val dlmKeyStore: DlmKeyStore) extends CloudServ
       val userNameIndex= arn.indexOf(AmazonS3Service.arnUserNameLabel) + AmazonS3Service.arnUserNameLabel.length
       val userName = arn.substring(userNameIndex)
       val accountId = callerIdentityResult.getAccount
-      Future.successful(Right(S3AccountDetails(CloudAccountProvider.S3.toString, Some(CloudCredentialType.S3_TOKEN),
+      Future.successful(Right(S3AccountDetails(CloudAccountProvider.AWS.toString, Some(CloudCredentialType.AWS_ACCESSKEY),
         Some(accountId), Some(userName))))
     } catch {
       case ex : AmazonClientException =>

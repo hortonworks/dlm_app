@@ -17,7 +17,7 @@ import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { ACTION_TYPES } from 'pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
-import {IAM_ROLE} from 'constants/cloud.constant';
+import {IAM_ROLE, CLOUD_PROVIDER_LABELS} from 'constants/cloud.constant';
 
 @Component({
   selector: 'dlm-cloud-accounts-list',
@@ -29,6 +29,7 @@ import {IAM_ROLE} from 'constants/cloud.constant';
 export class CloudAccountsListComponent implements OnInit {
 
   IAM_ROLE = IAM_ROLE;
+  CLOUD_PROVIDER_LABELS = CLOUD_PROVIDER_LABELS;
 
   @Output() removeAccount = new EventEmitter<CloudAccount>();
   @Output() editAccount = new EventEmitter<CloudAccount>();
