@@ -238,3 +238,7 @@ DELETE      /favourites/:favId                                              cont
 #bookmarks api
 POST        /bookmarks                                                      controllers.Bookmarks.add
 DELETE      /bookmarks/:bmId                                                controllers.Bookmarks.deleteById(bmId: Long, userId: Long)
+
+# trust store
+GET         /certificates                                                   controllers.Certificates.list(active: Option[Boolean])
+POST        /certificates                                                   controllers.Certificates.create

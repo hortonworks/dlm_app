@@ -423,6 +423,7 @@ object Entities {
                       objectType: String,
                       objectId: Long)
 
+  case class Certificate(id: Option[String] = None, data: String, active: Boolean)
 }
 
 object JsonFormatters {
@@ -626,5 +627,7 @@ object JsonFormatters {
   implicit val bookmarkReads = Json.reads[Bookmark]
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
+
+  implicit val certificateFormats = Json.format[Certificate]
 
 }
