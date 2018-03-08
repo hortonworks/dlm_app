@@ -28,7 +28,7 @@ export const routes: Routes = [
     {path: ":id/edit", component: DsEditor, data: {crumb: 'dss.collections.cCollection.edit'}},
     {path: '', pathMatch: 'full', component: DatasetDashboardComponent, data: {crumb: undefined}},
   ]},
-  {path: "clusters/:clusterId/assets/:guid", component: AssetViewComponent, data: {crumb: 'dss.assets.cAsset'}, children: [
+  {path: "dss/clusters/:clusterId/assets/:guid", component: AssetViewComponent, data: {crumb: 'dss.assets.cAsset'}, children: [
       {path: 'nodes/:guidOfNode', component: NodeDetailsComponent, outlet: 'sidebar'}
   ]},
   {path: "dss/bookmarks", component: DatasetDashboardComponent, data: {filter: 'bookmark', crumb: 'dss.bookmarks'}}
