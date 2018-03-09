@@ -442,10 +442,10 @@
           "iam_role": "IAM ROLE",
           "iam_username": "IAM USERNAME",
           "aws_account_id": "AWS ACCOUNT ID",
-          "expired_account": "Cloud credentials invalid. Edit these credentials to continue using them.",
-          "out_of_sync_account": "{{clusters}} clusters not updated with revised credentials. Sync revised credentials to all clusters",
+          "expired_account": "Cloud credential invalid. Update this credential to continue using it.",
+          "out_of_sync_account": "{{clusters}} clusters not updated with revised credential. Sync revised credential to all clusters",
           "edit": {
-            "title": "Edit Cloud Credential",
+            "title": "Update Cloud Credential",
             "success_notification": {
               "title": "Success",
               "body": "Cloud credential updated successfully"
@@ -460,8 +460,8 @@
             }
           },
           "delete": {
-            "title": "Delete Credential Account",
-            "body": "Are you sure you want to delete credential account {{accountName}}?",
+            "title": "Delete Cloud Credential",
+            "body": "Are you sure you want to delete cloud credential {{accountName}}?",
             "success_notification": {
               "title": "Success",
               "body": "Cloud credential deleted successfully"

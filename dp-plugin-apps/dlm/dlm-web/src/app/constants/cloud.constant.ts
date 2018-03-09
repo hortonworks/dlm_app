@@ -37,4 +37,9 @@ export const FILE_TYPES = {
   DIRECTORY: 'DIRECTORY'
 };
 
+export const INVALID = 'INVALID';
+export const OUT_OF_SYNC = 'OUT_OF_SYNC';
+
+export const CREDENTIAL_ERROR_TYPES = {INVALID, OUT_OF_SYNC};
+
 export const ROOT_PATH = '/';

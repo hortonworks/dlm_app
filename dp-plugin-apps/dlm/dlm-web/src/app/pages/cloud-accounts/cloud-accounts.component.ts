@@ -131,10 +131,19 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
       },
       levels: [NOTIFICATION_TYPES.SUCCESS, NOTIFICATION_TYPES.ERROR]
     };
-    this.asyncActions.dispatch(deleteUnregisteredStore(account, {notification}))
-      .subscribe(_ => {
-        this.refreshAccounts();
-      });
+
+    const callback = (acc: CloudAccount) => () => {
+      this.asyncActions.dispatch(deleteUnregisteredStore(acc, {notification}))
+        .subscribe(_ => {
+          this.refreshAccounts();
+        });
+    };
+
+    this.store.dispatch(confirmNextAction(null, {
+      title: this.t.instant('page.cloud_stores.content.accounts.delete.title'),
+      body: this.t.instant('page.cloud_stores.content.accounts.delete.body', { accountName: account.id }),
+      callback: callback(account)
+    }));
   }
 
   ngOnDestroy() {

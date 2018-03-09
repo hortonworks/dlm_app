@@ -43,6 +43,7 @@ export interface BeaconCloudCred {
 
 export interface CloudAccountDetails {
   provider: string;
+  credentialType: string;
   accountName: string;
   userName: string;
 }

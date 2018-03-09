@@ -14,7 +14,8 @@
   <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
     <li *ngFor="let cloudAccountAction of cloudAccountActions"
         (click)="handleSelectedAction(cloudAccount, cloudAccountAction)">
-      <a href="javascript:void(0);" class="dropdown-item">{{cloudAccountAction.label}}</a>
+      <a href="javascript:void(0);" class="dropdown-item" [attr.qe-attr]="'cloud-account-' + cloudAccountAction.type">
+        {{cloudAccountAction.label}}</a>
     </li>
   </ul>
 </div>

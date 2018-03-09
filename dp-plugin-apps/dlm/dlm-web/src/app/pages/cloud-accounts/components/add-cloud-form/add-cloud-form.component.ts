@@ -93,6 +93,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   private deserializeAccount(account: CloudAccount) {
     return {
       cloudProviderType: account.accountDetails.provider,
+      authType: account.accountDetails.credentialType,
       credentialName: account.id
     };
   }

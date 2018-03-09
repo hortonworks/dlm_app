@@ -17,7 +17,7 @@ import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { ACTION_TYPES } from 'pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
-import {IAM_ROLE, CLOUD_PROVIDER_LABELS} from 'constants/cloud.constant';
+import {IAM_ROLE, CLOUD_PROVIDER_LABELS, CREDENTIAL_ERROR_TYPES} from 'constants/cloud.constant';
 
 @Component({
   selector: 'dlm-cloud-accounts-list',
@@ -47,6 +47,8 @@ export class CloudAccountsListComponent implements OnInit {
 
   @HostBinding('class') className = 'dlm-cloud-accounts-list';
 
+  CREDENTIAL_ERROR_TYPES = CREDENTIAL_ERROR_TYPES;
+
   tableTheme = TableTheme.Cards;
   columns = [];
   footerHeight = 0;
@@ -60,7 +62,7 @@ export class CloudAccountsListComponent implements OnInit {
   columnMode = ColumnMode.flex;
   cloudAccountActions = [
     {
-      label: this.t.instant('common.edit'),
+      label: this.t.instant('common.update'),
       type: ACTION_TYPES.EDIT
     },
     {
@@ -105,7 +107,7 @@ export class CloudAccountsListComponent implements OnInit {
         flexGrow: 3
       },
       {
-        name: this.t.instant('page.cloud_stores.content.table.actions'),
+        name: '',
         cellTemplate: this.actionsCellRef,
         cellClass: 'add-actions-cell',
         prop: 'containers.length',
@@ -129,6 +131,17 @@ export class CloudAccountsListComponent implements OnInit {
 
   hasError(account: CloudAccountUI): boolean {
     return this.isExpiredAccount(account) || this.isOutOfSync(account);
+  }
+
+  getErrorType(account: CloudAccountUI): string {
+    if (this.hasError(account)) {
+      if (this.isExpiredAccount(account)) {
+        return CREDENTIAL_ERROR_TYPES.INVALID;
+      } else if (this.isOutOfSync(account)) {
+        return CREDENTIAL_ERROR_TYPES.OUT_OF_SYNC;
+      }
+    }
+    return '';
   }
 
   errorMessage(account: CloudAccountUI): string {
