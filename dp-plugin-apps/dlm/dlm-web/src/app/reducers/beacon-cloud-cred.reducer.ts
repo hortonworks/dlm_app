@@ -11,7 +11,9 @@ import { BaseState } from 'models/base-resource-state';
 import { BeaconCloudCred, BeaconCloudCredWithPoliciesResponse } from 'models/beacon-cloud-cred.model';
 import { toEntities } from 'utils/store-util';
 import * as fromBeacon from 'actions/beacon-cloud-cred.action';
+import * as fromCloudAccount from 'actions/cloud-account.action';
 import {flatten} from 'utils/array-util';
+import { omit } from 'utils/object-utils';
 
 export type State = BaseState<BeaconCloudCred>;
 
@@ -33,6 +35,15 @@ export function reducer(state = initialState, action): State {
         ...state,
         entities: toEntities<BeaconCloudCred>(credsWithPoliciesResponse.allCloudCreds, 'name')
       };
+    case fromCloudAccount.ActionTypes.DELETE_CLOUD_STORE.SUCCESS: {
+      if (!action.payload.response) {
+        return state;
+      }
+      const { id } = action.payload.response;
+      return {
+        entities: omit(state.entities, id)
+      };
+    }
     default:
       return state;
   }
