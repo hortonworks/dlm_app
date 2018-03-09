@@ -35,7 +35,7 @@
 				</div>
 				<table  class="mdl-data-table">
 					<tbody>
-					<tr *ngFor="let key of JSObject.keys(jSFState)" (click)="jsfChanged(key);">
+					<tr *ngFor="let key of jSFState | keys" (click)="jsfChanged(key);">
 						<td><i class="fa" [ngClass]="jSFState[key]?'fa-check-square-o hwx-external':'fa-square-o'"></i> {{key}}</td>
 						<td class="numeric-column">{{jobsCountModel[key]}}</td>
 					</tr>
@@ -67,7 +67,7 @@
 						<ng-container *ngFor="let lake of clusters">
 							<span *ngIf="clstrFilState && clstrFilState[lake.id]" class="tag">{{lake.name}}, {{lake.dcName}}</span>
 						</ng-container>	
-						<ng-container *ngFor="let key of JSObject.keys(jSFState)">
+						<ng-container *ngFor="let key of jSFState | keys">
 							<span *ngIf="jSFState[key]" class="tag">{{key}} <i class="fa fa-times" (click)="jsfChanged(key);"></i></span>
 						</ng-container>	
 						<ng-container *ngFor="let pInfo of profilersList">
