@@ -462,7 +462,7 @@
           "delete": {
             "title": "Delete Cloud Credential",
             "body": "Are you sure you want to delete cloud credential {{accountName}}?",
-            "expired_account_hint": "Delete all associated running policies to be able to delete the cloud credential",
+            "expired_account_hint": "Delete all associated active and suspended policies to be able to delete the cloud credential",
             "success_notification": {
               "title": "Success",
               "body": "Cloud credential deleted successfully"

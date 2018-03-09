@@ -21,6 +21,7 @@
           <button (click)="addAccount()" class="btn btn-secondary pull-right" qe-attr="dlm-add-cloud-credential">Add</button>
         </div>
       </div>
+      <dlm-beacon-validity></dlm-beacon-validity>
       <div class="row">
         <div class="col-xs-12 cloud-accounts-list-container">
           <div *ngIf="(tableData$ | async)?.length > 0; else noAccounts">
