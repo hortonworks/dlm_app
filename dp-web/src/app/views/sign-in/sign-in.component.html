@@ -33,7 +33,7 @@
                          *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message"
                          data-se="sign_in__message">{{message}}
                     </div>
-                    <div class="tracking-message" *ngIf="gaTrackingStatus">
+                    <div id="tracking-message" class="tracking-message" *ngIf="gaTrackingStatus">
                      <span>{{'pages.signin.description.trackingMessage' | translate }}</span><span [innerHTML]="'pages.signin.description.privacyPolicyLink' | translate"></span>
                     </div>
                     <div class="action-group">
