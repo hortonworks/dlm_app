@@ -271,7 +271,8 @@
 
     "not_found": "Not Found",
     "unauthorized": "Unauthorized",
-    "service_not_enabled": "Service not enabled"
+    "service_not_enabled": "Service not enabled",
+    "profilers": "Profilers"
   },
   "titles": {
     "core": "DataPlane Service",
