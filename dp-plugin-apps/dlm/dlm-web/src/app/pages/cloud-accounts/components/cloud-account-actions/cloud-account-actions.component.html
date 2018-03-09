@@ -14,7 +14,11 @@
   <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
     <li *ngFor="let cloudAccountAction of cloudAccountActions"
         (click)="handleSelectedAction(cloudAccount, cloudAccountAction)">
-      <a href="javascript:void(0);" class="dropdown-item" [attr.qe-attr]="'cloud-account-' + cloudAccountAction.type">
+      <a href="javascript:void(0);"
+        class="dropdown-item"
+        [tooltip]="tooltipMessage(cloudAccountAction) | translate"
+        [attr.qe-attr]="'cloud-account-' + cloudAccountAction.type"
+        [ngClass]="{'text-muted disabled': isDisabled(cloudAccountAction)}">
         {{cloudAccountAction.label}}</a>
     </li>
   </ul>

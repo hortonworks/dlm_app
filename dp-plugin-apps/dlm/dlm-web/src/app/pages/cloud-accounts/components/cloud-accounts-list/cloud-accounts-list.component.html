@@ -101,8 +101,11 @@
     (handler)="handleSelectedAction($event)">
   </dlm-cloud-account-actions>
   <ng-template #deleteAccount>
-    <i class="fa fa-trash fa-2x text-primary actionable" [tooltip]="('common.delete' | translate)"
-       [attr.qe-attr]="'unregistered-account-delete-action-' + index" (click)="deleteUnregistered(account)"></i>
+    <i class="fa fa-trash fa-2x "
+      [tooltip]="(hasUnexpiredPolicies(account) ? 'page.cloud_stores.content.accounts.delete.expired_account_hint' : 'common.delete') | translate"
+      container="body"
+      [ngClass]="{'text-muted disabled': hasUnexpiredPolicies(account), 'text-primary actionable': !hasUnexpiredPolicies(account)}"
+      [attr.qe-attr]="'unregistered-account-delete-action-' + index" (click)="deleteUnregistered(account)"></i>
   </ng-template>
 </ng-template>
 
