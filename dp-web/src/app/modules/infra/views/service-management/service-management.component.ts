@@ -195,7 +195,7 @@ export class ServiceManagementComponent implements OnInit {
       DialogType.Confirmation
     ).subscribe(result => {
       if(result){
-        this.router.navigate(['/infra/services', service.sku.description, 'verify'])
+        this.router.navigate(['/infra/services', service.skuName, 'verify'])
       }
     });
   }

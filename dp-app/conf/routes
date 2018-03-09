@@ -101,7 +101,7 @@ GET           /api/services/enabled                                  controllers
 POST          /api/services/verifyCode                               controllers.ServicesManager.verifySmartSense
 POST          /api/services/enable                                   controllers.ServicesManager.enableService
 GET           /api/services/:serviceName/dependencies                controllers.ServicesManager.getDependentServices(serviceName: String)
-GET           /api/services/health/:serviceName                      controllers.ServicesManager.getServiceHealth(serviceName: String)
+GET           /api/services/:serviceName/health                      controllers.ServicesManager.getServiceHealth(serviceName: String)
 
 # Workspaces
 # ===========================================

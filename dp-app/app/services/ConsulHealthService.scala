@@ -19,7 +19,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait HealthService {
-  def getServiceHealth(serviceId: String) : Future[Either[JsObject, ServiceHealth]]
+  def getServiceHealth(serviceId: String) : Future[ServiceHealth]
 }
 
 class ConsulHealthService (config: Config)(implicit ws: WSClient) extends HealthService {
@@ -30,25 +30,25 @@ class ConsulHealthService (config: Config)(implicit ws: WSClient) extends Health
 
   private val healthUrl = s"http://$consulHost:$consulPort/v1/health/checks"
 
-  def getServiceHealth(serviceId: String): Future[Either[JsObject, ServiceHealth]] = {
+  def getServiceHealth(serviceId: String): Future[ServiceHealth] = {
     ws.url(s"$healthUrl/$serviceId").get()
-      .map(res => {
+      .flatMap(res => {
         res.status match {
           case 200 => {
            val opt = res.json.as[List[JsObject]].headOption
             opt match {
-              case None => Right(ServiceHealth(Some(false), Some(false)))
+              case None => Future.successful(ServiceHealth(Some(false), Some(false)))
               case Some(response) => {
                 val status: JsResult[String] = (response \ "Status").validate[String]
                 if (status.isSuccess && status.get.toLowerCase == "passing") {
-                  Right(ServiceHealth(Some(true), Some(true)))
+                  Future.successful(ServiceHealth(Some(true), Some(true)))
                 } else {
-                  Right(ServiceHealth(Some(true), Some(false)))
+                  Future.successful(ServiceHealth(Some(true), Some(false)))
                 }
               }
             }
           }
-          case _ => Left(res.json.as[JsObject])
+          case _ => Future.failed(new Exception("Failed to get service health from consul"))
         }
       })
   }

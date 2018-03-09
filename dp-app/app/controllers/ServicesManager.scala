@@ -22,6 +22,7 @@ import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import models.JsonResponses
 
 import scala.concurrent.Future
 import scala.util.Left
@@ -37,8 +38,11 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService,
   def getServiceHealth(skuName: String) = Action.async { request =>
     healthService.getServiceHealth(skuName)
       .map {
-      case Left(errors) => InternalServerError
-      case Right(status) => Ok(Json.toJson(status))
+      statusResponse => Ok(Json.toJson(statusResponse))
+    }.recoverWith {
+      case e: Throwable =>
+        Future.successful(
+          InternalServerError(JsonResponses.statusError(e.getMessage)))
     }
   }
 

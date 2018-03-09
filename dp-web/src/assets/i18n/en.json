@@ -174,8 +174,8 @@
         "optionalInstallation":"Optionally, you can install the following services to perform additional functions on the cluster.",
         "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
         "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service.",
-        "dlmInstallationLink":"https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/install_dps_using_rpm_files.html",
-        "dssInstallationLink":"https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/install_dps_using_rpm_files.html",
+        "dlmInstallationLink":"https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/ch05s02.html",
+        "dssInstallationLink":"https://docs.hortonworks.com/HDPDocuments/DPS1/DPS-1.0.0/bk_dps-installation/content/ch05s02.html",
         "serviceNotInstalled":"{{serviceName}} is not installed as a part DataPlane Services. Please follow this <a href={{installationStepsLink}} target='_blank'>link</a> to know more information on how services can be added to DataPlane Services",
         "serviceNotHealthy":"{{serviceName}} has been added as a DataPlane Service, but it is not running. You can still enable this service but the users might not be able to access the service. Click OK to continue."
       }

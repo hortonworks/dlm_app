@@ -28,7 +28,7 @@ export class AddOnAppService {
   }
   getServiceStatus(appName): Observable<any>{
     return this.http
-      .get(`${this.uri}/health/${appName}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.uri}/${appName}/health`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
