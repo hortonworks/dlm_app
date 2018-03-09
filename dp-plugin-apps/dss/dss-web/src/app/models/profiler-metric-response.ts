@@ -11,7 +11,7 @@
 import {MetricTypeConst} from '../shared/utils/constants';
 import {MetricType} from './profiler-metric-request';
 
-export class AccessPerDayResponse {
+export class AccessPerDayItems {
   date: string;
   numberOfAccesses: number;
 
@@ -20,6 +20,15 @@ export class AccessPerDayResponse {
     this.numberOfAccesses = numberOfAccesses;
   }
 }
+
+export class AccessPerDayResponse {
+  accessPerDay: AccessPerDayItems[] = [];
+
+  constructor(accessPerDay: AccessPerDayItems[]) {
+    this.accessPerDay = accessPerDay;
+  }
+}
+
 
 export class SensitivityDistributionResponse {
   totalAssets: number;
@@ -30,16 +39,16 @@ export class SensitivityDistributionResponse {
     this.assetsHavingSensitiveData = assetsHavingSensitiveData;
   }
 
-  getSensitiveDataPercentage() {
-    return ((this.assetsHavingSensitiveData / this.totalAssets) * 100).toFixed(2);
+  static getSensitiveDataPercentage(resp: SensitivityDistributionResponse) {
+    return ((resp.assetsHavingSensitiveData / resp.totalAssets) * 100).toFixed(2);
   }
 
-  getNonSensitiveDataPercentage() {
-    return (this.getNonSensitiveDataValue() * 100).toFixed(2);
+  static getNonSensitiveDataPercentage(resp: SensitivityDistributionResponse) {
+    return (SensitivityDistributionResponse.getNonSensitiveDataValue(resp) * 100).toFixed(2);
   }
 
-  getNonSensitiveDataValue() {
-    return ((this.totalAssets - this.assetsHavingSensitiveData) / this.totalAssets);
+  static getNonSensitiveDataValue(resp: SensitivityDistributionResponse) {
+    return ((resp.totalAssets - resp.assetsHavingSensitiveData) / resp.totalAssets);
   }
 }
 
@@ -52,27 +61,45 @@ export class QueriesAndSensitivityDistributionResponse {
     this.queriesRunningOnSensitiveData = queriesRunningOnSensitiveData;
   }
 
-  getQuiresRunningOnSensitiveDataPercentage() {
-    return ((this.queriesRunningOnSensitiveData / this.totalQueries) * 100).toFixed(2);
+  static getQuiresRunningOnSensitiveDataPercentage(resp: QueriesAndSensitivityDistributionResponse) {
+    return ((resp.queriesRunningOnSensitiveData / resp.totalQueries) * 100).toFixed(2);
   }
 
-  getQuiresRunningOnNonSensitiveDataPercentage() {
-    return (this.getQuiresRunningOnNonSensitiveDataValue() * 100).toFixed(2);
+  static getQuiresRunningOnNonSensitiveDataPercentage(resp: QueriesAndSensitivityDistributionResponse) {
+    return (QueriesAndSensitivityDistributionResponse.getQuiresRunningOnNonSensitiveDataValue(resp) * 100).toFixed(2);
   }
 
-  getQuiresRunningOnNonSensitiveDataValue() {
-    return ((this.totalQueries - this.queriesRunningOnSensitiveData) / this.totalQueries);
+  static getQuiresRunningOnNonSensitiveDataValue(resp: QueriesAndSensitivityDistributionResponse) {
+    return ((resp.totalQueries - resp.queriesRunningOnSensitiveData) / resp.totalQueries);
+  }
+}
+
+export class AssetDistributionBySensitivityTagResponse {
+  tagToAssetCount: {[p: string]: Number};
+
+  constructor(tagToAssetCount: { [p: string]: Number }) {
+    this.tagToAssetCount = tagToAssetCount;
+  }
+}
+
+export class SecureAssetAccessUserCountResponse {
+  accessCounts: {[key: string]: Number};
+
+  constructor(accessPerDay: { [p: string]: Number }) {
+    this.accessCounts = accessPerDay;
   }
 }
 
 export class Metric {
   status: boolean;
   metricType: MetricType;
-  definition: {[key: string]: Number} | AccessPerDayResponse[] | SensitivityDistributionResponse | QueriesAndSensitivityDistributionResponse;
+  definition: AssetDistributionBySensitivityTagResponse | AccessPerDayResponse | SensitivityDistributionResponse |
+                QueriesAndSensitivityDistributionResponse | SecureAssetAccessUserCountResponse;
 
   constructor(status: boolean,
               metricType: MetricType,
-              definition: {[key: string]: Number} | AccessPerDayResponse[] | SensitivityDistributionResponse | QueriesAndSensitivityDistributionResponse) {
+              definition: AssetDistributionBySensitivityTagResponse | AccessPerDayResponse | SensitivityDistributionResponse |
+                  QueriesAndSensitivityDistributionResponse | SecureAssetAccessUserCountResponse) {
     this.status = status;
     this.metricType = metricType;
     this.definition = definition;
@@ -85,7 +112,7 @@ export class ProfilerMetricResponse {
 
   static getData(): ProfilerMetricResponse {
     const profilerMetricResponse = new ProfilerMetricResponse();
-    const tagToAssetCount = {
+    const tagToAssetCount = new AssetDistributionBySensitivityTagResponse({
       'name': 1,
       'email': 1,
       'expirydate': 1,
@@ -96,24 +123,24 @@ export class ProfilerMetricResponse {
       'npi': 1,
       'creditcard': 1,
       'ssn': 1
-    };
-    const accessPerDay = [
-      new AccessPerDayResponse('2017-03-01', 19),
-      new AccessPerDayResponse('2017-02-28', 34),
-      new AccessPerDayResponse('2017-02-27', 2),
-      new AccessPerDayResponse('2017-02-26', 31),
-      new AccessPerDayResponse('2017-02-25', 7),
-      new AccessPerDayResponse('2017-02-24', 18),
-      new AccessPerDayResponse('2017-02-23', 3),
-      new AccessPerDayResponse('2017-02-22', 44)
-    ];
+    });
+    const accessPerDay = new AccessPerDayResponse([
+      new AccessPerDayItems('2017-03-01', 19),
+      new AccessPerDayItems('2017-02-28', 34),
+      new AccessPerDayItems('2017-02-27', 2),
+      new AccessPerDayItems('2017-02-26', 31),
+      new AccessPerDayItems('2017-02-25', 7),
+      new AccessPerDayItems('2017-02-24', 18),
+      new AccessPerDayItems('2017-02-23', 3),
+      new AccessPerDayItems('2017-02-22', 44)
+    ]);
     const sensitivityDistribution = new SensitivityDistributionResponse(2, 1);
     const queriesAndSensitivityDistribution = new QueriesAndSensitivityDistributionResponse(10, 5);
-    const accessCounts =  {
+    const accessCounts =  new SecureAssetAccessUserCountResponse({
       'rohit': 10,
       'gaurav': 2,
       'vimal': 16
-    };
+    });
 
     profilerMetricResponse.status = true;
     profilerMetricResponse.metrics = [

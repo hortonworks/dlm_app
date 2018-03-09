@@ -28,8 +28,9 @@ import {
 } from '../../../../../models/profiler-metric-request';
 import {ActivatedRoute} from '@angular/router';
 import {
-  AccessPerDayResponse,
+  AccessPerDayItems, AccessPerDayResponse, AssetDistributionBySensitivityTagResponse,
   Metric, ProfilerMetricResponse, QueriesAndSensitivityDistributionResponse,
+  SecureAssetAccessUserCountResponse,
   SensitivityDistributionResponse
 } from '../../../../../models/profiler-metric-response';
 import {TranslateService} from '@ngx-translate/core';
@@ -99,7 +100,7 @@ export class OverviewComponent implements OnChanges {
   }
 
   private createProfilerMetricRequest() {
-    const collectionId = this.activatedRoute.snapshot.params['id'];
+    const collectionId = parseInt(this.activatedRoute.snapshot.params['id']);
 
     const profilerMetricRequest = new ProfilerMetricRequest();
     profilerMetricRequest.clusterId = this.clusterId;
@@ -131,10 +132,13 @@ export class OverviewComponent implements OnChanges {
   }
 
   private  createTopUsersChart() {
+    this.topUsers.nativeElement.classList.remove('loader');
+
     let topUsersData = [];
     const metrics = this.assetCollectionDashboard.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.TopKUsersPerAssetMetric)[0];
     if (metrics.status) {
-      const metricsChartValues = Object.keys(metrics.definition).map(key => ({'label': key, 'value': metrics.definition[key]}));
+      const data = metrics.definition as SecureAssetAccessUserCountResponse;
+      const metricsChartValues = Object.keys(data.accessCounts).map(key => ({'label': key, 'value': data.accessCounts[key]}));
       topUsersData = [{'key': this.i18nUserAccessedAnyData, 'color': chartColors.GREEN, 'values': metricsChartValues}];
     }
 
@@ -171,13 +175,19 @@ export class OverviewComponent implements OnChanges {
   }
 
   private createSensitiveNonSensitiveChart() {
+    this.sensitiveNonSensitive.nativeElement.classList.remove('loader');
+
     let data = [];
     const metrics = this.assetCollectionDashboard.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.SensitivityDistributionMetric)[0];
     if (metrics.status) {
       this.sensitivityDistributionData = metrics.definition as SensitivityDistributionResponse;
+      const sensitiveDataPercentage = SensitivityDistributionResponse.getSensitiveDataPercentage(this.sensitivityDistributionData);
+      const nonSensitiveDataPercentage = SensitivityDistributionResponse.getNonSensitiveDataPercentage(this.sensitivityDistributionData);
+      const nonSensitiveDataValue = SensitivityDistributionResponse.getNonSensitiveDataValue(this.sensitivityDistributionData);
+      const sensitiveDataValue = this.sensitivityDistributionData.assetsHavingSensitiveData;
       data = [
-          {key: "Sensitive", y: this.sensitivityDistributionData.getSensitiveDataPercentage(), tooltip: this.sensitivityDistributionData.assetsHavingSensitiveData},
-          {key: "Non Sensitive", y:  this.sensitivityDistributionData.getNonSensitiveDataPercentage(), tooltip: this.sensitivityDistributionData.getNonSensitiveDataValue()}
+          {key: "Sensitive", y: sensitiveDataPercentage, tooltip: sensitiveDataValue},
+          {key: "Non Sensitive", y:  nonSensitiveDataPercentage, tooltip: nonSensitiveDataValue}
       ];
     }
     nv.addGraph(() => {
@@ -212,10 +222,13 @@ export class OverviewComponent implements OnChanges {
   }
 
   private createDistributionByTagChart() {
+    this.distributionByTag.nativeElement.classList.remove('loader');
+
     let distributionByTagData = [];
     const metrics = this.assetCollectionDashboard.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.AssetDistributionBySensitivityTagMetric)[0];
     if (metrics.status) {
-      const metricsChartValues = Object.keys(metrics.definition).map(key => ({'label': key, 'value': metrics.definition[key]}));
+      const data = metrics.definition as AssetDistributionBySensitivityTagResponse;
+      const metricsChartValues = Object.keys(data.tagToAssetCount).map(key => ({'label': key, 'value': data.tagToAssetCount[key]}));
       distributionByTagData = [{'key': this.i18nTablesInAssetCollectionWithTag, 'color': chartColors.GREEN, 'values': metricsChartValues}];
     }
 
@@ -252,13 +265,15 @@ export class OverviewComponent implements OnChanges {
   }
 
   private createQuiresRunningSensitiveDataChart() {
+    this.quiresRunningSensitiveData.nativeElement.classList.remove('loader');
+
     let data = [];
     const metrics = this.assetCollectionDashboard.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.QueriesAndSensitivityDistributionMetric)[0];
     if (metrics.status) {
       const sensitiveData = metrics.definition as QueriesAndSensitivityDistributionResponse;
       data = [
-        {key: "Sensitive", y: sensitiveData.getQuiresRunningOnSensitiveDataPercentage(), tooltip: sensitiveData.queriesRunningOnSensitiveData},
-        {key: "Non Sensitive", y:  sensitiveData.getQuiresRunningOnNonSensitiveDataPercentage(), tooltip: sensitiveData.getQuiresRunningOnNonSensitiveDataValue()}
+        {key: "Sensitive", y: QueriesAndSensitivityDistributionResponse.getQuiresRunningOnSensitiveDataPercentage(sensitiveData), tooltip: sensitiveData.queriesRunningOnSensitiveData},
+        {key: "Non Sensitive", y:  QueriesAndSensitivityDistributionResponse.getQuiresRunningOnNonSensitiveDataPercentage(sensitiveData), tooltip: QueriesAndSensitivityDistributionResponse.getQuiresRunningOnNonSensitiveDataValue(sensitiveData)}
       ];
     }
 
@@ -295,11 +310,13 @@ export class OverviewComponent implements OnChanges {
   }
 
   private createUsersAccessingSensitiveDataChart() {
+    this.usersAccessingSensitiveData.nativeElement.classList.remove('loader');
+
     let data = [];
     const metrics = this.assetCollectionDashboard.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.SecureAssetAccessUserCountMetric)[0];
     if (metrics.status) {
-      const metricValues = metrics.definition as AccessPerDayResponse[];
-      const metricsChartValues = metricValues.map((key) => ({'x': moment(key.date, 'YYYY-MM-DD').valueOf(), 'y': key.numberOfAccesses}));
+      const respData = metrics.definition as AccessPerDayResponse;
+      const metricsChartValues = respData.accessPerDay.map((key) => ({'x': moment(key.date, 'YYYY-MM-DD').valueOf(), 'y': key.numberOfAccesses}));
       data = [{
           area: true,
           values: metricsChartValues,

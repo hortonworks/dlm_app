@@ -10,11 +10,12 @@
  */
 
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, RequestOptions} from "@angular/http";
 import {Observable} from "rxjs";
 import {DataLakeDashboard} from '../models/data-lake-dashboard';
 import {ProfilerMetricRequest} from '../models/profiler-metric-request';
 import {ProfilerMetricResponse} from '../models/profiler-metric-response';
+import {HttpUtil} from '../shared/utils/httpUtil';
 
 @Injectable()
 export class ProfilerService {
@@ -23,13 +24,13 @@ export class ProfilerService {
 
   assetCollectionStats(profilerMetricRequest: ProfilerMetricRequest): Observable<ProfilerMetricResponse> {
     const url = '/api/dpProfiler/metrics';
-    // return this.http.post(url, profilerMetricRequest, new RequestOptions(HttpUtil.getHeaders()))
-    //             .map(HttpUtil.extractData);
+    return this.http.post(url, profilerMetricRequest, new RequestOptions(HttpUtil.getHeaders()))
+                .map(HttpUtil.extractData);
 
-    return Observable.create(observer => {
-      observer.next(ProfilerMetricResponse.getData());
-      observer.complete();
-    });
+    // return Observable.create(observer => {
+    //   observer.next(ProfilerMetricResponse.getData());
+    //   observer.complete();
+    // });
   }
 
   dataLakeStats(dataLakeId: number): Observable<DataLakeDashboard> {

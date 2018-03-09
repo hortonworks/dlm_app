@@ -8,9 +8,9 @@ export const MetricTypeConst: any = {
   ProfilerMetric: 'ProfilerMetric',
   TopKUsersPerAssetMetric: 'TopKUsersPerAsset',
   AssetDistributionBySensitivityTagMetric: 'AssetDistributionBySensitivityTag',
-  QueriesAndSensitivityDistributionMetric: 'QueriesAndSensitivityDistributionResponse',
+  QueriesAndSensitivityDistributionMetric: 'QueriesAndSensitivityDistribution',
   SecureAssetAccessUserCountMetric: 'SecureAssetAccessUserCount',
-  SensitivityDistributionMetric: 'SensitivityDistributionResponse'
+  SensitivityDistributionMetric: 'SensitivityDistribution'
 };
 export const ContextTypeConst: any = {
   COLLECTION: 'COLLECTION'
