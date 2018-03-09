@@ -1,0 +1,60 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import '../../../styles/variables';
+@import '../../../styles/charts';
+
+.profilers-dashboard-container {
+  padding: 20px 25px;
+}
+
+.flex-grid {
+    display: flex;
+}
+
+.primary-space, .flex-primary {
+    flex-grow: 1;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+.tabs.menu > ul {
+    margin-bottom: 15px;
+}
+.tabs > ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.tabs > ul > li {
+    cursor: pointer;
+    padding: 10px 20px;
+    background: #f1f2f3;
+    border: 1px solid #d0dad7;
+    border-bottom: none;
+}
+
+.tabs.menu > ul > li {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+}
+
+.tabs.menu > ul > li.active {
+    background: transparent;
+    border-color: #61bb5a;
+}
+
+.tabs > ul > li:first-child {
+    border-radius: 4px 0 0 0;
+}

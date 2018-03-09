@@ -20,6 +20,7 @@ import {DssAppEvents} from './services/dss-app-events';
 import {LakeService} from './services/lake.service';
 import {navigation} from './_nav';
 import {DataLakeDashboardModule} from './components/data-lake-dashboard/data-lake-dashboard.module';
+import {ProfilersDashboardModule} from './components/profilers-dashboard/profilers-dashboard.module';
 import {DatasetModule} from './components/dataset/dataset.module';
 
 export function HttpLoaderFactory(http: Http) {
@@ -47,6 +48,7 @@ export function startupServiceFactory(authenticationService: AuthenticationServi
     CommentsModule,
     DatasetModule,
     DataLakeDashboardModule,
+    ProfilersDashboardModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
