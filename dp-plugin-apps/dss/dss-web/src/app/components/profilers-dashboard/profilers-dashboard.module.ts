@@ -18,11 +18,13 @@ import { ProfilersDashboardComponent } from './profilers-dashboard.component';
 import {ProfilerJobsComponent} from './jobs/jobs.component';
 import {ProfilerConfigsComponent} from './configurations/configs.component';
 import {routes} from './profilers-dashboard.routes';
+import {SharedModule} from '../../shared/shared.module';
 
 
 @NgModule({
   imports: [
     CommonModule,
+    SharedModule,
     TranslateModule,
     TabsModule,
     RouterModule.forChild(routes)

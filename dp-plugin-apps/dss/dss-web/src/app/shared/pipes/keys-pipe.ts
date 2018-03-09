@@ -8,22 +8,11 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
+import { PipeTransform, Pipe } from '@angular/core';
 
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {RouterModule} from "@angular/router";
-import {KeysPipe} from './pipes/keys-pipe';
-
-@NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule
-  ],
-  declarations: [KeysPipe],
-  exports: [KeysPipe]
-})
-
-export class SharedModule {
+@Pipe({name: 'keys'})
+export class KeysPipe implements PipeTransform {
+  transform(value, args:string[]) : any {
+    return value ? Object.keys(value): [];
+  }
 }
