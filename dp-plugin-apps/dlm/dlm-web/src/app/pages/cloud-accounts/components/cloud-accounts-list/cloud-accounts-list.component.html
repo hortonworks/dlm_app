@@ -28,8 +28,10 @@
 </ng-template>
 
 <ng-template #providerCell let-account="row" let-index="rowIndex">
-  <div>
-    <span class="provider" [attr.qe-attr]="'cloud-account-provider-' + index">
+  <div class="provider-wrapper">
+    <span class="provider"
+      [attr.qe-attr]="'cloud-account-provider-' + index"
+      [tooltip]="errorMessage(account)">
       {{CLOUD_PROVIDER_LABELS[account.accountDetails.provider]}}</span>
     <span class="left-arrow">&#9664;</span>
   </div>
@@ -49,10 +51,10 @@
 </ng-template>
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
-  <div class="userName is-text-large"
-    [tooltip]="errorMessage(account)"
-    [attr.qe-attr]="'cloud-account-id-' + index">
-    {{account.id}}
+  <div class="userName is-text-large" [attr.qe-attr]="'cloud-account-id-' + index">
+    <span [tooltip]="errorMessage(account)">
+      {{account.id}}
+    </span>
   </div>
   <div class="userDetails">
     <span
