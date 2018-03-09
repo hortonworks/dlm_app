@@ -12,6 +12,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
+import {TabsModule} from '../../shared/tabs/tabs.module'
 
 import { ProfilersDashboardComponent } from './profilers-dashboard.component';
 import {ProfilerJobsComponent} from './jobs/jobs.component';
@@ -23,6 +24,7 @@ import {routes} from './profilers-dashboard.routes';
   imports: [
     CommonModule,
     TranslateModule,
+    TabsModule,
     RouterModule.forChild(routes)
   ],
   declarations: [

@@ -16,7 +16,7 @@
 									<span class="primary-space hwx-subtitle">Clusters</span>
 								</div>
 								<div class="section-content">
-									<table class="selectable" id="ClusterList" onclick="onShowProfilerConfiguration(event)">
+									<table class="mdl-data-table selectable" id="ClusterList" onclick="onShowProfilerConfiguration(event)">
 										<tbody>
 										<tr *ngFor="let lake of clusters" [class.active]="lake === selectedLake" (click)="selectLake(lake);">
 											<td>{{lake.name}}, {{lake.dcName}}</td>
@@ -33,7 +33,7 @@
 									<span class="primary-space hwx-subtitle">Profiler Configuration</span>
 								</div>
 								<div class="section-content">
-									<table id="ProfilerConfiguration">
+									<table id="ProfilerConfiguration" class="mdl-data-table">
 										<thead>
 										<tr>
 											<th class="sortable-column"><span>Name</span></th>

@@ -87,6 +87,7 @@ export class DsAssetSearch {
 
   actionSearch() {
     this.showQueryResults = true;
+    setTimeout(() =>this.onQueryEditorResize(), 0);
     setTimeout(() => this._actionSearch(), 0);
   }
 

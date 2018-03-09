@@ -46,42 +46,16 @@
     flex-grow: 1;
 }
 
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    width: 100%;
-}
-
-.tab-content table {
-    margin: 0;
-}
-
 table th, table td {
     text-align: left;
     padding: 9px 10px;
     font-size: 12px;
 }
 
-table th {
-    color: #999;
-    font-weight: normal;
-}
-
-table td {
-    border-top: 1px solid;
-}
-
-table tr td {
-    border-color: #edeced;
-}
-
 table td.numeric-column, table th.numeric-column {
     text-align: right;
 }
 
-table.selectable td {
-    cursor: pointer;
-}
 
 .status-graph {
     align-items: center;

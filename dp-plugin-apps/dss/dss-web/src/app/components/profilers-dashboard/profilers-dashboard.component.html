@@ -10,16 +10,11 @@
   -->
 <div class="profilers-dashboard-container">
 	
-	<div class="flex-grid">
-		<div class="primary-space">
-			<div class="tabs menu">
-				<ul>
-					<li [class.active]="selectedTab === tabEnum.JOBS" (click)="selectedTab = tabEnum.JOBS;" >Jobs</li>
-					<li [class.active]="selectedTab === tabEnum.CONFIGS" (click)="selectedTab = tabEnum.CONFIGS;" >Clusters</li>
-				</ul>
-			</div>
-		</div>
-	</div>
+
+	<div class="tabs-container">
+      <dp-tabs [tabEnum]="tabEnum" (selected)="selectedTab=$event"> </dp-tabs>
+    </div>
+
 
 	<profilers-jobs-dashboard *ngIf="selectedTab === tabEnum.JOBS"></profilers-jobs-dashboard>
 	<profilers-configs-dashboard *ngIf="selectedTab === tabEnum.CONFIGS"></profilers-configs-dashboard>
