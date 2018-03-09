@@ -219,7 +219,7 @@ export class StepScheduleComponent implements OnInit, OnDestroy, StepComponent {
       job: this.formBuilder.group({
         start: this.policyStart.ON_SCHEDULE,
         repeatMode: this.policyRepeatModes.EVERY,
-        frequency: ['1', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
+        frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
         day: this.policyDays.MONDAY,
         frequencyInSec: 0,
         unit: this.policyTimeUnits.DAYS,
@@ -247,6 +247,7 @@ export class StepScheduleComponent implements OnInit, OnDestroy, StepComponent {
   ngOnInit() {
     this.form = this.initForm();
     this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
+      .skip(1) // allow to skip calling `onFormValidityChange` from patchValue in the `presetJobTime` (it happens only on form init)
       .subscribe(isFormValid => this.onFormValidityChange.emit(isFormValid));
     this.setupTimeZoneChanges();
     this.presetJobTime(this.form);
