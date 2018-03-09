@@ -22,15 +22,29 @@ import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import models.JsonResponses
 
 import scala.concurrent.Future
 import scala.util.Left
 import play.api.Configuration
+import services.ConsulHealthService
 
-class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
-                               ,private val configuration: Configuration) extends Controller{
+class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService,
+                                @Named("healthService") val healthService: ConsulHealthService,
+                                private val configuration: Configuration) extends Controller{
 
   private val smartSenseRegex: String = configuration.underlying.getString("smartsense.regex")
+
+  def getServiceHealth(skuName: String) = Action.async { request =>
+    healthService.getServiceHealth(skuName)
+      .map {
+      statusResponse => Ok(Json.toJson(statusResponse))
+    }.recoverWith {
+      case e: Throwable =>
+        Future.successful(
+          InternalServerError(JsonResponses.statusError(e.getMessage)))
+    }
+  }
 
   def getServices = Action.async { request =>
     getDpServicesInternal().map {

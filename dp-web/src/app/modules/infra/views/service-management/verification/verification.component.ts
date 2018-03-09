@@ -14,6 +14,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {AddOnAppService} from '../../../../../services/add-on-app.service';
 import {ConfigPayload, SKU} from '../../../../../models/add-on-app';
+import {ServiceErrorType} from "../../../../../shared/utils/enums";
 
 @Component({
   selector: 'dp-verification',
@@ -38,10 +39,16 @@ export class VerificationComponent implements OnInit {
 
   ngOnInit() {
     let serviceName = this.route.snapshot.params['name'];
-    this.addOnAppService.getServiceByName(serviceName).subscribe(sku => {
-      this.descriptionParams = {
-        serviceName : sku.description
-      };
+    this.addOnAppService.getServiceStatus(serviceName).subscribe(response => {
+      if(!response.installed){
+        this.router.navigate(['/service-error', ServiceErrorType.NOT_INSTALLED]);
+      }else{
+        this.addOnAppService.getServiceByName(serviceName).subscribe(sku => {
+          this.descriptionParams = {
+            serviceName : sku.description
+          };
+        });
+      }
     });
     this.skuName = serviceName;
   }

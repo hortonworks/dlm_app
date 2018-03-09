@@ -35,6 +35,8 @@ object Entities {
     val PRIVATE = Value(2)
   }
 
+  case class ServiceHealth(installed: Option[Boolean]=Some(false), healthy: Option[Boolean]=Some(false))
+
   case class HJwtToken(token: String)
 
   case class InnerError(code: String, trace: Option[String] = None, innererror: Option[InnerError] = None)
@@ -636,6 +638,10 @@ object JsonFormatters {
 
   implicit val bookmarkWrites = Json.writes[Bookmark]
   implicit val bookmarkReads = Json.reads[Bookmark]
+
+  implicit val serviceHealthWrites = Json.writes[ServiceHealth]
+  implicit val serviceHealthReads = Json.reads[ServiceHealth]
+
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 

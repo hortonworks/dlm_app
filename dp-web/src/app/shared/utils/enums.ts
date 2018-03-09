@@ -13,3 +13,8 @@ export enum Sort {
   ASC,
   DSC
 }
+
+export enum ServiceErrorType {
+  NOT_ENABLED,
+  NOT_INSTALLED
+}
