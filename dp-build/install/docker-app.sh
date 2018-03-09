@@ -23,7 +23,9 @@
 
 # for mount (new) >> --mount type=bind,readonly=false,source=$(pwd)/certs,target=/usr/dp-app/conf/cert \
 
-docker start dp-app >> install.log 2>&1 || \
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker start dp-app >> "$DP_PATH"/install.log 2>&1 || \
     docker run \
         --name dp-app \
         --network dp \
@@ -35,5 +37,5 @@ docker start dp-app >> install.log 2>&1 || \
         --env "KEYSTORE_PATH=/dp-shared/dp-keystore.jceks" \
         --env "KEYSTORE_PASSWORD=$MASTER_PASSWORD" \
         --env "USE_TLS=$USE_TLS" \
-        --volume $(pwd)/certs:/dp-shared \
+        --volume "$DP_PATH"/certs:/dp-shared \
         hortonworks/dp-app:$VERSION

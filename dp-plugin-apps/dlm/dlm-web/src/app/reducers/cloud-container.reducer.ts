@@ -17,7 +17,7 @@ import { AdlsContainer } from 'models/adls-container.model';
 
 export interface State {
   WASB: BaseState<WasbContainer>;
-  S3: BaseState<AwsBucket>;
+  AWS: BaseState<AwsBucket>;
   ADLS: BaseState<AdlsContainer>;
 }
 
@@ -25,7 +25,7 @@ export const initialState: State = {
   WASB: {
     entities: {}
   },
-  S3: {
+  AWS: {
     entities: {}
   },
   ADLS: {
@@ -45,8 +45,8 @@ export function reducer(state = initialState, action): State {
         WASB: {
           entities: Object.assign({}, state.WASB.entities, toEntities<WasbContainer>(containersMap.WASB || []))
         },
-        S3: {
-          entities: Object.assign({}, state.S3.entities, toEntities<AwsBucket>(containersMap.S3 || []))
+        AWS: {
+          entities: Object.assign({}, state.AWS.entities, toEntities<AwsBucket>(containersMap.AWS || []))
         },
         ADLS: {
           entities: Object.assign({}, state.ADLS.entities, toEntities<AdlsContainer>(containersMap.ADLS || []))

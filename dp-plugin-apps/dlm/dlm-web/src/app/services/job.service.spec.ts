@@ -88,7 +88,7 @@ describe('JobService', () => {
   });
 
   describe('#getJobsForPolicy', () => {
-    const policy = { name: 'policyId1', targetClusterResource: { id: 1 } } as Policy;
+    const policy = { name: 'policyId1', clusterResourceForRequests: { id: 1 } } as Policy;
     beforeEach(() => {
       jobService.getJobsForPolicy(policy).subscribe();
     });

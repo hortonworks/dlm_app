@@ -20,7 +20,7 @@ class CloudServiceFactory @Inject()(
     getCloudProvider(accountId) map {
       case Right(cloudType) =>
         cloudType match {
-          case CloudAccountProvider.S3 => Right(amazonS3Service)
+          case CloudAccountProvider.AWS => Right(amazonS3Service)
           case CloudAccountProvider.WASB => Right(wasbService)
           case CloudAccountProvider.ADLS => Right(adlsService)
         }

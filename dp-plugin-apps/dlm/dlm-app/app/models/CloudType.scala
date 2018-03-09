@@ -34,7 +34,7 @@ object CloudCredentialType extends Enumeration {
 
   val WASB_TOKEN = Value("WASB_TOKEN")
   val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
-  val S3_TOKEN = Value("S3_TOKEN")
+  val AWS_ACCESSKEY = Value("AWS_ACCESSKEY")
   val IAM_ROLE = Value("IAM_ROLE")
   val ADLS_STS = Value("ADLS_STS")
 
@@ -51,7 +51,7 @@ object CloudAccountProvider extends Enumeration {
   type CloudAccountProvider = Value
 
   val WASB = Value("WASB")
-  val S3 = Value("S3")
+  val AWS = Value("AWS")
   val ADLS = Value("ADLS")
 
   implicit val cloudAccountProviderFormat = new Format[CloudAccountProvider] {

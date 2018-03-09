@@ -61,7 +61,7 @@ object CloudAccountEntities {
   implicit val cloudAccountCredentialsFmt: Format[CloudAccountCredentials] = new Format[CloudAccountCredentials] {
     def reads(json: JsValue): JsResult[CloudAccountCredentials] = {
       def from(name: CloudCredentialType, data: JsObject): JsResult[CloudAccountCredentials] = name match {
-        case S3_TOKEN  => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
+        case AWS_ACCESSKEY  => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
         case IAM_ROLE => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
         case WASB_TOKEN  => Json.fromJson[WASBAccountCredential](data)(Json.format[WASBAccountCredential])
         case WASB_SAS_TOKEN => Json.fromJson[WASBAccountCredentialSAS](data)(Json.format[WASBAccountCredentialSAS])
@@ -93,7 +93,7 @@ object CloudAccountEntities {
   implicit val cloudAccountDetailsFmt: Format[CloudAccountDetails] = new Format[CloudAccountDetails] {
     def reads(json: JsValue): JsResult[CloudAccountDetails] = {
       def from(name: CloudAccountProvider, data: JsObject): JsResult[CloudAccountDetails] = name match {
-        case CloudAccountProvider.S3  => Json.fromJson[S3AccountDetails](data)(s3AccountDetailsFmt)
+        case CloudAccountProvider.AWS  => Json.fromJson[S3AccountDetails](data)(s3AccountDetailsFmt)
         case CloudAccountProvider.WASB => Json.fromJson[WASBAccountDetails](data)(wasbAccountDetailsFmt)
         case CloudAccountProvider.ADLS => Json.fromJson[ADLSAccountDetails](data)(adlsAccountDetailsFmt)
         case _      => JsError(s"Unknown provider '$name'")

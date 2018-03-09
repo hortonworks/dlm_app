@@ -38,13 +38,15 @@ export const getAllPolicies = createSelector(getEntities, mapToList);
 
 export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllClusters, (policies, clusters) => {
   return policies.map(policy => {
-    return {
+    const p = {
       ...policy,
       targetClusterResource: clusters.find(cluster =>  PolicyService
         .makeClusterId(cluster.dataCenter, cluster.name) === policy.targetCluster) || {},
       sourceClusterResource: clusters.find(cluster =>  PolicyService
         .makeClusterId(cluster.dataCenter, cluster.name) === policy.sourceCluster) || {}
     };
+    p.clusterResourceForRequests = p.targetClusterResource.id ? p.targetClusterResource : p.sourceClusterResource;
+    return p;
   });
 });
 
@@ -120,7 +122,7 @@ export const getUnhealthyPolicies = createSelector(
 export const getPoliciesTableData = createSelector(getPolicyClusterJob, getAllBeaconAdminStatuses,
   (policies: Policy[], beaconStatuses: BeaconAdminStatus[]) => {
     return policies.map(policy => {
-      const clusterStatus = beaconStatuses.find(c => c.clusterId === policy.targetClusterResource.id);
+      const clusterStatus = beaconStatuses.find(c => c.clusterId === policy.clusterResourceForRequests.id);
       if (!clusterStatus) {
         return {...policy, rangerEnabled: false, accessMode: POLICY_MODES.READ_WRITE};
       }

@@ -40,18 +40,20 @@
   //border:12px solid $bgGray;
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
+  background: url(/assets/images/search-bg.png) no-repeat 50% 30%;
+  padding: 70px;
 }
 .queryResultCont .noSearchMessage > span {
   display: table-cell;
-  vertical-align: middle;
+  vertical-align: bottom;
 }
 
 .tabCont .tab {
   width: 80px;
   height: 35px;
   padding: 10px;
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
+//  border-top-right-radius: 3px;
+//  border-top-left-radius: 3px;
   float: left;
   cursor: pointer;
   text-align: center;
@@ -73,14 +75,18 @@
   padding: 10px;
   background-color: $bgGray;
 }
-
+.actionButtonTopMargin {
+  position: absolute;
+  bottom: 43px;
+  left: 0px;
+  right: 0px;  
+  border-top: 1px solid #D1D2D4;
+}
 .actionButtonCont{
   position: absolute;
   bottom: 0px;
   left: 0px;
-  right: 0px;
   padding: 5px;
-  border-top: 1px solid #D1D2D4;
   text-align: left;
 }
 .actionButtonCont > .mdl-button {
@@ -89,4 +95,17 @@
 .emptySearchMsg {
   color:red;
   display: none;
+}
+
+.resultContTitle{
+  background: #53646a;
+  color: #fff; padding: 10px;
+  font-weight: 500; 
+  text-transform: uppercase;
+}
+.dismissPopup{
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  cursor:pointer;
 }

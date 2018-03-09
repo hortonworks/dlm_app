@@ -7,6 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+import {ADLS, WASB} from './cloud.constant';
+
 export const HDFS = 'FS';
 export const HIVE = 'HIVE';
 export const HBASE = 'HBASE';
@@ -33,7 +35,7 @@ export const SUNDAY = '0';
 
 // Source and Destination Types
 export const CLUSTER = 'CLUSTER';
-export const S3 = 'S3';
+export const S3 = 'AWS';
 
 // Wizard step ids for Create Policy Wizard
 export const GENERAL = 'general';
@@ -78,6 +80,11 @@ export const POLICY_TIME_UNITS = {
   HOURS,
   DAYS,
   WEEKS
+};
+
+export const SOURCE_TYPES_LABELS = {
+  [CLUSTER]: 'CLUSTER',
+  [S3]: 'S3'
 };
 
 export const SOURCE_TYPES = {

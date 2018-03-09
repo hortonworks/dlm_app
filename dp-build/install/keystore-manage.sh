@@ -10,6 +10,7 @@
 #  */
 #
 set -e
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 update_call() {
     local ALIAS="$1"
@@ -18,7 +19,7 @@ update_call() {
         --rm \
         --entrypoint /scripts/keystore-update.sh \
         --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
-        --volume $(pwd)/certs:/dp-shared \
+        --volume "$DP_PATH"/certs:/dp-shared \
         hortonworks/dp-migrate:$VERSION update "$@"
 
     echo "'$ALIAS' updated successfully"

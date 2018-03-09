@@ -16,7 +16,7 @@ import play.api.libs.ws.{WSAuthScheme, WSResponse}
 import com.hortonworks.dlm.beacon.WebService.BeaconPolicyService
 import com.hortonworks.dlm.beacon.domain.ResponseEntities._
 import com.hortonworks.dlm.beacon.Exception.JsonException
-import com.hortonworks.dlm.beacon.domain.RequestEntities.PolicyDefinitionRequest
+import com.hortonworks.dlm.beacon.domain.RequestEntities.{PolicyDefinitionRequest, PolicyTestRequest}
 import play.api.http.Status.{BAD_GATEWAY, SERVICE_UNAVAILABLE}
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.libs.ws.ahc.AhcWSResponse
@@ -147,6 +147,27 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
       })
   }
 
+  private def mapToPolicyTestRequest(policyTestRequest : PolicyTestRequest) = {
+    "type = " + policyTestRequest.`type` +
+      "\ncloudCred = " +  policyTestRequest.cloudCred +
+      (policyTestRequest.sourceDataset match {
+        case Some(sourceDataset) => "\nsourceDataset = " + sourceDataset
+        case None => ""
+      }) +
+      (policyTestRequest.targetDataset match {
+        case Some(targetDataset) => "\ntargetDataset = " + targetDataset
+        case None => ""
+      }) +
+      (policyTestRequest.sourceCluster match {
+        case Some(sourceCluster) => "\nsourceCluster = " + sourceCluster
+        case None => ""
+      }) +
+      (policyTestRequest.sourceDataset match {
+        case Some(sourceDataset) => "\nsourceDataset = " + sourceDataset
+        case None => ""
+      })
+  }
+
 
 
   override def listPolicyStatus(beaconEndpoint : String, clusterId: Long, policyName : String)
@@ -221,6 +242,18 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
       .delete()
       .map(mapToPostActionResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
+    }
+  }
+
+  override def testPolicy(beaconEndpoint : String, clusterId: Long, policyTestRequest : PolicyTestRequest)
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    val requestData:String =  mapToPolicyTestRequest(policyTestRequest)
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/dryrun/testPolicy", clusterId, BEACON).withHeaders(token)
+      .withAuth(user, password, WSAuthScheme.BASIC)
+      .withHeaders(httpHeaders.toList: _*)
+      .post(requestData)
+      .map(mapToPostActionResponse).recoverWith {
+      case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 }

@@ -21,6 +21,7 @@ import { Component, OnInit, Input, ViewEncapsulation, HostBinding } from '@angul
           <span class="page-title">
             {{title | translate}}
             <dlm-help-link [iconHint]="contextMessage"
+            [icon]="helpLinkIcon"
             [linkText]="linkText | translate"
             [linkTo]="linkTo | translate"
             [placement]="'right'">
@@ -43,6 +44,7 @@ export class PageHeaderComponent implements OnInit {
   @Input() contextMessage = '';
   @Input() linkText = '';
   @Input() linkTo = '';
+  @Input() helpLinkIcon = 'fa fa-question-circle-o';
   @HostBinding('class') className = 'dlm-page-header';
   @HostBinding('class.flex-center') @Input() isFlexCenter = false;
 

@@ -15,15 +15,16 @@ import {
   AddCloudStoreRequestBody,
   ValidateCredentialsRequestBody,
   CloudAccountsStatusResponse,
-  CloudAccount
+  CloudAccount,
+  CloudAccountActions
 } from 'models/cloud-account.model';
 import { AddAccountModalState, AddAccountModalActions } from 'pages/cloud-accounts/components/add-account-modal/add-account-modal.type';
 import { ProgressState } from 'models/progress-state.model';
-import { CRUD_ACTIONS } from 'constants/api.constant';
 import { ToastNotification } from 'models/toast-notification.model';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from 'services/notification.service';
+import { CRUD_ACTIONS } from 'constants/api.constant';
 
 @Injectable()
 export class CloudAccountService {
@@ -55,7 +56,7 @@ export class CloudAccountService {
     });
   }
 
-  notifyOnCRUD(progressState: ProgressState, action: CRUD_ACTIONS) {
+  notifyOnCRUD(progressState: ProgressState, action: CloudAccountActions|CRUD_ACTIONS) {
     const translateKey = action.toLowerCase();
     const translateLevel = progressState.success ? 'success_notification' :
       progressState.status > 200 ? 'error_notification' : 'warn_notification';
@@ -89,5 +90,13 @@ export class CloudAccountService {
 
   deleteCloudStore(cloudAccountId): Observable<any> {
     return this.httpClient.delete(`store/credential/${cloudAccountId}`);
+  }
+
+  syncCloudStore(cloudAccount): Observable<any> {
+    return this.httpClient.put(`store/credential/sync`, cloudAccount);
+  }
+
+  deleteUnregisteredStore(cloudAccount): Observable<any> {
+    return this.httpClient.delete(`store/beaconCredential/${cloudAccount.id}`);
   }
 }

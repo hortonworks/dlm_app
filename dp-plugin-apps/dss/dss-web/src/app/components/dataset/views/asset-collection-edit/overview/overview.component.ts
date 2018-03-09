@@ -1,9 +1,20 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {Chart} from 'nvd3';
 
 import {ProfilerService} from '../../../../../services/profiler.service';
 import {AssetCollectionDashboard} from '../../../../../models/asset-collection-dashboard';
 import {DssAppEvents} from "app/services/dss-app-events";
+import {chartColors} from '../../../../../shared/utils/constants';
 
 declare let d3: any;
 declare let nv: any;
@@ -51,7 +62,7 @@ export class OverviewComponent implements OnInit {
     const topUsersData = [
       {
         'key': '',
-        'color': '#2DB075',
+        'color': chartColors.GREEN,
         'values': this.assetCollectionDashboard.topUsers.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
       }
     ];
@@ -96,7 +107,7 @@ export class OverviewComponent implements OnInit {
         return d.y
       })
       .donut(true)
-      .color(['#2DB075', '#2891C0'])
+      .color([chartColors.GREEN, chartColors.BLUE])
       .labelFormat((val) => `${val}%`)
       .labelType('percent');
 
@@ -118,7 +129,7 @@ export class OverviewComponent implements OnInit {
     const distributionByTagData = [
       {
         'key': '',
-        'color': '#2DB075',
+        'color': chartColors.GREEN,
         'values': this.assetCollectionDashboard.assetDistribution.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
       }
     ];
@@ -163,7 +174,7 @@ export class OverviewComponent implements OnInit {
       })
       .donut(true)
       .title('')
-      .color(['#2DB075', '#2891C0'])
+      .color([chartColors.GREEN, chartColors.BLUE])
       .labelFormat((val) => `${val}%`)
       .labelType('percent');
 
@@ -200,7 +211,7 @@ export class OverviewComponent implements OnInit {
           area: true,
           values: this.assetCollectionDashboard.usersAccessingSecureData.stats.map(stat => ({'x': stat.key, 'y': stat.value})),
           key: 'User Accessing Secure Data',
-          color: '  #2DB075',
+          color: chartColors.GREEN,
           fillOpacity: .1
         }
       ];

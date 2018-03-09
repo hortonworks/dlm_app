@@ -33,7 +33,6 @@ export class CollapsibleNavComponent implements OnInit {
               private dssAppEvents: DssAppEvents) {}
 
   ngOnInit() {
-    //this.activeTabName = this.navItems[0].name;
     DpAppNavigation.init({
         srcElement: this.personaNavSrc.nativeElement,
         assetPrefix: '/assets/images'
@@ -65,8 +64,34 @@ export class CollapsibleNavComponent implements OnInit {
     setTimeout(() => this.dssAppEvents.setSideNavCollapsed(this.collapseSideNav), 300);
   }
 
-  navigateToURL(nav) {
+  onSideNavClick($event, nav) {
+    $event.stopPropagation();
+
+    if (nav.children && nav.children.length > 0) {
+      if (!this.collapseSideNav) {
+        nav.hidden = !nav.hidden;
+      }
+      return;
+    }
+
     this.activeTabName = nav.name;
     this.router.navigateByUrl(nav.url);
+
+    return false;
+  }
+
+  onSideNavMouseEnter(nav, children) {
+    let childMenu = children.getElementsByClassName('sidenav-item-children')[0];
+    if (this.collapseSideNav && childMenu) {
+      childMenu.classList.add('active');
+    }
+  }
+
+  onSideNavMouseLeave(nav, children) {
+    let childMenu = children.getElementsByClassName('sidenav-item-children')[0];
+    if (this.collapseSideNav && childMenu) {
+      childMenu.classList.remove('active');
+    }
+
   }
 }

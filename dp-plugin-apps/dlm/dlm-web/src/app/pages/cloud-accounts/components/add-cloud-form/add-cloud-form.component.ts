@@ -19,11 +19,12 @@ import { CloudAccountService } from 'services/cloud-account.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SelectOption } from 'components/forms/select-field';
 import {
-   CREDENTIAL_TYPE_LABELS,
-   S3_TYPE_VALUES, S3_TOKEN,
-   IAM_ROLE,
-   CLOUD_PROVIDER_LABELS,
-   CLOUD_PROVIDER_VALUES
+  CREDENTIAL_TYPE_LABELS,
+  S3_TYPE_VALUES,
+  AWS_ACCESSKEY,
+  IAM_ROLE,
+  CLOUD_PROVIDER_LABELS,
+  CLOUD_PROVIDER_VALUES
 } from 'constants/cloud.constant';
 import { loadAccounts } from 'actions/cloud-account.action';
 import { addCloudStore, validateCredentials, resetAddCloudProgressState, updateCloudStore } from 'actions/cloud-account.action';
@@ -92,13 +93,14 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   private deserializeAccount(account: CloudAccount) {
     return {
       cloudProviderType: account.accountDetails.provider,
+      authType: account.accountDetails.credentialType,
       credentialName: account.id
     };
   }
 
   private serializeValue(formValue: AbstractControl, validationResponse: ValidateCredentialsResponse|any = {}): AddCloudStoreRequestBody {
     const authType = formValue.get('authType').value;
-    if (authType === S3_TOKEN) {
+    if (authType === AWS_ACCESSKEY) {
       if (validationResponse) {
         const {accountName, credentialType, userName, provider, payload} = validationResponse;
         return {
@@ -224,7 +226,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   }
 
   get isS3AccessKeyAuthType(): boolean {
-    return this.authType === S3_TOKEN;
+    return this.authType === AWS_ACCESSKEY;
   }
 
   get isIamRoleAuthType(): boolean {
@@ -285,7 +287,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   saveButtonHandler() {
     this.resetErrors();
     const authType = this.addCloudForm.get('authType').value;
-    if (authType === S3_TOKEN) {
+    if (authType === AWS_ACCESSKEY) {
       if (this.isValidationSuccess && this.progress.validateCredentials.response) {
         this.isSaveInProgress = true;
         const requestPayload = this.serializeValue(this.addCloudForm, this.progress.validateCredentials.response);

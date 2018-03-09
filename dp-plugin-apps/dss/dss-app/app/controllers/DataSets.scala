@@ -11,7 +11,7 @@
 
 package controllers
 
-import java.time.LocalDateTime
+import java.time.{Clock, LocalDateTime}
 import javax.inject.Inject
 
 import com.google.inject.name.Named
@@ -114,14 +114,8 @@ class DataSets @Inject()(
       .flatMap {
         case Left(errors) => Future.successful(Left(errors))
         case Right(atlasEntities) => {
-          extractAndMarkEntities(clusterId, atlasEntities, filterDatasetId)
-            .map {
-              case Left(errors) => Left(errors)
-              case Right(marked) =>
-                val entitiesToSave =  if(filterDatasetId == 0) marked.filter(_.datasetId.isEmpty)
-                                      else  marked.filter(_.datasetId.getOrElse(0) != filterDatasetId)
-                Right(entitiesToSave.map(getAssetFromEntity(_, clusterId)))
-            }
+          val entitiesToSave = extractAndFilterEntities(atlasEntities)
+          Future.successful(Right(entitiesToSave.map(getAssetFromEntity(_, clusterId))))
         }
       }
   }
@@ -134,15 +128,9 @@ class DataSets @Inject()(
       .flatMap {
         case Left(errors) => Future.successful(Left(errors))
         case Right(atlasEntities) => {
-          extractAndMarkEntities(clusterId, atlasEntities, filterDatasetId, exceptions)
-            .map {
-              case Left(errors) => Left(errors)
-              case Right(marked) =>
-                val entitiesToSave =  if(filterDatasetId == 0) marked.filter(_.datasetId.isEmpty)
-                                      else  marked.filter(_.datasetId.getOrElse(0) != filterDatasetId)
-                Right(entitiesToSave.map(getAssetFromEntity(_, clusterId)),
-                  entitiesToSave.size, marked.size - entitiesToSave.size)
-            }
+          val entitiesToSave = extractAndFilterEntities(atlasEntities, exceptions)
+          Future.successful(Right(entitiesToSave.map(getAssetFromEntity(_, clusterId)),
+            entitiesToSave.size, 0))
         }
       }
   }
@@ -159,17 +147,17 @@ class DataSets @Inject()(
   def addSelectedAssetsToDataset = AuthenticatedAction.async(parse.json) { req =>
     implicit val token = req.token
     req.body.validate[BoxSelectionPrams].map{ params =>
-      getAssetsFromGuids(params.clusterId, params.guids, params.datasetId).flatMap {
+      getAssetsFromGuids(params.clusterId, params.guids, 0).flatMap {
         case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(assets) =>  assets.size match {
           case 0 =>
             Logger.info("Effectively no asset to add.")
             dataSetService
               .getRichDatasetById(params.datasetId,req.user.id.get)
-              .map {
-                case Left(errors) => InternalServerError(Json.toJson(errors))
-                case Right(richDataset) => Ok(Json.toJson(richDataset))
-              }
+              .map(rDataset => Ok(Json.toJson(rDataset)))
+              .recoverWith({
+                case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+              })
 //            Future.successful(Conflict)
           case _ => dataSetService
             .addAssets(params.datasetId, assets)
@@ -188,17 +176,17 @@ class DataSets @Inject()(
   def addAssetsToDataset = AuthenticatedAction.async(parse.json) { req =>
     implicit val token = req.token
     req.body.validate[AddToBoxPrams].map{ params =>
-      getAssetFromSearch(params.clusterId, params.assetQueryModel, params.datasetId, params.exceptions).flatMap {
+      getAssetFromSearch(params.clusterId, params.assetQueryModel, 0, params.exceptions).flatMap {
         case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right((assets, _, _)) =>  assets.size match {
           case 0 =>
             Logger.info("Effectively no asset to add.")
             dataSetService
               .getRichDatasetById(params.datasetId,req.user.id.get)
-              .map {
-                case Left(errors) => InternalServerError(Json.toJson(errors))
-                case Right(richDataset) => Ok(Json.toJson(richDataset))
-              }
+              .map(rDataset => Ok(Json.toJson(rDataset)))
+              .recoverWith({
+                case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+              })
           case _ => dataSetService
             .addAssets(params.datasetId, assets)
             .map(rDataset =>
@@ -215,10 +203,10 @@ class DataSets @Inject()(
 
   def removeAssetsFromDataset(datasetId: Long) = AuthenticatedAction.async { req =>
     implicit val token = req.token
+    Logger.info("Received request to remove selected assets from dataset")
     dataSetService
       .removeAssets(datasetId, req.rawQueryString)
       .map(rDataset =>
-        // TODO Modify Profiler data
         Ok(Json.toJson(rDataset))
       )
       .recoverWith({
@@ -229,12 +217,66 @@ class DataSets @Inject()(
 
   def removeAllAssetsFromDataset(datasetId: Long) = AuthenticatedAction.async { req =>
     implicit val token = req.token
+    Logger.info("Received request to remove all assets from dataset")
     dataSetService
       .removeAllAssets(datasetId)
       .map(rDataset =>
-        // TODO Modify Profiler data
         Ok(Json.toJson(rDataset))
       )
+      .recoverWith({
+        case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+      })
+  }
+
+  def beginDatasetEdit(datasetId: Long) = AuthenticatedAction.async(parse.json) { req =>
+    implicit val token = req.token
+    Logger.info("Received request to BEGIN dataset edit process")
+    (for {
+      edtOptn    <- dataSetService.getRichDatasetById(datasetId, req.user.id.get).map{rDset =>rDset.editDetails}
+      needRevert <- Future.successful(edtOptn match {
+        case None => false
+        case Some(edtDtl) => edtDtl.editBegin.get.isBefore(LocalDateTime.now(Clock.systemUTC()).minusMinutes(15))
+      })
+      _     <- Future.successful(if(needRevert) Logger.info("Need to REVERT stale inprogress edit process"))
+      rDSet <- Future.successful(if(needRevert) dataSetService.cancelEdition(datasetId))
+      rDSet <- dataSetService.beginEdition(datasetId, req.user.id.get)
+    } yield {
+      Ok(Json.toJson(rDSet))
+    })
+    .recoverWith({
+      case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+    })
+  }
+
+  def saveDatasetEdit(datasetId: Long) = AuthenticatedAction.async(parse.json) { req =>
+    implicit val token = req.token
+    Logger.info("Received request to SAVE dataset edit process")
+    dataSetService
+      .saveEdition(datasetId)
+      .map { rDataset =>
+        dataSetService.getDataAssetByDatasetId(rDataset.dataset.id.get, "",0, Integer.MAX_VALUE -1,"").map {
+            case Left(errors) => InternalServerError(Json.toJson(errors))
+            case Right(assetsandcount) => {
+              val assetIds = assetsandcount.assets.map { asset =>
+                ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
+              }
+              dpProfilerService.datasetAssetMapping(rDataset.clusterId.toString, assetIds, rDataset.dataset.name)
+                .recover(apiErrorWithLog(e => Logger.error(s"Datasets-Controller: Mapping of dataset $rDataset and assets $assetIds on profiler_agent failed with message ${e.getMessage}", e)))
+            }
+        }
+        Ok(Json.toJson(rDataset))
+      }
+      .recoverWith({
+        case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+      })
+  }
+
+  def revertDatasetEdit(datasetId: Long) = AuthenticatedAction.async(parse.json) { req =>
+    implicit val token = req.token
+    Logger.info("Received request to REVERT dataset edit process")
+    dataSetService
+      .cancelEdition(datasetId)
+      .map(rDataset => Ok(Json.toJson(rDataset)))
       .recoverWith({
         case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
       })
@@ -320,29 +362,23 @@ class DataSets @Inject()(
   }
 
   def getRichDatasetById(id: String) =  AuthenticatedAction.async { req =>
-    Logger.info("Received retrieve dataSet request")
-    if(Try(id.toLong).isFailure){
-      Future.successful(BadRequest)
-    }else{
-      dataSetService
-        .getRichDatasetById(id.toLong,req.user.id.get)
-        .map {
-          case Left(errors)
-            if errors.errors.size > 0 && errors.errors.head.status == 404 =>
-            NotFound
-          case Left(errors) =>
-            InternalServerError(Json.toJson(errors))
-          case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-        }
-    }
+    Logger.info("Received get richDataSet by Id request")
+    dataSetService
+      .getRichDatasetById(id.toLong,req.user.id.get)
+      .map(rDataset => Ok(Json.toJson(rDataset)))
+      .recoverWith({
+        case e: NoSuchElementException => Future.successful(NotFound)
+        case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+      })
   }
 
   def getDataAssetsByDatasetId(datasetId: String,
                                queryName: String,
                                offset: Long,
-                               limit: Long) =  Action.async {
+                               limit: Long,
+                               state: Option[String]) =  Action.async {
     dataSetService
-      .getDataAssetByDatasetId(datasetId.toLong, queryName, offset, limit)
+      .getDataAssetByDatasetId(datasetId.toLong, queryName, offset, limit, state.getOrElse(""))
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
@@ -353,7 +389,7 @@ class DataSets @Inject()(
   def getUniqueTagsFromAssetsOfDataset (datasetId: String) =  AuthenticatedAction.async { req =>
     implicit val token = req.token
     dataSetService
-      .getDataAssetByDatasetId(datasetId.toLong, "", 0, 10000000)
+      .getDataAssetByDatasetId(datasetId.toLong, "", 0, 10000000, "")
       .flatMap {
         case Left(errors) =>
           Future.successful(InternalServerError(Json.toJson(errors)))
@@ -402,14 +438,14 @@ class DataSets @Inject()(
   }
 
   def delete(dataSetId: String) =  AuthenticatedAction.async { request =>
-    implicit val token = request.token
+    implicit val token: Option[HJwtToken] = request.token
     Logger.info("Received delete dataSet request")
     (for {
       dataset <- doGetDataset(dataSetId,request.user.id.get)
       cmntDelMsg <- commentService.deleteByObjectRef(dataSetId, "assetCollection")
       clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toString)
       _ <- ratingService.deleteByObjectRef(dataSetId, "assetCollection")
-      deleted <- doDeleteDataset(dataset.id.get.toString)
+      deleted <- doDeleteDataset(dataset,clusterId)
       jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
       _ <- doDeleteProfilers(clusterId, jobName)
     }  yield {
@@ -479,6 +515,10 @@ class DataSets @Inject()(
       }
   }
 
+  private def extractAndFilterEntities(atlasEntities: AtlasEntities, exceptions: Seq[String] = Seq()) :Seq[Entity] = {
+    atlasEntities.entities.getOrElse(Seq[Entity]()).filter(_.guid.nonEmpty).filter(ent => exceptions.find(_ == ent.guid.getOrElse(None)).isEmpty)
+  }
+
   // Extracts entities and mark them with dataset name and Id
   private def extractAndMarkEntities(clstrId: Long, atlasEntities: AtlasEntities, prefDatasetId:Long = 0, exceptions: Seq[String] = Seq())
   : Future[Either[Errors, Seq[Entity]]] = {
@@ -508,13 +548,23 @@ class DataSets @Inject()(
       }
   }
 
-  private def doDeleteDataset(datasetId: String): Future[Long] = {
+  private def doDeleteDataset(dataset: Dataset, clusterId: String)(implicit token: Option[HJwtToken]): Future[Long] = {
     dataSetService
-      .delete(datasetId.toString)
+      .delete(dataset.id.get.toString)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
-        case Right(deleted) => Future.successful(deleted)
+        case Right(deleted) => {
+          deleteDatasetAssetMapping(deleted, clusterId, dataset.name)
+          Future.successful(deleted)
+        }
       }
+  }
+
+  def deleteDatasetAssetMapping(rowsDeleted: Long, clusterId: String, datasetName: String)(implicit token: Option[HJwtToken]) = {
+
+    if (rowsDeleted > 0) dpProfilerService.datasetAssetMapping(clusterId, Seq.empty[String], datasetName)
+      .recover(apiErrorWithLog(e => Logger.error(s"Datasets-Controller: Delete Mapping of dataset $datasetName on profiler_agent failed with message ${e.getMessage}", e)))
+
   }
 
   private def doDeleteProfilers(clusterId: String, jobName: String)(implicit token:Option[HJwtToken]): Future[Boolean] = {
@@ -544,10 +594,7 @@ class DataSets @Inject()(
   private def doGetDataset(datasetId: String,userId: Long): Future[Dataset] = {
     dataSetService
       .getRichDatasetById(datasetId.toLong,userId)
-      .flatMap {
-        case Left(errors) => Future.failed(WrappedErrorsException(errors))
-        case Right(dataset) => Future.successful(dataset.dataset)
-      }
+      .map(dataset => dataset.dataset)
   }
 
 }

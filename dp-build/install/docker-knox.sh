@@ -21,7 +21,9 @@
 #      - CONSUL_HOST
 #     command: sh ./launch-knox.sh
 
-docker start knox >> install.log 2>&1 || \
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker start knox >> "$DP_PATH"/install.log 2>&1 || \
     docker run \
         --name knox \
         --network dp \
@@ -32,6 +34,6 @@ docker start knox >> install.log 2>&1 || \
         --env "CONSUL_HOST=$CONSUL_HOST" \
         --volume knox-config:/etc/knox/conf \
         --volume knox-security:/usr/hdp/current/knox-server/data/security \
-        --volume $(pwd)/certs:/dp-shared \
+        --volume "$DP_PATH"/certs:/dp-shared \
         hortonworks/dp-knox:$VERSION
         

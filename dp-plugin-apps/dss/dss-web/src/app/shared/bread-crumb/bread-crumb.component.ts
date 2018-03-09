@@ -44,7 +44,7 @@ export class BreadCrumbComponent implements OnInit, OnDestroy {
   private getBreadcrumbs(
     route: ActivatedRoute,
     url: string = '',
-    breadcrumbs: IBreadcrumb[] = []
+    breadcrumbs: IBreadcrumb[] = [{label: 'dss', params: {}, url: 'dss/collections'}]
   ): IBreadcrumb[] {
     const ROUTE_DATA_BREADCRUMB: string = 'crumb';
 

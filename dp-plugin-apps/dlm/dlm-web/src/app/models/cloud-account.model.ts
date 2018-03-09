@@ -8,10 +8,18 @@
  */
 
 import { CloudContainer } from './cloud-container.model';
+import { Policy } from 'models/policy.model';
+import { CloudAccountSyncStatus } from 'models/beacon-cloud-cred.model';
+import { CRUD_ACTIONS } from 'constants/api.constant';
 
 export enum AccountStatus {
   Expired = 'EXPIRED',
-  Active = 'ACTIVE'
+  Active = 'ACTIVE',
+  Unregistered = 'UNREGISTERED' // UI status
+}
+
+export enum CloudAccountActions {
+  SYNC = 'SYNC'
 }
 
 export interface CloudAccount {
@@ -20,8 +28,22 @@ export interface CloudAccount {
   containers?: CloudContainer[];
 }
 
+export interface CloudAccountUI extends CloudAccount {
+  policies: Policy[];
+  status: AccountStatus;
+  cloudCred: BeaconCloudCred;
+  clusters: CloudAccountSyncStatus[];
+}
+
+export interface BeaconCloudCred {
+  id: string;
+  name: string;
+  provider: string;
+}
+
 export interface CloudAccountDetails {
   provider: string;
+  credentialType: string;
   accountName: string;
   userName: string;
 }

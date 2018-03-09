@@ -10,11 +10,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { CloudAccount } from 'models/cloud-account.model';
+import { CloudAccount, CloudAccountActions } from 'models/cloud-account.model';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers';
-import { loadAccounts, loadAccountsStatus, deleteCloudStore } from 'actions/cloud-account.action';
-import { getFullAccountsInfo } from 'selectors/cloud-account.selector';
+import { loadAccounts, loadAccountsStatus, deleteCloudStore, syncCloudStore, deleteUnregisteredStore } from 'actions/cloud-account.action';
+import { getFullAccountsInfo, getUnregisteredDLMCreds } from 'selectors/cloud-account.selector';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
 import { CloudAccountService } from 'services/cloud-account.service';
@@ -27,6 +27,8 @@ import { confirmNextAction } from 'actions/confirmation.action';
 import { noop } from 'actions/app.action';
 import { AsyncActionsService } from 'services/async-actions.service';
 import { CRUD_ACTIONS } from 'constants/api.constant';
+import { contains } from 'utils/array-util';
+import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 
 const ACCOUNTS_REQUEST = '[CLOUD STORES] ACCOUNTS_REQUEST';
 const BEACON_ACCOUNTS_REQUEST = '[CLOUD STORES] BEACON CLOUD CREDS';
@@ -42,6 +44,7 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
 
   accounts$: Observable<CloudAccount[]>;
   beaconCloudCreds$: Observable<BeaconCloudCred[]>;
+  unregisteredAccounts$: Observable<BeaconCloudCred[]>;
   overallProgress$: Observable<ProgressState>;
   _accounts: CloudAccount[];
   accountsSubscription$: Subscription;
@@ -55,6 +58,14 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
     return title;
   }
 
+  private refreshAccounts(): void {
+    [
+      loadAccounts(),
+      loadBeaconCloudCredsWithPolicies(),
+      loadAccountsStatus()
+    ].forEach(action => this.store.dispatch(action));
+  }
+
   constructor(
     private store: Store<State>,
     private cloudAccountService: CloudAccountService,
@@ -65,6 +76,7 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
     this.beaconCloudCreds$ = this.store.select(getAllBeaconCloudCreds);
     this.overallProgress$ = this.store.select(getMergedProgress(ACCOUNTS_REQUEST, BEACON_ACCOUNTS_REQUEST, ACCOUNTS_STATUS_REQUEST));
     this.tableData$ = this.accounts$;
+    this.unregisteredAccounts$ = this.store.select(getUnregisteredDLMCreds);
   }
 
   ngOnInit() {
@@ -91,6 +103,42 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
           this.cloudAccountService.notifyOnCRUD(progressState, CRUD_ACTIONS.DELETE);
         });
     };
+    this.store.dispatch(confirmNextAction(null, {
+      title: this.t.instant('page.cloud_stores.content.accounts.delete.title'),
+      body: this.t.instant('page.cloud_stores.content.accounts.delete.body', { accountName: account.id }),
+      callback: callback(account)
+    }));
+  }
+
+  handleSyncAccount(account: CloudAccount): void {
+    this.asyncActions.dispatch(syncCloudStore(account))
+      .subscribe(progressState => {
+        this.cloudAccountService.notifyOnCRUD(progressState, CloudAccountActions.SYNC);
+        this.refreshAccounts();
+      });
+  }
+
+  handleDeleteUnregisteredAccount(account: CloudAccount): void {
+    const notification = {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: 'page.cloud_stores.content.accounts.delete.success_notification.title',
+        body: 'page.cloud_stores.content.accounts.delete.success_notification.body'
+      },
+      [NOTIFICATION_TYPES.ERROR]: {
+        title: 'page.cloud_stores.content.accounts.delete.error_notification.title',
+        body: 'page.cloud_stores.content.accounts.delete.error_notification.body',
+        contentType: NOTIFICATION_CONTENT_TYPE.INLINE
+      },
+      levels: [NOTIFICATION_TYPES.SUCCESS, NOTIFICATION_TYPES.ERROR]
+    };
+
+    const callback = (acc: CloudAccount) => () => {
+      this.asyncActions.dispatch(deleteUnregisteredStore(acc, {notification}))
+        .subscribe(_ => {
+          this.refreshAccounts();
+        });
+    };
+
     this.store.dispatch(confirmNextAction(null, {
       title: this.t.instant('page.cloud_stores.content.accounts.delete.title'),
       body: this.t.instant('page.cloud_stores.content.accounts.delete.body', { accountName: account.id }),

@@ -204,6 +204,18 @@ table.mdl-data-table {
   }
 }
 
+.not-installed {
+  color: $shuttle-gray;
+}
+
+.installed {
+  color: $forest-green-1;
+}
+
+.unhealthy {
+  color: $roman-red;
+}
+
 .hexagon {
   width: 20px;
   height: 150px;

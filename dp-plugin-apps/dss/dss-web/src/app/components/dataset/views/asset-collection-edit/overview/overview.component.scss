@@ -1,25 +1,21 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
 @import "../../../../../../styles/variables";
+@import "../../../../../../styles/charts";
 
-.overview-cards-container {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-between;
-  align-items: stretch;
 
-  .overview-card {
-    border: 1px solid #E7E7E7;
-    border-radius: 2px;
-    flex-grow: 1;
-    margin: 0px 5px;
-    padding: 15px;
-    background: #FFFFFF;
-  }
-}
-
-.overview-cards-container.summary {
+.charts-cards-container.summary {
   height: 120px;
 
-  .overview-card {
+  .charts-card {
     min-width: 150px;
   }
 
@@ -35,34 +31,6 @@
     font-size: 28px;
     line-height: 75px;
     text-align: center;
-  }
-}
-
-.overview-cards-container.two-col {
-  margin-top: 10px;
-
-  .overview-card {
-    min-height: 320px;
-  }
-
-  .title {
-    color: $shuttle-gray;
-    font-weight: 400;
-    font-size: 16px;
-  }
-}
-
-.overview-cards-container.one-col {
-  margin-top: 10px;
-
-  .overview-card {
-    min-height: 320px;
-  }
-
-  .title {
-    color: $shuttle-gray;
-    font-weight: 400;
-    font-size: 16px;
   }
 }
 

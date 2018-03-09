@@ -62,16 +62,20 @@ class BeaconCloudCredServiceImpl()(implicit ws: KnoxProxyWsClient) extends Beaco
         case Some(provider) => "provider=" + provider + "\n"
         case None => ""
       }) +
-      (cloudCredRequest.`s3.access.key` match {
-        case Some(s3AccessKey) => "s3.access.key=" + s3AccessKey + "\n"
+       (cloudCredRequest.authtype match {
+         case Some(authtype) => "authtype=" + authtype + "\n"
+         case None => ""
+       }) +
+      (cloudCredRequest.`aws.access.key` match {
+        case Some(s3AccessKey) => "aws.access.key=" + s3AccessKey + "\n"
         case None => ""
       }) +
-      (cloudCredRequest.`s3.secret.key` match {
-        case Some(s3SecretKey) => "s3.secret.key=" + s3SecretKey + "\n"
+      (cloudCredRequest.`aws.secret.key` match {
+        case Some(s3SecretKey) => "aws.secret.key=" + s3SecretKey + "\n"
         case None => ""
       }) +
-      (cloudCredRequest.`s3.encryption.key` match {
-        case Some(s3EncryptionKey) => "s3.encryption.key=" + s3EncryptionKey
+      (cloudCredRequest.`aws.encryption.key` match {
+        case Some(s3EncryptionKey) => "aws.encryption.key=" + s3EncryptionKey
         case None => ""
       })
   }

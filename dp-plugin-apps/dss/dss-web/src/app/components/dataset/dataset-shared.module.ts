@@ -34,6 +34,7 @@ import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
 import {DsAssetListStyle1} from "./views/ds-assets-list/styled/style1";
 import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holder.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
+import {DsCreator} from "./views/ds-create/ds-creator.component";
 import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.component";
 import {UniqueDatasetNameValidator} from "./directives/validators";
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
@@ -60,7 +61,6 @@ import {routes} from "./dataset.routes";
 import {CommentsModule} from '../../shared/comments/comments.module';
 import {DatasetTagService} from "app/services/tag.service";
 import {DataSetService} from '../../services/dataset.service';
-import {LakeService} from '../../services/lake.service';
 import {CommentService} from '../../services/comment.service';
 import {RatingService} from "../../services/rating.service";
 import {FavouriteService} from "../../services/favourite.service";
@@ -76,6 +76,7 @@ import {ProfilerService} from "app/services/profiler.service";
     DsTileProxy,
     DsFullView,
     DsEditor,
+    DsCreator,
     DsInfoHolder,
     DsAssetsHolder,
     DsSummaryHolder,
@@ -114,7 +115,7 @@ import {ProfilerService} from "app/services/profiler.service";
     DropdownModule,
     TabsModule,
     LineageModule,
-    RouterModule.forChild(routes),
+    RouterModule,
     MyDateRangePickerModule,
     CommentsModule
   ],
@@ -124,6 +125,7 @@ import {ProfilerService} from "app/services/profiler.service";
     DsTileProxy,
     DsFullView,
     DsEditor,
+    DsCreator,
     DsInfoHolder,
     DsAssetsHolder,
     DsSummaryHolder,
@@ -148,7 +150,6 @@ import {ProfilerService} from "app/services/profiler.service";
     RangerService,
     DatasetTagService,
     DataSetService,
-    LakeService,
     CommentService,
     RatingService,
     FavouriteService,

@@ -71,7 +71,7 @@ export const routes: Routes = [{
     title: 'core',
   }
 }, {
-  path: 'service-notenabled',
+  path: 'service-error/:type',
   component: ServiceErrorComponent,
   data: {
     crumb: 'service_not_enabled',

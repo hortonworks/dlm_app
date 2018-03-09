@@ -9,12 +9,18 @@
 
 import { Policy } from 'models/policy.model';
 
+
+export interface CloudAccountSyncStatus {
+  clusterId: number;
+  isInSync: boolean;
+}
 export interface BeaconCloudCred {
   id: string;
   name: string;
   provider: string;
   clusterId: string;
   policies?: Policy;
+  clusters?: CloudAccountSyncStatus[];
 }
 
 export interface BeaconCloudCredWithPoliciesResponse {
@@ -22,5 +28,6 @@ export interface BeaconCloudCredWithPoliciesResponse {
   allCloudCreds: {
     name: string;
     policies: Policy[];
+    clusters: CloudAccountSyncStatus[];
   }[];
 }

@@ -10,20 +10,18 @@
 package controllers
 
 import com.google.inject.Inject
-
 import models.JsonResponses
 import models.Entities.PolicySubmitRequest
-import models.{SUSPEND,RESUME,DELETE}
+import models.{DELETE, RESUME, SUSPEND}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.BeaconService
-
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
+import com.hortonworks.dlm.beacon.domain.RequestEntities.PolicyTestRequest
 import models.JsonFormatters._
-
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -74,6 +72,22 @@ class Policies @Inject() (
     implicit val token = request.token
     request.body.validate[PolicySubmitRequest].map { policySubmitRequest =>
       beaconService.createPolicy(clusterId, policyName, policySubmitRequest).map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(postSuccessResponse) => Ok(Json.toJson(postSuccessResponse))
+      }
+    }.getOrElse(Future.successful(BadRequest))
+  }
+
+  /**
+    * Test policy
+    * @param clusterId    cluster id of the target cluster
+    * @return
+    */
+  def testPolicy(clusterId: Long) = AuthenticatedAction.async (parse.json) { request =>
+    Logger.info("Received submit policy request")
+    implicit val token = request.token
+    request.body.validate[PolicyTestRequest].map { policyTestRequest =>
+      beaconService.testPolicy(clusterId, policyTestRequest).map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
         case Right(postSuccessResponse) => Ok(Json.toJson(postSuccessResponse))
       }

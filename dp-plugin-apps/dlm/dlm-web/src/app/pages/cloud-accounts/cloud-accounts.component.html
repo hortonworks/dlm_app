@@ -18,7 +18,7 @@
           </dlm-page-header>
         </div>
         <div class="col-xs-3">
-          <button (click)="addAccount()" class="btn btn-secondary pull-right">Add</button>
+          <button (click)="addAccount()" class="btn btn-secondary pull-right" qe-attr="dlm-add-cloud-credential">Add</button>
         </div>
       </div>
       <div class="row">
@@ -27,7 +27,8 @@
             <dlm-cloud-accounts-list
               [accounts]="tableData$ | async"
               (editAccount)="handleEditAccount($event)"
-              (removeAccount)="handleRemoveAccount($event)">
+              (removeAccount)="handleRemoveAccount($event)"
+              (syncAccount)="handleSyncAccount($event)">
             </dlm-cloud-accounts-list>
           </div>
           <ng-template #noAccounts>
@@ -37,6 +38,26 @@
               </div>
             </div>
           </ng-template>
+        </div>
+      </div>
+      <div class="unregistered-accounts-section" *ngIf="(unregisteredAccounts$ | async)?.length > 0">
+        <div class="row">
+          <div class="col-md-12">
+            <dlm-page-header
+              [title]="('page.cloud_stores.unregistered_header' | translate) + '[' + (unregisteredAccounts$ | async).length + ']'"
+              [contextMessage]="'page.cloud_stores.unregistered_hint' | translate"
+              [helpLinkIcon]="'fa fa-info-circle'"
+              [isFlexCenter]="true">
+            </dlm-page-header>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12 cloud-accounts-list-container">
+            <dlm-cloud-accounts-list
+              [accounts]="unregisteredAccounts$ | async"
+              (deleteUnregisteredAccount)="handleDeleteUnregisteredAccount($event)">
+            </dlm-cloud-accounts-list>
+          </div>
         </div>
       </div>
     </div>

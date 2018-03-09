@@ -102,8 +102,11 @@ object RequestEntities {
                                       `tde.sameKey`: Option[Boolean], description: Option[String], sourceSnapshotRetentionAgeLimit: Option[Long],
                                       sourceSnapshotRetentionNumber: Option[Long], targetSnapshotRetentionAgeLimit: Option[Long],
                                       targetSnapshotRetentionNumber: Option[Long], retryAttempts: Option[Long], retryDelay: Option[Long])
-  case class CloudCredRequest(name: Option[String], provider: Option[String], `s3.access.key`: Option[String],
-                              `s3.secret.key`: Option[String], `s3.encryption.key`: Option[String] = None)
+  case class PolicyTestRequest(`type`: String, cloudCred: String, sourceCluster: Option[String], sourceDataset: Option[String],
+                               targetDataset: Option[String], targetCluster: Option[String])
+
+  case class CloudCredRequest(name: Option[String], provider: Option[String], authtype: Option[String], `aws.access.key`: Option[String],
+                              `aws.secret.key`: Option[String], `aws.encryption.key`: Option[String] = None)
 }
 
 object JsonFormatters {
@@ -205,6 +208,9 @@ object JsonFormatters {
 
   implicit val policyDefinitionRequestWrites = Json.writes[PolicyDefinitionRequest]
   implicit val policyDefinitionRequestReads = Json.reads[PolicyDefinitionRequest]
+
+  implicit val policyTestRequestWrites = Json.writes[PolicyTestRequest]
+  implicit val policyTestRequestReads = Json.reads[PolicyTestRequest]
 
   implicit val cloudCredRequestRequestWrites = Json.writes[CloudCredRequest]
   implicit val cloudCredRequestRequestReads = Json.reads[CloudCredRequest]

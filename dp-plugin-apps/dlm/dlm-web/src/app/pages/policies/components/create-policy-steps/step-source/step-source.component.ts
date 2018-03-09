@@ -9,7 +9,7 @@
 
 import {
   Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
-  HostBinding, ChangeDetectionStrategy, OnDestroy
+  HostBinding, ChangeDetectionStrategy, OnDestroy, AfterViewInit
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -19,7 +19,7 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES} from 'constants/policy.constant';
+import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS} from 'constants/policy.constant';
 import { getStep } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
@@ -37,6 +37,7 @@ import { loadDatabases } from 'actions/hivelist.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { merge } from 'utils/object-utils';
 import { wizardResetStep } from 'actions/policy.action';
+import { getClusterEntities } from 'utils/policy-util';
 
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
@@ -46,18 +47,20 @@ const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
+export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, StepComponent {
 
   @Input() pairings: Pairing[] = [];
   @Input() containers: any = {};
   @Input() accounts: CloudAccount[] = [];
   @Input() clusters: Cluster[] = [];
   @Input() containersList: CloudContainer[] = [];
+  @Input() sourceClusterId = 0;
   @Output() onFormValidityChange = new EventEmitter<boolean>();
   @HostBinding('class') className = 'dlm-step-source';
 
   private tableRequestPrefix = '[StepSourceComponent] LOAD_TABLES ';
   SOURCE_TYPES = SOURCE_TYPES;
+  SOURCE_TYPES_LABELS = SOURCE_TYPES_LABELS;
   form: FormGroup;
   general: {};
   WIZARD_STEP_ID = WIZARD_STEP_ID;
@@ -94,7 +97,7 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
   }
 
   get sourceClusters() {
-    return mapToList(this.getClusterEntities(this.pairings));
+    return mapToList(getClusterEntities(this.pairings));
   }
 
   get sourceCloudAccounts() {
@@ -109,16 +112,9 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
    * @type {{label: string, value: string}}[]
    */
   get sourceTypes() {
-    const cluster = {label: this.SOURCE_TYPES.CLUSTER, value: this.SOURCE_TYPES.CLUSTER};
-    const s3 = {label: this.SOURCE_TYPES.S3, value: this.SOURCE_TYPES.S3};
+    const cluster = {label: this.SOURCE_TYPES_LABELS[this.SOURCE_TYPES.CLUSTER], value: this.SOURCE_TYPES.CLUSTER};
+    const s3 = {label: this.SOURCE_TYPES_LABELS[this.SOURCE_TYPES.S3], value: this.SOURCE_TYPES.S3};
     return this.isHivePolicy() ? [cluster] : [s3, cluster];
-  }
-
-  static clusterToListOption(cluster) {
-    return {
-      label: `${cluster.name} (${cluster.dataCenter})`,
-      value: cluster.id
-    };
   }
 
   constructor(private store: Store<State>, private formBuilder: FormBuilder, private t: TranslateService) {}
@@ -158,6 +154,17 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
     this.subscriptions.push(formSubscription);
   }
 
+  ngAfterViewInit() {
+    if (this.sourceClusterId) {
+      this.form.patchValue({
+        source: {
+          type: this.SOURCE_TYPES.CLUSTER,
+          cluster: Number(this.sourceClusterId)
+        }
+      });
+    }
+  }
+
   isFormValid() {
     return this.form.valid;
   }
@@ -169,7 +176,7 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
   private filterCloudAccounts(provider) {
     return this.accounts
       .filter(a => a.accountDetails.provider === provider)
-      .map(a => ({label: a.accountDetails['userName'] || a.accountDetails['accountName'], value: a.id}));
+      .map(a => ({label: a.id, value: a.id}));
   }
 
   isHDFSPolicy() {
@@ -178,19 +185,6 @@ export class StepSourceComponent implements OnInit, OnDestroy, StepComponent {
 
   isHivePolicy() {
     return this.general && 'type' in this.general && this.general['type'] === POLICY_TYPES.HIVE;
-  }
-
-  getClusterEntities(pairings) {
-    return pairings.reduce((entities: { [id: number]: {} }, entity: Pairing) => {
-      const getClusters = (pairing) => {
-        return pairing.pair.reduce((clusters: {}, cluster) => {
-          return Object.assign({}, clusters, {
-            [cluster.id]: StepSourceComponent.clusterToListOption(cluster)
-          });
-        }, {});
-      };
-      return Object.assign({}, entities, getClusters(entity));
-    }, {});
   }
 
   handleHdfsPathChange(path) {

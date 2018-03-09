@@ -77,7 +77,7 @@ describe('PolicyService', () => {
 
   describe('#deletePolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
+      this.policy = <Policy>{name: 'n1', clusterResourceForRequests: {id: 1}};
       policyService.deletePolicy(this.policy).subscribe();
     });
     it('should do DELETE request', () => {
@@ -88,7 +88,7 @@ describe('PolicyService', () => {
 
   describe('#suspendPolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
+      this.policy = <Policy>{name: 'n1', clusterResourceForRequests: {id: 1}};
       policyService.suspendPolicy(this.policy).subscribe();
     });
     it('should do PUT request', () => {
@@ -99,7 +99,7 @@ describe('PolicyService', () => {
 
   describe('#resumePolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
+      this.policy = <Policy>{name: 'n1', clusterResourceForRequests: {id: 1}};
       policyService.resumePolicy(this.policy).subscribe();
     });
     it('should do PUT request', () => {

@@ -18,7 +18,9 @@
 #     environment:
 #         CONSUL_HOST: ${CONSUL_HOST}
 
-docker start dp-db-service >> install.log 2>&1 || \
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker start dp-db-service >> "$DP_PATH"/install.log 2>&1 || \
     docker run \
         --name dp-db-service \
         --network dp \

@@ -1,0 +1,31 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import '../../../styles/variables';
+@import '../../../styles/charts';
+
+.data-lake-container {
+  padding: 15px 30px;
+}
+
+.total-assets {
+  font-size: 2.4em;
+  font-weight: 500;
+}
+
+.charts-cards-container {
+  .charts-card {
+    min-height: 350px;
+  }
+}
+
+:host ::ng-deep .nv-multiBarWithLegend .tick line {
+  stroke: transparent;
+}

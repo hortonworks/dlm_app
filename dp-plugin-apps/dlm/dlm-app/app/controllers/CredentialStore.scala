@@ -84,4 +84,13 @@ class CredentialStore @Inject()(
       case Right(dlmApiErrors) => Ok(Json.toJson(dlmApiErrors))
     }
   }
+
+  def deleteBeaconCredential(cloudAccountId: String) = AuthenticatedAction.async { request =>
+    Logger.info("Received delete cloud credential request")
+    implicit val token = request.token
+    beaconService.deleteCloudCreds(cloudAccountId).map {
+      case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
+      case Right(dlmApiErrors) => Ok(Json.toJson(dlmApiErrors))
+    }
+  }
 }

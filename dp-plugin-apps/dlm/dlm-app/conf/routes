@@ -13,6 +13,7 @@ POST     /api/store/credential                                        controller
 PUT      /api/store/credential                                        controllers.CredentialStore.updateCredentialAccount
 PUT      /api/store/credential/sync                                   controllers.CredentialStore.syncCredentialAccount
 DELETE   /api/store/credential/:cloudAccountId                        controllers.CredentialStore.deleteCredentialAccount(cloudAccountId: String)
+DELETE   /api/store/beaconCredential/:cloudAccountId                  controllers.CredentialStore.deleteBeaconCredential(cloudAccountId: String)
 
 #CloudCred
 GET     /api/cluster/:clusterId/credId/:credId                        controllers.CloudCred.retrieveById(clusterId: Long, credId: String)
@@ -47,6 +48,7 @@ POST    /api/clusters/:clusterId/policy/:name/submit          controllers.Polici
 PUT     /api/clusters/:clusterId/policy/:name/suspend         controllers.Policies.suspend(clusterId: Long, name: String)
 PUT     /api/clusters/:clusterId/policy/:name/resume          controllers.Policies.resume(clusterId: Long, name: String)
 DELETE  /api/clusters/:clusterId/policy/:name                 controllers.Policies.delete(clusterId: Long, name: String)
+POST    /api/clusters/:clusterId/policy/test                  controllers.Policies.testPolicy(clusterId: Long)
 
 #Policy instances
 GET     /api/clusters/:clusterId/policy/:name/jobs            controllers.PolicyInstances.retrieve(clusterId : Long, name : String)

@@ -24,6 +24,9 @@ import {configureComponentTest} from 'testing/configure';
 import {HortonStyleModule} from 'common/horton-style.module';
 import {PolicyService} from 'services/policy.service';
 import {JobService} from 'services/job.service';
+import {WizardSummaryComponent} from 'pages/policies/components/create-policy-wizard-summary/create-policy-wizard-summary.component';
+import {SummaryTreeComponent} from 'pages/policies/components/summary-tree/summary-tree.component';
+import {FrequencyPipe} from 'pipes/frequency.pipe';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -45,12 +48,15 @@ describe('CreatePolicyComponent', () => {
         CreatePolicyComponent,
         CreatePolicyWizardComponent,
         CreatePolicyModalComponent,
-        WizardContentComponent
+        WizardContentComponent,
+        WizardSummaryComponent,
+        SummaryTreeComponent
       ],
       providers: [
         NavbarService,
         PolicyService,
-        JobService
+        JobService,
+        FrequencyPipe
       ]
     })
       .compileComponents();

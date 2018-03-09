@@ -321,7 +321,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     }
     return this.clusters.filter(cluster => {
       const status = this.beaconStatuses.find(c => c.clusterId === cluster.id);
-      return status ? status.beaconAdminStatus.replicationCloudFS : false;
+      return status ? status.beaconAdminStatus.replication_cloud_fs : false;
     }).map(cluster => this.clusterToListOption(cluster));
   }
 
@@ -371,7 +371,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       return onlyCluster;
     }
     const status = this.beaconStatuses.find(c => c.clusterId === sourceClusterId);
-    const replicationCloudFS = status ? status.beaconAdminStatus.replicationCloudFS : false;
+    const replicationCloudFS = status ? status.beaconAdminStatus.replication_cloud_fs : false;
     return replicationCloudFS ? this.DESTINATION_TYPES.map(dt => ({label: dt, value: dt})) : onlyCluster;
   }
 

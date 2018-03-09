@@ -23,7 +23,9 @@
 
 # for mount (new) >> --mount type=bind,readonly=true,source=$(pwd)/dbscripts,target=/dbscripts \
 
-docker start dp-migrate >> install.log 2>&1 || \
+DP_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+docker start dp-migrate >> "$DP_PATH"/install.log 2>&1 || \
     docker run \
         --name dp-migrate \
         --network dp \

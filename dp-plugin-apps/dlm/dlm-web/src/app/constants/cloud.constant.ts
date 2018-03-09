@@ -7,8 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export const S3_TOKEN = 'S3_TOKEN';
-export const S3 = 'S3';
+export const AWS_ACCESSKEY = 'AWS_ACCESSKEY';
+export const S3 = 'AWS';
 export const WASB = 'WASB';
 export const ADLS = 'ADLS';
 export const IAM_ROLE = 'IAM_ROLE';
@@ -26,15 +26,20 @@ export const CLOUD_PROVIDER_LABELS = {
 export const CLOUD_PROVIDER_VALUES = [S3];
 
 export const CREDENTIAL_TYPE_LABELS = {
-  [S3_TOKEN]: 'Access & Secret Key',
+  [AWS_ACCESSKEY]: 'Access & Secret Key',
   [IAM_ROLE]: 'IAM Role'
 };
 
-export const S3_TYPE_VALUES = [S3_TOKEN, IAM_ROLE];
+export const S3_TYPE_VALUES = [AWS_ACCESSKEY, IAM_ROLE];
 
 export const FILE_TYPES = {
   FILE: 'FILE',
   DIRECTORY: 'DIRECTORY'
 };
+
+export const INVALID = 'INVALID';
+export const OUT_OF_SYNC = 'OUT_OF_SYNC';
+
+export const CREDENTIAL_ERROR_TYPES = {INVALID, OUT_OF_SYNC};
 
 export const ROOT_PATH = '/';

@@ -10,6 +10,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import {ActivatedRoute} from "@angular/router";
+import {ServiceErrorType} from "../utils/enums";
 
 @Component({
   selector: 'dp-service-error',
@@ -18,9 +20,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ServiceErrorComponent implements OnInit {
 
-  constructor() { }
+  errorTypeRef = ServiceErrorType;
+  errorType: any;
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.errorType = this.route.snapshot.params['type'];
   }
 
 }

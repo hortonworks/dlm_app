@@ -14,7 +14,6 @@ package com.hortonworks.dataplane.commons.domain
 import java.time.LocalDateTime
 
 import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
-import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.libs.json._
 
 /**
@@ -35,6 +34,8 @@ object Entities {
     val PUBLIC = Value(1)
     val PRIVATE = Value(2)
   }
+
+  case class ServiceHealth(installed: Option[Boolean]=Some(false), healthy: Option[Boolean]=Some(false))
 
   case class HJwtToken(token: String)
 
@@ -306,13 +307,22 @@ object Entities {
                        guid: String,
                        assetProperties: JsValue,
                        clusterId: Long,
-                       datasetId: Option[Long] = None)
+                       datasetId: Option[Long] = None,
+                       state : Option[String] = None,
+                       editFlag : Option[String] = None
+                      )
 
   case class AssetsAndCounts(assets: Seq[DataAsset], count: Long)
 
   case class DatasetDetails(id: Option[Long],
                             details: Option[JsValue],
                             datasetId: Long)
+
+  case class DatasetEditDetails(id: Option[Long],
+                                datasetId: Long,
+                                editorId: Long,
+                                editBegin: Option[LocalDateTime] //= Some(LocalDateTime.now())
+                               )
 
   case class DpConfig(id: Option[Long],
                       configKey: String,
@@ -324,7 +334,7 @@ object Entities {
 
   // classes as data conatiner for Rest Api
 
-  case class DataAssetCount(assetType: String, count: Int)
+  case class DataAssetCount(assetType: String, assetState: String, count: Int)
 
   case class RichDataset(dataset: Dataset,
                          tags: Seq[String],
@@ -332,7 +342,8 @@ object Entities {
                          cluster: String,
                          clusterId: Long,
                          counts: Seq[DataAssetCount],
-                         favouriteId: Option[Long]= None,
+                         editDetails:Option[DatasetEditDetails] = None,
+                         favouriteId: Option[Long] = None,
                          favouriteCount: Option[Int] = None,
                          bookmarkId: Option[Long]= None,
                          totalComments: Option[Int] = None,
@@ -521,6 +532,9 @@ object JsonFormatters {
   implicit val datasetDetailsWrites = Json.writes[DatasetDetails]
   implicit val datasetDetailsReads = Json.reads[DatasetDetails]
 
+  implicit val datasetEditDetailsWrites = Json.writes[DatasetEditDetails]
+  implicit val datasetEditDetailsReads = Json.reads[DatasetEditDetails]
+
   // classes as data conatiner for Rest Api
   implicit val categoriesCountReads = Json.reads[CategoryCount]
   implicit val categoriesCountWrites = Json.writes[CategoryCount]
@@ -625,6 +639,10 @@ object JsonFormatters {
 
   implicit val bookmarkWrites = Json.writes[Bookmark]
   implicit val bookmarkReads = Json.reads[Bookmark]
+
+  implicit val serviceHealthWrites = Json.writes[ServiceHealth]
+  implicit val serviceHealthReads = Json.reads[ServiceHealth]
+
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 

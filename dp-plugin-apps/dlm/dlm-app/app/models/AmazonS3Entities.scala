@@ -32,7 +32,7 @@ object AmazonS3Entities {
   case class S3AccountCredential (credentialType: String, accessKeyId: Option[String], secretAccessKey: Option[String]) extends Serializable with CloudAccountCredentials
 
   case class S3FileItem(pathSuffix: String, `type`: String, length: Option[Long], modificationTime: Option[Long]) extends FileListItem
-  case class S3FileListResponse(fileList: Seq[S3FileItem], provider: CloudAccountProvider = CloudAccountProvider.S3) extends FileListResponse
+  case class S3FileListResponse(fileList: Seq[S3FileItem], provider: CloudAccountProvider = CloudAccountProvider.AWS) extends FileListResponse
 
   case class StatementPrincipal(AWS: String)
   case class StatementPrincipals(AWS: Seq[String])

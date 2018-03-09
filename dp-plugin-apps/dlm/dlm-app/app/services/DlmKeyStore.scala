@@ -67,7 +67,7 @@ class DlmKeyStore @Inject()(keyStoreManager: KeyStoreManager) extends
         Right(CloudAccountsBody(cloudAccounts.map(cloudAccount => {
           val credentials = cloudAccount.accountCredentials
           val accountDetails = CloudAccountProvider.withName(cloudAccount.accountDetails.provider) match {
-            case CloudAccountProvider.S3 =>
+            case CloudAccountProvider.AWS =>
               val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
               S3AccountDetails(accountDetails.provider, Some(CloudCredentialType.withName(credentials.credentialType)),
                 accountDetails.accountName, accountDetails.userName)

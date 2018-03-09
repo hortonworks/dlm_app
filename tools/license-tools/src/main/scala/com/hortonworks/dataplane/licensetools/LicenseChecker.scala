@@ -29,17 +29,27 @@ object LicenseChecker {
     a.split(",$")(0).replace("\"", "").trim().toLowerCase()
   }
 
-  def processLicenseLine(l: String): Option[LicenseDefinition] = {
+  def processLicenseLine(licenseReportFile: String, l: String): Option[LicenseDefinition] = {
     val matches = licensePattern.findAllIn(l).toArray
     matches match {
-      case Array(a: String, b: String, c: String, d: String) => Some(LicenseDefinition(normalize(a), normalize(b), normalize(c)))
+      case Array(a: String, b: String, c: String, d: String) =>
+        if (licenseReportFile.contains("scala")) {
+          Some(LicenseDefinition(normalize(a), normalize(b), normalize(c)))
+        } else if (licenseReportFile.contains("npm")) {
+          Some(LicenseDefinition("", normalize(b), normalize(a)))
+        } else {
+          None
+        }
+      case Array(a: String, b: String, c: String, d: String, e: String) =>
+        Some(LicenseDefinition("", normalize(c), normalize(a)))
       case _ => None
     }
   }
 
   def parseLicenses(licenseReportFile: String): Set[LicenseDefinition] = {
     val licenses = Source.fromFile(licenseReportFile).getLines.toList
-    val licenseDefinitions = licenses.map(l => processLicenseLine(l)).filter(_.isDefined).map(_.get).toSet
+    val licenseDefinitions = licenses.map(l => processLicenseLine(licenseReportFile, l)).
+                                                  filter(_.isDefined).map(_.get).toSet
     licenseDefinitions
   }
 
@@ -94,7 +104,7 @@ object LicenseChecker {
 
   def printReport(header: String, definitions: mutable.Set[LicenseDefinition]): Unit = {
     for (defn <- definitions) {
-      println(s"${header}: ${defn}")
+      println(s"${header}|${defn.license}|${defn.dependency}")
     }
   }
 

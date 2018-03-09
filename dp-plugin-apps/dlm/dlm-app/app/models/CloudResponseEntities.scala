@@ -46,7 +46,7 @@ object CloudResponseEntities {
   implicit val fileListResponseFmt: Format[FileListResponse] = new Format[FileListResponse] {
     def reads(json: JsValue): JsResult[FileListResponse] = {
       def from(name: CloudAccountProvider, data: JsObject): JsResult[FileListResponse] = name match {
-        case CloudAccountProvider.S3  => Json.fromJson[S3FileListResponse](data)(s3FileListResponseFmt)
+        case CloudAccountProvider.AWS  => Json.fromJson[S3FileListResponse](data)(s3FileListResponseFmt)
         case CloudAccountProvider.WASB => Json.fromJson[BlobListResponse](data)(blobListResponseFmt)
         case CloudAccountProvider.ADLS => Json.fromJson[ADLSFileListResponse](data)(adlsFilesResponseFmt)
         case _      => JsError(s"Unknown provider '$name'")

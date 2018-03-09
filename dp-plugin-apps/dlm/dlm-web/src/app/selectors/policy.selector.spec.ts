@@ -77,16 +77,19 @@ describe('Policy Selectors', () => {
         {
           ...this.policy1,
           targetClusterResource: this.cluster1,
+          clusterResourceForRequests: this.cluster1,
           sourceClusterResource: this.cluster2
         },
         {
           ...this.policy2,
           targetClusterResource: this.cluster2,
+          clusterResourceForRequests: this.cluster2,
           sourceClusterResource: this.cluster1
         },
         {
           ...this.policy3,
           targetClusterResource: {},
+          clusterResourceForRequests: {},
           sourceClusterResource: {}
         }
       ];
@@ -101,6 +104,7 @@ describe('Policy Selectors', () => {
         {
           ...this.policy1,
           targetClusterResource: this.cluster1,
+          clusterResourceForRequests: this.cluster1,
           sourceClusterResource: this.cluster2,
           jobsResource: [this.job1],
           lastJobResource: this.job1,
@@ -111,6 +115,7 @@ describe('Policy Selectors', () => {
         {
           ...this.policy2,
           targetClusterResource: this.cluster2,
+          clusterResourceForRequests: this.cluster2,
           sourceClusterResource: this.cluster1,
           jobsResource: [this.job2],
           lastJobResource: this.job2,
@@ -121,6 +126,7 @@ describe('Policy Selectors', () => {
         {
           ...this.policy3,
           targetClusterResource: {},
+          clusterResourceForRequests: {},
           sourceClusterResource: {},
           jobsResource: [],
           lastJobResource: null,

@@ -119,6 +119,8 @@ object WebService {
                     (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
     def deletePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
                     (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def testPolicy(beaconEndpoint : String, clusterId: Long, policyTestRequest : PolicyTestRequest)
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconPolicyInstanceService extends ClientService {

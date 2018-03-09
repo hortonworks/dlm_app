@@ -21,7 +21,7 @@ import { JobTrackingInfo } from 'models/job-tracking-info.model';
 export class JobService {
 
   private getUrlForJobs(policy: Policy) {
-    return `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs`;
+    return `clusters/${policy.clusterResourceForRequests.id}/policy/${policy.name}/jobs`;
   }
 
   private doJobsRequest(url) {

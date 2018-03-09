@@ -21,12 +21,16 @@
 </dlm-table>
 
 <ng-template #statusCell let-account="row">
-  <i *ngIf="isExpiredAccount(account)" class="fa fa-2x fa-exclamation-triangle text-danger"></i>
+  <i *ngIf="hasError(account)" class="fa fa-2x text-danger"
+     [ngClass]="{'fa-refresh': getErrorType(account) == CREDENTIAL_ERROR_TYPES.OUT_OF_SYNC,
+     'fa-exclamation-triangle': getErrorType(account) == CREDENTIAL_ERROR_TYPES.INVALID}"
+     [tooltip]="errorMessage(account)" ></i>
 </ng-template>
 
 <ng-template #providerCell let-account="row" let-index="rowIndex">
   <div>
-    <span class="provider" [attr.qe-attr]="'cloud-account-provider-' + index">{{account.accountDetails.provider}}</span>
+    <span class="provider" [attr.qe-attr]="'cloud-account-provider-' + index">
+      {{CLOUD_PROVIDER_LABELS[account.accountDetails.provider]}}</span>
     <span class="left-arrow">&#9664;</span>
   </div>
 </ng-template>
@@ -46,7 +50,7 @@
 
 <ng-template #nameCell let-account="row" let-index="rowIndex">
   <div class="userName is-text-large"
-    [tooltip]="isExpiredAccount(account) ? ('page.cloud_stores.content.accounts.expired_account' | translate) : ''"
+    [tooltip]="errorMessage(account)"
     [attr.qe-attr]="'cloud-account-id-' + index">
     {{account.id}}
   </div>
@@ -72,21 +76,34 @@
       | {{account.accountDetails.accountName}}
     </span>
   </div>
-  <div *ngIf="isExpiredAccount(account)">
-    <button type="button" class="btn btn-secondary btn-xs" (click)="edit(account)">
-      {{'common.edit' | translate}}
+  <div *ngIf="isExpiredAccount(account); else outOfSync">
+    <button type="button" class="btn btn-secondary btn-xs" [attr.qe-attr]="'cloud-account-update-button-' + index"
+            (click)="edit(account)">
+      {{'common.update' | translate | uppercase}}
     </button>
   </div>
+  <ng-template #outOfSync>
+    <div *ngIf="isOutOfSync(account)">
+      <button type="button" class="btn btn-secondary btn-xs" [attr.qe-attr]="'cloud-account-sync-button-' + index"
+              (click)="sync(account)">
+        {{'common.sync' | translate | uppercase}}
+      </button>
+    </div>
+  </ng-template>
 </ng-template>
 
 <ng-template #actionsCell let-account="row" let-index="rowIndex">
-  <dlm-cloud-account-actions
+  <dlm-cloud-account-actions *ngIf="!isUnregistered(account); else deleteAccount"
     [attr.qe-attr]="'cloud-account-actions-' + index"
     [rowId]="account.id"
     [cloudAccount]="account"
     [cloudAccountActions]="cloudAccountActions"
     (handler)="handleSelectedAction($event)">
   </dlm-cloud-account-actions>
+  <ng-template #deleteAccount>
+    <i class="fa fa-trash fa-2x text-primary actionable" [tooltip]="('common.delete' | translate)"
+       [attr.qe-attr]="'unregistered-account-delete-action-' + index" (click)="deleteUnregistered(account)"></i>
+  </ng-template>
 </ng-template>
 
 <ng-template let-account="row" ngx-datatable-row-detail-template #rowDetailRef>

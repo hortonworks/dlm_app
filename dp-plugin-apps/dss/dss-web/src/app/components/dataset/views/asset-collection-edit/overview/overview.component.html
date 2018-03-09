@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <!--<div style="display: flex;justify-content: flex-end;margin: 0px 0px 15px 0px;">-->
   <!--<div>-->
     <!--<button class="date-range selected">D</button>-->
@@ -7,50 +18,49 @@
   <!--</div>-->
 <!--</div>-->
 
-
-<div class="overview-cards-container summary">
-  <div class="overview-card">
+<div class="charts-cards-container summary">
+  <div class="charts-card">
     <div class="title">{{"pages.dataset.asset-collection.no-of-tables" | translate}} </div>
     <div class="value"> {{assetCollectionDashboard.summary.noOfTables}} </div>
   </div>
 
-  <div class="overview-card">
+  <div class="charts-card">
     <div class="title">{{"pages.dataset.asset-collection.no-of-profiled-tables" | translate}} </div>
     <div class="value"> {{assetCollectionDashboard.summary.noOfProfiledTables}} </div>
   </div>
 
-  <div class="overview-card">
+  <div class="charts-card">
     <div class="title">{{"pages.dataset.asset-collection.no-of-sensitive-tables" | translate}} </div>
     <div class="value"> {{assetCollectionDashboard.summary.noOfSensitiveTables}} </div>
   </div>
 </div>
 
 
-<div class="overview-cards-container two-col">
-  <div class="overview-card">
-    <div class="title"> Top 10 Users </div>
+<div class="charts-cards-container two-col card-margin-top">
+  <div class="charts-card">
+    <div class="title"> {{"pages.dataset.asset-collection.top-10-users" | translate}} </div>
     <svg #topUsers></svg>
   </div>
-  <div class="overview-card">
-    <div class="title"> Sensitive Vs Non Sensitive </div>
+  <div class="charts-card">
+    <div class="title"> {{"pages.dataset.asset-collection.sensitive-vs-non-sensitive" | translate}} </div>
     <svg #sensitiveNonSensitive></svg>
   </div>
 </div>
 
-<div class="overview-cards-container two-col">
-  <div class="overview-card">
-    <div class="title"> Asset Distribution by Sensitive Tag </div>
+<div class="charts-cards-container two-col card-margin-top">
+  <div class="charts-card">
+    <div class="title"> {{"pages.dataset.asset-collection.asset-distribution-by-sensitive-tag" | translate}} </div>
     <svg #distributionByTag></svg>
   </div>
-  <div class="overview-card">
-    <div class="title"> # of Quires running Sensitive Data </div>
+  <div class="charts-card">
+    <div class="title"> {{"pages.dataset.asset-collection.no-of-quires-running-sensitive-data" | translate}} </div>
     <svg #quiresRunningSensitiveData></svg>
   </div>
 </div>
 
-<div class="overview-cards-container one-col">
-  <div class="overview-card">
-    <div class="title"> Users Accessing Sensitive Data</div>
+<div class="charts-cards-container one-col card-margin-top">
+  <div class="charts-card">
+    <div class="title"> {{"pages.dataset.asset-collection.users-accessing-sensitive-data" | translate}} </div>
     <svg #usersAccessingSensitiveData></svg>
   </div>
 </div>

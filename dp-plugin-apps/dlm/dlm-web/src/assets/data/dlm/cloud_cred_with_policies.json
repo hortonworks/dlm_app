@@ -141,9 +141,73 @@
       "clusters": [
         {
           "clusterId": 1,
-          "isInSyn": true
+          "isInSync": true
         }
       ]
+    },
+    {
+      "name": "out-of-sync",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "dc-Europe$c2",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "clusters": [
+        {
+          "clusterId": 2,
+          "isInSync": false
+        }
+      ]
+    },
+    {
+      "name": "unregistered",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "dc-Europe$c2",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "cloudCred": {
+        "name": "unregistered",
+        "provider": "AWS"
+      }
     }
   ]
 }

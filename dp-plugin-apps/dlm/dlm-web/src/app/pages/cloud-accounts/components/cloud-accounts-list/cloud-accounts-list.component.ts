@@ -12,12 +12,12 @@ import {
   ChangeDetectorRef, HostBinding, EventEmitter, Output
 } from '@angular/core';
 import { ColumnMode } from '@swimlane/ngx-datatable';
-import { CloudAccount, AccountStatus } from 'models/cloud-account.model';
+import { CloudAccount, AccountStatus, CloudAccountUI } from 'models/cloud-account.model';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { ACTION_TYPES } from 'pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
-import {IAM_ROLE} from 'constants/cloud.constant';
+import {IAM_ROLE, CLOUD_PROVIDER_LABELS, CREDENTIAL_ERROR_TYPES} from 'constants/cloud.constant';
 
 @Component({
   selector: 'dlm-cloud-accounts-list',
@@ -29,9 +29,12 @@ import {IAM_ROLE} from 'constants/cloud.constant';
 export class CloudAccountsListComponent implements OnInit {
 
   IAM_ROLE = IAM_ROLE;
+  CLOUD_PROVIDER_LABELS = CLOUD_PROVIDER_LABELS;
 
   @Output() removeAccount = new EventEmitter<CloudAccount>();
   @Output() editAccount = new EventEmitter<CloudAccount>();
+  @Output() syncAccount = new EventEmitter<CloudAccount>();
+  @Output() deleteUnregisteredAccount = new EventEmitter<CloudAccount>();
 
   @Input() accounts: CloudAccount[] = [];
 
@@ -43,6 +46,8 @@ export class CloudAccountsListComponent implements OnInit {
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
 
   @HostBinding('class') className = 'dlm-cloud-accounts-list';
+
+  CREDENTIAL_ERROR_TYPES = CREDENTIAL_ERROR_TYPES;
 
   tableTheme = TableTheme.Cards;
   columns = [];
@@ -57,7 +62,7 @@ export class CloudAccountsListComponent implements OnInit {
   columnMode = ColumnMode.flex;
   cloudAccountActions = [
     {
-      label: this.t.instant('common.edit'),
+      label: this.t.instant('common.update'),
       type: ACTION_TYPES.EDIT
     },
     {
@@ -65,6 +70,13 @@ export class CloudAccountsListComponent implements OnInit {
       type: ACTION_TYPES.DELETE
     }
   ];
+
+  private getAccountBody(account: CloudAccountUI): CloudAccount {
+    return {
+      id: account.id,
+      accountDetails: account.accountDetails
+    };
+  }
 
   constructor(private t: TranslateService, private cdRef: ChangeDetectorRef) {}
 
@@ -95,7 +107,7 @@ export class CloudAccountsListComponent implements OnInit {
         flexGrow: 3
       },
       {
-        name: this.t.instant('page.cloud_stores.content.table.actions'),
+        name: '',
         cellTemplate: this.actionsCellRef,
         cellClass: 'add-actions-cell',
         prop: 'containers.length',
@@ -105,13 +117,51 @@ export class CloudAccountsListComponent implements OnInit {
     ];
   }
 
-  isExpiredAccount(account): boolean {
+  isExpiredAccount(account: CloudAccountUI): boolean {
     return account.status === AccountStatus.Expired;
   }
 
-  rowClass = (row): {[className: string]: boolean} => {
+  isOutOfSync({clusters = []}: CloudAccountUI): boolean {
+    return clusters.some(cluster => cluster.isInSync === false);
+  }
+
+  isUnregistered(account: CloudAccountUI): boolean {
+    return account.status === AccountStatus.Unregistered;
+  }
+
+  hasError(account: CloudAccountUI): boolean {
+    return this.isExpiredAccount(account) || this.isOutOfSync(account);
+  }
+
+  getErrorType(account: CloudAccountUI): string {
+    if (this.hasError(account)) {
+      if (this.isExpiredAccount(account)) {
+        return CREDENTIAL_ERROR_TYPES.INVALID;
+      } else if (this.isOutOfSync(account)) {
+        return CREDENTIAL_ERROR_TYPES.OUT_OF_SYNC;
+      }
+    }
+    return '';
+  }
+
+  errorMessage(account: CloudAccountUI): string {
+    if (this.hasError(account)) {
+      if (this.isExpiredAccount(account)) {
+        return this.t.instant('page.cloud_stores.content.accounts.expired_account');
+      } else if (this.isOutOfSync(account)) {
+        return this.t.instant('page.cloud_stores.content.accounts.out_of_sync_account', {
+          clusters: account.clusters.filter(c => c.isInSync === false).length
+        });
+      }
+      return '';
+    }
+    return '';
+  }
+
+  rowClass = (account: CloudAccountUI): {[className: string]: boolean} => {
     return {
-      'card-danger': this.isExpiredAccount(row)
+      'card-danger': this.hasError(account),
+      'card-disabled': this.isUnregistered(account)
     };
   }
 
@@ -123,11 +173,8 @@ export class CloudAccountsListComponent implements OnInit {
     this.tableComponent.toggleRowDetail(account);
   }
 
-  handleSelectedAction({cloudAccount, action}: {cloudAccount: CloudAccount, action: any}) {
-    const account: CloudAccount = {
-      id: cloudAccount.id,
-      accountDetails: cloudAccount.accountDetails
-    };
+  handleSelectedAction({cloudAccount, action}: {cloudAccount: CloudAccountUI, action: any}) {
+    const account: CloudAccount = this.getAccountBody(cloudAccount);
     switch (action.type) {
       case ACTION_TYPES.DELETE:
         this.removeAccount.emit(account);
@@ -141,5 +188,13 @@ export class CloudAccountsListComponent implements OnInit {
 
   edit(account) {
     this.editAccount.emit(account);
+  }
+
+  sync(account) {
+    this.syncAccount.emit(this.getAccountBody(account));
+  }
+
+  deleteUnregistered(account) {
+    this.deleteUnregisteredAccount.emit(this.getAccountBody(account));
   }
 }
