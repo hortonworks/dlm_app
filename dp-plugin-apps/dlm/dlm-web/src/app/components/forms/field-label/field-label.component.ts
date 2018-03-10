@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import {Component, OnInit, Input, HostBinding} from '@angular/core';
 
 @Component({
   selector: 'dlm-field-label',
@@ -24,6 +24,7 @@ import { Component, OnInit, Input } from '@angular/core';
 export class FieldLabelComponent implements OnInit {
 
   @Input() required = false;
+  @HostBinding('class') hostClass = 'dlm-field-label';
 
   constructor() { }
 

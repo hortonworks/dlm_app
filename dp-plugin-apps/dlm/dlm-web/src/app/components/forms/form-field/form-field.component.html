@@ -46,7 +46,9 @@
   </div>
 </ng-template>
 <ng-template #labelTemplate>
-  <dlm-field-label [ngClass]="fieldClass" [required]="required">
-    {{label}}
-  </dlm-field-label>
+  <div [ngClass]="fieldClass">
+    <dlm-field-label [required]="required">
+      {{label}}
+    </dlm-field-label>
+  </div>
 </ng-template>
