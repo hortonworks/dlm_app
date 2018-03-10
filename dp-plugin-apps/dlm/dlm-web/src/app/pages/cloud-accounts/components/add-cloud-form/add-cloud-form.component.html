@@ -21,9 +21,10 @@
             [label]="'page.cloud_stores.content.accounts.add.provider' | translate"
             [fieldClass]="fieldClass"
             [errorClass]="fieldClass">
-            <dlm-select-field qe-attr="add-cloud-store-cloud-provider-type" formField formControlName="cloudProviderType"
-                              [options]="cloudProviderOptions" [value]="cloudProviderType">
+            <dlm-select-field [class.hidden]="isEditMode" qe-attr="add-cloud-store-cloud-provider-type" formField
+                              formControlName="cloudProviderType" [options]="cloudProviderOptions" [value]="cloudProviderType">
             </dlm-select-field>
+            <span *ngIf="isEditMode" qe-attr="add-cloud-store-cloud-provider-type-read-only">{{account?.accountDetails?.provider}}</span>
           </dlm-form-field>
           <dlm-form-field
             [label]="'page.cloud_stores.content.accounts.add.name.label' | translate"
@@ -31,11 +32,12 @@
             [fieldClass]="fieldClass"
             [errorClass]="fieldClass"
             [required]="true">
-            <input type="text" class="form-control"  [placeholder]="'page.cloud_stores.content.accounts.add.name.placeholder' | translate"
+            <input type="text" class="form-control" [class.hidden]="isEditMode" [placeholder]="'page.cloud_stores.content.accounts.add.name.placeholder' | translate"
                    qe-attr="add-cloud-store-credential-name" formField formControlName="credentialName" maxlength="32"/>
             <dlm-field-error *ngIf="addCloudForm.get('credentialName').hasError('uniqValidator')">
               {{'forms.validation_errors.credValidator' | translate}}
             </dlm-field-error>
+            <span *ngIf="isEditMode" qe-attr="add-cloud-store-credential-name-read-only">{{account?.id}}</span>
           </dlm-form-field>
           <dlm-form-field
             [label]="'page.cloud_stores.content.accounts.add.auth_type.label' | translate"
