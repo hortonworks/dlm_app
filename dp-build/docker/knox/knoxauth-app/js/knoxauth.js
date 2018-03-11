@@ -20,13 +20,11 @@ var webssoURL = "/api/v1/websso?originalUrl=";
 var userAgent = navigator.userAgent.toLowerCase();
 
 $(document).ready(function () {
-    var originalUrl = get("originalUrl");
-    var url = originalUrl + (originalUrl.substr(-1) === '/'? '':'/') + 'api/config/dps.ga.tracking.enabled';
-    $.get(url, function (res) {
+    $.get('/api/config/dps.ga.tracking.enabled', function (res) {
         if(res.value === "true"){
-            $("#tracking-message").html("Hortonworks DataPlane Service uses cookies and other telemetry mechanisms to improve the product and your experience. By logging in, you give consent to Hortonworks to use cookies. To learn more, please review our <a href='https://hortonworks.com/privacy-policy/' target='_blank'>Privacy Policy</a>");
+            $("#tracking-message-container").html("<div class='tracking-message' id='tracking-message'>Hortonworks DataPlane Service uses cookies and other telemetry mechanisms to improve the product and your experience. By logging in, you give consent to Hortonworks to use cookies. To learn more, please review our <a href='https://hortonworks.com/privacy-policy/' target='_blank'>Privacy Policy</a></div>");
         }else{
-            $("#tracking-message").html("")
+            $("#tracking-message-container").empty();
         }
     });
 });
