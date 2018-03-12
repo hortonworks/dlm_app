@@ -444,7 +444,7 @@
           "aws_account_id": "AWS ACCOUNT ID",
           "expired_account": "Cloud credential invalid. Update this credential to continue using it.",
           "out_of_sync_account": "{{clusters}} clusters not updated with revised credential. Sync revised credential to all clusters",
-          "edit": {
+          "update": {
             "title": "Update Cloud Credential",
             "success_notification": {
               "title": "Success",
@@ -462,6 +462,7 @@
           "delete": {
             "title": "Delete Cloud Credential",
             "body": "Are you sure you want to delete cloud credential {{accountName}}?",
+            "expired_account_hint": "Delete all associated active and suspended policies to be able to delete the cloud credential",
             "success_notification": {
               "title": "Success",
               "body": "Cloud credential deleted successfully"

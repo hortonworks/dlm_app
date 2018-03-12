@@ -67,6 +67,17 @@
     }
   }
 
+  .provider-wrapper {
+    .tooltip {
+      width: 164px;
+      margin-left: 32px;
+
+      .tooltip-arrow {
+        left: 50px !important;
+      }
+    }
+  }
+
   span.left-arrow {
     font-size: 15px;
     color: #A0A0A0;

@@ -1207,37 +1207,53 @@ class BeaconService @Inject()(
                   val allCloudCredentials: Seq[CloudCredWithPolicies] = allCloudCreds.foldLeft(List(): List[CloudCredWithPolicies]) {
                     (acc, next) => {
                       val policies = next.policies
-                      var newAcc : List[CloudCredWithPolicies] = List()
-                      if (policies.isEmpty)
-                        newAcc = acc
-                      else {
-                        val clusterId = next.cloudCred.clusterId
-                        for (nextPolicyInCluster <- policies) {
-                          newAcc = nextPolicyInCluster.customProperties match {
-                            case None => acc
-                            case Some(customProperties) =>
-                              customProperties.get("cloudCred") match {
-                                case None => acc
-                                case Some(cloudCredId) =>
-                                  val cloudCred = next.cloudCred.cloudCreds.cloudCred.find(x => x.id == cloudCredId)
-                                  cloudCred match {
-                                    case None => acc
-                                    case Some(cloudCredResponse) =>
-                                      val cloudCredName = cloudCredResponse.name
-                                      val cloudCredWithSameName = acc.find(x => x.name == cloudCredName)
-                                      cloudCredWithSameName match {
-                                        case None => acc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster), List(ClusterCred(clusterId)), Some(cloudCredResponse))
-                                        case Some(cloudCredWithPolicies) =>
-                                          val index = acc.indexOf(cloudCredWithPolicies)
-                                          val updatedPoliciesList = cloudCredWithPolicies.policies :+ nextPolicyInCluster
-                                          val updatedClusterList = cloudCredWithPolicies.clusters :+ ClusterCred(clusterId)
-                                          acc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList, cloudCredWithPolicies.cloudCred))
-                                      }
-                                  }
-                              }
-                          }
+                      val cloudCredsInCluster = next.cloudCred.cloudCreds.cloudCred
+                      val clusterId = next.cloudCred.clusterId
+                      var newAcc : List[CloudCredWithPolicies] = acc
+                      val cloudCredsInClusterWithNoPolicies = cloudCredsInCluster.filterNot(x =>
+                        policies.exists(policy =>
+                          policy.customProperties.exists(properties => properties.get("cloudCred").contains(x.id))
+                        )
+                      )
+                      for (nextCloudCredInCluster <- cloudCredsInClusterWithNoPolicies) {
+                        val cloudCredName = nextCloudCredInCluster.name
+                        val cloudCredWithSameName = acc.find(x => x.name == cloudCredName)
+                        newAcc = cloudCredWithSameName match {
+                          case None => acc :+ CloudCredWithPolicies(cloudCredName, List(), List(ClusterCred(clusterId)), Some(nextCloudCredInCluster))
+                          case Some(cloudCredWithPolicies) =>
+                            val index = acc.indexOf(cloudCredWithPolicies)
+                            val updatedPoliciesList = cloudCredWithPolicies.policies
+                            val updatedClusterList = cloudCredWithPolicies.clusters :+ ClusterCred(clusterId)
+                            acc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList, cloudCredWithPolicies.cloudCred))
                         }
                       }
+
+                      for (nextPolicyInCluster <- policies) {
+                        newAcc = nextPolicyInCluster.customProperties match {
+                          case None => newAcc
+                          case Some(customProperties) =>
+                            customProperties.get("cloudCred") match {
+                              case None => newAcc
+                              case Some(cloudCredId) =>
+                                val cloudCred = next.cloudCred.cloudCreds.cloudCred.find(x => x.id == cloudCredId)
+                                cloudCred match {
+                                  case None => newAcc
+                                  case Some(cloudCredResponse) =>
+                                    val cloudCredName = cloudCredResponse.name
+                                    val cloudCredWithSameName = newAcc.find(x => x.name == cloudCredName)
+                                    cloudCredWithSameName match {
+                                      case None => newAcc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster), List(ClusterCred(clusterId)), Some(cloudCredResponse))
+                                      case Some(cloudCredWithPolicies) =>
+                                        val index = newAcc.indexOf(cloudCredWithPolicies)
+                                        val updatedPoliciesList = cloudCredWithPolicies.policies :+ nextPolicyInCluster
+                                        val updatedClusterList = cloudCredWithPolicies.clusters :+ ClusterCred(clusterId)
+                                        newAcc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList, cloudCredWithPolicies.cloudCred))
+                                    }
+                                }
+                            }
+                        }
+                      }
+
                       newAcc
                     }
                   }
@@ -1250,7 +1266,7 @@ class BeaconService @Inject()(
                       }
                     }
                   }
-                  p.success(Right(CloudCredWithPoliciesResponse(failedResponses, allCloudCredentials ++ dlmCloudCred)))
+                  p.success(Right(CloudCredWithPoliciesResponse(failedResponses ++ adminStatusResponse.unreachableBeacon, allCloudCredentials ++ dlmCloudCred)))
                 }
               }
             })

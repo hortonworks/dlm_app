@@ -78,7 +78,7 @@ export class AddAccountModalComponent implements OnInit, OnDestroy {
     const updateModalTitle = modalState$.subscribe(nextState => {
       const { account } = nextState;
       this.title = isEmpty(account || {}) ? 'page.cloud_stores.content.accounts.add.title' :
-        'page.cloud_stores.content.accounts.edit.title';
+        'page.cloud_stores.content.accounts.update.title';
     });
     this.progress$ = this.store.select(getCloudStoreProgress);
     this.subscriptions.push(updateModalVisibility);

@@ -22,7 +22,6 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS} from 'constants/policy.constant';
 import { getStep } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
-import { mapToList } from 'utils/store-util';
 import { Subscription } from 'rxjs/Subscription';
 import { loadTables } from 'actions/hivelist.action';
 import { ProgressState } from 'models/progress-state.model';
@@ -37,7 +36,7 @@ import { loadDatabases } from 'actions/hivelist.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { merge } from 'utils/object-utils';
 import { wizardResetStep } from 'actions/policy.action';
-import { getClusterEntities } from 'utils/policy-util';
+import { clusterToListOption } from 'utils/policy-util';
 
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
@@ -97,7 +96,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
   }
 
   get sourceClusters() {
-    return mapToList(getClusterEntities(this.pairings));
+    return this.clusters.map(cluster => clusterToListOption(cluster));
   }
 
   get sourceCloudAccounts() {

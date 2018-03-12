@@ -199,6 +199,7 @@ GET           /dataassets/:datasetId                                         con
 GET           /dataassets/guid/:guid                                         controllers.DataAssets.loadFromGuid(guid: String)
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
+GET           /dataassets/list/:datasetId                                    controllers.DataAssets.allAssetsWithDatasetId(datasetId:Long)
 
 POST          /dataassets/managedresults                                     controllers.Datasets.findManagedAssets(clusterId: Long)
 

@@ -21,6 +21,7 @@
           <button (click)="addAccount()" class="btn btn-secondary pull-right" qe-attr="dlm-add-cloud-credential">Add</button>
         </div>
       </div>
+      <dlm-beacon-validity></dlm-beacon-validity>
       <div class="row">
         <div class="col-xs-12 cloud-accounts-list-container">
           <div *ngIf="(tableData$ | async)?.length > 0; else noAccounts">
@@ -44,7 +45,7 @@
         <div class="row">
           <div class="col-md-12">
             <dlm-page-header
-              [title]="('page.cloud_stores.unregistered_header' | translate) + '[' + (unregisteredAccounts$ | async).length + ']'"
+              [title]="('page.cloud_stores.unregistered_header' | translate) + ' [' + (unregisteredAccounts$ | async).length + ']'"
               [contextMessage]="'page.cloud_stores.unregistered_hint' | translate"
               [helpLinkIcon]="'fa fa-info-circle'"
               [isFlexCenter]="true">

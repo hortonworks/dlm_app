@@ -18,6 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { ACTION_TYPES } from 'pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
 import {IAM_ROLE, CLOUD_PROVIDER_LABELS, CREDENTIAL_ERROR_TYPES} from 'constants/cloud.constant';
+import { POLICY_UI_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-cloud-accounts-list',
@@ -67,7 +68,9 @@ export class CloudAccountsListComponent implements OnInit {
     },
     {
       label: this.t.instant('common.delete'),
-      type: ACTION_TYPES.DELETE
+      type: ACTION_TYPES.DELETE,
+      disabled: (account) => this.hasUnexpiredPolicies(account),
+      disabledMessage: 'page.cloud_stores.content.accounts.delete.expired_account_hint'
     }
   ];
 
@@ -133,6 +136,11 @@ export class CloudAccountsListComponent implements OnInit {
     return this.isExpiredAccount(account) || this.isOutOfSync(account);
   }
 
+  hasUnexpiredPolicies(account: CloudAccountUI) {
+    return (account.policies || [])
+      .some(policy => policy.status !== POLICY_UI_STATUS.ENDED);
+  }
+
   getErrorType(account: CloudAccountUI): string {
     if (this.hasError(account)) {
       if (this.isExpiredAccount(account)) {
@@ -195,6 +203,9 @@ export class CloudAccountsListComponent implements OnInit {
   }
 
   deleteUnregistered(account) {
+    if (this.hasUnexpiredPolicies(account)) {
+      return;
+    }
     this.deleteUnregisteredAccount.emit(this.getAccountBody(account));
   }
 }

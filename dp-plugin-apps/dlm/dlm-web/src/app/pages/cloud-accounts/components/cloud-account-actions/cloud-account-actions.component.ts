@@ -8,7 +8,7 @@
  */
 
 import { Component, EventEmitter, Input, Output, ElementRef, HostListener } from '@angular/core';
-import { CloudAccountAction } from 'models/cloud-account.model';
+import { CloudAccountAction, CloudAccountUI } from 'models/cloud-account.model';
 
 export const ACTION_TYPES = {
   DELETE: 'DELETE',
@@ -39,8 +39,19 @@ export class CloudAccountActionsComponent {
   constructor(private elementRef: ElementRef) { }
 
   handleSelectedAction(cloudAccount, action) {
+    if (this.isDisabled(action)) {
+      return;
+    }
     this.toggleDropDown();
     this.handler.emit({cloudAccount, action});
+  }
+
+  isDisabled(action: CloudAccountAction): boolean {
+    return action.disabled && action.disabled(this.cloudAccount);
+  }
+
+  tooltipMessage(action: CloudAccountAction): string {
+    return this.isDisabled(action) ? action.disabledMessage : '';
   }
 
   toggleDropDown() {

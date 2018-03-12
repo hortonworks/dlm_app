@@ -87,6 +87,8 @@ export interface Progress {
 export interface CloudAccountAction {
   label: string;
   type: string;
+  disabled?: (account: CloudAccountUI) => boolean;
+  disabledMessage: string;
 }
 
 export interface CloudAccountStatus {

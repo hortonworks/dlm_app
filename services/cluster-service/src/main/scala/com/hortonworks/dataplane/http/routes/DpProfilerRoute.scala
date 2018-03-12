@@ -26,9 +26,15 @@ import com.hortonworks.dataplane.http.BaseRoute
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.JsSuccess
+import play.api.libs.json.JsError
 import com.hortonworks.dataplane.http.JsonSupport._
 import com.typesafe.config.Config
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.AssetResolvedProfilerMetricRequest
+import com.hortonworks.dataplane.commons.domain.profiler.parsers.RequestParser._
+import com.hortonworks.dataplane.commons.domain.profiler.parsers.ResponseParser._
+import com.hortonworks.dataplane.cs.profiler.{GlobalProfilerConfigs, MetricRetriever}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -198,8 +204,7 @@ class DpProfilerRoute @Inject()(
 
   private def getAuditResults(clusterId: Long, dbName: String, tableName: String, userName: String, startDate: String, endDate: String): Future[WSResponse] = {
     val postData = Json.obj(
-      "metric" -> "hiveagg",
-      "aggType" -> "Daily",
+      "metrics" -> List(Map("metric" -> "hiveagg", "aggType" -> "Daily")),
       "sql" -> (if(userName == "")
                   s"SELECT date, data.`result` from hiveagg_daily where database='$dbName' and table='$tableName' and date >= cast('$startDate' as date) and date <= cast('$endDate' as date) order by date asc"
                 else
@@ -224,8 +229,7 @@ class DpProfilerRoute @Inject()(
 
   private def getAuditActions(clusterId: Long, dbName: String, tableName: String, userName: String, startDate: String, endDate: String): Future[WSResponse] = {
     val postData = Json.obj(
-      "metric" -> "hiveagg",
-      "aggType" -> "Daily",
+      "metrics" -> List(Map("metric" -> "hiveagg", "aggType" -> "Daily")),
       "sql" -> (if(userName == "")
                   s"SELECT date, data.`action` from hiveagg_daily where database='$dbName' and table='$tableName' and date >= cast('$startDate' as date) and date <= cast('$endDate' as date) order by date asc"
               else
@@ -247,6 +251,40 @@ class DpProfilerRoute @Inject()(
       response
     }
   }
+
+  val profilerMetrics = path("cluster" / "dp-profiler" / "metrics") {
+    parameters('userName.?) { userNameOpt =>
+      extractRequest { request =>
+        post {
+          entity(as[JsObject]) { request =>
+            request.validate[AssetResolvedProfilerMetricRequest] match {
+              case JsSuccess(metricRequest, _) =>
+                userNameOpt.map(userName => {
+                  onComplete(
+                    retrieveProfilerConfig(metricRequest.clusterId).flatMap(MetricRetriever.retrieveMetrics(ws, _, metricRequest, userName))
+                  ) {
+                    case Success(results) =>
+                      complete(success(Json.toJson(results).as[JsObject]))
+                    case Failure(error) =>
+                      complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "An error occured while communicating with Profiler.", error))
+                  }
+                }).getOrElse(complete(StatusCodes.BadRequest, errors(405, "cluster.profiler.service-not-found", "Mandatory param userName is missing", new Exception("userName is missing"))))
+              case error: JsError =>
+                complete(StatusCodes.BadRequest, errors(405, "cluster.profiler.service-not-found", "Invalid payload", new Exception(JsError.toFlatForm(error).toString())))
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private def retrieveProfilerConfig(clusterId: Long): Future[GlobalProfilerConfigs] =
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}/assetmetrics")
+    } yield GlobalProfilerConfigs(urlToHit)
 
   private def deleteProfilerByJobName(clusterId: Long, jobName: String): Future[WSResponse] = {
 

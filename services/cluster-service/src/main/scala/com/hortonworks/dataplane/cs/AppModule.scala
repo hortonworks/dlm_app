@@ -284,6 +284,7 @@ object AppModule extends AbstractModule {
         dpProfilerRoute.scheduleInfo ~
         dpProfilerRoute.auditResults ~
         dpProfilerRoute.auditActions ~
+        dpProfilerRoute.profilerMetrics ~
         atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~

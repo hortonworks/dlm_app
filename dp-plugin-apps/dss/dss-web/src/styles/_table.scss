@@ -21,6 +21,7 @@ table.mdl-data-table {
     font-weight: normal;
     line-height: 1;
     padding: 10px;
+    text-align: left;
 
     .mdl-data-table__header--sorted-ascending {
       color: $dusty-gray;
@@ -89,6 +90,7 @@ table.mdl-data-table {
     border-bottom: none;
     border-color: $bon-jour;
     height: 34px;
+    text-align: left;
 
     &:first-child {
       border-left: 1px solid transparent;
