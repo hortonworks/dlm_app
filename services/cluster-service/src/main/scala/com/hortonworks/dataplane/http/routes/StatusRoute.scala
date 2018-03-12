@@ -58,7 +58,7 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   val TOKEN_TOPOLOGY_NAME = Try(config.getString("dp.services.knox.token.topology")).getOrElse("token")
 
-  lazy val FLAG_INFER_GATEWAY_SUFFIX_FROM_URL = Try(config.getBoolean("dp.services.knox.infer.gateway.name")).getOrElse(false)
+  val FLAG_INFER_GATEWAY_SUFFIX_FROM_URL = Try(config.getBoolean("dp.services.knox.infer.gateway.name")).getOrElse(false)
 
   val DEFAULT_GATEWAY_SUFFIX = "gateway"
 

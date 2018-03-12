@@ -5,3 +5,6 @@ CREATE TABLE IF NOT EXISTS dataplane.certificates (
   data    TEXT,
   active  BOOLEAN
 );
+
+ALTER TABLE dataplane.dp_clusters
+  ADD allow_untrusted BOOLEAN DEFAULT TRUE;
