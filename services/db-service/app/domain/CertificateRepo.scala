@@ -53,11 +53,13 @@ class CertificateRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   final class CertificatesTable(tag: Tag) extends Table[Certificate](tag, Some("dataplane"), "certificates") {
     def id = column[Option[String]]("id", O.PrimaryKey, O.AutoInc)
 
+    def name = column[String]("name")
+
     def data = column[String]("data")
 
     def active = column[Boolean]("active")
 
-    def * = (id, data, active) <> ((Certificate.apply _).tupled, Certificate.unapply)
+    def * = (id, name, data, active) <> ((Certificate.apply _).tupled, Certificate.unapply)
   }
 
 }

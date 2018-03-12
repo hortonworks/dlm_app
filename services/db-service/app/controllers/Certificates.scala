@@ -41,5 +41,17 @@ class Certificates @Inject()(certificateRepo: CertificateRepo)(implicit exec: Ex
     .recoverWith(apiError)
   }
 
+  def retrieve(certificateId: String) = Action.async {
+    certificateRepo.retrieve(certificateId)
+      .map(success(_))
+      .recoverWith(apiError)
+  }
+
+  def delete(certificateId: String) = Action.async {
+    certificateRepo.delete(certificateId)
+      .map(success(_))
+      .recoverWith(apiError)
+  }
+
 
 }

@@ -245,3 +245,5 @@ DELETE      /bookmarks/:bmId                                                cont
 # trust store
 GET         /certificates                                                   controllers.Certificates.list(active: Option[Boolean])
 POST        /certificates                                                   controllers.Certificates.create
+GET         /certificates/:certificateId                                    controllers.Certificates.retrieve(certificateId: String)
+DELETE      /certificates/:certificateId                                    controllers.Certificates.delete(certificateId: String)
