@@ -175,6 +175,7 @@ object Entities {
       state: Option[String] = Some("TO_SYNC"),
       isDatalake: Option[Boolean] = Some(false),
       knoxEnabled: Option[Boolean] = Some(false),
+      allowUntrusted: Option[Boolean] = Some(false),
       knoxUrl: Option[String],
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
