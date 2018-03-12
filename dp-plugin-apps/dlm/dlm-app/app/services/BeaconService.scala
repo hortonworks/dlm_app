@@ -16,7 +16,7 @@ import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDeta
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.{CloudCredRequest, ClusterDefinitionRequest, PolicyTestRequest}
 import models.AmazonS3Entities.{S3AccountCredential, S3AccountDetails}
-import models.CloudAccountEntities.CloudAccountWithCredentials
+import models.CloudAccountEntities.{CloudAccountWithCredentials, CloudAccountsBody}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import models.Entities.{CloudCredWithPolicies, UnpairClusterDefinition, _}
@@ -572,8 +572,8 @@ class BeaconService @Inject()(
                               val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
                               val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
                               val credentialType = cloudAccount.accountCredentials.credentialType
-                              val cloudCredRequest = CloudCredRequest(Some(cloudCredName), Some(accountDetails.provider),
-                                Some(credentialType), accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
+                              val cloudCredRequest = CloudCredRequest(Some(cloudCredName), cloudAccount.version.get,
+                                Some(accountDetails.provider), Some(credentialType), accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
                               createCloudCred(clusterId, cloudCredRequest) map  {
                                 case Left(errors) => p.success(Left(errors))
                                 case Right(cloudCredPostResponse) =>
@@ -632,7 +632,7 @@ class BeaconService @Inject()(
                           val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
                           val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
                           val credentialType = cloudAccount.accountCredentials.credentialType
-                          val cloudCredRequest = CloudCredRequest(Some(cloudCredName), Some(accountDetails.provider),
+                          val cloudCredRequest = CloudCredRequest(Some(cloudCredName), cloudAccount.version.get, Some(accountDetails.provider),
                             Some(credentialType), accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
                           createCloudCred(clusterId, cloudCredRequest) map  {
                             case Left(errors) => p.success(Left(errors))
@@ -1010,9 +1010,11 @@ class BeaconService @Inject()(
                       (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors,DlmApiErrors]] = {
     val p: Promise[Either[DlmApiErrors,DlmApiErrors]] = Promise()
     dlmKeyStore.updateCloudAccount(cloudAccount) map {
-      case Right(result) => syncCloudCred(cloudAccount).map {
-        dlmApiErrors => p.success(Right(dlmApiErrors))
-      }
+      case Right(result) =>
+        val versionedCloudAccount = cloudAccount.copy(version=Some(cloudAccount.version.get + 1))
+        syncCloudCred(versionedCloudAccount).map {
+          dlmApiErrors => p.success(Right(dlmApiErrors))
+        }
       case Left(error) =>  p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message))))))
     }
     p.future
@@ -1038,7 +1040,7 @@ class BeaconService @Inject()(
           CloudAccountProvider.withName(cloudAccount.accountDetails.provider) match {
             case CloudAccountProvider.AWS =>
               val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
-              val cloudCredRequest = CloudCredRequest(None, None, None,
+              val cloudCredRequest = CloudCredRequest(None, cloudAccount.version.get, None, None,
                 accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
               Future.sequence(filteredCloudCreds.map(x => {
                 beaconCloudCredService.updateCloudCred(x.beaconUrl, x.clusterId, x.cloudCreds.cloudCred.head.id, cloudCredRequest)
@@ -1215,15 +1217,18 @@ class BeaconService @Inject()(
                           policy.customProperties.exists(properties => properties.get("cloudCred").contains(x.id))
                         )
                       )
+                      val isInSync = false
                       for (nextCloudCredInCluster <- cloudCredsInClusterWithNoPolicies) {
                         val cloudCredName = nextCloudCredInCluster.name
+                        val clusterCred = getClusterCred(cloudAccounts, clusterId, cloudCredName, nextCloudCredInCluster)
                         val cloudCredWithSameName = acc.find(x => x.name == cloudCredName)
                         newAcc = cloudCredWithSameName match {
-                          case None => acc :+ CloudCredWithPolicies(cloudCredName, List(), List(ClusterCred(clusterId)), Some(nextCloudCredInCluster))
+                          case None =>
+                            acc :+ CloudCredWithPolicies(cloudCredName, List(), List(clusterCred), Some(nextCloudCredInCluster))
                           case Some(cloudCredWithPolicies) =>
                             val index = acc.indexOf(cloudCredWithPolicies)
                             val updatedPoliciesList = cloudCredWithPolicies.policies
-                            val updatedClusterList = cloudCredWithPolicies.clusters :+ ClusterCred(clusterId)
+                            val updatedClusterList = cloudCredWithPolicies.clusters :+ clusterCred
                             acc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList, cloudCredWithPolicies.cloudCred))
                         }
                       }
@@ -1235,18 +1240,19 @@ class BeaconService @Inject()(
                             customProperties.get("cloudCred") match {
                               case None => newAcc
                               case Some(cloudCredId) =>
-                                val cloudCred = next.cloudCred.cloudCreds.cloudCred.find(x => x.id == cloudCredId)
+                                val cloudCred = cloudCredsInCluster.find(x => x.id == cloudCredId)
                                 cloudCred match {
                                   case None => newAcc
                                   case Some(cloudCredResponse) =>
                                     val cloudCredName = cloudCredResponse.name
+                                    val clusterCred = getClusterCred(cloudAccounts, clusterId, cloudCredName, cloudCredResponse)
                                     val cloudCredWithSameName = newAcc.find(x => x.name == cloudCredName)
                                     cloudCredWithSameName match {
-                                      case None => newAcc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster), List(ClusterCred(clusterId)), Some(cloudCredResponse))
+                                      case None => newAcc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster), List(clusterCred), Some(cloudCredResponse))
                                       case Some(cloudCredWithPolicies) =>
                                         val index = newAcc.indexOf(cloudCredWithPolicies)
                                         val updatedPoliciesList = cloudCredWithPolicies.policies :+ nextPolicyInCluster
-                                        val updatedClusterList = cloudCredWithPolicies.clusters :+ ClusterCred(clusterId)
+                                        val updatedClusterList = cloudCredWithPolicies.clusters :+ clusterCred
                                         newAcc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList, cloudCredWithPolicies.cloudCred))
                                     }
                                 }
@@ -1274,6 +1280,23 @@ class BeaconService @Inject()(
     }
 
     p.future
+  }
+
+  def getClusterCred(cloudAccounts: CloudAccountsBody, clusterId: Long, cloudCredName: String,
+                     cloudCredResponse: CloudCredResponse): ClusterCred = {
+    val isInSync = false
+    cloudAccounts.accounts.find(x => x.id == cloudCredName) match {
+      case None => ClusterCred(clusterId, isInSync)
+      case Some(dlmAccount) => cloudCredResponse.configs match {
+        case None => ClusterCred(clusterId, isInSync)
+        case Some(configs) => {
+          configs.get("version") match {
+            case None => ClusterCred(clusterId, isInSync)
+            case Some(version) => ClusterCred(clusterId, dlmAccount.version == version.toLong)
+          }
+        }
+      }
+    }
   }
 
 

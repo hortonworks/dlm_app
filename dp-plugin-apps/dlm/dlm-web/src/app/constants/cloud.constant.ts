@@ -11,9 +11,8 @@ export const AWS_ACCESSKEY = 'AWS_ACCESSKEY';
 export const S3 = 'AWS';
 export const WASB = 'WASB';
 export const ADLS = 'ADLS';
-export const IAM_ROLE = 'IAM_ROLE';
+export const AWS_INSTANCEPROFILE = 'AWS_INSTANCEPROFILE';
 export const ACCESS_KEY = 'ACCESS_KEY';
-export const S3_AUTH_TYPES = [ACCESS_KEY, IAM_ROLE];
 
 export const PROVIDERS = [S3, ADLS, WASB];
 
@@ -27,10 +26,10 @@ export const CLOUD_PROVIDER_VALUES = [S3];
 
 export const CREDENTIAL_TYPE_LABELS = {
   [AWS_ACCESSKEY]: 'Access & Secret Key',
-  [IAM_ROLE]: 'IAM Role'
+  [AWS_INSTANCEPROFILE]: 'IAM Role'
 };
 
-export const S3_TYPE_VALUES = [AWS_ACCESSKEY, IAM_ROLE];
+export const S3_TYPE_VALUES = [AWS_ACCESSKEY, AWS_INSTANCEPROFILE];
 
 export const FILE_TYPES = {
   FILE: 'FILE',

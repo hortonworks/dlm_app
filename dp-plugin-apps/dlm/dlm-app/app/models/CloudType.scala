@@ -35,7 +35,8 @@ object CloudCredentialType extends Enumeration {
   val WASB_TOKEN = Value("WASB_TOKEN")
   val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
   val AWS_ACCESSKEY = Value("AWS_ACCESSKEY")
-  val IAM_ROLE = Value("IAM_ROLE")
+  val IAM_ROLE = Value("AWS_INSTANCEPROFILE")
+  val AWS_INSTANCEPROFILE = Value("AWS_INSTANCEPROFILE")
   val ADLS_STS = Value("ADLS_STS")
 
   implicit val cloudCredentialTypeFormat = new Format[CloudCredentialType] {

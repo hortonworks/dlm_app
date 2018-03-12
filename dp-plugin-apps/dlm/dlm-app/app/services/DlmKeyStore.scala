@@ -81,7 +81,7 @@ class DlmKeyStore @Inject()(keyStoreManager: KeyStoreManager) extends
                 accountDetails.accountName)
             }
 
-          CloudAccountsItem(cloudAccount.id, accountDetails)
+          CloudAccountsItem(cloudAccount.id, cloudAccount.version.get, accountDetails)
         }
         )))
       case Left(error) => Right(CloudAccountsBody(List()))
@@ -120,14 +120,15 @@ class DlmKeyStore @Inject()(keyStoreManager: KeyStoreManager) extends
   def updateCloudAccount(cloudAccount: CloudAccountWithCredentials) : Future[Either[GenericError,Unit]] = {
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccountsWithCredentials) =>
-        val otherAccounts = cloudAccountsWithCredentials.filterNot(_.id == cloudAccount.id)
-        if (otherAccounts.lengthCompare(cloudAccountsWithCredentials.length) != 0) {
-          saveCloudAccountsToKeyStore(otherAccounts :+ cloudAccount) match {
-            case Success(v) => Right(Unit)
-            case Failure(ex) => Left(GenericError(ex.getMessage))
-          }
-        } else {
-          Left(GenericError(DpKeyStore.credentialDoesNotExistsErrMsg))
+        cloudAccountsWithCredentials.find(_.id == cloudAccount.id) match {
+          case None => Left(GenericError(DpKeyStore.credentialDoesNotExistsErrMsg))
+          case Some(account) =>
+            val versionedCloudAccount = account.copy(version=Some(account.version.get + 1))
+            val otherAccounts = cloudAccountsWithCredentials.filterNot(_.id == cloudAccount.id)
+            saveCloudAccountsToKeyStore(otherAccounts :+ versionedCloudAccount) match {
+              case Success(v) => Right(Unit)
+              case Failure(ex) => Left(GenericError(ex.getMessage))
+            }
         }
       case Left(error) => Left(GenericError(error.message))
     }
@@ -143,7 +144,11 @@ class DlmKeyStore @Inject()(keyStoreManager: KeyStoreManager) extends
         if (cloudAccounts.exists(_.id == cloudAccount.id)) {
           Left(KeyStoreWriteError(DpKeyStore.credentialNameExistsErrMsg))
         } else {
-          saveCloudAccountsToKeyStore(cloudAccounts :+ cloudAccount) match {
+          val versionedCloudAccount = cloudAccount.version match {
+            case None => cloudAccount.copy(version=Some(1))
+            case Some(result) => cloudAccount
+          }
+          saveCloudAccountsToKeyStore(cloudAccounts :+ versionedCloudAccount) match {
             case Success(v) => Right(Unit)
             case Failure(ex) => Left(KeyStoreWriteError(ex.getMessage))
           }

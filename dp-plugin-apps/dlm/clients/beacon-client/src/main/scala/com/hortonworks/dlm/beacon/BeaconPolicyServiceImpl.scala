@@ -137,14 +137,14 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
         case Some(targetSnapshotRetentionNumber) => "\ntargetSnapshotRetentionNumber = " + targetSnapshotRetentionNumber
         case None => ""
       }) +
-      (policyDefinitionRequest.retryAttempts match {
-        case Some(retryAttempts) => "\nretryAttempts = " + retryAttempts
+      (policyDefinitionRequest.`cloud.encryptionAlgorithm` match {
+        case Some(cloudEncryptionAlgorithm) => "\ncloud.encryptionAlgorithm = " + cloudEncryptionAlgorithm
         case None => ""
       }) +
-      (policyDefinitionRequest.retryDelay match {
-        case Some(retryDelay) => "\nretryDelay = " + retryDelay
+      (policyDefinitionRequest.`cloud.encryptionKey` match {
+        case Some(cloudEncryptionKey) => "\ncloud.encryptionKey = " + cloudEncryptionKey
         case None => ""
-      })
+      }) 
   }
 
   private def mapToPolicyTestRequest(policyTestRequest : PolicyTestRequest) = {

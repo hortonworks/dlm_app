@@ -60,7 +60,7 @@
     <span
       class="iamRole"
       [attr.qe-attr]="'cloud-account-account-iamRole-' + index"
-      *ngIf="account.accountDetails.credentialType === IAM_ROLE">
+      *ngIf="account.accountDetails.credentialType === AWS_INSTANCEPROFILE">
       {{'page.cloud_stores.content.accounts.iam_role' | translate}}
     </span>
     <span

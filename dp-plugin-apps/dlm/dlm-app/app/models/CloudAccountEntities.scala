@@ -46,8 +46,8 @@ object CloudAccountEntities {
     def accountName: Option[String]
   }
   @SerialVersionUID(1234)
-  case class CloudAccountWithCredentials(id: String, accountCredentials: CloudAccountCredentials, accountDetails: CloudAccountDetails) extends Serializable
-  case class CloudAccountsItem(id: String, accountDetails: CloudAccountDetails)
+  case class CloudAccountWithCredentials(id: String, version: Option[Long], accountCredentials: CloudAccountCredentials, accountDetails: CloudAccountDetails) extends Serializable
+  case class CloudAccountsItem(id: String, version: Long, accountDetails: CloudAccountDetails)
   case class CloudAccountsBody(accounts: List[CloudAccountsItem])
 
   implicit val cloudCredentialTypeReads = Reads.enumNameReads(CloudCredentialType)
@@ -62,7 +62,7 @@ object CloudAccountEntities {
     def reads(json: JsValue): JsResult[CloudAccountCredentials] = {
       def from(name: CloudCredentialType, data: JsObject): JsResult[CloudAccountCredentials] = name match {
         case AWS_ACCESSKEY  => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
-        case IAM_ROLE => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
+        case AWS_INSTANCEPROFILE => Json.fromJson[S3AccountCredential](data)(s3CloudAccountCredentialFmt)
         case WASB_TOKEN  => Json.fromJson[WASBAccountCredential](data)(Json.format[WASBAccountCredential])
         case WASB_SAS_TOKEN => Json.fromJson[WASBAccountCredentialSAS](data)(Json.format[WASBAccountCredentialSAS])
         case ADLS_STS => Json.fromJson[ADLSAccountCredentials](data)(Json.format[ADLSAccountCredentials])

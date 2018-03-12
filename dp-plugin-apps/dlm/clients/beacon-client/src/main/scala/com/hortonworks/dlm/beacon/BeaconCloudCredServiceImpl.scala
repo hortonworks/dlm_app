@@ -54,6 +54,7 @@ class BeaconCloudCredServiceImpl()(implicit ws: KnoxProxyWsClient) extends Beaco
   }
 
   private def mapToCloudCredRequest(cloudCredRequest : CloudCredRequest) = {
+    "version = " + cloudCredRequest.version + "\n" +
      (cloudCredRequest.name match {
         case Some(name) => "name=" + name + "\n"
         case None => ""

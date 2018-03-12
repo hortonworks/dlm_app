@@ -62,21 +62,22 @@ object ResponseEntities {
 
   case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String,
                                        wireEncryption: Boolean, rangerCreateDenyPolicy: String, replication_TDE: Option[Boolean],
-                                       replication_cloud_fs: Option[Boolean], replication_cloud_hive_withCluster: Option[Boolean])
+                                       replication_cloud_fs: Option[Boolean], replication_cloud_hive_withCluster: Option[Boolean],
+                                       cloudHosted: Option[Boolean])
 
   case class BeaconAdminStatusDetails(clusterId: Long, beaconEndpoint: String, beaconAdminStatus: BeaconAdminStatusResponse)
 
   case class HdfsFile(accessTime: Long, blockSize: Long, group: String, length: Long, modificationTime: Long,
                       owner: String, pathSuffix: String, permission: String, replication: Int, `type`: String,
-                      isEncrypted: Option[Boolean], encryptionKeyName: Option[String])
+                      isEncrypted: Option[Boolean], encryptionKeyName: Option[String], snapshottable: Option[Boolean])
 
   case class BeaconHdfsFileResponse(status: String, message: String, requestId: String, totalResults: Long, fileList: Seq[HdfsFile])
 
-  case class HiveDbName(database: String)
+  case class HiveDbName(database: String, isEncrypted: Option[Boolean], encryptionKeyName: Option[String], snapshottable: Option[String])
   
   case class BeaconHiveDbResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbName])
 
-  case class HiveDbTables(database: String, table: Seq[String])
+  case class HiveDbTables(database: String, isEncrypted: Option[Boolean], encryptionKeyName: Option[String], table: Seq[String])
 
   case class BeaconHiveDbTablesResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbTables])
 
@@ -101,11 +102,13 @@ object RequestEntities {
                                       distcpMaxMaps: Option[Long], distcpMapBandwidth: Option[Long], queueName: Option[String],
                                       `tde.sameKey`: Option[Boolean], description: Option[String], sourceSnapshotRetentionAgeLimit: Option[Long],
                                       sourceSnapshotRetentionNumber: Option[Long], targetSnapshotRetentionAgeLimit: Option[Long],
-                                      targetSnapshotRetentionNumber: Option[Long], retryAttempts: Option[Long], retryDelay: Option[Long])
+                                      targetSnapshotRetentionNumber: Option[Long], `cloud.encryptionAlgorithm`: Option[String],
+                                      `cloud.encryptionKey`: Option[String])
+
   case class PolicyTestRequest(`type`: String, cloudCred: String, sourceCluster: Option[String], sourceDataset: Option[String],
                                targetDataset: Option[String], targetCluster: Option[String])
 
-  case class CloudCredRequest(name: Option[String], provider: Option[String], authtype: Option[String], `aws.access.key`: Option[String],
+  case class CloudCredRequest(name: Option[String], version: Long, provider: Option[String], authtype: Option[String], `aws.access.key`: Option[String],
                               `aws.secret.key`: Option[String], `aws.encryption.key`: Option[String] = None)
 }
 

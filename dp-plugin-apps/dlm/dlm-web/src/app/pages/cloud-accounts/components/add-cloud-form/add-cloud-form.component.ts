@@ -22,7 +22,7 @@ import {
   CREDENTIAL_TYPE_LABELS,
   S3_TYPE_VALUES,
   AWS_ACCESSKEY,
-  IAM_ROLE,
+  AWS_INSTANCEPROFILE,
   CLOUD_PROVIDER_LABELS,
   CLOUD_PROVIDER_VALUES
 } from 'constants/cloud.constant';
@@ -117,7 +117,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
           }
         };
       }
-    } else if (authType === IAM_ROLE) {
+    } else if (authType === AWS_INSTANCEPROFILE) {
       const cloudProviderType = formValue.get('cloudProviderType').value;
       return {
         id: formValue.get('credentialName').value.trim(),
@@ -230,7 +230,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
   }
 
   get isIamRoleAuthType(): boolean {
-    return this.authType === IAM_ROLE;
+    return this.authType === AWS_INSTANCEPROFILE;
   }
 
   get isValidationFailure(): boolean {
@@ -295,7 +295,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
       } else {
         this.errorMessage = this.t.instant('page.cloud_stores.content.accounts.add.invalid_form');
       }
-    } else if (authType === IAM_ROLE) {
+    } else if (authType === AWS_INSTANCEPROFILE) {
       this.isSaveInProgress = true;
       const requestPayload = this.serializeValue(this.addCloudForm);
       this.saveAccount(requestPayload);

@@ -419,13 +419,22 @@ class AmbariService @Inject()(
                           "hive-site",
                           "hive.repl.replica.functions.root.dir"))
 
+                    val hmsKerberosPrincipal: Option[String] =
+                      convertEitherToOption(
+                        getPropertyValue(
+                          res,
+                          AmbariService.HIVE_SERVICE_NAME,
+                          "hive-site",
+                          "hive.metastore.kerberos.principal"))
+
                     val hiveServiceConfigMap: Map[String, Option[String]] = Map(
                       "hsEndpoint" -> Some(hsEndpoint),
                       "hive.server2.authentication.kerberos.principal" -> hsKerberosPrincipal,
                       "hive.metastore.uris" -> hiveMetastoreUris,
                       "hive.metastore.warehouse.dir" -> hmsWarehouseDir,
                       "hive.warehouse.subdir.inherit.perms" -> hmsWarehouseDirPerms,
-                      "hive.repl.replica.functions.root.dir" -> hmsReplRootDir
+                      "hive.repl.replica.functions.root.dir" -> hmsReplRootDir,
+                      "hive.metastore.kerberos.principal" -> hmsKerberosPrincipal
                     )
 
                     p.success(Right(hiveServiceConfigMap))

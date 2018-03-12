@@ -17,7 +17,7 @@ import { TableTheme } from 'common/table/table-theme.type';
 import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { ACTION_TYPES } from 'pages/cloud-accounts/components/cloud-account-actions/cloud-account-actions.component';
-import {IAM_ROLE, CLOUD_PROVIDER_LABELS, CREDENTIAL_ERROR_TYPES} from 'constants/cloud.constant';
+import {AWS_INSTANCEPROFILE, CLOUD_PROVIDER_LABELS, CREDENTIAL_ERROR_TYPES} from 'constants/cloud.constant';
 import { POLICY_UI_STATUS } from 'constants/status.constant';
 
 @Component({
@@ -29,7 +29,7 @@ import { POLICY_UI_STATUS } from 'constants/status.constant';
 })
 export class CloudAccountsListComponent implements OnInit {
 
-  IAM_ROLE = IAM_ROLE;
+  AWS_INSTANCEPROFILE = AWS_INSTANCEPROFILE;
   CLOUD_PROVIDER_LABELS = CLOUD_PROVIDER_LABELS;
 
   @Output() removeAccount = new EventEmitter<CloudAccount>();

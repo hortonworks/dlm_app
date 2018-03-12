@@ -51,7 +51,7 @@ class CloudServiceImpl @Inject() (
         Future.sequence(accounts.filter(x =>
           x.accountDetails.credentialType match {
             case None => false
-            case Some(result) => result != CloudCredentialType.IAM_ROLE
+            case Some(result) => result != CloudCredentialType.AWS_INSTANCEPROFILE
           }).map(x => checkUserIdentityValid(x.id))).map({
           cloudCredentialStatusList => {
             val allCloudCreds : Seq[CloudCredentialStatus] = cloudCredentialStatusList.filter(x => x.isRight).map(_.right.get)
