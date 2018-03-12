@@ -297,8 +297,6 @@ object Webservice {
     def getEndpointsForCluster(clusterId: Long, service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
 
     def getAllServiceEndpoints(serviceName: String): Future[Either[Errors, Seq[ClusterServiceWithConfigs]]]
-
-    def getServiceEndpointForCluster(clusterId:String, serviceId: String): Future[String]
   }
 
   trait ClusterHostsService extends DbClientService {
@@ -365,10 +363,16 @@ object Webservice {
     def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]]
   }
 
-  trait SkuService extends  DbClientService {
+  trait SkuService extends DbClientService {
     def getAllSkus():Future[Either[Errors,Seq[Sku]]]
     def getSku(name:String): Future[Either[Errors,Sku]]
     def getEnabledSkus():Future[Either[Errors,Seq[EnabledSku]]]
     def enableSku(enabledSku: EnabledSku):Future[Either[Errors,EnabledSku]]
+  }
+
+  trait CertificateService extends DbClientService {
+    def list(active: Option[Boolean]): Future[Seq[Certificate]]
+    def create(certificate: Certificate): Future[Certificate]
+    def delete(certificateId: String): Future[Long]
   }
 }

@@ -81,6 +81,13 @@ class Module extends AbstractModule {
     new LocationServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("certificateService")
+  def provideCertificateService(implicit ws: WSClient, configuration: Configuration): CertificateService = {
+    new CertificateServiceImpl(configuration.underlying)
+  }
+
 
   @Provides
   @Singleton
