@@ -1,0 +1,80 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="container">
+  <div class="title-pane">
+    <div class="mdl-grid mdl-grid--no-spacing action-bar">
+      <div class="page-title">
+        <span class="hwx-title">Certificate Settings</span>
+      </div>
+      <div class="mdl-layout-spacer"></div>
+      <div class="action-pane">
+        <button class="mdl-button btn-hwx-primary margin-left-10 pull-right" (click)="showUpload()">Upload</button>
+        <button class="mdl-button btn-hwx-secondary pull-right" (click)="deleteCert()">Delete</button>
+    </div>
+    </div>
+  </div>
+
+    <table class="mdl-data-table mdl-js-data-table" dp-config-table>
+      <thead>
+        <tr>
+          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
+            <input class="id-check" type="checkbox" value="all" [(ngModel)]="allSelected" (change)="selectAll()"/>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              Certificate KeyPair Name
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+             Certificate
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+             Status
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cert of certs">
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
+            <input class="id-check" type="checkbox" [(ngModel)]="cert.selected"/>
+          </td>
+          <td class="mdl-data-table__cell--non-numeric">{{cert.name}}</td>
+          <td class="mdl-data-table__cell--non-numeric"><div title="{{cert.data}}" class="cert-data">{{cert.data}}</div></td>
+          <td class="mdl-data-table__cell--non-numeric">{{cert.active}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="showingUpload" id="upload-container">
+      <div class="sub-title">
+        <span class="hwx-subtitle">Upload</span>
+      </div>
+      <form class="upload-form">
+        <div class="dp-input form-group">
+          <label class="required">Certificate Key Pair Name</label>
+          <input required name="file-name" type="text" [(ngModel)]="name" placeholder="Name of the certificate"/>
+        </div>
+        <div class="dp-input form-group">
+          <label class="required">Certificate File</label>
+          <label class="fileContainer">
+            <div>
+              <div class="btn-hwx-default upload-btn">Choose</div>
+              <input class="pull-left file-name-input" name="file" [(ngModel)]="selectedFile"/></div>
+              <input #fileInput required type="file" (change)="fileChanged(fileInput.files)" placeholder="Upload File"/>
+          </label>
+        </div>
+        <button class="mdl-button btn-hwx-primary margin-right-10" (click)="upload()">Upload</button>
+        <button class="mdl-button btn-hwx-secondary" (click)="hideUpload()">
+          <span *ngIf="!uploading && !uploadingSuccess && !uploadingFailure">Cancel</span>
+            <span *ngIf="uploading || uploadingSuccess || uploadingFailure">Back</span>
+        </button>
+      </form>
+
+    </div>
+</div>

@@ -40,6 +40,7 @@ import {TabsModule} from '../../shared/tabs/tabs.module';
 import { ManualInstallCheckComponent } from './views/service-management/manual-install-check/manual-install-check.component';
 import { LdapEditConfigComponent } from './views/ldap-edit-config/ldap-edit-config.component';
 import { CommonTopRowComponent } from './views/user-management/common-top-row/common-top-row.component';
+import {SettingsComponent} from "./views/settings/settings.component";
 
 @NgModule({
   imports: [
@@ -73,7 +74,8 @@ import { CommonTopRowComponent } from './views/user-management/common-top-row/co
     VerificationComponent,
     ManualInstallCheckComponent,
     LdapEditConfigComponent,
-    CommonTopRowComponent
+    CommonTopRowComponent,
+    SettingsComponent
   ]
 })
 export class InfraModule {

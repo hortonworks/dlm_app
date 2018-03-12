@@ -12,6 +12,13 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+#Settings
+
+POST          /api/settings/create-cert                              controllers.Settings.createCert()
+GET           /api/settings/certs                                    controllers.Settings.listCerts()
+DELETE        /api/settings/delete-cert/:certificateId                         controllers.Settings.deleteCert(certificateId: String)
+
+
 # health checks
 # ===========================================
 GET           /health                                                controllers.Status.health

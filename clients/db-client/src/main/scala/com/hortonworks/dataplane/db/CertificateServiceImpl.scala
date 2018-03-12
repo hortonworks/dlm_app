@@ -40,7 +40,7 @@ class CertificateServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def create(certificate: Certificate): Future[Certificate] = {
-    ws.url(s"$url/certificate")
+    ws.url(s"$url/certificates")
       .withHeaders(
         "Accept" -> "application/json",
         "Content-Type" -> "application/json"
@@ -55,7 +55,7 @@ class CertificateServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def delete(certificateId: String): Future[Long] = {
-    ws.url(s"$url/certificate/$certificateId")
+    ws.url(s"$url/certificates/$certificateId")
       .withHeaders("Accept" -> "application/json")
       .delete()
       .map { res =>
