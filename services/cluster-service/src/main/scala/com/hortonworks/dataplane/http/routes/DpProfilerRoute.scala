@@ -31,7 +31,7 @@ import play.api.libs.json.JsError
 import com.hortonworks.dataplane.http.JsonSupport._
 import com.typesafe.config.Config
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
-import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.AssetResolvedProfilerMetricRequest
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.ProfilerMetricRequest
 import com.hortonworks.dataplane.commons.domain.profiler.parsers.RequestParser._
 import com.hortonworks.dataplane.commons.domain.profiler.parsers.ResponseParser._
 import com.hortonworks.dataplane.cs.profiler.{GlobalProfilerConfigs, MetricRetriever}
@@ -257,7 +257,7 @@ class DpProfilerRoute @Inject()(
       extractRequest { request =>
         post {
           entity(as[JsObject]) { request =>
-            request.validate[AssetResolvedProfilerMetricRequest] match {
+            request.validate[ProfilerMetricRequest] match {
               case JsSuccess(metricRequest, _) =>
                 userNameOpt.map(userName => {
                   onComplete(

@@ -9,8 +9,8 @@
 
 package com.hortonworks.dataplane.commons.domain.profiler.parsers
 
-import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics._
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.MetricType.MetricType
+import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
@@ -25,13 +25,20 @@ object MetricParser {
 
     def writes(myEnum: MetricType) = JsString(myEnum.toString)
   }
+
   private implicit val topKUsersPerAssetMetricFormat: Format[TopKUsersPerAssetMetric] = Json.format[TopKUsersPerAssetMetric]
   private implicit val assetDistributionBySensitivityTagMetricFormat: Format[AssetDistributionBySensitivityTagMetric] =
     Json.format[AssetDistributionBySensitivityTagMetric]
   private implicit val queriesAndSensitivityDistributionMetricFormat: Format[QueriesAndSensitivityDistributionMetric] =
     Json.format[QueriesAndSensitivityDistributionMetric]
-  private implicit val secureAssetAccessUserCountMetricMetricFormat: Format[SecureAssetAccessUserCountMetric] =
+  private implicit val secureAssetAccessUserCountMetricFormat: Format[SecureAssetAccessUserCountMetric] =
     Json.format[SecureAssetAccessUserCountMetric]
+  private implicit val topKCollectionsMetricFormat: Format[TopKCollectionsMetric] =
+    Json.format[TopKCollectionsMetric]
+  private implicit val topKAssetsMetricFormat: Format[TopKAssetsMetric] =
+    Json.format[TopKAssetsMetric]
+  private implicit val assetCountsMetricFormat: Format[AssetCountsMetric] =
+    Json.format[AssetCountsMetric]
 
   private implicit val assetReadEither: Reads[Either[ProfilerMetric, ErrorMessage]] = ((JsPath \ metricTypeIdentifier).read[MetricType]
     and (JsPath \ metricDefinitionIdentifier).read[JsValue]) (
@@ -46,6 +53,12 @@ object MetricParser {
           , definition.as[SecureAssetAccessUserCountMetric]))
         case MetricType.SensitivityDistribution => Left(ProfilerMetric(MetricType.SensitivityDistribution
           , SensitivityDistributionMetric))
+        case MetricType.TopKCollections => Left(ProfilerMetric(MetricType.TopKCollections
+          , definition.as[TopKCollectionsMetric]))
+        case MetricType.TopKAssets => Left(ProfilerMetric(MetricType.TopKAssets
+          , definition.as[TopKAssetsMetric]))
+        case MetricType.AssetCounts => Left(ProfilerMetric(MetricType.AssetCounts
+          , definition.as[AssetCountsMetric]))
         case _ => Right(s"unsupported metric type ${metricType.toString}")
       }
     }
@@ -64,6 +77,9 @@ object MetricParser {
       case definition: AssetDistributionBySensitivityTagMetric => Json.toJson(Map(metricTypeIdentifier -> JsString(metric.metricType.toString), metricDefinitionIdentifier -> Json.toJson(definition)))
       case definition: QueriesAndSensitivityDistributionMetric => Json.toJson(Map(metricTypeIdentifier -> JsString(metric.metricType.toString), metricDefinitionIdentifier -> Json.toJson(definition)))
       case definition: SecureAssetAccessUserCountMetric => Json.toJson(Map(metricTypeIdentifier -> JsString(metric.metricType.toString), metricDefinitionIdentifier -> Json.toJson(definition)))
+      case definition: TopKCollectionsMetric => Json.toJson(Map(metricTypeIdentifier -> JsString(metric.metricType.toString), metricDefinitionIdentifier -> Json.toJson(definition)))
+      case definition: TopKAssetsMetric => Json.toJson(Map(metricTypeIdentifier -> JsString(metric.metricType.toString), metricDefinitionIdentifier -> Json.toJson(definition)))
+      case definition: AssetCountsMetric => Json.toJson(Map(metricTypeIdentifier -> JsString(metric.metricType.toString), metricDefinitionIdentifier -> Json.toJson(definition)))
       case SensitivityDistributionMetric => Json.toJson(Map(metricTypeIdentifier -> JsString(metric.metricType.toString), metricDefinitionIdentifier -> emptyJson))
       case _ => JsNull
     }

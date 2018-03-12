@@ -150,8 +150,6 @@ object Webservice {
 
     def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long, state: String): Future[Either[Errors, AssetsAndCounts]]
 
-    def allAssetsWithDatasetId(id: Long): Future[Either[Errors, List[DataAsset]]]
-
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
     def updateDataset(datasetId : String, dataset: Dataset): Future[Dataset]
