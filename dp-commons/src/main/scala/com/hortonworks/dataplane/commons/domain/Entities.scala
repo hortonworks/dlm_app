@@ -434,7 +434,7 @@ object Entities {
                       objectType: String,
                       objectId: Long)
 
-  case class Certificate(id: Option[String] = None, data: String, active: Boolean)
+  case class Certificate(id: Option[String] = None, name: String, data: String, active: Boolean)
 }
 
 object JsonFormatters {
