@@ -55,11 +55,13 @@ class CertificateRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
 
     def name = column[String]("name")
 
+    def format = column[String]("format")
+
     def data = column[String]("data")
 
     def active = column[Boolean]("active")
 
-    def * = (id, name, data, active) <> ((Certificate.apply _).tupled, Certificate.unapply)
+    def * = (id, name, format, data, active) <> ((Certificate.apply _).tupled, Certificate.unapply)
   }
 
 }
