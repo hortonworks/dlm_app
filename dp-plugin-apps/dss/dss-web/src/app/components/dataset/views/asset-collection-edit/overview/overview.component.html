@@ -21,17 +21,17 @@
 <div class="charts-cards-container summary">
   <div class="charts-card">
     <div class="title">{{"pages.dataset.asset-collection.no-of-tables" | translate}} </div>
-    <div class="value"> {{assetCollectionDashboard.summary.noOfTables}} </div>
+    <div class="value"> {{sensitivityDistributionData.totalAssets.toLocaleString()}} </div>
   </div>
 
   <div class="charts-card">
     <div class="title">{{"pages.dataset.asset-collection.no-of-profiled-tables" | translate}} </div>
-    <div class="value"> {{assetCollectionDashboard.summary.noOfProfiledTables}} </div>
+    <div class="value"> -- </div>
   </div>
 
   <div class="charts-card">
     <div class="title">{{"pages.dataset.asset-collection.no-of-sensitive-tables" | translate}} </div>
-    <div class="value"> {{assetCollectionDashboard.summary.noOfSensitiveTables}} </div>
+    <div class="value"> {{sensitivityDistributionData.assetsHavingSensitiveData.toLocaleString()}} </div>
   </div>
 </div>
 
@@ -39,28 +39,28 @@
 <div class="charts-cards-container two-col card-margin-top">
   <div class="charts-card">
     <div class="title"> {{"pages.dataset.asset-collection.top-10-users" | translate}} </div>
-    <svg #topUsers></svg>
+    <svg #topUsers class="loader"></svg>
   </div>
   <div class="charts-card">
     <div class="title"> {{"pages.dataset.asset-collection.sensitive-vs-non-sensitive" | translate}} </div>
-    <svg #sensitiveNonSensitive></svg>
+    <svg #sensitiveNonSensitive class="loader"></svg>
   </div>
 </div>
 
 <div class="charts-cards-container two-col card-margin-top">
   <div class="charts-card">
     <div class="title"> {{"pages.dataset.asset-collection.asset-distribution-by-sensitive-tag" | translate}} </div>
-    <svg #distributionByTag></svg>
+    <svg #distributionByTag class="loader"></svg>
   </div>
   <div class="charts-card">
     <div class="title"> {{"pages.dataset.asset-collection.no-of-quires-running-sensitive-data" | translate}} </div>
-    <svg #quiresRunningSensitiveData></svg>
+    <svg #quiresRunningSensitiveData class="loader"></svg>
   </div>
 </div>
 
 <div class="charts-cards-container one-col card-margin-top">
   <div class="charts-card">
     <div class="title"> {{"pages.dataset.asset-collection.users-accessing-sensitive-data" | translate}} </div>
-    <svg #usersAccessingSensitiveData></svg>
+    <svg #usersAccessingSensitiveData class="loader"></svg>
   </div>
 </div>

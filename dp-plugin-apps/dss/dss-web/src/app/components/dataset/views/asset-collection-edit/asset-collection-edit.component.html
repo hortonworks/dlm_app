@@ -35,7 +35,7 @@
       <dp-tabs [tabEnum]="tabEnum" (selected)="selectedTab=$event"> </dp-tabs>
     </div>
 
-    <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW"> </dss-overview>
+    <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW" [clusterId]="dsModel.clusterId"> </dss-overview>
 
     <ds-full-view *ngIf="selectedTab===tabEnum.ASSETS"> </ds-full-view>
   </div>
