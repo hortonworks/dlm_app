@@ -31,7 +31,7 @@ object Webservice {
     protected  def createEmptyErrorResponse = {
       Left(Errors(Seq(Error(status=404, message = "No response from server"))))
     }
-    
+
     protected def extractEntity[T](res: WSResponse,
                                    f: WSResponse => T): Either[Errors, T] = {
       Right(f(res))
@@ -149,6 +149,8 @@ object Webservice {
     def listRichDatasetByTag(tagName: String, queryString : String,userId:Long): Future[Either[Errors, Seq[RichDataset]]]
 
     def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long, state: String): Future[Either[Errors, AssetsAndCounts]]
+
+    def allAssetsWithDatasetId(id: Long): Future[Either[Errors, List[DataAsset]]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 

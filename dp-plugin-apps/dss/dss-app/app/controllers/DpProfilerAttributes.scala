@@ -18,19 +18,25 @@ import com.hortonworks.dataplane.cs.Webservice.DpProfilerService
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.Controller
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DataSetService
+import com.hortonworks.dataplane.commons.domain.Entities
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.{AssetResolvedProfilerMetricRequest, ProfilerMetricRequest}
+import com.hortonworks.dataplane.commons.domain.profiler.parsers.RequestParser._
+import controllers.helpers.AssetRetriever
 import services.UtilityService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DpProfilerAttributes @Inject()(
-      @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
-      @Named("dataSetService") val dataSetService: DataSetService,
-      val utilityService: UtilityService
-) extends Controller {
+                                      @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
+                                      @Named("dataSetService") val dataSetService: DataSetService,
+                                      val utilityService: UtilityService
+                                    ) extends Controller {
 
   def startProfilerJob(clusterId: String, dbName: String, tableName: String) = {
     AuthenticatedAction.async { req =>
@@ -76,7 +82,7 @@ class DpProfilerAttributes @Inject()(
     AuthenticatedAction.async { req =>
       Logger.info(s"Received getScheduleStatus for entity $clusterId $dataSetId")
       implicit val token = req.token
-      dataSetService.retrieve(dataSetId).flatMap{
+      dataSetService.retrieve(dataSetId).flatMap {
         case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(datasetAndCategories) => {
           val dataset = datasetAndCategories.dataset
@@ -143,5 +149,28 @@ class DpProfilerAttributes @Inject()(
     }
   }
 
+  def getMetrics(userName: String) = AuthenticatedAction.async(parse.json) { request =>
+    implicit val token: Option[Entities.HJwtToken] = request.token
+    request.body.validate[ProfilerMetricRequest] match {
+      case JsSuccess(simpleRequest, _) =>
+        Logger.debug(s"Received Metrics request for  $simpleRequest for user $userName ")
+        AssetRetriever.getAssets(simpleRequest.context, dataSetService) flatMap {
+          assets =>
+            val request = AssetResolvedProfilerMetricRequest(simpleRequest.clusterId, assets, simpleRequest.metrics)
+            dpProfilerService.getMetrics(request, userName)
+        } map {
+          case Left(errors) =>
+            errors.errors.head.status match {
+              case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 405 => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case 503 => ServiceUnavailable(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case _ => InternalServerError(Json.toJson(errors))
+            }
+          case Right(attributes) => Ok(Json.toJson(attributes))
+        }
+      case error: JsError =>
+        Future.successful(BadRequest(s"Failed to parse request  ${BadRequest(JsError.toFlatForm(error).toString())}"))
+    }
+  }
 
 }

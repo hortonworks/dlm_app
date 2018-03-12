@@ -76,6 +76,8 @@ GET           /api/dpProfiler/jobStatus                               controller
 GET           /api/dpProfiler/scheduleStatus                          controllers.DpProfilerAttributes.getScheduleStatus(clusterId: String, dataSetId: String)
 GET           /api/dpProfiler/auditResults                            controllers.DpProfilerAttributes.getAuditResults(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
 GET           /api/dpProfiler/auditActions                            controllers.DpProfilerAttributes.getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
+POST          /api/dpProfiler/metrics                                 controllers.DpProfilerAttributes.getMetrics(userName: String ?="")
+
 
 # Ranger
 # ===========================================
