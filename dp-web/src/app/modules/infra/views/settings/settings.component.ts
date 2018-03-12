@@ -11,6 +11,7 @@
 
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {SettingsService} from "../../../../services/settings.service";
+import {NgForm} from "@angular/forms";
 
 @Component({
   selector: 'dp-settings',
@@ -26,6 +27,11 @@ export class SettingsComponent implements OnInit {
   uploading = false;
   uploadSuccess = false;
   uploadFailure = false;
+  showError = false;
+  @ViewChild('fileInput') fileInput;
+  @ViewChild('uploadForm') uploadForm: NgForm;
+  name: string;
+  errorMessage: string;
 
   constructor(private settingsService: SettingsService) { }
 
@@ -42,9 +48,6 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  @ViewChild('fileInput') fileInput;
-  name: string;
-
   fileChanged(files){
     this.selectedFile = files[0].name;
   }
@@ -56,8 +59,14 @@ export class SettingsComponent implements OnInit {
   }
 
   upload(): void {
+    let files = this.fileInput.nativeElement.files;
+    if(!this.uploadForm.valid || !files || !files.length){
+      this.showError = true;
+      this.errorMessage = 'Please fill all the fields marked with (*)!';
+      return;
+    }
     this.uploading = true;
-    let file = this.fileInput.nativeElement.files[0];
+    let file = files[0];
     let reader = new FileReader();
     reader.readAsText(file);
     reader.onload = (data) => {
@@ -68,13 +77,16 @@ export class SettingsComponent implements OnInit {
         this.uploadSuccess = true;
         this.uploadFailure = false;
       },(error)=>{
-        console.error(error)
         this.uploadSuccess = false;
         this.uploadFailure = true;
       })
     };
+    let self = this;
     reader.onerror = function () {
-      console.error("Unable to read file")
+      console.error("Unable to read file");
+      self.uploading = false;
+      self.errorMessage = 'Error occurred while reading the file!'
+      self.showError = true;
     };
   }
 
@@ -84,6 +96,8 @@ export class SettingsComponent implements OnInit {
 
   hideUpload(){
     this.showingUpload = false;
+    this.uploadFailure = false;
+    this.uploadSuccess = false;
     this.clearForm();
   }
 
@@ -100,7 +114,8 @@ export class SettingsComponent implements OnInit {
   clearForm(){
     this.selectedFile = '';
     this.name = '';
-    this.uploading = false
+    this.uploading = false;
+    this.showError = false;
   }
 
 }
