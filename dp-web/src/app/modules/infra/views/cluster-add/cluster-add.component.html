@@ -107,6 +107,24 @@
           <div class="mdl-cell mdl-cell--6-col">
             <div class="datalake-input">
               <div class="form-group">
+                <label class="required">{{"pages.infra.labels.behindGateway" | translate}}</label>
+                <div class="hwx-inline-desc">{{"pages.infra.description.behindGateway" | translate}}</div>
+                <div class="form-toggle-comments">
+                  <ui-switch size="small" data-se="cluster_add__behind_gateway" class="dp-input" name="behindGateway" [(ngModel)]="behindGateway"></ui-switch>
+                  <span *ngIf="behindGateway">{{"pages.infra.labels.behindGateway-enabled" | translate}}</span>
+                  <span *ngIf="!behindGateway">{{"pages.infra.labels.behindGateway-disabled" | translate}}</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="required">{{"pages.infra.labels.allowUntrusted" | translate}}</label>
+                <div class="hwx-inline-desc">{{"pages.infra.description.allowUntrusted" | translate}}</div>
+                <div class="form-toggle-comments">
+                  <ui-switch size="small" data-se="cluster_add__allow_untrusted" class="dp-input" name="allowUntrusted" [(ngModel)]="allowUntrusted"></ui-switch>
+                  <span *ngIf="allowUntrusted">{{"pages.infra.labels.allowUntrusted-enabled" | translate}}</span>
+                  <span *ngIf="!allowUntrusted">{{"pages.infra.labels.allowUntrusted-disabled" | translate}}</span>
+                </div>
+              </div>
+              <div class="form-group">
                 <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
                 <div style="display: flex;align-items: center">

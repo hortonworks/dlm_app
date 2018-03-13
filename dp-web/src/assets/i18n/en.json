@@ -252,7 +252,13 @@
         "hdfsDiskSpace": "HDFS Disk Space",
         "nodeManagers": "NodeManagers",
         "resourceManagerHeapSize": "ResourceManager Heap Size",
-        "resourceManagerUptime": "ResourceManager Uptime"
+        "resourceManagerUptime": "ResourceManager Uptime",
+        "allowUntrusted": "Allow connections to untrusted URLs",
+        "allowUntrusted-enabled": "Default. DataPlane would connect to URLs regardless of their TLS configuration.",
+        "allowUntrusted-disabled": "Recommended. DataPlane would validate certificates before connecting to the cluster. If your cluster uses self-signed certificates, you would need to add them via DataPlane Settings page.",
+        "behindGateway": "Ambari is exposed via Knox",
+        "behindGateway-enabled": "DataPlane would assume that Ambari is exposed via Knox.",
+        "behindGateway-disabled": "DataPlane would assume that Ambari is directly exposed."
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to DataPlane) here.",
@@ -289,7 +295,9 @@
         },
         "rolesOverrideWarning":"This will override any roles the user acquired as part of groups",
         "clusterDeleteWarning":"Removing a cluster causes loss of data such as associated pairings, policies and asset collections. Please delete those objects first before deleting a cluster. This action cannot be undone. Please confirm if you want to go ahead.",
-        "deleteFailed": "Cluster could not be deleted"
+        "deleteFailed": "Cluster could not be deleted",
+        "allowUntrusted": "Enabling this flag would mean that for this cluster, DataPlane would connect to any service regardless of the TLS certificate installed",
+        "behindGateway": "Enable this if Ambari on this cluster is exposed via Knox"
       }
     },
     "dataset": {

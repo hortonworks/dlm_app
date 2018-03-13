@@ -109,6 +109,15 @@ input[type="text"].dp-input {
 
 }
 
+.form-toggle-comments {
+  display: flex;
+  align-items: center;
+
+  & > span {
+    margin-left: 10px;
+  }
+}
+
 .notification-bar {
   padding: 15px;
   background: $concrete;

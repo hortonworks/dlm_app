@@ -65,6 +65,9 @@ export class ClusterAddComponent implements OnInit {
   location: Location;
   isLocationValid: boolean;
 
+  allowUntrusted: boolean = true;
+  behindGateway: boolean = false;
+
   dpRequiredServices = ['ATLAS'];
 
   showNotification = false;
@@ -340,6 +343,9 @@ export class ClusterAddComponent implements OnInit {
     lake.dcName = this.cluster.dcName;
     lake.state = 'TO_SYNC';
     lake.ambariIpAddress = this.cluster.ipAddress;
+    lake.allowUntrusted = this.allowUntrusted;
+    lake.behindGateway = this.behindGateway;
+
     if (this._clusterState.knoxDetected) {
       lake.knoxEnabled = true;
       lake.knoxUrl = this._clusterState.knoxUrl;
