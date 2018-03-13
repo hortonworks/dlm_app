@@ -52,15 +52,15 @@ DELETE        /locations/:locationId                                         con
 POST          /locations                                                     controllers.DpClusters.addLocation
 
 #DpClusters API
-GET           /dpclusters                                                   controllers.DpClusters.all
-POST          /dpclusters                                                   controllers.DpClusters.add
-GET           /dpclusters/:dpClusterId                                      controllers.DpClusters.load(dpClusterId:Long)
-GET           /dpclusters/:dpClusterId/clusters                             controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
-DELETE        /dpclusters/:dpClusterId                                      controllers.DpClusters.delete(dpClusterId:Long)
-PATCH         /dpclusters/status                                            controllers.DpClusters.updateStatus
-PUT           /dpclusters                                                   controllers.DpClusters.update
-GET           /dpclusters/:dpClusterId/services                             controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
-POST          /dpclusters/services                                          controllers.ClusterServices.addWithDpCluster
+GET           /dp/clusters                                                   controllers.DpClusters.all
+POST          /dp/clusters                                                   controllers.DpClusters.add
+GET           /dp/clusters/:dpClusterId                                      controllers.DpClusters.load(dpClusterId:Long)
+GET           /dp/clusters/:dpClusterId/clusters                             controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
+DELETE        /dp/clusters/:dpClusterId                                      controllers.DpClusters.delete(dpClusterId:Long)
+PATCH         /dp/clusters/status                                            controllers.DpClusters.updateStatus
+PUT           /dp/clusters                                                   controllers.DpClusters.update
+GET           /dp/clusters/:dpClusterId/services                             controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
+POST          /dp/clusters/services                                          controllers.ClusterServices.addWithDpCluster
 
 #Clusters API
 GET           /clusters                                                      controllers.DiscoveredClusters.all(dpClusterId: Option[Long])

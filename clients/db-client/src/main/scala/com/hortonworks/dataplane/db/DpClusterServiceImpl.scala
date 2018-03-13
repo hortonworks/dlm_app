@@ -33,7 +33,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   override def list(): Future[Either[Errors, Seq[DataplaneCluster]]] = {
-    ws.url(s"$url/dpclusters")
+    ws.url(s"$url/dp/clusters")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToDpClusters)
@@ -41,7 +41,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def create(dpCluster: DataplaneCluster)
   : Future[Either[Errors, DataplaneCluster]] = {
-    ws.url(s"$url/dpclusters")
+    ws.url(s"$url/dp/clusters")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
@@ -52,21 +52,21 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def retrieve(
                          dpClusterId: String): Future[Either[Errors, DataplaneCluster]] = {
-    ws.url(s"$url/dpclusters/$dpClusterId")
+    ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToDpCluster)
   }
 
    override def retrieveServiceInfo(dpClusterId: String): Future[Either[Errors, Seq[ClusterService]]] = {
-    ws.url(s"$url/dpclusters/$dpClusterId/services")
+    ws.url(s"$url/dp/clusters/$dpClusterId/services")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToClusterService)
   }
 
   override def checkExistenceByUrl(ambariUrl: String): Future[Either[Errors, Boolean]] = {
-    ws.url(s"$url/dpclusters?ambariUrl=$ambariUrl")
+    ws.url(s"$url/dp/clusters?ambariUrl=$ambariUrl")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapClusterExists)
@@ -74,7 +74,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def update(dpClusterId: String, dpCluster: DataplaneCluster)
   : Future[Either[Errors, DataplaneCluster]] = {
-    ws.url(s"$url/dpclusters/$dpClusterId")
+    ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
@@ -85,7 +85,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def delete(
                        dpClusterId: String): Future[Either[Errors, Boolean]] = {
-    ws.url(s"$url/dpclusters/$dpClusterId")
+    ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders("Accept" -> "application/json")
       .delete()
       .map(mapStatus)
@@ -146,7 +146,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def updateStatus(
                              dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]] = {
-    ws.url(s"$url/dpclusters/status")
+    ws.url(s"$url/dp/clusters/status")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
@@ -156,7 +156,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def update(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]] = {
-    ws.url(s"$url/dpclusters")
+    ws.url(s"$url/dp/clusters")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
