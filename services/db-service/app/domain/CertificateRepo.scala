@@ -11,6 +11,7 @@
 
 package domain
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Certificate, Error, WrappedErrorException}
@@ -35,7 +36,7 @@ class CertificateRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
   }
 
   def create(certificate: Certificate): Future[Certificate] =
-    db.run { Certificates returning Certificates += certificate }
+    db.run { Certificates returning Certificates += certificate.copy(created = Some(LocalDateTime.now())) }
 
   def retrieve(id: String): Future[Certificate] =
     db.run(Certificates.filter(_.id === id).result.headOption)
@@ -61,7 +62,11 @@ class CertificateRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPr
 
     def active = column[Boolean]("active")
 
-    def * = (id, name, format, data, active) <> ((Certificate.apply _).tupled, Certificate.unapply)
+    def createdBy = column[Option[Long]]("created_by")
+
+    def created = column[Option[LocalDateTime]]("created")
+
+    def * = (id, name, format, data, active, createdBy, created) <> ((Certificate.apply _).tupled, Certificate.unapply)
   }
 
 }

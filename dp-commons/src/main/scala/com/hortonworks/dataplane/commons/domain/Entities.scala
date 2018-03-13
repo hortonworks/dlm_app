@@ -427,15 +427,20 @@ object Entities {
                        objectType: String,
                        objectId: Long)
 
-  case class FavouriteWithTotal(favourite: Favourite,
-                                totalFavCount: Int)
+  case class FavouriteWithTotal(favourite: Favourite, totalFavCount: Int)
 
   case class Bookmark(id: Option[Long] = None,
                       userId: Long,
                       objectType: String,
                       objectId: Long)
 
-  case class Certificate(id: Option[String] = None, name: String, format: String, data: String, active: Boolean)
+  case class Certificate(id: Option[String] = None,
+                         name: String,
+                         format: String,
+                         data: String,
+                         active: Boolean,
+                         createdBy: Option[Long],
+                         created: Option[LocalDateTime] = Some(LocalDateTime.now()))
 }
 
 object JsonFormatters {
