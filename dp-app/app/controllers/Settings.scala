@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
-import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariEndpoint, ServiceInfo}
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.{CertificateService, DpClusterService, SkuService}

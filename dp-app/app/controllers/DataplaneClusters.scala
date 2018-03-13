@@ -14,7 +14,7 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariEndpoint, ServiceInfo}
+import com.hortonworks.dataplane.commons.domain.Ambari.ServiceInfo
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.{DpClusterService, SkuService}
@@ -146,10 +146,10 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def ambariCheck(url: String) = AuthenticatedAction.async { request =>
+  def ambariCheck(url: String, allowUntrusted: Boolean, behindGateway: Boolean) = AuthenticatedAction.async { request =>
     implicit val token = request.token
     ambariService
-      .statusCheck(AmbariEndpoint(url))
+      .statusCheck(url, allowUntrusted, behindGateway)
       .flatMap {
         case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(checkResponse) => {

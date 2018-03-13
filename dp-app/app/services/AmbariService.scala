@@ -37,8 +37,8 @@ class AmbariService @Inject()(
       .getOrElse(
         configuration.underlying.getString("dp.services.cluster.service.uri"))
 
-  def statusCheck(ambariEndpoint: AmbariEndpoint)(implicit hJwtToken: Option[HJwtToken]): Future[Either[Errors,AmbariCheckResponse]] = {
-    ambariWebService.checkAmbariStatus(ambariEndpoint)
+  def statusCheck(url: String, allowUntrusted: Boolean, behindGateway: Boolean)(implicit hJwtToken: Option[HJwtToken]): Future[Either[Errors,AmbariCheckResponse]] = {
+    ambariWebService.checkAmbariStatus(url, allowUntrusted, behindGateway)
   }
 
   def getClusterServices(dpcwServices: DpClusterWithDpServices)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[ServiceInfo]]] = {

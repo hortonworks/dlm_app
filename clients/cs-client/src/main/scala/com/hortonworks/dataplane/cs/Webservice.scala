@@ -12,7 +12,7 @@
 package com.hortonworks.dataplane.cs
 
 import com.google.common.base.Strings
-import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, AmbariEndpoint, ServiceInfo}
+import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, ServiceInfo}
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
 import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.AssetResolvedProfilerMetricRequest
@@ -101,7 +101,7 @@ object Webservice {
 
     def syncAmbari(dpCluster: DataplaneClusterIdentifier)(implicit token:Option[HJwtToken]):Future[Boolean]
 
-    def checkAmbariStatus(endpoint:AmbariEndpoint)(implicit token:Option[HJwtToken]):Future[Either[Errors,AmbariCheckResponse]]
+    def checkAmbariStatus(ambariUrl: String, allowUntrusted: Boolean, behindGateway: Boolean)(implicit token:Option[HJwtToken]):Future[Either[Errors,AmbariCheckResponse]]
 
     def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[AmbariCluster]]]
 

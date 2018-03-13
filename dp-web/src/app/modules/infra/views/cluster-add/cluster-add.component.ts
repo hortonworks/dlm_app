@@ -129,6 +129,11 @@ export class ClusterAddComponent implements OnInit {
     this._isClusterValidateSuccessful = false;
     this.clusterForm.reset();
     this.cluster = new Cluster();
+
+    window.setTimeout(() => {
+      this.allowUntrusted = true;
+      this.behindGateway = false;
+    }, 0);
   }
 
   getClusterInfo(event) {
