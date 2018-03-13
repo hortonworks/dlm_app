@@ -180,6 +180,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
     };
 
     let clusterId;
+    const sc = this.clusters.find(c => c.id === source.cluster);
 
     if (destination.type === SOURCE_TYPES.CLUSTER) {
       // destination cluster
@@ -190,6 +191,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
         policyData.policyDefinition.targetDataset = destination.path;
       }
     } else {
+      clusterId = sc.id;
       if (destination.type === SOURCE_TYPES.S3) {
         // destination s3
         policyData.policyDefinition.targetDataset = destination.s3endpoint;
@@ -200,8 +202,6 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
     if (source.type === SOURCE_TYPES.CLUSTER) {
       // source cluster
       let sourceDataset = '';
-      const sc = this.clusters.find(c => c.id === source.cluster);
-      clusterId = sc.id;
       policyData.policyDefinition.sourceCluster = PolicyService.makeClusterId(sc.dataCenter, sc.name);
       if (general.type === POLICY_TYPES.HDFS) {
         sourceDataset = source.directories;
