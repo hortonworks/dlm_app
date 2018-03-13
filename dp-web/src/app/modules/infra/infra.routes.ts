@@ -128,6 +128,6 @@ export const routes: Routes = [{
   path: 'settings',
   component: SettingsComponent,
   data: {
-    crumb: 'infra.clusters.add'
+    crumb: 'infra.settings'
   }
 }];

@@ -180,6 +180,24 @@
         "serviceNotHealthy":"{{serviceName}} has been added as a DataPlane Service, but it is not running. You can still enable this service but the users might not be able to access the service. Click OK to continue."
       }
     },
+    "settings": {
+      "labels": {
+        "settings" : "Settings",
+        "settingsPageTitle":"Certificate Settings",
+        "upload":"Upload",
+        "certificateName":"Certificate Name",
+        "certificate" : "Certificate",
+        "certificateFile":"Certificate File",
+        "uploading":"Uploading.."
+      },
+      "description" : {
+        "certificateName" : "Name of the certificate",
+        "uploadSuccessMessage":"Certificate uploaded successfully!!",
+        "uploadFailureMessage":"Certificate could not be uploaded!!",
+        "validationErrorMessage":"Please fill all the fields marked with (*)!",
+        "fileReadErrorMessage":"Error occurred while reading the file!"
+      }
+    },
     "infra": {
       "topnav": {
         "cluster-link": "CLUSTERS"
@@ -417,6 +435,7 @@
     "infra.access.users": "Users",
     "infra.access.groups": "Groups",
     "infra.access.identity_provider_edit": "Edit LDAP",
+    "infra.settings":"Settings",
 
     "onboard": "Onboard",
     "onboard.welcome": "Welcome",
