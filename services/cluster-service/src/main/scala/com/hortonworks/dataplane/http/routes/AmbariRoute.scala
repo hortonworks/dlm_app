@@ -95,7 +95,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
       properties = None,
       location = None,
       knoxEnabled = Some(ambariDetailRequest.knoxDetected),
-      allowUntrusted = Some(false),
+      allowUntrusted = false,
+      behindGateway = false,
       knoxUrl = ambariDetailRequest.knoxUrl
     )
 

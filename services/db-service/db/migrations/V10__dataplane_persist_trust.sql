@@ -9,4 +9,5 @@ CREATE TABLE IF NOT EXISTS dataplane.certificates (
 );
 
 ALTER TABLE dataplane.dp_clusters
-  ADD allow_untrusted BOOLEAN DEFAULT TRUE;
+  ADD COLUMN allow_untrusted BOOLEAN DEFAULT FALSE, 
+  ADD COLUMN behind_gateway BOOLEAN DEFAULT FALSE;
