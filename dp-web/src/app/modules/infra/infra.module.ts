@@ -14,7 +14,7 @@ import {RouterModule} from '@angular/router';
 
 import {TranslateModule} from '@ngx-translate/core';
 import {NguiAutoCompleteModule} from '@ngui/auto-complete';
-import { UiSwitchModule } from 'angular2-ui-switch';
+import { UiSwitchModule } from 'ngx-ui-switch';
 import {routes} from './infra.routes';
 import {LakesComponent} from './views/lakes/lakes.component';
 import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
