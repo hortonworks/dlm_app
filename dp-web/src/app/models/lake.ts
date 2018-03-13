@@ -26,5 +26,7 @@ export class Lake {
   isDatalake:boolean;
   knoxEnabled?:boolean;
   knoxUrl?:string;
+  allowUntrusted: boolean;
+  behindGateway: boolean;
   isWaiting: boolean;
 }

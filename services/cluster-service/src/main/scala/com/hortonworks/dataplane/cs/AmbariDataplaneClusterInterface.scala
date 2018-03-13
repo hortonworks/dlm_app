@@ -25,7 +25,7 @@ import scala.util.Try
 
 sealed trait AmbariDataplaneClusterInterface {
 
-  def discoverClusters(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
+  def discoverClusters()(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
 
   def getHdpVersion(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
 
@@ -61,7 +61,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     *
     * @return List of Cluster names
     */
-  override def discoverClusters(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
+  override def discoverClusters()(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
 
     val url = s"${dataplaneCluster.ambariUrl}$prefix"
     val response = getAmbariResponse(url)
