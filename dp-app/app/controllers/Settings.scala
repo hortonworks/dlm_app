@@ -16,6 +16,7 @@ import java.nio.file.Paths
 import javax.inject.Inject
 
 import com.google.inject.name.Named
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariEndpoint, ServiceInfo}
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
@@ -32,15 +33,17 @@ import scala.concurrent.Future
 class Settings @Inject()( @Named("certificateService") certificateService: CertificateService,
                           configuration: Configuration) extends Controller {
 
-  def createCert = Action.async(parse.json) { req =>
+  def createCert = AuthenticatedAction.async(parse.json) { req =>
     req.body.validate[Certificate].map { certificate =>
-      certificateService.create(certificate).map { createdCert =>
-       Ok(Json.toJson(createdCert))
-      }.recoverWith {
-        case e: Throwable =>
-          Future.successful(
-            InternalServerError(JsonResponses.statusError(e.getMessage)))
-      }
+      certificateService
+        .create(certificate.copy(createdBy = req.user.id))
+        .map { createdCert =>
+         Ok(Json.toJson(createdCert))
+        }.recoverWith {
+          case e: Throwable =>
+            Future.successful(
+              InternalServerError(JsonResponses.statusError(e.getMessage)))
+        }
     }.getOrElse(Future.successful(BadRequest))
   }
 
