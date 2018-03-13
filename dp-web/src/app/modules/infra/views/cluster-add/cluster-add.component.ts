@@ -146,27 +146,28 @@ export class ClusterAddComponent implements OnInit {
       this.applyErrorClass();
       return;
     }
-    this.lakeService.validate(cleanedUri).subscribe(
-      response => {
-        this._clusterState = response as ClusterState;
-        if (response.ambariApiStatus === 200) {
-          //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
-          let detailRequest = new ClusterDetailRequest();
-          this.createDetailRequest(detailRequest, cleanedUri);
-          this.requestClusterInfo(detailRequest, cleanedUri);
-          this.removeValidationError();
-        } else {
-          this._isClusterValidateInProgress = false;
-          this._isClusterValidateSuccessful = true;
-          this._isClusterValid = false;
-          this.applyErrorClass();
+    this.lakeService.validate(cleanedUri, this.allowUntrusted, this.behindGateway)
+      .subscribe(
+        response => {
+          this._clusterState = response as ClusterState;
+          if (response.ambariApiStatus === 200) {
+            //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
+            let detailRequest = new ClusterDetailRequest();
+            this.createDetailRequest(detailRequest, cleanedUri);
+            this.requestClusterInfo(detailRequest, cleanedUri);
+            this.removeValidationError();
+          } else {
+            this._isClusterValidateInProgress = false;
+            this._isClusterValidateSuccessful = true;
+            this._isClusterValid = false;
+            this.applyErrorClass();
+          }
+        },
+        error => {
+          let err = JSON.parse(error._body).errors[0] as CustomError;
+          this.onError(err);
         }
-      },
-      error => {
-        let err = JSON.parse(error._body).errors[0] as CustomError;
-        this.onError(err);
-      }
-    );
+      );
   }
 
   applyErrorClass() {
