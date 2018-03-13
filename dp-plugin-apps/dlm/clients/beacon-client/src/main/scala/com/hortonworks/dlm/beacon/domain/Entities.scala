@@ -97,13 +97,11 @@ object RequestEntities {
                                        rangerService: Option[RangerServiceDetails], hiveConfigs: Map[String, Option[String]])
   
   case class PolicyDefinitionRequest(name: String, `type`: String, sourceDataset: String, targetDataset: Option[String],
-                                      cloudCred: Option[String], sourceCluster: Option[String], targetCluster: Option[String],
-                                      frequencyInSec: Long, startTime: Option[String], endTime: Option[String],
-                                      distcpMaxMaps: Option[Long], distcpMapBandwidth: Option[Long], queueName: Option[String],
-                                      `tde.sameKey`: Option[Boolean], description: Option[String], sourceSnapshotRetentionAgeLimit: Option[Long],
-                                      sourceSnapshotRetentionNumber: Option[Long], targetSnapshotRetentionAgeLimit: Option[Long],
-                                      targetSnapshotRetentionNumber: Option[Long], `cloud.encryptionAlgorithm`: Option[String],
-                                      `cloud.encryptionKey`: Option[String])
+                                     cloudCred: Option[String], sourceCluster: Option[String], targetCluster: Option[String],
+                                     frequencyInSec: Long, startTime: Option[String], endTime: Option[String],
+                                     distcpMaxMaps: Option[Long], distcpMapBandwidth: Option[Long], queueName: Option[String],
+                                     `tde.sameKey`: Option[Boolean], description: Option[String], `source.setSnapshottable`: Option[Boolean],
+                                     `cloud.encryptionAlgorithm`: Option[String], `cloud.encryptionKey`: Option[String])
 
   case class PolicyTestRequest(`type`: String, cloudCred: String, sourceCluster: Option[String], sourceDataset: Option[String],
                                targetDataset: Option[String], targetCluster: Option[String])

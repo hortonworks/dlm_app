@@ -57,6 +57,15 @@ class Clusters @Inject()(
     }
   }
 
+  def listBeaconRequiredConfigs() = AuthenticatedAction.async { request =>
+    Logger.info("Received get cluster status request")
+    implicit val token = request.token
+    ambariService.getAllBeaconClusterConfigDetails().map {
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(clusterStatusResponse) => Ok(Json.toJson(clusterStatusResponse))
+    }
+  }
+
   def getBeaconClusterDetails(clusterEndpointId : Long, clusterId: Long) = AuthenticatedAction.async { request =>
     Logger.info("Received get beacon cluster details request")
     implicit val token = request.token

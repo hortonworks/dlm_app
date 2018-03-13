@@ -32,6 +32,7 @@ GET      /api/cloud/account/:accountId/bucket/:bucketName/policy          contro
 #Clusters
 GET     /api/clusters                                         controllers.Clusters.list
 GET     /api/clusters/status                                  controllers.Clusters.listStatus
+GET     /api/clusters/beacon/config/status                    controllers.Clusters.listBeaconRequiredConfigs
 GET     /api/clusters/:clusterId/status                       controllers.Clusters.retrieveStatus(clusterId : Long)
 GET     /api/clusters/:clusterEndpointId/details/:clusterId   controllers.Clusters.getBeaconClusterDetails(clusterEndpointId : Long, clusterId: Long)
 

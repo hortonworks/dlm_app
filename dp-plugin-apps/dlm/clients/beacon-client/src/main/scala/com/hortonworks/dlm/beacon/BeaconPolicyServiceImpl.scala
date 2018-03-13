@@ -121,20 +121,8 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
         case Some(description) => "\ndescription = " + description
         case None => ""
       }) +
-      (policyDefinitionRequest.sourceSnapshotRetentionAgeLimit match {
-        case Some(sourceSnapshotRetentionAgeLimit) => "\nsourceSnapshotRetentionAgeLimit = " + sourceSnapshotRetentionAgeLimit
-        case None => ""
-      }) +
-      (policyDefinitionRequest.sourceSnapshotRetentionNumber match {
-        case Some(sourceSnapshotRetentionNumber) => "\nsourceSnapshotRetentionNumber = " + sourceSnapshotRetentionNumber
-        case None => ""
-      }) +
-      (policyDefinitionRequest.targetSnapshotRetentionAgeLimit match {
-        case Some(targetSnapshotRetentionAgeLimit) => "\ntargetSnapshotRetentionAgeLimit = " + targetSnapshotRetentionAgeLimit
-        case None => ""
-      }) +
-      (policyDefinitionRequest.targetSnapshotRetentionNumber match {
-        case Some(targetSnapshotRetentionNumber) => "\ntargetSnapshotRetentionNumber = " + targetSnapshotRetentionNumber
+      (policyDefinitionRequest.`source.setSnapshottable` match {
+        case Some(sourceSetSnapshottable) => "\nsource.setSnapshottable = " + sourceSetSnapshottable
         case None => ""
       }) +
       (policyDefinitionRequest.`cloud.encryptionAlgorithm` match {
@@ -144,7 +132,7 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
       (policyDefinitionRequest.`cloud.encryptionKey` match {
         case Some(cloudEncryptionKey) => "\ncloud.encryptionKey = " + cloudEncryptionKey
         case None => ""
-      }) 
+      })
   }
 
   private def mapToPolicyTestRequest(policyTestRequest : PolicyTestRequest) = {

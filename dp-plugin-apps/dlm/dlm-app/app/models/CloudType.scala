@@ -46,6 +46,21 @@ object CloudCredentialType extends Enumeration {
 }
 
 /**
+  * Hive underlying FS type
+  */
+object HiveFileSystemType extends Enumeration {
+  type HiveFileSystemType = Value
+
+  val HDFS = Value("HDFS")
+  val S3 = Value("S3")
+
+  implicit val hiveFileSystemTypeFormat = new Format[HiveFileSystemType] {
+    def reads(json: JsValue) = JsSuccess(HiveFileSystemType.withName(json.as[String]))
+    def writes(myEnum: HiveFileSystemType) = JsString(myEnum.toString)
+  }
+}
+
+/**
   * List of supported cloud providers
   */
 object CloudAccountProvider extends Enumeration {

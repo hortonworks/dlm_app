@@ -16,6 +16,7 @@ import play.api.libs.json.Json
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import models.CloudAccountStatus.CloudAccountStatus
+import models.HiveFileSystemType.HiveFileSystemType
 
 import scala.collection.immutable.Set.Set2
 import scala.concurrent.Future
@@ -86,6 +87,9 @@ object Entities {
   case class CloudCredWithPoliciesResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredWithPolicies])
   case class CloudCredsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), allCloudCreds: Seq[CloudCredsBeaconResponse])
   case class CloudCredsUpdateResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq())
+
+  case class BeaconClusterConfigDetials(clusterId: Long, underlyingFsForHive: Option[HiveFileSystemType], configs: Map[String, String])
+  case class BeaconClusterConfig(unreachableAmbari: Seq[BeaconApiErrors] = Seq(), configDetails: Seq[BeaconClusterConfigDetials])
 }
 
 object JsonFormatters {
@@ -149,6 +153,12 @@ object JsonFormatters {
 
   implicit val cloudCredsUpdateResponseReads = Json.reads[CloudCredsUpdateResponse]
   implicit val cloudCredsUpdateResponseWrites = Json.writes[CloudCredsUpdateResponse]
+
+  implicit val beaconClusterConfigDetialsReads = Json.reads[BeaconClusterConfigDetials]
+  implicit val beaconClusterConfigDetialsWrites = Json.writes[BeaconClusterConfigDetials]
+
+  implicit val beaconClusterConfigReads = Json.reads[BeaconClusterConfig]
+  implicit val beaconClusterConfigWrites = Json.writes[BeaconClusterConfig]
 
 }
 

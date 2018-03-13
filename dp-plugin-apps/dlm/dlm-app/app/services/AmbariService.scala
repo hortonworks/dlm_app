@@ -12,19 +12,15 @@ package services
 import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import models.Ambari._
-import com.hortonworks.dataplane.cs.Webservice.{
-  AmbariWebService => AmbariClientService
-}
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Error,
-  Errors,
-  HJwtToken
-}
+import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService => AmbariClientService}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dlm.beacon.domain.RequestEntities.RangerServiceDetails
-import models.Ambari
-import models.Entities.{YarnQueueDefinition, YarnQueuesResponse}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, CloudCredsBeaconResponse}
+import models.{Ambari, HiveFileSystemType}
+import models.Entities._
+import models.HiveFileSystemType.HiveFileSystemType
 import play.api.Logger
-import play.api.http.Status.BAD_GATEWAY
+import play.api.http.Status.{BAD_GATEWAY, INTERNAL_SERVER_ERROR}
 import play.api.libs.json.{JsObject, JsValue}
 import utils.StringExtensions._
 
@@ -95,7 +91,7 @@ class AmbariService @Inject()(
               allClusterStatus.filter(_.isRight).map(_.right.get)
             val failedAmbariApis =
               allClusterStatus.filter(_.isLeft).map(_.left.get)
-            if (failedAmbariApis.length == allClusterStatus.length) {
+            if (failedAmbariApis.lengthCompare(allClusterStatus.length) == 0) {
               p.success(Left(failedAmbariApis))
             } else {
               p.success(Right(clusterStatuses))
@@ -103,6 +99,63 @@ class AmbariService @Inject()(
           }
         }
 
+    }
+    p.future
+  }
+
+  /**
+    * For all beacon clusters, Get current value for all configs that are posted to cluster definition
+    *
+    * @return
+    */
+  def getAllBeaconClusterConfigDetails()(implicit token: Option[HJwtToken])
+  : Future[Either[DlmApiErrors, BeaconClusterConfig]] = {
+    val p: Promise[Either[DlmApiErrors, BeaconClusterConfig]] = Promise()
+    dataplaneService.getBeaconClusters.map {
+      case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+        Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
+      case Right(beaconCluster) =>
+        val beaconClusters = beaconCluster.clusters
+        Future.sequence(beaconClusters.map((x) => getBeaconClusterConfigDetails(x.id))).map({
+          allBeaconClustersConfigDetials =>
+            val beaconClustersConfigDetials: Seq[BeaconClusterConfigDetials] = allBeaconClustersConfigDetials.filter(_.isRight).map(_.right.get)
+            val failedResponses: Seq[BeaconApiErrors] = allBeaconClustersConfigDetials.filter(_.isLeft).map(_.left.get)
+            if (failedResponses.lengthCompare(allBeaconClustersConfigDetials.length) == 0) {
+              p.success(Left(DlmApiErrors(failedResponses)))
+            } else {
+              p.success(Right(BeaconClusterConfig(failedResponses, beaconClustersConfigDetials)))
+            }
+        })
+    }
+    p.future
+  }
+
+
+  /**
+    * Get current value for all configs posted to beacon cluster definition
+    *
+    * @param clusterId cluster id
+    * @return
+    */
+  def getBeaconClusterConfigDetails(clusterId: Long)(implicit token: Option[HJwtToken])
+  : Future[Either[BeaconApiErrors, BeaconClusterConfigDetials]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconClusterConfigDetials]] = Promise()
+    getHiveConfigDetails(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+        Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(response) =>
+        val underlyingHiveFs : Option[HiveFileSystemType] = response.getOrElse("hive.metastore.warehouse.dir", None) match {
+          case None => None
+          case Some(value) =>
+            if (value.startsWith("s3a://")) {
+              Some(HiveFileSystemType.S3)
+            } else {
+              Some(HiveFileSystemType.HDFS)
+            }
+        }
+        val filteredResponse: Map[String,String] = response.filter(x => x._2.isDefined) mapValues(_.get)
+        val  beaconClusterConfigDetials = BeaconClusterConfigDetials(clusterId, underlyingHiveFs, filteredResponse)
+        p.success(Right(beaconClusterConfigDetials))
     }
     p.future
   }
@@ -451,7 +504,7 @@ class AmbariService @Inject()(
       implicit token: Option[HJwtToken])
     : Future[Either[Errors, Ambari.ServiceConfigurations]] = {
     val p: Promise[Either[Errors, Ambari.ServiceConfigurations]] = Promise()
-    val configError = Errors(Seq(Error(500, "no configs")))
+    val configError = Errors(Seq(Error(INTERNAL_SERVER_ERROR, "no configs")))
 
     getServiceConfigDetails(clusterId, AmbariService.YARN_SERVICE_NAME).map {
       case Left(errors) => p.success(Left(errors))
@@ -569,12 +622,12 @@ class AmbariService @Inject()(
             val errorMsg =
               s"$configName is not found in $configType for $serviceName"
             Logger.error(errorMsg)
-            Left(Errors(Seq(Error(500, errorMsg))))
+            Left(Errors(Seq(Error(INTERNAL_SERVER_ERROR, errorMsg))))
         }
       case None =>
         val errorMsg = s"$configType is not associated with $serviceName"
         Logger.error(errorMsg)
-        Left(Errors(Seq(Error(500, errorMsg))))
+        Left(Errors(Seq(Error(INTERNAL_SERVER_ERROR, errorMsg))))
     }
 
   }
