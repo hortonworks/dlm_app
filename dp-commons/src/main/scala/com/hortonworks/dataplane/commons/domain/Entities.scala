@@ -175,6 +175,7 @@ object Entities {
       state: Option[String] = Some("TO_SYNC"),
       isDatalake: Option[Boolean] = Some(false),
       knoxEnabled: Option[Boolean] = Some(false),
+      allowUntrusted: Option[Boolean] = Some(false),
       knoxUrl: Option[String],
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
@@ -426,14 +427,20 @@ object Entities {
                        objectType: String,
                        objectId: Long)
 
-  case class FavouriteWithTotal(favourite: Favourite,
-                                totalFavCount: Int)
+  case class FavouriteWithTotal(favourite: Favourite, totalFavCount: Int)
 
   case class Bookmark(id: Option[Long] = None,
                       userId: Long,
                       objectType: String,
                       objectId: Long)
 
+  case class Certificate(id: Option[String] = None,
+                         name: String,
+                         format: String,
+                         data: String,
+                         active: Boolean,
+                         createdBy: Option[Long],
+                         created: Option[LocalDateTime] = Some(LocalDateTime.now()))
 }
 
 object JsonFormatters {
@@ -644,5 +651,7 @@ object JsonFormatters {
 
 
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
+
+  implicit val certificateFormats = Json.format[Certificate]
 
 }

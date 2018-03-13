@@ -286,26 +286,17 @@ object Webservice {
   // Maps to ClusterService
   trait ClusterComponentService extends DbClientService {
 
-    def create(
-                clusterService: ClusterData): Future[Either[Errors, ClusterData]]
+    def create(clusterService: ClusterData): Future[Either[Errors, ClusterData]]
 
-    def getServiceByName(
-                          clusterId: Long,
-                          serviceName: String): Future[Either[Errors, ClusterData]]
+    def getServiceByName(clusterId: Long, serviceName: String): Future[Either[Errors, ClusterData]]
 
-    def updateServiceByName(
-                             clusterData: ClusterData): Future[Either[Errors, Boolean]]
+    def updateServiceByName(clusterData: ClusterData): Future[Either[Errors, Boolean]]
 
-    def addClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
-    : Future[Seq[Either[Errors, ClusterServiceHost]]]
+    def addClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq()): Future[Seq[Either[Errors, ClusterServiceHost]]]
 
-    def updateClusterHosts(
-                            clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
-    : Future[Seq[Either[Errors, Boolean]]]
+    def updateClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq()): Future[Seq[Either[Errors, Boolean]]]
 
-    def getEndpointsForCluster(
-                                clusterId: Long,
-                                service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
+    def getEndpointsForCluster(clusterId: Long, service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
 
     def getAllServiceEndpoints(serviceName: String): Future[Either[Errors, Seq[ClusterServiceWithConfigs]]]
   }
@@ -373,10 +364,17 @@ object Webservice {
     def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
     def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]]
   }
-  trait SkuService extends  DbClientService {
+
+  trait SkuService extends DbClientService {
     def getAllSkus():Future[Either[Errors,Seq[Sku]]]
     def getSku(name:String): Future[Either[Errors,Sku]]
     def getEnabledSkus():Future[Either[Errors,Seq[EnabledSku]]]
     def enableSku(enabledSku: EnabledSku):Future[Either[Errors,EnabledSku]]
+  }
+
+  trait CertificateService extends DbClientService {
+    def list(active: Option[Boolean]): Future[Seq[Certificate]]
+    def create(certificate: Certificate): Future[Certificate]
+    def delete(certificateId: String): Future[Long]
   }
 }

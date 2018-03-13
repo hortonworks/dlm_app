@@ -1,0 +1,96 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="container">
+  <div class="title-pane">
+    <div class="mdl-grid mdl-grid--no-spacing action-bar">
+      <div class="page-title">
+        <span class="hwx-title">{{"pages.settings.labels.settingsPageTitle" | translate}}</span>
+      </div>
+      <div class="mdl-layout-spacer"></div>
+      <div class="action-pane">
+        <button class="mdl-button btn-hwx-primary margin-left-10 pull-right" (click)="showUpload()">{{"pages.settings.labels.upload" | translate}}</button>
+        <button class="mdl-button btn-hwx-secondary pull-right" (click)="deleteCert()">{{"common.delete" | translate}}</button>
+    </div>
+    </div>
+  </div>
+  <table class="mdl-data-table mdl-js-data-table" dp-config-table>
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
+          <input class="id-check" type="checkbox" value="all" [(ngModel)]="allSelected" (change)="selectAll()"/>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+          {{"pages.settings.labels.certificateName" | translate}}
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+          {{"pages.settings.labels.certificate" | translate}}
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+           {{"common.status" | translate}}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cert of certs">
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
+          <input class="id-check" type="checkbox" [(ngModel)]="cert.selected"/>
+        </td>
+        <td class="mdl-data-table__cell--non-numeric">{{cert.name}}</td>
+        <td class="mdl-data-table__cell--non-numeric"><div title="{{cert.data}}" class="cert-data">{{cert.data}}</div></td>
+        <td class="mdl-data-table__cell--non-numeric">{{cert.active}}</td>
+      </tr>
+      <tr *ngIf="certs.length === 0">
+        <td class="center" colspan="4" >No certificates added. Please click 'Upload' to add a certificate</td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="showingUpload" id="upload-container">
+    <div class="sub-title">
+      <span class="hwx-subtitle">Upload</span>
+    </div>
+    <div class="upload-form-container">
+      <form  #uploadForm="ngForm" *ngIf="!uploading && !uploadSuccess && !uploadFailure">
+        <div class="error" *ngIf="showError">
+         <span><i class="fa fa-times-circle"></i>&nbsp;{{errorMessage}} </span>
+        </div>
+        <div class="dp-input form-group">
+          <label class="required">{{"pages.settings.labels.certificateName" | translate}}</label>
+          <input required name="file-name" type="text" [(ngModel)]="name" placeholder="Name of the certificate"/>
+        </div>
+        <div class="dp-input form-group">
+          <label class="required">{{"pages.settings.labels.certificateFile" | translate}}</label>
+          <label class="fileContainer">
+            <div>
+              <div class="btn-hwx-default upload-btn">Choose <i class="fa fa-caret-down pull-right"></i></div>
+              <input class="pull-left file-name-input" name="file" [(ngModel)]="selectedFile"/>
+            </div>
+            <input #fileInput required type="file" (change)="fileChanged(fileInput.files)" placeholder="Upload File"/>
+          </label>
+        </div>
+      </form>
+      <div *ngIf="uploading" class="progress"><i class="fa fa-spin fa-spinner"></i> {{"pages.settings.labels.uploading" | translate}}</div>
+      <div class="success-notification" *ngIf="uploadSuccess">
+        <span><i class="fa fa-check-circle"></i>&nbsp; {{"pages.settings.description.uploadSuccessMessage" | translate}}</span>
+      </div>
+      <div class="error-notification" *ngIf="uploadFailure">
+        <span><i class="fa fa-times-circle"></i>&nbsp; {{"pages.settings.description.uploadFailureMessage" | translate}} </span>
+      </div>
+    </div>
+    <div class="action-pane">
+      <button *ngIf="!uploading && !uploadSuccess && !uploadFailure" class="mdl-button btn-hwx-primary margin-right-10" (click)="upload()">{{"pages.settings.labels.upload" | translate}}</button>
+      <button class="mdl-button btn-hwx-secondary" (click)="hideUpload()">
+        <span *ngIf="!uploading && !uploadSuccess && !uploadFailure">{{"common.cancel" | translate}}</span>
+        <span *ngIf="uploading || uploadSuccess || uploadFailure">{{"common.back" | translate}}</span>
+      </button>
+    </div>
+  </div>
+</div>

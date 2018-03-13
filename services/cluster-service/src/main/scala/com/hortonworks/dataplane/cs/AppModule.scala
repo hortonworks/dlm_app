@@ -56,16 +56,14 @@ object AppModule extends AbstractModule {
                        config: Config,
                        dPKeystore: DPTrustStore): HttpsConnectionContext = {
     // provides a custom ssl config with the dp keystore
-    val c = AkkaSSLConfig().mapSettings { s =>
-      val settings = s
-        .withDisabledKeyAlgorithms(
-          scala.collection.immutable.Seq("RSA keySize < 1024"))
+    val c = AkkaSSLConfig().mapSettings { sslConfig =>
+      val settings = sslConfig
+        .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
         .withTrustManagerConfig(
-          TrustManagerConfig().withTrustStoreConfigs(scala.collection.immutable
-            .Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
-      if (config.getBoolean(
-            "dp.services.ssl.config.disable.hostname.verification"))
-        settings.withLoose(s.loose.withDisableHostnameVerification(true))
+          TrustManagerConfig()
+            .withTrustStoreConfigs(scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
+      if (config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
+        settings.withLoose(sslConfig.loose.withDisableHostnameVerification(true))
       else
         settings
     }
@@ -86,6 +84,7 @@ object AppModule extends AbstractModule {
                       materializer: ActorMaterializer,
                       configuration: Config): WSClient = {
     val config = new DefaultAsyncHttpClientConfig.Builder()
+
       .setAcceptAnyCertificate(true)
       .setRequestTimeout(Try(configuration.getInt(
         "dp.services.ws.client.requestTimeout.mins") * 60 * 1000)

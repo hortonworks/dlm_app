@@ -23,6 +23,7 @@ import {ServiceManagementComponent} from './views/service-management/service-man
 import {VerificationComponent} from './views/service-management/verification/verification.component';
 import {ManualInstallCheckComponent} from './views/service-management/manual-install-check/manual-install-check.component';
 import {LdapEditConfigComponent} from "./views/ldap-edit-config/ldap-edit-config.component";
+import {SettingsComponent} from "./views/settings/settings.component";
 
 export const routes: Routes = [{
     path: '',
@@ -123,4 +124,10 @@ export const routes: Routes = [{
       component: AddGroupComponent,
       outlet: 'sidebar'
     }]
+  }, {
+  path: 'settings',
+  component: SettingsComponent,
+  data: {
+    crumb: 'infra.settings'
+  }
 }];

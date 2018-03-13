@@ -11,7 +11,7 @@
 
 package controllers
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, WrappedErrorException}
 import domain.API.{AlreadyExistsError, EntityNotFound, UpdateError}
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -51,6 +51,7 @@ trait JsonAPI extends Controller {
         val errors = wrapErrors(status, e.getMessage)
         Status(status)(Json.toJson(errors))
       }
+    case e: WrappedErrorException => Future.successful(Status(e.error.status)(Json.toJson(e.error)))
     case e:EntityNotFound => Future.successful(notFound)
     case e:UpdateError => Future.successful(NoContent)
     case e: AlreadyExistsError => Future.successful(Conflict)

@@ -56,7 +56,8 @@ export class RbacService {//role based access control
       new Persona('DataPlane Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-cubes'),
         new PersonaTabs('Users', 'infra/manage-access', 'fa-users'),
-        new PersonaTabs('Services', 'infra/services', 'fa-th-large')
+        new PersonaTabs('Services', 'infra/services', 'fa-th-large'),
+        new PersonaTabs('Settings', 'infra/settings', 'fa-cog')
       ], ['/onboard', '/onboard/welcome', '/onboard/identity-provider', '/onboard/users-and-groups', '/profile/change-password'], '', 'infra-logo-white.png')
     ]);
     personaMap.set('CURATOR', [

@@ -2,11 +2,12 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-#Users API
 
 GET           /health                                                        controllers.Status.health
 GET           /metrics                                                       controllers.Status.metrics
 
+
+# Users
 GET           /users/detail/:username                                        controllers.Users.getUserDetail(username:String)
 GET           /users                                                         controllers.Users.all(username: Option[String])
 POST          /users/withroles                                               controllers.Users.insertWithRoles
@@ -20,8 +21,10 @@ GET           /users/role/:username                                          con
 GET           /users/all                                                     controllers.Users.getUsers
 GET           /users/:userId                                                 controllers.Users.load(userId:Long)
 PUT           /users/:userId                                                 controllers.Users.update(userId: String)
+DELETE        /users/:userId                                                 controllers.Users.delete(userId:Long)
 
 
+# Groups
 GET           /groups                                                        controllers.Groups.getGroups
 GET           /groups/active                                                 controllers.Groups.getAllActiveGroups
 POST          /groups/withroles                                              controllers.Groups.insertWithRoles
@@ -30,7 +33,6 @@ GET           /groups/roles                                                  con
 GET           /groups/:name                                                  controllers.Groups.groupInfoByName(name: String)
 
 
-DELETE        /users/:userId                                                 controllers.Users.delete(userId:Long)
 
 #Roles API
 GET           /roles                                                         controllers.Roles.all
@@ -53,14 +55,12 @@ POST          /locations                                                     con
 GET           /dp/clusters                                                   controllers.DpClusters.all
 POST          /dp/clusters                                                   controllers.DpClusters.add
 GET           /dp/clusters/:dpClusterId                                      controllers.DpClusters.load(dpClusterId:Long)
-
-#TODO: Fix this ridiculous signature
 GET           /dp/clusters/:dpClusterId/clusters                             controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
 DELETE        /dp/clusters/:dpClusterId                                      controllers.DpClusters.delete(dpClusterId:Long)
 PATCH         /dp/clusters/status                                            controllers.DpClusters.updateStatus
-
 PUT           /dp/clusters                                                   controllers.DpClusters.update
-
+GET           /dp/clusters/:dpClusterId/services                             controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
+POST          /dp/clusters/services                                          controllers.ClusterServices.addWithDpCluster
 
 #Clusters API
 GET           /clusters                                                      controllers.DiscoveredClusters.all(dpClusterId: Option[Long])
@@ -71,13 +71,14 @@ DELETE        /clusters/:clusterId                                           con
 
 #Cluster services API
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
-GET           /dp/clusters/:dpClusterId/services                             controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
-POST          /dp/clusters/services                                          controllers.ClusterServices.addWithDpCluster
-GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
-DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
 PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
 GET           /clusters/:clusterId/services/:serviceId/endpoint              controllers.ClusterServices.getEndpoints(clusterId:Long,serviceId:Long)
+GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
+
+
+# Services API
+DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
 POST          /services/endpoints                                            controllers.ClusterServices.addServiceEndpoint
 GET           /services/:serviceId/endpoints                                 controllers.ClusterServices.getServiceEndpoints(serviceId:Long)
 GET           /services/endpoints/:serviceName                               controllers.ClusterServices.getAllServiceEndpoints(serviceName: String)
@@ -97,7 +98,7 @@ DELETE        /workspaces/:workspaceId                                       con
 GET           /workspacedetails                                              controllers.Workspaces.allWithDetails
 GET           /workspacedetails/name/:name                                   controllers.Workspaces.loadByNameWithDetails(name:String)
 DELETE        /workspacedetails/name/:name                                   controllers.Workspaces.deleteByName(name:String)
-
+DELETE        /workspacedetails/name/:name                                   controllers.Workspaces.deleteByName(name:String)
 GET           /workspaces/users/:userId                                      controllers.Workspaces.loadByUser(userId:Long)
 
 
@@ -241,3 +242,9 @@ DELETE      /favourites/:favId                                              cont
 #bookmarks api
 POST        /bookmarks                                                      controllers.Bookmarks.add
 DELETE      /bookmarks/:bmId                                                controllers.Bookmarks.deleteById(bmId: Long, userId: Long)
+
+# trust store
+GET         /certificates                                                   controllers.Certificates.list(active: Option[Boolean])
+POST        /certificates                                                   controllers.Certificates.create
+GET         /certificates/:certificateId                                    controllers.Certificates.retrieve(certificateId: String)
+DELETE      /certificates/:certificateId                                    controllers.Certificates.delete(certificateId: String)
