@@ -53,7 +53,8 @@ export function reducer(state = initialState, action): State {
 
 function wizardSaveStep(state: State, action): State {
   const {stepId, value} = action.payload;
-  const updatedEntity = {...state.entities[stepId], value, state: WIZARD_STATE.COMPLETED};
+  const updatedState = state.entities[stepId].nextStepId !== null ? WIZARD_STATE.COMPLETED : WIZARD_STATE.ACTIVE;
+  const updatedEntity = {...state.entities[stepId], value, state: updatedState};
   const newEntities = Object.assign({}, state.entities, {[stepId]: updatedEntity});
   // Update state of next step
   const nextStepId = newEntities[stepId].nextStepId;

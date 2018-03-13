@@ -7,41 +7,45 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.panel-body {
-  padding: 0 !important;
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  .panel-content {
-    overflow-y: auto;
-    padding: 10px;
-    width: 100%;
-    height: 100%;
-  }
-  &.with-summary {
-    height: 100%;
-    overflow: visible;
-    .panel-content {
-      order: 1;
-      -webkit-box-ordinal-group: 1;
-      -moz-box-ordinal-group: 1;
-      -ms-flex-order: 1;
-      -webkit-order: 1;
-      width: 75%;
-    }
-    .summary-panel {
-      background-color: #F9F9F9;
-      width: 25%;
-      order: 2;
-      -webkit-box-ordinal-group: 2;
-      -moz-box-ordinal-group: 2;
-      -ms-flex-order: 2;
-      -webkit-order: 2;
-      min-width: 250px;
+.wizard-content {
+  .panel {
+    .panel-body {
+      padding: 0 !important;
+      display: -webkit-box;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      .panel-content {
+        overflow-y: auto;
+        padding: 10px;
+        width: 100%;
+        height: 100%;
+      }
+      &.with-summary {
+        height: 100%;
+        overflow: visible;
+        .panel-content {
+          order: 1;
+          -webkit-box-ordinal-group: 1;
+          -moz-box-ordinal-group: 1;
+          -ms-flex-order: 1;
+          -webkit-order: 1;
+          width: 75%;
+        }
+        .summary-panel {
+          background-color: #F9F9F9;
+          width: 25%;
+          order: 2;
+          -webkit-box-ordinal-group: 2;
+          -moz-box-ordinal-group: 2;
+          -ms-flex-order: 2;
+          -webkit-order: 2;
+          min-width: 250px;
+        }
+      }
     }
   }
 }
