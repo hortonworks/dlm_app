@@ -51,7 +51,7 @@ export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
         <ul class="select-field-option-list select-field-options-wrapper list-unstyled" *ngIf="showMenu">
           <li class="select-field-option-item" *ngFor="let option of options"
               (click)="selectOption(option.value)">
-            <div *ngIf="!optionView?.template">
+            <div *ngIf="!optionView?.template" [attr.qe-attr]="option.value">
               {{option.label || option.value}}
             </div>
             <ng-container *ngTemplateOutlet="optionView?.template; context: {value: option.value, label: option.label}">
