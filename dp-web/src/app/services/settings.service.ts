@@ -27,21 +27,21 @@ export class SettingsService {
 
   uploadCert(name:string, format:string, fileContent: any){
     return this.http
-      .post(`${this.url}/create-cert`, {name:name, format:format, data:fileContent, active: true} , new RequestOptions(HttpUtil.getHeaders()))
+      .post(`${this.url}/certificates`, {name:name, format:format, data:fileContent, active: true} , new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
 
   listCerts(){
     return this.http
-      .get(`${this.url}/certs` , new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}/certificates` , new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
 
   deleteCert(id:string){
     return this.http
-      .delete(`${this.url}/delete-cert/${id}`, new RequestOptions(HttpUtil.getHeaders()))
+      .delete(`${this.url}/certificates/${id}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

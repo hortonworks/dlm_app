@@ -22,59 +22,75 @@
     </div>
     </div>
   </div>
-
-    <table class="mdl-data-table mdl-js-data-table" dp-config-table>
-      <thead>
-        <tr>
-          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
-            <input class="id-check" type="checkbox" value="all" [(ngModel)]="allSelected" (change)="selectAll()"/>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-              Certificate KeyPair Name
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-             Certificate
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-             Status
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let cert of certs">
-          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
-            <input class="id-check" type="checkbox" [(ngModel)]="cert.selected"/>
-          </td>
-          <td class="mdl-data-table__cell--non-numeric">{{cert.name}}</td>
-          <td class="mdl-data-table__cell--non-numeric"><div title="{{cert.data}}" class="cert-data">{{cert.data}}</div></td>
-          <td class="mdl-data-table__cell--non-numeric">{{cert.active}}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div *ngIf="showingUpload" id="upload-container">
-      <div class="sub-title">
-        <span class="hwx-subtitle">Upload</span>
-      </div>
-      <form class="upload-form">
+  <table class="mdl-data-table mdl-js-data-table" dp-config-table>
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
+          <input class="id-check" type="checkbox" value="all" [(ngModel)]="allSelected" (change)="selectAll()"/>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+            Certificate Name
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+           Certificate
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+           Status
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cert of certs">
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
+          <input class="id-check" type="checkbox" [(ngModel)]="cert.selected"/>
+        </td>
+        <td class="mdl-data-table__cell--non-numeric">{{cert.name}}</td>
+        <td class="mdl-data-table__cell--non-numeric"><div title="{{cert.data}}" class="cert-data">{{cert.data}}</div></td>
+        <td class="mdl-data-table__cell--non-numeric">{{cert.active}}</td>
+      </tr>
+      <tr *ngIf="certs.length === 0">
+        <td class="center" colspan="4" >No certificates added. Please click 'Upload' to add a certificate</td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="showingUpload" id="upload-container">
+    <div class="sub-title">
+      <span class="hwx-subtitle">Upload</span>
+    </div>
+    <div class="upload-form-container">
+      <form  #uploadForm="ngForm" *ngIf="!uploading && !uploadSuccess">
+        <div class="error" *ngIf="showError">
+         <span><i class="fa fa-times-circle"></i>&nbsp;{{errorMessage}} </span>
+        </div>
         <div class="dp-input form-group">
-          <label class="required">Certificate Key Pair Name</label>
+          <label class="required">Certificate Name</label>
           <input required name="file-name" type="text" [(ngModel)]="name" placeholder="Name of the certificate"/>
         </div>
         <div class="dp-input form-group">
           <label class="required">Certificate File</label>
           <label class="fileContainer">
             <div>
-              <div class="btn-hwx-default upload-btn">Choose</div>
-              <input class="pull-left file-name-input" name="file" [(ngModel)]="selectedFile"/></div>
-              <input #fileInput required type="file" (change)="fileChanged(fileInput.files)" placeholder="Upload File"/>
+              <div class="btn-hwx-default upload-btn">Choose <i class="fa fa-caret-down pull-right"></i></div>
+              <input class="pull-left file-name-input" name="file" [(ngModel)]="selectedFile"/>
+            </div>
+            <input #fileInput required type="file" (change)="fileChanged(fileInput.files)" placeholder="Upload File"/>
           </label>
         </div>
-        <button class="mdl-button btn-hwx-primary margin-right-10" (click)="upload()">Upload</button>
-        <button class="mdl-button btn-hwx-secondary" (click)="hideUpload()">
-          <span *ngIf="!uploading && !uploadingSuccess && !uploadingFailure">Cancel</span>
-            <span *ngIf="uploading || uploadingSuccess || uploadingFailure">Back</span>
-        </button>
       </form>
-
+      <div *ngIf="uploading" class="progress"><i class="fa fa-spin fa-spinner"></i> Uploading..</div>
+      <div class="success-notification" *ngIf="uploadSuccess">
+        <span><i class="fa fa-check-circle"></i>&nbsp; Certificate uploaded successfully!!</span>
+      </div>
+      <div class="error-notification" *ngIf="uploadError">
+        <span><i class="fa fa-times-circle"></i>&nbsp; Certificate could not be uploaded!!</span>
+      </div>
     </div>
+    <div class="action-pane">
+      <button *ngIf="!uploading && !uploadSuccess && !uploadFailure" class="mdl-button btn-hwx-primary margin-right-10" (click)="upload()">Upload</button>
+      <button class="mdl-button btn-hwx-secondary" (click)="hideUpload()">
+        <span *ngIf="!uploading && !uploadSuccess && !uploadFailure">Cancel</span>
+        <span *ngIf="uploading || uploadSuccess || uploadFailure">Back</span>
+      </button>
+    </div>
+  </div>
 </div>

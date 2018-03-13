@@ -14,9 +14,9 @@
 
 #Settings
 
-POST          /api/settings/create-cert                              controllers.Settings.createCert()
-GET           /api/settings/certs                                    controllers.Settings.listCerts()
-DELETE        /api/settings/delete-cert/:certificateId                         controllers.Settings.deleteCert(certificateId: String)
+POST          /api/settings/certificates                             controllers.Settings.createCert()
+GET           /api/settings/certificates                             controllers.Settings.listCerts()
+DELETE        /api/settings/certificates/:certificateId              controllers.Settings.deleteCert(certificateId: String)
 
 
 # health checks

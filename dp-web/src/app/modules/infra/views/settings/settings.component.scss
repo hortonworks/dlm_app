@@ -82,23 +82,57 @@
   border-top: 1px solid $iron !important;
   float: left;
   border-right: none;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .file-name-input {
   width: 315px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .sub-title {
   padding: 15px 0;
 }
 
-.upload-form {
+.upload-form-container {
   background-color: $white;
-  padding: 5px 10px 20px 10px;
+  padding: 5px 10px;
+}
+
+.action-pane {
+  margin-top: 10px;
+}
+
+.progress {
+  font-size: 16px;
+  padding: 25px 0;
 }
 
 .cert-data {
   width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.success-notification {
+  font-size: 16px;
+  padding: 25px;
+  color: $forest-green-1;
+}
+
+.error-notification {
+  font-size: 16px;
+  padding: 25px;
+  color: $burnt-cienna-red;
+}
+
+.error {
+  padding: 10px 0;
+  color: $burnt-cienna-red;
+}
+
+.center {
+  text-align: center !important;
 }
