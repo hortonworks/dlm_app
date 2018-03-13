@@ -12,6 +12,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {SettingsService} from "../../../../services/settings.service";
 import {NgForm} from "@angular/forms";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'dp-settings',
@@ -33,7 +34,7 @@ export class SettingsComponent implements OnInit {
   name: string;
   errorMessage: string;
 
-  constructor(private settingsService: SettingsService) { }
+  constructor(private settingsService: SettingsService, private translateService: TranslateService) { }
 
   ngOnInit() {
    this.listCerts()
@@ -62,7 +63,7 @@ export class SettingsComponent implements OnInit {
     let files = this.fileInput.nativeElement.files;
     if(!this.uploadForm.valid || !files || !files.length){
       this.showError = true;
-      this.errorMessage = 'Please fill all the fields marked with (*)!';
+      this.errorMessage =  this.translateService.instant("pages.settings.description.validationErrorMessage");//'Please fill all the fields marked with (*)!';
       return;
     }
     this.uploading = true;
@@ -74,19 +75,20 @@ export class SettingsComponent implements OnInit {
       this.settingsService.uploadCert(this.name, "PEM", result).subscribe(response =>{
         this.listCerts();
         this.clearForm();
+        this.uploading = false;
         this.uploadSuccess = true;
         this.uploadFailure = false;
       },(error)=>{
+        this.uploading = false;
         this.uploadSuccess = false;
         this.uploadFailure = true;
       })
     };
-    let self = this;
-    reader.onerror = function () {
-      console.error("Unable to read file");
-      self.uploading = false;
-      self.errorMessage = 'Error occurred while reading the file!'
-      self.showError = true;
+    reader.onerror = (event: any) => {
+      console.error(event.target.error);
+      this.uploading = false;
+      this.errorMessage = event.target.error || this.translateService.instant("pages.settings.description.fileReadErrorMessage");
+      this.showError = true;
     };
   }
 
