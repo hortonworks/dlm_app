@@ -38,6 +38,22 @@
     </div>
 
     <form #clusterForm="ngForm">
+      <div class="form-group">
+        <div class="form-toggle-comments">
+          <input type="checkbox" data-se="cluster_add__behind_gateway" class="dp-input" name="behindGateway" [(ngModel)]="behindGateway">
+          <label for="behindGateway">{{"pages.infra.labels.behindGateway" | translate}}</label>
+          <i class="fa fa-info-circle more-information" [attr.title]="'pages.infra.labels.behindGateway-hint' | translate"></i>
+        </div>
+        <div class="hwx-inline-desc">{{"pages.infra.description.behindGateway" | translate}}</div>
+      </div>
+      <div class="form-group">
+        <div class="form-toggle-comments">
+          <input type="checkbox" data-se="cluster_add__allow_untrusted" class="dp-input" name="allowUntrusted" [(ngModel)]="allowUntrusted">
+          <label for="allowUntrusted">{{"pages.infra.labels.allowUntrusted" | translate}}</label>
+          <i class="fa fa-info-circle more-information" [attr.title]="'pages.infra.labels.allowUntrusted-hint' | translate"></i>
+        </div>
+        <div class="hwx-inline-desc">{{"pages.infra.description.allowUntrusted" | translate}}</div>
+      </div>
       <div class="form-group" #ambariInput>
         <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
         <div class="input-group">
@@ -106,24 +122,6 @@
         <div class="mdl-grid mdl-grid--no-spacing">
           <div class="mdl-cell mdl-cell--6-col">
             <div class="datalake-input">
-              <div class="form-group">
-                <label class="required">{{"pages.infra.labels.behindGateway" | translate}}</label>
-                <div class="hwx-inline-desc">{{"pages.infra.description.behindGateway" | translate}}</div>
-                <div class="form-toggle-comments">
-                  <ui-switch size="small" data-se="cluster_add__behind_gateway" class="dp-input" name="behindGateway" [(ngModel)]="behindGateway"></ui-switch>
-                  <span *ngIf="behindGateway">{{"pages.infra.labels.behindGateway-enabled" | translate}}</span>
-                  <span *ngIf="!behindGateway">{{"pages.infra.labels.behindGateway-disabled" | translate}}</span>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="required">{{"pages.infra.labels.allowUntrusted" | translate}}</label>
-                <div class="hwx-inline-desc">{{"pages.infra.description.allowUntrusted" | translate}}</div>
-                <div class="form-toggle-comments">
-                  <ui-switch size="small" data-se="cluster_add__allow_untrusted" class="dp-input" name="allowUntrusted" [(ngModel)]="allowUntrusted"></ui-switch>
-                  <span *ngIf="allowUntrusted">{{"pages.infra.labels.allowUntrusted-enabled" | translate}}</span>
-                  <span *ngIf="!allowUntrusted">{{"pages.infra.labels.allowUntrusted-disabled" | translate}}</span>
-                </div>
-              </div>
               <div class="form-group">
                 <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>

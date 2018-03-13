@@ -113,10 +113,18 @@ input[type="text"].dp-input {
   display: flex;
   align-items: center;
 
-  & > span {
+  & > label {
+    margin-bottom: 0;
     margin-left: 10px;
   }
+
+  .more-information {
+    margin-left: 10px;
+    color: $black_80;
+    cursor: pointer;
+  }
 }
+
 
 .notification-bar {
   padding: 15px;
