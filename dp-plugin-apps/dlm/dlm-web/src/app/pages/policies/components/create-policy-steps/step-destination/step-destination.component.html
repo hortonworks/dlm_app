@@ -148,6 +148,26 @@
             </div>
             <!-- DESTINATION S3 ENDPOINT END -->
           </div>
+          <div class="row" *ngIf="showValidation">
+            <div class="col-xs-12">
+              <dlm-checkbox (onSelect)="handleSkipValidation($event)">
+                {{'page.policies.form.fields.destinationCluster.skipValidation' | translate}}
+              </dlm-checkbox>
+              <button
+                [disabled]="form.get('destination.skipValidation').value || validationInProgress"
+                type="button"
+                class="btn btn-success"
+                (click)="validate()">
+                &nbsp;{{"page.policies.form.validateBtn" | translate}} <i *ngIf="validationInProgress" class="fa fa-fw fa-spinner fa-spin"></i>
+                <i class="glyphicon glyphicon-ok" *ngIf="form.get('destination.validationStatus').value && !validationInProgress"></i>
+              </button>
+              <div *ngIf="form.get('destination.validationPerformed').value && !form.get('destination.skipValidation').value && !validationInProgress">
+                <div *ngIf="!form.get('destination.validationStatus').value">
+                  <dlm-field-error>{{"page.policies.form.fields.destinationCluster.validationFailed" | translate}}</dlm-field-error>
+                </div>
+              </div>
+            </div>
+          </div>
         </fieldset>
       </div>
     </div>
