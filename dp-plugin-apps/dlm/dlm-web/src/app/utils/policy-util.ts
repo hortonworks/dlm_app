@@ -39,15 +39,19 @@ export const parsePolicyId = (policyId: string): ParsedPolicyId => {
   if (!policyId) {
     return null;
   }
-  const splits = policyId.split('/');
-  if (splits.length <= 5) {
+  const splits = policyId.split('/').slice(1, policyId.split('/').length);
+  if (splits.length <= 4) {
     return null;
   }
-  const policyName = splits[5] || '';
-  const timeStamp = parseInt(splits[7], 10);
-  const idSplits = (splits[9] || '').split('@');
-  const dataCenter = splits[3];
-  const clusterName = splits[4];
+  // cluster to cluster and cluster to cloud events has 8 splits
+  // cloud to cluster event has 6 splits (without target cluster splits)
+  const offset = splits.length === 6 ? 2 : 0;
+  const withOffset = (id) => id - offset;
+  const policyName = splits[withOffset(4)] || '';
+  const timeStamp = parseInt(splits[withOffset(6)], 10);
+  const idSplits = (splits[withOffset(7)] || '').split('@');
+  const dataCenter = splits[withOffset(2)];
+  const clusterName = splits[withOffset(3)];
   const policyBeaconId = idSplits.length ? idSplits[0] : null;
   // jobId segment may not be present, it can be absent when we look to policy log
   // and will be there in case when we look to job log

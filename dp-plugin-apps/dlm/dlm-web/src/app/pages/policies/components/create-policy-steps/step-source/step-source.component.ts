@@ -108,6 +108,10 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
     return this.clusters.map(cluster => clusterToListOption(cluster));
   }
 
+  get sourceCloudAccount() {
+    return this.form.value.source.cloudAccount;
+  }
+
   get sourceCloudAccounts() {
     return this.filterCloudAccounts(this.form.value.source.type);
   }
