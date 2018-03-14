@@ -143,4 +143,12 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       .map(mapToResultsGeneric)
   }
 
+  override def getProfilersJobs (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/jobs?$queryString")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResultsGeneric)
+  }
+
 }

@@ -186,12 +186,26 @@ class DpProfilerAttributes @Inject()(
     }
   }
 
-    def getProfilersStatusWithAssetsCount(clusterId: String, startTime: String, endTime: String) = {
+  def getProfilersStatusWithAssetsCount(clusterId: String, startTime: String, endTime: String) = {
     AuthenticatedAction.async { req =>
       Logger.info(s"Received getProfilersStatusWithAssetsCount for clusterId - $clusterId $startTime $endTime")
       implicit val token = req.token
       dpProfilerService
         .getProfilersStatusWithAssetsCount(clusterId, startTime, endTime)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
+    def getProfilersJobs(clusterId: String) = {
+    AuthenticatedAction.async { req =>
+      val queryString = req.rawQueryString
+      Logger.info(s"Received getProfilersJobs for clusterId - $clusterId with query params - $queryString")
+      implicit val token = req.token
+      dpProfilerService
+        .getProfilersJobs(clusterId, queryString)
         .map(jsObj => Ok(Json.toJson(jsObj)))
         .recoverWith({
           case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))

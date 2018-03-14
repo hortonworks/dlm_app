@@ -81,6 +81,7 @@ POST          /api/dpProfiler/metrics                                 controller
 
 GET           /api/dpProfiler/status-with-jobs-count                  controllers.DpProfilerAttributes.getProfilersStatusWithJobSummary(clusterId: String, startTime: String, endTime: String)
 GET           /api/dpProfiler/status-with-assets-count                controllers.DpProfilerAttributes.getProfilersStatusWithAssetsCount(clusterId: String, startTime: String, endTime: String)
+GET           /api/dpProfiler/:clusterId/jobs                         controllers.DpProfilerAttributes.getProfilersJobs(clusterId: String)
 
 
 # Ranger

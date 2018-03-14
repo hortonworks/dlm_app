@@ -151,5 +151,7 @@ object Webservice {
 
     def getProfilersStatusWithAssetsCount (clusterId: String, startTime: String, endTime: String)(implicit token:Option[HJwtToken]) : Future[JsObject]
 
+    def getProfilersJobs (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject]
+
   }
 }
