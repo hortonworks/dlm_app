@@ -173,4 +173,30 @@ class DpProfilerAttributes @Inject()(
     }
   }
 
+  def getProfilersStatusWithJobSummary(clusterId: String, startTime: String, endTime: String) = {
+    AuthenticatedAction.async { req =>
+      Logger.info(s"Received getProfilersStatusWithJobSummary for clusterId - $clusterId $startTime $endTime")
+      implicit val token = req.token
+      dpProfilerService
+        .getProfilersStatusWithJobSummary(clusterId, startTime, endTime)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
+    def getProfilersStatusWithAssetsCount(clusterId: String, startTime: String, endTime: String) = {
+    AuthenticatedAction.async { req =>
+      Logger.info(s"Received getProfilersStatusWithAssetsCount for clusterId - $clusterId $startTime $endTime")
+      implicit val token = req.token
+      dpProfilerService
+        .getProfilersStatusWithAssetsCount(clusterId, startTime, endTime)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
 }
