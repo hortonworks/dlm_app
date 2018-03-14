@@ -5,7 +5,8 @@
   "totalResults": 1,
   "dbList": [
     {
-      "database": "testdb"
+      "database": "testdb",
+      "isEncrypted": true
     },
     {
       "database": "default"

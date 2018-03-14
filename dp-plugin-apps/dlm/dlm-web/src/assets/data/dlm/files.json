@@ -14,7 +14,8 @@
       "pathSuffix": "app-logs",
       "permission": "rwxrwxrwx",
       "replication": 0,
-      "type": "DIRECTORY"
+      "type": "DIRECTORY",
+      "isEncrypted": true
     },
     {
       "accessTime": 0,

@@ -64,8 +64,11 @@ export const FILES_REQUEST = '[HDFS Browser Component] FILES_REQUEST';
     >
     </dlm-table>
     <ng-template #nameFormattedTemplate let-value="value" let-row="row">
-      <i *ngIf="row.pathSuffix !== '..'"
-      [ngClass]="{'fa': true, 'fa-folder-o': row.type === fileTypes.DIRECTORY, 'fa-file-text-o': row.type !== fileTypes.DIRECTORY}"></i>
+      <span class="fa fa-stack fa-lg fa-stack-left">
+        <i class="fa fa-lock" [hidden]="!row.isEncrypted"></i>
+        <i *ngIf="row.pathSuffix !== '..'"
+        [ngClass]="{'fa': true, 'fa-folder-o': row.type === fileTypes.DIRECTORY, 'fa-file-text-o': row.type !== fileTypes.DIRECTORY}"></i>
+      </span>
       <a *ngIf="row.type === fileTypes.DIRECTORY" class="nameLink" (click)="handleDoubleClickAction(row, $event)">
         <span *ngIf="row.pathSuffix !== '..'" [innerHTML]="value" style="padding-left: 5px;"></span>
         <i *ngIf="row.pathSuffix === '..'" class="fa fa-reply"></i>
@@ -111,7 +114,7 @@ export class HdfsBrowserComponent implements OnInit, OnDestroy {
   @Input() selectFiles = false;
   @Input() page = 0;
 
-  @Output() select: EventEmitter<string> = new EventEmitter<string>();
+  @Output() selectFile: EventEmitter<string> = new EventEmitter<string>();
   @Output() openDirectory = new EventEmitter<string>();
   @Output() changePage = new EventEmitter<any>();
 
@@ -154,7 +157,7 @@ export class HdfsBrowserComponent implements OnInit, OnDestroy {
       });
     this.rows$ = dataChanges$
       .switchMap(([path, clusterId]) => {
-        return this.store.select(getAllFilesForClusterPath(clusterId, path)).map(files => {
+        return this.store.select(getAllFilesForClusterPath(clusterId, path)).map((files = []) => {
           const parent = path === '/' ? [] : [<ListStatus>{ pathSuffix: '..', type: FILE_TYPES.DIRECTORY }];
           return [...parent, ...files];
         });
@@ -194,7 +197,7 @@ export class HdfsBrowserComponent implements OnInit, OnDestroy {
       const prefix = currentDirectory === '/' ? '' : currentDirectory;
       if (pathSuffix !== '..') {
         this.selected = prefix + '/' + pathSuffix;
-        this.select.emit(this.selected);
+        this.selectFile.emit(this.selected);
       }
     }
   }
@@ -241,7 +244,7 @@ export class HdfsBrowserComponent implements OnInit, OnDestroy {
     this.currentDirectory$.next(path);
     this.selected = path;
     this.page = 0;
-    this.select.emit(this.selected);
+    this.selectFile.emit(this.selected);
     this.openDirectory.emit(this.selected);
     this.changePage.emit({offset: this.page});
   }

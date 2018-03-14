@@ -9,79 +9,119 @@
 
 <div class="form-container">
   <form class="basic-form policy-form" [formGroup]="form">
-    <div class="row">
-      <fieldset formGroupName="destination">
-        <div class="col-xs-12">
-          <div class="row">
+    <div class="container-fluid">
+      <div class="row">
+        <fieldset formGroupName="destination">
+          <div class="col-xs-12 form-section">
             <!-- DESTINATION TYPE -->
-            <div class="col-xs-4">
-              <dlm-form-field
-                [label]="'page.policies.form.fields.destination_type' | translate"
-                [fieldClass]="'col-xs-12'"
-                [errorClass]=""
-                [required]="true">
-                <dlm-select-field
-                  qe-attr="policy-destination-type"
-                  formField
-                  formControlName="type"
-                  [options]="destinationTypes"
-                  [value]="destinationType">
-                </dlm-select-field>
-              </dlm-form-field>
+            <div class="row">
+              <div class="col-xs-4">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.destination_type' | translate"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]=""
+                  [required]="true">
+                  <dlm-select-field
+                    qe-attr="policy-destination-type"
+                    formField
+                    formControlName="type"
+                    [options]="destinationTypes"
+                    [value]="destinationType">
+                  </dlm-select-field>
+                </dlm-form-field>
+              </div>
             </div>
             <!-- DESTINATION TYPE END -->
 
             <!-- DESTINATION CLUSTER -->
-            <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.CLUSTER">
-              <dlm-form-field
-                [label]="'page.policies.form.fields.destinationCluster.self' | translate"
-                [fieldClass]="'col-xs-12'"
-                [errorClass]=""
-                [required]="true">
-                <dlm-select-field
-                  qe-attr="policy-destination-cluster"
-                  formField
-                  formControlName="cluster"
-                  [options]="destinationClusters"
-                  [value]="destinationCluster">
-                </dlm-select-field>
-              </dlm-form-field>
+            <div class="row">
+              <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.CLUSTER">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.destinationCluster.self' | translate"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]=""
+                  [required]="true">
+                  <dlm-select-field
+                    qe-attr="policy-destination-cluster"
+                    formField
+                    formControlName="cluster"
+                    [options]="destinationClusters"
+                    [value]="destinationCluster">
+                  </dlm-select-field>
+                </dlm-form-field>
+              </div>
             </div>
             <!-- DESTINATION CLUSTER END -->
 
             <!-- DESTINATION PATH -->
-            <div class="col-xs-4" *ngIf="general.type === POLICY_TYPES.HDFS && form.get('destination.type').value === SOURCE_TYPES.CLUSTER">
-              <dlm-form-field
-                [label]="'page.policies.form.fields.destinationCluster.path' | translate"
-                [fieldClass]="'col-xs-12'"
-                [errorClass]=""
-                [required]="true">
-                <input
-                  qe-attr="policy-destination-path"
-                  formField
-                  class="form-control"
-                  formControlName="path">
-              </dlm-form-field>
+            <div class="row">
+              <div class="col-xs-4">
+                <dlm-form-field
+                  [label]="destinationPathLabel"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]="'col-xs-12'"
+                  [required]="true">
+                  <input
+                    qe-attr="policy-destination-path"
+                    formField
+                    class="form-control"
+                    formControlName="path">
+                  <dlm-field-error *ngIf="form.get('destination.path').hasError('encryption')">
+                    {{'page.policies.form.fields.destinationCluster.errors.encryption' | translate}}
+                  </dlm-field-error>
+                </dlm-form-field>
+              </div>
             </div>
             <!-- DESTINATION PATH END -->
 
+            <div class="row" *ngIf="isSourceEncrypted">
+              <div class="col-xs-4">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.destinationCluster.tdeKey' | translate"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]="'col-xs-12'">
+                  <dlm-radio-button qe-attr="policy-destination-tde-type"
+                    formField
+                    [items]="tdeOptions"
+                    formControlName="tdeKey">
+                  </dlm-radio-button>
+                </dlm-form-field>
+              </div>
+            </div>
+
             <!-- DESTINATION CLOUD ACCOUNT -->
-            <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.S3">
-              <dlm-form-field
-                [label]="'page.policies.form.fields.s3.account' | translate"
-                [required]="true"
-                [fieldClass]="'col-xs-12'"
-                [errorClass]="">
-                <dlm-select-field
-                  qe-attr="destination-cloud-account"
-                  formField
-                  formControlName="cloudAccount"
-                  [options]="destinationCloudAccounts"
-                  [value]="destinationCloudAccount">
-                </dlm-select-field>
-              </dlm-form-field>
+            <div class="row">
+              <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.S3">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.s3.account' | translate"
+                  [required]="true"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]="">
+                  <dlm-select-field
+                    qe-attr="destination-cloud-account"
+                    formField
+                    formControlName="cloudAccount"
+                    [options]="destinationCloudAccounts"
+                    [value]="destinationCloudAccount">
+                  </dlm-select-field>
+                </dlm-form-field>
+              </div>
             </div>
             <!-- DESTINATION CLOUD ACCOUNT END -->
+
+            <div class="row" *ngIf="shouldShowTDEWarning">
+              <div class="col-xs-4">
+                <div class="alert alert-warning alert-small flex-center">
+                  <div class="pull-left">
+                    <i class="fa fa-exclamation-triangle text-warning"></i>
+                  </div>
+                  <div class="pull-left mlm">
+                    <div>{{'page.policies.form.fields.destinationCluster.tde_warning.title' | translate}}</div>
+                    <small>{{'page.policies.form.fields.destinationCluster.tde_warning.body' | translate}}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- DESTINATION S3 ENDPOINT -->
             <div class="col-xs-4" *ngIf="form.get('destination.cloudAccount').value && form.get('destination.type').value === SOURCE_TYPES.S3">
@@ -104,8 +144,8 @@
             </div>
             <!-- DESTINATION S3 ENDPOINT END -->
           </div>
-        </div>
-      </fieldset>
+        </fieldset>
+      </div>
     </div>
   </form>
 </div>

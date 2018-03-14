@@ -218,6 +218,12 @@
       "events": "Events",
       "files": "Files",
       "tables": "Tables"
+    },
+    "tde": {
+      "options": {
+        "same": "Same Key",
+        "different": "Different Key"
+      }
     }
   },
   "topnav": {
@@ -588,7 +594,9 @@
         },
         "help": {
           "snapshot_text": "Enable snapshot based replication",
-          "snapshot_url": "http://horton.works/dlm100_h0006a"
+          "snapshot_url": "http://horton.works/dlm100_h0006a",
+          "encrypted_path": "Selected path contains one or more folders that are encrypted",
+          "encrypted_db": "Selected database is encrypted"
         },
         "no_containers": "No containers",
         "fields": {
@@ -606,8 +614,17 @@
           "destinationCluster": {
             "self": "Destination Cluster",
             "default": "Select a Source Cluster first",
-            "path": "Destination Path",
-            "noPair": "No paired cluster available for the selected source cluster"
+            "directory": "Destination Path",
+            "database": "Destination Database",
+            "noPair": "No paired cluster available for the selected source cluster",
+            "tdeKey": "Source & Destination encrypted with",
+            "errors": {
+              "encryption": "Encrypted data cannot be replicated to an unencrypted path. Please enter an encrypted path to continue."
+            },
+            "tde_warning": {
+              "title": "Alert: Incorrect key selection",
+              "body": "Selecting same key when different keys was configured as the encryption type will cause policy to fail."
+            }
           },
           "destination_type": "Type",
           "source_type": "Type",

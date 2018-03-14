@@ -11,6 +11,9 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { HiveDatabase, HiveTable } from 'models/hive-database.model';
+import { Store } from '@ngrx/store';
+import { State } from 'reducers';
+import { getDatabaseForCluster } from 'selectors/hive.selector';
 
 @Injectable()
 export class HiveService {
@@ -40,7 +43,7 @@ export class HiveService {
     }) as HiveTable);
   }
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, private store: Store<State>) {}
 
   fetchDatabases(clusterId): Observable<any> {
     return this.httpClient.get<any>(`clusters/${clusterId}/hive/databases`)
@@ -62,5 +65,10 @@ export class HiveService {
         }));
       });
     });
+  }
+
+  checkDatabaseEncryption(clusterId, databaseName: string): Observable<boolean> {
+    return this.store.select(getDatabaseForCluster(clusterId, databaseName))
+      .map((entity = {}) => !!entity.isEncrypted);
   }
 }

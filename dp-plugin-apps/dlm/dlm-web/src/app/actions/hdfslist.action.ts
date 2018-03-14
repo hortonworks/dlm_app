@@ -16,7 +16,7 @@ export const ActionTypes = {
 };
 
 export const listFiles = (clusterId, path, meta = {}): ActionWithPayload<any> => ({
-  type: ActionTypes.LIST_FILES.START, payload: { clusterId, path, meta }
+  type: ActionTypes.LIST_FILES.START, payload: { clusterId, path, meta: {clusterId, path, ...meta} }
 });
 
 export const listFilesSuccess = (listStatuses, meta = {}): ActionSuccess => {

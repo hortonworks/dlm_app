@@ -52,7 +52,7 @@ import { TimeZoneService } from 'services/time-zone.service';
 xdescribe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
   let fixture: ComponentFixture<PolicyFormComponent>;
-  let store: Store<State>;
+  let store: Store<any>;
   let timezoneService: TimeZoneService;
 
   beforeEach(async(() => {
@@ -538,7 +538,8 @@ xdescribe('PolicyFormComponent', () => {
         entityId: 'db1',
         clusterId: 1,
         database: 'db1',
-        name: 'db1'
+        name: 'db1',
+        isEncrypted: false
       },
       collapsed: true
     };

@@ -23,7 +23,7 @@ import { Cluster } from 'models/cluster.model';
 import { Step } from 'models/wizard.model';
 import { getAllSteps, getEntities } from 'selectors/create-policy.selector';
 import { getStepById } from 'utils/policy-util';
-import { WIZARD_STEP_ID, WIZARD_STATE, SOURCE_TYPES, POLICY_TYPES } from 'constants/policy.constant';
+import { WIZARD_STEP_ID, WIZARD_STATE, SOURCE_TYPES, POLICY_TYPES, TDE_KEY_TYPE } from 'constants/policy.constant';
 import { wizardSaveStep, wizardMoveToStep, createPolicy } from 'actions/policy.action';
 import { StepGeneralComponent } from '../create-policy-steps/step-general/step-general.component';
 import { StepSourceComponent } from '../create-policy-steps/step-source/step-source.component';
@@ -187,9 +187,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
       const dc = this.clusters.find(c => c.id === destination.cluster);
       clusterId = dc.id;
       policyData.policyDefinition.targetCluster = PolicyService.makeClusterId(dc.dataCenter, dc.name);
-      if (general.type === POLICY_TYPES.HDFS) {
-        policyData.policyDefinition.targetDataset = destination.path;
-      }
+      policyData.policyDefinition.targetDataset = destination.path;
     } else {
       clusterId = sc.id;
       if (destination.type === SOURCE_TYPES.S3) {
@@ -214,6 +212,12 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
         // source s3
         policyData.policyDefinition.sourceDataset = source.s3endpoint;
         policyData.policyDefinition.cloudCred = source.cloudAccount;
+      }
+    }
+
+    if (source.type === SOURCE_TYPES.CLUSTER && source.type === destination.type) {
+      if (destination.tdeKey === TDE_KEY_TYPE.SAME_KEY) {
+        policyData.policyDefinition['tde.sameKey'] = true;
       }
     }
     policyData.policyDefinition = <PolicyDefinition>omitEmpty(policyData.policyDefinition);

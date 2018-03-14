@@ -25,4 +25,5 @@ export interface HiveDatabaseUI {
 }
 export interface HiveDatabase extends HiveDatabaseUI {
   database: string;
+  isEncrypted: boolean;
 }

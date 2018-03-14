@@ -26,7 +26,10 @@ import { ProgressState } from 'models/progress-state.model';
             </div>
           </div>
           <div class="pull-left">
-            <i class="fa fa-database"></i>
+            <span class="fa-stack fa-lg fa-stack-left database-name-stack">
+              <i class="fa fa-lock" [hidden]="!database?.isEncrypted"></i>
+              <i class="fa fa-database text-primary"></i>
+            </span>
             <span class="database-name">{{database?.name}}</span>
           </div>
           <div class="pull-right">

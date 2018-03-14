@@ -24,6 +24,9 @@ import {WizardSummaryComponent} from '../create-policy-wizard-summary/create-pol
 import {SummaryTreeComponent} from '../summary-tree/summary-tree.component';
 import {FrequencyPipe} from 'pipes/frequency.pipe';
 import { TranslateService } from '@ngx-translate/core';
+import { AsyncActionsService } from 'services/async-actions.service';
+import { HdfsService } from 'services/hdfs.service';
+import { HiveService } from 'services/hive.service';
 
 describe('CreatePolicyWizardComponent', () => {
   let component: CreatePolicyWizardComponent;
@@ -52,7 +55,10 @@ describe('CreatePolicyWizardComponent', () => {
         NavbarService,
         PolicyService,
         JobService,
-        FrequencyPipe
+        FrequencyPipe,
+        AsyncActionsService,
+        HdfsService,
+        HiveService
       ]
     })
       .compileComponents();

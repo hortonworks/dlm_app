@@ -153,3 +153,35 @@ ng-select {
     height: auto;
   }
 }
+
+.fa-stack-left {
+  &.fa-stack {
+    position: relative;
+
+    > i.fa:first-child {
+      position: absolute;
+      z-index: 1;
+      top: 11px;
+      font-size: 11px;
+      left: -3px;
+    }
+
+    > i.fa:nth-child(2) {
+      position: relative;
+    }
+
+    &.fa-lg {
+      > i.fa:first-child {
+        &.fa-lock {
+          left: 1px;
+          font-size: inherit;
+          top: 8px;
+        }
+      }
+
+      > i.fa:nth-child(2) {
+        left: 8px;
+      }
+    }
+  }
+}

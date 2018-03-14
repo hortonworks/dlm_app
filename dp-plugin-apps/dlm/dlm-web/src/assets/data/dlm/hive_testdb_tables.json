@@ -6,6 +6,7 @@
   "dbList": [
     {
       "database": "testdb",
+      "isEncrtypted": true,
       "table": [
         "school_from_test_db",
         "allstar_full_from_test_db"

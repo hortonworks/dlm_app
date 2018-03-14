@@ -14,3 +14,5 @@ import { mapToList } from 'utils/store-util';
 export const getEntities = createSelector(getDatabasesList, state => state.entities);
 export const getAllDatabases = createSelector(getEntities, mapToList);
 export const getDatabase = (entityId: string) => createSelector(getEntities, entities => entities[entityId]);
+export const getDatabaseForCluster = (clusterId: number, dbName: string) => createSelector(getAllDatabases,
+  (databases) => databases.find(db => db.name === dbName && db.clusterId === clusterId));

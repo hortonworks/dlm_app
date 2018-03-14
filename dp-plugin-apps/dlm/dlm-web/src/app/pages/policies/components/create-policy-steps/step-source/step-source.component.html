@@ -15,78 +15,89 @@
           <div class="form-group">
             <!-- SOURCE -->
             <fieldset formGroupName="source">
-              <div class="col-xs-12">
-                <div class="row">
+              <div class="row">
+                <div class="col-xs-12">
                   <!-- SOURCE TYPE -->
-                  <div class="col-xs-4">
-                    <dlm-form-field
-                      [label]="'page.policies.form.fields.source_type' | translate"
-                      [fieldClass]="'col-xs-12'"
-                      [errorClass]=""
-                      [required]="true">
-                      <dlm-select-field
-                        qe-attr="policy-source-type"
-                        formField
-                        formControlName="type"
-                        [options]="sourceTypes"
-                        [value]="sourceType">
-                      </dlm-select-field>
-                    </dlm-form-field>
+                  <div class="row">
+                    <div class="col-xs-4">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.source_type' | translate"
+                        [fieldClass]="'col-xs-12'"
+                        [errorClass]=""
+                        [required]="true">
+                        <dlm-select-field
+                          qe-attr="policy-source-type"
+                          formField
+                          formControlName="type"
+                          [options]="sourceTypes"
+                          [value]="sourceType">
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
                   </div>
                   <!-- SOURCE TYPE END -->
+
                   <!-- SOURCE CLUSTER -->
-                  <div class="col-xs-4" *ngIf="form.get('source.type').value === SOURCE_TYPES.CLUSTER">
-                    <dlm-form-field
-                      [label]="'page.policies.form.fields.sourceCluster.self' | translate"
-                      [fieldClass]="'col-xs-12'"
-                      [errorClass]=""
-                      [required]="true">
-                      <dlm-select-field
-                        qe-attr="policy-source-cluster"
-                        formField
-                        formControlName="cluster"
-                        [options]="sourceClusters"
-                        [value]="sourceCluster">
-                      </dlm-select-field>
-                    </dlm-form-field>
+                  <div class="row">
+                    <div class="col-xs-4" *ngIf="form.get('source.type').value === SOURCE_TYPES.CLUSTER">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.sourceCluster.self' | translate"
+                        [fieldClass]="'col-xs-12'"
+                        [errorClass]=""
+                        [required]="true">
+                        <dlm-select-field
+                          qe-attr="policy-source-cluster"
+                          formField
+                          formControlName="cluster"
+                          [options]="sourceClusters"
+                          [value]="sourceCluster">
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
                   </div>
                   <!-- SOURCE CLUSTER END -->
+
                   <!-- SOURCE CLOUD ACCOUNT -->
-                  <div class="col-xs-4"
-                       *ngIf="form.get('source.type').value === SOURCE_TYPES.S3">
-                    <dlm-form-field
-                      [label]="'page.policies.form.fields.s3.account' | translate"
-                      [required]="true"
-                      [fieldClass]="'col-xs-12'"
-                      [errorClass]="">
-                      <dlm-select-field
-                        qe-attr="source-cloud-account"
-                        formField
-                        formControlName="cloudAccount"
-                        [options]="sourceCloudAccounts"
-                        [value]="sourceCloudAccount">
-                      </dlm-select-field>
-                    </dlm-form-field>
+                  <div class="row">
+                    <div class="col-xs-4"
+                        *ngIf="form.get('source.type').value === SOURCE_TYPES.S3">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.s3.account' | translate"
+                        [required]="true"
+                        [fieldClass]="'col-xs-12'"
+                        [errorClass]="">
+                        <dlm-select-field
+                          qe-attr="source-cloud-account"
+                          formField
+                          formControlName="cloudAccount"
+                          [options]="sourceCloudAccounts"
+                          [value]="sourceCloudAccount">
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
                   </div>
                   <!-- SOURCE CLOUD ACCOUNT END -->
+
                   <!-- SOURCE S3 ENDPOINT -->
-                  <div class="col-xs-4" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === SOURCE_TYPES.S3">
-                    <dlm-form-field
-                      [label]="'page.policies.form.fields.s3.endpoint' | translate"
-                      [errorClass]="'col-xs-12'"
-                      [fieldClass]="'col-xs-12'"
-                      [required]="true">
-                      <div class="input-group">
-                        <div class="input-group-addon">{{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}://</div>
-                        <input
-                          type="text"
-                          class="form-control"
-                          qe-attr="source-S3-endpoint"
-                          formField
-                          formControlName="s3endpoint"/>
-                      </div>
-                    </dlm-form-field>
-                    <button type="button" class="btn btn-success pull-right">{{"page.policies.form.validateBtn" | translate}}</button>
+                  <div class="row">
+                    <div class="col-xs-4" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === SOURCE_TYPES.S3">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.s3.endpoint' | translate"
+                        [errorClass]="'col-xs-12'"
+                        [fieldClass]="'col-xs-12'"
+                        [required]="true">
+                        <div class="input-group">
+                          <div class="input-group-addon">{{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}://</div>
+                          <input
+                            type="text"
+                            class="form-control"
+                            qe-attr="source-S3-endpoint"
+                            formField
+                            formControlName="s3endpoint"/>
+                        </div>
+                      </dlm-form-field>
+                      <button type="button" class="btn btn-success pull-right">{{"page.policies.form.validateBtn" | translate}}</button>
+                    </div>
                   </div>
                   <!-- SOURCE S3 ENDPOINT END -->
                 </div>
@@ -102,7 +113,16 @@
                     <div class="row">
                       <div class="col-xs-12">
                         <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
-                          <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
+                          <div class="row">
+                            <div class="col-xs-10">
+                              <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
+                            </div>
+                            <div class="col-xs-2 text-left path-help-hint">
+                              <i class="fa fa-lock fa-2x text-muted"
+                                *ngIf="isDatasetEncrypted()"
+                                [tooltip]="'page.policies.form.help.encrypted_path' | translate"></i>
+                            </div>
+                          </div>
                           <dlm-field-error *ngIf="form.get('source.directories').hasError('isFile')">
                             {{'forms.validation_errors.not_directory' | translate:directoryField}}
                           </dlm-field-error>
@@ -114,7 +134,7 @@
                           <dlm-hdfs-browser
                             [rootPath]="hdfsRootPath"
                             [clusterId]="sourceCluster"
-                            (select)="handleHdfsPathChange($event)"
+                            (selectFile)="handleHdfsPathChange($event)"
                           ></dlm-hdfs-browser>
                         </div>
                       </div>
@@ -137,6 +157,9 @@
                   <span class="text-muted">
                     <span>
                       {{'page.policies.form.selected' | translate}}: {{form.value.source.databases}}
+                      <i class="fa fa-lock text-muted"
+                        *ngIf="isDatasetEncrypted()"
+                        [tooltip]="'page.policies.form.help.encrypted_db' | translate"></i>
                     </span>
                   </span>
                         </div>

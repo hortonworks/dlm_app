@@ -49,11 +49,11 @@ export const ACTIVE = 'active';
 export const DISABLED = 'disabled';
 export const COMPLETED = 'completed';
 
-export const POLICY_TYPES = {
-  HDFS,
-  HIVE,
-  HBASE
-};
+export enum POLICY_TYPES {
+  HDFS = 'FS',
+  HIVE = 'HIVE',
+  HBASE = 'HBASE'
+}
 
 export const POLICY_EXECUTION_TYPES = {
   HDFS,
@@ -87,10 +87,10 @@ export const SOURCE_TYPES_LABELS = {
   [S3]: 'S3'
 };
 
-export const SOURCE_TYPES = {
-  CLUSTER,
-  S3
-};
+export enum SOURCE_TYPES {
+  CLUSTER = 'CLUSTER',
+  S3 = 'S3'
+}
 
 export const POLICY_TYPES_LABELS = {
   [HDFS]: 'HDFS',
@@ -144,3 +144,13 @@ export const WIZARD_STATE = {
   DISABLED,
   COMPLETED
 };
+
+export enum TDE_KEY_TYPE {
+  SAME_KEY = 'SAME',
+  DIFFERENT_KEY = 'DIFFERENT'
+}
+
+export enum TDE_KEY_LABEL {
+  SAME_KEY = 'common.tde.options.same',
+  DIFFERENT_KEY = 'common.tde.options.different'
+}

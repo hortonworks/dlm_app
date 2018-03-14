@@ -75,6 +75,7 @@ export interface PolicyDefinition {
   queueName?: string;
   distcpMapBandwidth?: number;
   cloudCred?: string;
+  'tde.sameKey'?: boolean;
 }
 
 export interface PolicyPayload {

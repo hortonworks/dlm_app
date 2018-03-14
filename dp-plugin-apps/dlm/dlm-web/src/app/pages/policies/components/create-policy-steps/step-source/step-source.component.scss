@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,16 +7,14 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export interface ListStatus {
-  accessTime?: number;
-  blockSize?: number;
-  group?: string;
-  length?: number;
-  modificationTime?: number;
-  owner?: string;
-  pathSuffix: string;
-  permission?: string;
-  replication?: number;
-  type?: string;
-  isEncrypted?: boolean;
+.dlm-step-source {
+  .path-help-hint {
+    i.fa-lock {
+      line-height: 34px;
+    }
+
+    .tooltip {
+      width: 200px;
+    }
+  }
 }

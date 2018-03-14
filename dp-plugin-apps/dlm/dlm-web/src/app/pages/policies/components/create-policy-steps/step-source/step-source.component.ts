@@ -9,7 +9,7 @@
 
 import {
   Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
-  HostBinding, ChangeDetectionStrategy, OnDestroy, AfterViewInit
+  HostBinding, ChangeDetectionStrategy, OnDestroy, AfterViewInit, ChangeDetectorRef
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -33,10 +33,18 @@ import { HiveBrowserTablesLoadingMap } from 'components/hive-browser';
 import { simpleSearch } from 'utils/string-utils';
 import { getAllProgressStates, getMergedProgress } from 'selectors/progress.selector';
 import { loadDatabases } from 'actions/hivelist.action';
-import { getAllDatabases } from 'selectors/hive.selector';
+import { getAllDatabases, getDatabaseForCluster } from 'selectors/hive.selector';
+import { getAllFilesForClusterPath } from 'selectors/hdfs.selector';
 import { merge } from 'utils/object-utils';
 import { wizardResetStep } from 'actions/policy.action';
 import { clusterToListOption } from 'utils/policy-util';
+import { getClusterEntities } from 'utils/policy-util';
+import { contains } from 'utils/array-util';
+import { ListStatus } from 'models/list-status.model';
+import { AsyncActionsService } from 'services/async-actions.service';
+import { listFiles } from 'actions/hdfslist.action';
+import { HdfsService } from 'services/hdfs.service';
+import { HiveService } from 'services/hive.service';
 
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
@@ -44,7 +52,8 @@ const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
   selector: 'dlm-step-source',
   templateUrl: './step-source.component.html',
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./step-source.component.scss']
 })
 export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, StepComponent {
 
@@ -116,7 +125,15 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
     return this.isHivePolicy() ? [cluster] : [s3, cluster];
   }
 
-  constructor(private store: Store<State>, private formBuilder: FormBuilder, private t: TranslateService) {}
+  constructor(
+    private store: Store<State>,
+    private formBuilder: FormBuilder,
+    private t: TranslateService,
+    private asyncActions: AsyncActionsService,
+    private hdfsService: HdfsService,
+    private hiveService: HiveService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   private initForm(): FormGroup {
     return this.formBuilder.group({
@@ -127,6 +144,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
         s3endpoint: ['', Validators.required],
         databases: ['', Validators.required],
         directories: ['', Validators.required],
+        datasetEncrypted: [false]
       })
     });
   }
@@ -150,6 +168,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
     this.subscribeToSourceType();
     this.subscribeToSourceCluster();
     this.setupDatabaseChanges(this.form);
+    this.setupSourceEncryptionUpdate(this.form);
     this.subscriptions.push(formSubscription);
   }
 
@@ -184,6 +203,10 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
 
   isHivePolicy() {
     return this.general && 'type' in this.general && this.general['type'] === POLICY_TYPES.HIVE;
+  }
+
+  isDatasetEncrypted() {
+    return this.form.get('source.datasetEncrypted').value;
   }
 
   handleHdfsPathChange(path) {
@@ -287,10 +310,37 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
             return all;
           }, {});
         this.databaseTablesLoadingMap = merge({}, this.databaseTablesLoadingMap, updates);
+        this.cdRef.markForCheck();
       });
 
     this.subscriptions.push(updateTablesLoadingProgress);
     this.subscriptions.push(loadDatabasesSubscription);
+  }
+
+  private setupSourceEncryptionUpdate(form: FormGroup): void {
+    const sourceDatabaseChanges$: Observable<string> = form.get('source.databases').valueChanges.distinctUntilChanged();
+    const sourceDirectoryChanges$: Observable<string> = form.get('source.directories').valueChanges.distinctUntilChanged();
+    const typeChanges$: Observable<string> = form.get('source.type').valueChanges.distinctUntilChanged();
+    const findDir = (dirs: ListStatus[], fileName) => {
+      return dirs.find(d => d.pathSuffix === fileName);
+    };
+    const encryptionValue$: Observable<boolean> = Observable
+      .combineLatest(sourceDatabaseChanges$, sourceDirectoryChanges$, typeChanges$)
+      .switchMap(([database, directory, type]) => {
+        const cluster = form.get('source.cluster').value;
+        if (type !== SOURCE_TYPES.CLUSTER) {
+          return Observable.of(false);
+        }
+        if (this.isHDFSPolicy()) {
+          return this.hdfsService.checkFileEncryption(cluster, directory);
+        }
+        return this.hiveService.checkDatabaseEncryption(cluster, database);
+      });
+
+    const updateEncryptionValue: Subscription = encryptionValue$.subscribe(isEncrypted => {
+      form.patchValue({source: {datasetEncrypted: isEncrypted}});
+    });
+    this.subscriptions.push(updateEncryptionValue);
   }
 
   ngOnDestroy() {
