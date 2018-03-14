@@ -193,21 +193,31 @@ object AppModule extends AbstractModule {
                     dpClusterService,
                     config)
   }
+
   @Provides
   @Singleton
   def provideHdpProxyRoute(
-      actorSystem: ActorSystem,
-      actorMaterializer: ActorMaterializer,
-      clusterData: ClusterDataApi,
-      config: Config,
-      @Named("connectionContext") sslContext: Provider[HttpsConnectionContext],
-      dPKeystore: DPTrustStore): HdpRoute = {
+                            actorSystem: ActorSystem,
+                            actorMaterializer: ActorMaterializer,
+                            clusterData: ClusterDataApi,
+                            config: Config,
+                            @Named("connectionContext") sslContext: Provider[HttpsConnectionContext],
+                            dPKeystore: DPTrustStore): HdpRoute = {
     new HdpRoute(actorSystem,
-                 actorMaterializer,
-                 clusterData,
-                 sslContext,
-                 config,
-                 dPKeystore)
+      actorMaterializer,
+      clusterData,
+      sslContext,
+      config,
+      dPKeystore)
+  }
+
+  @Provides
+  @Singleton
+  def provideConfigurationRoute(wsClient: WSClient, config: Config): ConfigurationRoute = {
+    new ConfigurationRoute(
+      wsClient,
+      config
+    )
   }
 
   @Provides
@@ -267,7 +277,8 @@ object AppModule extends AbstractModule {
                         rangerRoute: RangerRoute,
                         dpProfilerRoute: DpProfilerRoute,
                         statusRoute: StatusRoute,
-                        ambariRoute: AmbariRoute): Webserver = {
+                        ambariRoute: AmbariRoute,
+                        configurationRoute: ConfigurationRoute): Webserver = {
     import akka.http.scaladsl.server.Directives._
     new Webserver(
       actorSystem,
@@ -298,7 +309,8 @@ object AppModule extends AbstractModule {
         ambariRoute.configRoute ~
         ambariRoute.serviceStateRoute ~
         ambariRoute.ambariClusterProxy ~
-        ambariRoute.ambariGenericProxy
+        ambariRoute.ambariGenericProxy ~
+        configurationRoute.route
     )
   }
 

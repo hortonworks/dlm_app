@@ -12,18 +12,18 @@
 
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, HJwtToken, WrappedErrorException}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, WrappedErrorException}
 import com.hortonworks.dataplane.cs.Webservice.ConfigurationUtilityService
 import com.typesafe.config.Config
 import play.api.libs.json.JsValue
+import play.api.libs.ws.WSClient
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-
-class ConfigurationUtilityServiceImpl(val config: Config)(implicit ws: ClusterWsClient) extends ConfigurationUtilityService {
+class ConfigurationUtilityServiceImpl(val config: Config)(implicit ws: WSClient) extends ConfigurationUtilityService {
   override def doReloadCertificates(): Future[JsValue] = {
     ws.url(s"$url/configuration/actions/reloadCertificates")
-      .withToken(None)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map { res =>
