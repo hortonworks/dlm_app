@@ -38,3 +38,5 @@ export const getAllStepValues = createSelector(getEntities, entities =>
     return stepValues;
   }, {})
 );
+
+export const getPolicyValidationProgress = createSelector(getCreatePolicyWizardState, state => state.validation);

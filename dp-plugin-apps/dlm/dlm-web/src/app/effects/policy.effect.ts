@@ -17,7 +17,7 @@ import { JobService } from 'services/job.service';
 import {
   loadPoliciesSuccess, loadPoliciesFail, createPolicyFail, createPolicySuccess, ActionTypes as policyActions,
   deletePolicySuccess, deletePolicyFail, suspendPolicyFail, suspendPolicySuccess, resumePolicySuccess, resumePolicyFail,
-  loadLastJobsSuccess, loadLastJobsFailure, wizardResetAllSteps
+  loadLastJobsSuccess, loadLastJobsFailure, wizardResetAllSteps, validatePolicySuccess, validatePolicyFailure
 } from 'actions/policy.action';
 
 @Injectable()
@@ -86,6 +86,16 @@ export class PolicyEffects {
       return this.jobService.getJobsForPolicies(payload.policies, payload.numJobs)
         .map(jobs => loadLastJobsSuccess(jobs, payload.meta))
         .catch(err => Observable.of(loadLastJobsFailure(err, payload.meta)));
+    });
+
+  @Effect()
+  validatePolicy$: Observable<any> = this.actions$
+    .ofType(policyActions.VALIDATE_POLICY.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.policyService.validatePolicy(payload.data)
+        .map(result => validatePolicySuccess(result, payload.meta))
+        .catch(err => Observable.of(validatePolicyFailure(err, payload.meta)));
     });
 
   constructor(private actions$: Actions,

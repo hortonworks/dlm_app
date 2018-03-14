@@ -12,6 +12,8 @@ import { BaseState } from 'models/base-resource-state';
 import * as fromPolicy from 'actions/policy.action';
 import { toEntities, mapToList } from 'utils/store-util';
 import { WIZARD_STEP_ID, WIZARD_STEP_LABELS, WIZARD_STATE } from 'constants/policy.constant';
+import { HttpProgress } from '../models/cloud-account.model';
+import { PROGRESS_STATUS } from 'constants/status.constant';
 
 export type State = BaseState<Step>;
 
@@ -33,7 +35,8 @@ const initialSteps: Step[] = Object.keys(WIZARD_STEP_ID).map((key, i) => {
 });
 
 export const initialState: State = {
-  entities: toEntities<Step>(initialSteps)
+  entities: toEntities<Step>(initialSteps),
+  validation: <HttpProgress>{}
 };
 
 export function reducer(state = initialState, action): State {
@@ -46,9 +49,33 @@ export function reducer(state = initialState, action): State {
       return wizardResetAllSteps(state, action);
     case fromPolicy.ActionTypes.WIZARD_RESET_STEP:
       return wizardResetStep(state, action);
+    case fromPolicy.ActionTypes.VALIDATE_POLICY.FAILURE:
+      return validationFailure(state, action);
+    case fromPolicy.ActionTypes.VALIDATE_POLICY.SUCCESS:
+      return validationSuccess(state, action);
     default:
       return state;
   }
+}
+
+function validationSuccess(state: State, action): State {
+  return <State>{
+    ...state,
+    validation: {
+      state: PROGRESS_STATUS.SUCCESS,
+      response: action.payload.response
+    }
+  };
+}
+
+function validationFailure(state: State, action): State {
+  return <State>{
+    ...state,
+    validation: {
+      state: PROGRESS_STATUS.FAILED,
+      response: action.payload
+    }
+  };
 }
 
 function wizardSaveStep(state: State, action): State {

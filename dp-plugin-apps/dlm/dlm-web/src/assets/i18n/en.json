@@ -624,7 +624,10 @@
             "tde_warning": {
               "title": "Alert: Incorrect key selection",
               "body": "Selecting same key when different keys was configured as the encryption type will cause policy to fail."
-            }
+            },
+            "skipValidation": "Skip Validation",
+            "validationFailed": "Validation failed",
+            "validationCompleted": "Validation completed"
           },
           "destination_type": "Type",
           "source_type": "Type",

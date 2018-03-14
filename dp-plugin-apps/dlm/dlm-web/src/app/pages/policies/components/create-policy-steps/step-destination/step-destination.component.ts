@@ -16,8 +16,8 @@ import { Observable } from 'rxjs/Observable';
 import { State } from 'reducers/index';
 import { Pairing } from 'models/pairing.model';
 import { CloudContainer } from 'models/cloud-container.model';
-import { StepSourceValue, SourceValue, StepGeneralValue } from 'models/create-policy-form.model';
-import { CloudAccount } from 'models/cloud-account.model';
+import { CloudAccount, HttpProgress } from 'models/cloud-account.model';
+import { SourceValue, StepGeneralValue } from 'models/create-policy-form.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
@@ -28,11 +28,15 @@ import { mapToList } from 'utils/store-util';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Subscription } from 'rxjs/Subscription';
 import { getClusterEntities, clusterToListOption } from 'utils/policy-util';
+import { validatePolicy } from 'actions/policy.action';
+import { omitEmpty } from 'utils/object-utils';
+import { getPolicyValidationProgress } from 'selectors/create-policy.selector';
+import { PROGRESS_STATUS } from 'constants/status.constant';
+import { PolicyService } from 'services/policy.service';
 import { contains } from 'utils/array-util';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
 import { AsyncActionsService } from 'services/async-actions.service';
-import { listFiles } from 'actions/hdfslist.action';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { loadDatabases } from 'actions/hivelist.action';
 import { omit, isEmpty } from 'utils/object-utils';
@@ -55,6 +59,9 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   @Output() onFormValidityChange = new EventEmitter<boolean>();
   @HostBinding('class') className = 'dlm-step-destination';
 
+  validationResults: HttpProgress;
+  showValidation = true;
+  validationInProgress = false;
   form: FormGroup;
   source: SourceValue = {} as SourceValue;
   general: StepGeneralValue = {} as StepGeneralValue;
@@ -146,8 +153,8 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
 
   get tdeOptions(): RadioItem[] {
     return [
-      { value: TDE_KEY_TYPE.DIFFERENT_KEY, label: this.t.instant(TDE_KEY_LABEL.DIFFERENT_KEY) },
-      { value: TDE_KEY_TYPE.SAME_KEY, label: this.t.instant(TDE_KEY_LABEL.SAME_KEY) },
+      {value: TDE_KEY_TYPE.DIFFERENT_KEY, label: this.t.instant(TDE_KEY_LABEL.DIFFERENT_KEY)},
+      {value: TDE_KEY_TYPE.SAME_KEY, label: this.t.instant(TDE_KEY_LABEL.SAME_KEY)},
     ];
   }
 
@@ -183,7 +190,10 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
         cloudAccount: ['', Validators.required],
         s3endpoint: ['', Validators.required],
         path: ['', Validators.required],
-        tdeKey: [TDE_KEY_TYPE.DIFFERENT_KEY]
+        tdeKey: [TDE_KEY_TYPE.DIFFERENT_KEY],
+        skipValidation: [false],
+        validationStatus: [false],
+        validationPerformed: [false]
       })
     });
   }
@@ -204,6 +214,21 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       if (type === SOURCE_TYPES.CLUSTER) {
         toEnable = this.clusterFields;
         toDisable = this.s3Fields;
+      }
+      if (type === SOURCE_TYPES.CLUSTER && this.source.type === SOURCE_TYPES.CLUSTER) {
+        this.showValidation = false;
+        this.form.patchValue({
+          destination: {
+            skipValidation: true
+          }
+        });
+      } else {
+        this.showValidation = true;
+        this.form.patchValue({
+          destination: {
+            skipValidation: false
+          }
+        });
       }
       toDisable.forEach(p => destinationControls[p].disable());
       toEnable.forEach(p => destinationControls[p].enable());
@@ -262,23 +287,49 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
 
   ngOnInit() {
     this.form = this.initForm();
-    this.store.select(getSteps(this.WIZARD_STEP_ID.GENERAL, this.WIZARD_STEP_ID.SOURCE)).subscribe(([general, source]) => {
-      const controls = this.form.controls.destination['controls'];
-      this.general = general.value || {};
-      this.source = source.value && source.value.source || {};
-      if (this.source.type === SOURCE_TYPES.CLUSTER) {
-        this.form.patchValue({
-          destination: {
-            path: this.general.type === POLICY_TYPES.HDFS ?
-              this.source.directories : this.source.databases
-          }
-        });
-      } else {
-        this.form.patchValue({destination: {path: ''}});
-      }
-    });
+    const validationSubscription = this.store.select(getPolicyValidationProgress)
+      .subscribe(validationResults => {
+        this.validationResults = validationResults;
+        this.validationInProgress = false;
+        if (validationResults.state) {
+          this.form.patchValue({
+            destination: {
+              validationPerformed: true,
+              validationStatus: validationResults.state === PROGRESS_STATUS.SUCCESS
+            }
+          });
+        }
+      });
+    const prevStepsSubscription = this.store.select(getSteps(this.WIZARD_STEP_ID.GENERAL, this.WIZARD_STEP_ID.SOURCE))
+      .subscribe(([general, source]) => {
+        const controls = this.form.controls.destination['controls'];
+        this.general = general.value || {};
+        this.source = source.value && source.value.source || {};
+        if (this.source.type === SOURCE_TYPES.CLUSTER) {
+          this.form.patchValue({
+            destination: {
+              path: this.general.type === POLICY_TYPES.HDFS ?
+                this.source.directories : this.source.databases
+            }
+          });
+        } else {
+          this.form.patchValue({destination: {path: ''}});
+        }
+      });
     this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
       .subscribe(isFormValid => this.onFormValidityChange.emit(isFormValid));
+    this.subscriptions.push(validationSubscription);
+    this.subscriptions.push(prevStepsSubscription);
+    this.subscriptions.push(this.form.valueChanges.subscribe(value => {
+      if (value.destination.validationStatus) {
+        this.form.patchValue({
+          destination: {
+            validationPerformed: false,
+            validationStatus: false
+          }
+        });
+      }
+    }));
     this.subscribeToDestinationType();
     this.subscribeToDestinationPath(this.form);
   }
@@ -292,10 +343,53 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   }
 
   isFormValid() {
-    return this.form.valid;
+    const validationStatus = this.form.get('destination.validationStatus').value;
+    const skipValidation = this.form.get('destination.skipValidation').value;
+    if (skipValidation) {
+      return this.form.valid;
+    }
+    if (this.form.valid) {
+      return validationStatus;
+    }
+    return false;
   }
 
   getFormValue() {
     return this.form.value;
+  }
+
+  validate() {
+    const form = this.form;
+    this.validationInProgress = true;
+    const requestData: any = {
+      type: this.general.type,
+      cloudCred: this.source.cloudAccount || form.get('destination.cloudAccount').value,
+      sourceDataset: this.source.type === SOURCE_TYPES.S3 ? this.source.s3endpoint : this.source.directories,
+      targetDataset: form.get('destination.type').value === SOURCE_TYPES.S3 ?
+        form.get('destination.s3endpoint').value : form.get('destination.path').value
+    };
+    const sourceCluster = this.clusters.find(c => c.id === this.source.cluster);
+    let sourceClusterId = '';
+    if (sourceCluster) {
+      sourceClusterId = PolicyService.makeClusterId(sourceCluster.dataCenter, sourceCluster.name);
+      requestData.idForUrl = sourceCluster.id;
+      requestData.sourceCluster = sourceClusterId;
+    }
+    const targetCluster = this.clusters.find(c => c.id === form.get('destination.cluster').value);
+    let targetClusterId = '';
+    if (targetCluster) {
+      targetClusterId = PolicyService.makeClusterId(targetCluster.dataCenter, targetCluster.name);
+      requestData.idForUrl = targetCluster.id;
+      requestData.targetCluster = targetClusterId;
+    }
+    this.store.dispatch(validatePolicy(omitEmpty(requestData), {}));
+  }
+
+  handleSkipValidation(skipValidation) {
+    this.form.patchValue({
+      destination: {
+        skipValidation
+      }
+    });
   }
 }
