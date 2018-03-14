@@ -84,7 +84,6 @@ object AppModule extends AbstractModule {
                       materializer: ActorMaterializer,
                       configuration: Config): WSClient = {
     val config = new DefaultAsyncHttpClientConfig.Builder()
-
       .setAcceptAnyCertificate(true)
       .setRequestTimeout(Try(configuration.getInt(
         "dp.services.ws.client.requestTimeout.mins") * 60 * 1000)

@@ -149,4 +149,9 @@ object Webservice {
 
 
   }
+
+
+  trait ConfigurationUtilityService extends CsClientService {
+    def doReloadCertificates() : Future[WSResponse]
+  }
 }
