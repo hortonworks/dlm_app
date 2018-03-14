@@ -121,7 +121,7 @@ class StatusRoute @Inject()(val ws: WSClient,
     ws.url(endpoint)
       .withRequestTimeout(NETWORK_TIMEOUT seconds)
       .get()
-      .map {response =>
+      .map { response =>
         response.status match {
           case 403 => {
             // This could be Knox or Ambari
@@ -198,19 +198,19 @@ class StatusRoute @Inject()(val ws: WSClient,
     */
   private def probeAmbari(endpoint: String): Future[JsValue] = {
     credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
-        .map { credential =>
-          (credential.user, credential.pass) match {
-            case (Some(username), Some(password)) => (username, password)
-            case _ => throw new WrappedErrorException(Error(500, "There is no credential configured for Ambari default user", "cluster.ambari.status.raw.credential-not-found"))
-          }
+      .map { credential =>
+        (credential.user, credential.pass) match {
+          case (Some(username), Some(password)) => (username, password)
+          case _ => throw new WrappedErrorException(Error(500, "There is no credential configured for Ambari default user", "cluster.ambari.status.raw.credential-not-found"))
         }
+      }
       .flatMap { case (username, password) =>
         ws.url(endpoint)
           .withAuth(username, password, WSAuthScheme.BASIC)
           .withRequestTimeout(NETWORK_TIMEOUT seconds)
           .get()
       }
-      .map{ response =>
+      .map { response =>
         response.status match {
           case 200 => response.json
           case 401 => throw WrappedErrorException(Error(401, "User needs to be authenticated.", "cluster.ambari.status.raw.unauthorized"))
@@ -219,11 +219,11 @@ class StatusRoute @Inject()(val ws: WSClient,
           case 500 => throw WrappedErrorException(Error(500, "An internal server error occurred.", "cluster.ambari.status.raw.server-error"))
           case _ => throw WrappedErrorException(Error(500, "Unknown error.", "cluster.ambari.status.raw.generic"))
         }
-    }
-    .recoverWith {
-      case ex: SSLException => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Ambari server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.raw.tls-error"))
-      case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.raw.connection-refused"))
-    }
+      }
+      .recoverWith {
+        case ex: SSLException => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Ambari server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.raw.tls-error"))
+        case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.raw.connection-refused"))
+      }
   }
 
 
@@ -281,13 +281,13 @@ class StatusRoute @Inject()(val ws: WSClient,
   private def probeStatus(knoxUrlAsOptional: Option[String], endpoint: String, request: HttpRequest): Future[AmbariCheckResponse] = {
     knoxUrlAsOptional match {
       case Some(knoxUrl) => {
-//        knox
+        //        knox
         val tokenTryable = Try(request.getHeader(Constants.DPTOKEN).get.value)
           .recoverWith {
             case ex: NoSuchElementException => throw WrappedErrorException(Error(400, "Ambari was Knox protected but no JWT token was sent with request", "cluster.ambari.status.knox.jwt-token-missing"))
           }
 
-        for{
+        for {
           url <- Future.fromTry(constructUrl(knoxUrl))
           inet <- Future.fromTry(probeNetwork(url))
           knoxUrl <- Future.successful(getKnoxUrlWithGatewaySuffix(url))
@@ -303,7 +303,7 @@ class StatusRoute @Inject()(val ws: WSClient,
           ambariApiResponseBody = json)
       }
       case None => {
-//        ambari
+        //        ambari
         for {
           url <- Future.fromTry(constructUrl(endpoint))
           inet <- Future.fromTry(probeNetwork(url))
@@ -346,8 +346,8 @@ class StatusRoute @Inject()(val ws: WSClient,
       endpoint <- Future.successful(s"${url.toString}$API_ENDPOINT")
       knoxUrlAsOptional <- probeCluster(endpoint)
       response <- probeStatus(knoxUrlAsOptional, endpoint, request)
-//    TODO: remove this hack
-      transformed <- Future.successful(response.copy(ambariIpAddress=new URL(url.getProtocol, inet.getHostAddress, url.getPort, url.getFile).toString))
+      //    TODO: remove this hack
+      transformed <- Future.successful(response.copy(ambariIpAddress = new URL(url.getProtocol, inet.getHostAddress, url.getPort, url.getFile).toString))
     } yield transformed
   }
 
@@ -358,21 +358,21 @@ class StatusRoute @Inject()(val ws: WSClient,
     path("ambari" / "status") {
       val context = ambariConnectTimer.time()
       extractRequest { request =>
-        post {
-          entity(as[AmbariEndpoint]) { ep =>
-            onComplete(probe(ep.url, request)) {
-              case Success(res) =>
-                context.stop()
-                complete(success(Json.toJson(res)))
-              case Failure(ex) =>
-                context.stop()
-                logger.info("ex", ex)
-                ex match {
-                  case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
-                  case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.status.generic", "Generic error while communicating with Ambari.", ex))
-                }
-
-            }
+        get {
+          parameters("url".as[String], "allowUntrusted".as[Boolean], "behindGateway".as[Boolean]) {
+            (url, allowUntrusted, behindGateway) =>
+              onComplete(probe(url, request)) {
+                case Success(res) =>
+                  context.stop()
+                  complete(success(Json.toJson(res)))
+                case Failure(ex) =>
+                  context.stop()
+                  logger.info("ex", ex)
+                  ex match {
+                    case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
+                    case ex: Exception => complete(StatusCodes.InternalServerError, errors(500, "cluster.ambari.status.generic", "Generic error while communicating with Ambari.", ex))
+                  }
+              }
           }
         }
       }

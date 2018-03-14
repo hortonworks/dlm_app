@@ -12,8 +12,7 @@ import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class TrustManager @Inject()(val config: Config, val certificateService: CertificateService) {
-  val system = TrustStoreConfig(None, None)
-    .withFilePath(Some("${java.home}/lib/security/cacerts"))
+  val system = TrustStoreConfig(data=None, filePath = Some("${java.home}/lib/security/cacerts"))
 
   val timeout = Duration(Try(config.getString("dp.certificate.query.timeout")).getOrElse("30 seconds)"))
 
@@ -22,9 +21,10 @@ class TrustManager @Inject()(val config: Config, val certificateService: Certifi
   private def build: Future[SSLConfigSettings] = {
     certificateService.list(active = Some(true))
       .map { certificates =>
+
         val trusts =
           certificates
-            .map(cCertificate => TrustStoreConfig(None, None).withStoreType(cCertificate.format).withData(Some(cCertificate.data)))
+            .map(cCertificate => TrustStoreConfig(Some(cCertificate.data), None).withStoreType(cCertificate.format))
 
         val trustManagerConfig =
           TrustManagerConfig()

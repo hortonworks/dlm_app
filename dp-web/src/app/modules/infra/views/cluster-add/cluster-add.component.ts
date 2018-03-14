@@ -65,6 +65,9 @@ export class ClusterAddComponent implements OnInit {
   location: Location;
   isLocationValid: boolean;
 
+  allowUntrusted: boolean = true;
+  behindGateway: boolean = false;
+
   dpRequiredServices = ['ATLAS'];
 
   showNotification = false;
@@ -126,6 +129,11 @@ export class ClusterAddComponent implements OnInit {
     this._isClusterValidateSuccessful = false;
     this.clusterForm.reset();
     this.cluster = new Cluster();
+
+    window.setTimeout(() => {
+      this.allowUntrusted = true;
+      this.behindGateway = false;
+    }, 0);
   }
 
   getClusterInfo(event) {
@@ -143,27 +151,28 @@ export class ClusterAddComponent implements OnInit {
       this.applyErrorClass();
       return;
     }
-    this.lakeService.validate(cleanedUri).subscribe(
-      response => {
-        this._clusterState = response as ClusterState;
-        if (response.ambariApiStatus === 200) {
-          //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
-          let detailRequest = new ClusterDetailRequest();
-          this.createDetailRequest(detailRequest, cleanedUri);
-          this.requestClusterInfo(detailRequest, cleanedUri);
-          this.removeValidationError();
-        } else {
-          this._isClusterValidateInProgress = false;
-          this._isClusterValidateSuccessful = true;
-          this._isClusterValid = false;
-          this.applyErrorClass();
+    this.lakeService.validate(cleanedUri, this.allowUntrusted, this.behindGateway)
+      .subscribe(
+        response => {
+          this._clusterState = response as ClusterState;
+          if (response.ambariApiStatus === 200) {
+            //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
+            let detailRequest = new ClusterDetailRequest();
+            this.createDetailRequest(detailRequest, cleanedUri);
+            this.requestClusterInfo(detailRequest, cleanedUri);
+            this.removeValidationError();
+          } else {
+            this._isClusterValidateInProgress = false;
+            this._isClusterValidateSuccessful = true;
+            this._isClusterValid = false;
+            this.applyErrorClass();
+          }
+        },
+        error => {
+          let err = JSON.parse(error._body).errors[0] as CustomError;
+          this.onError(err);
         }
-      },
-      error => {
-        let err = JSON.parse(error._body).errors[0] as CustomError;
-        this.onError(err);
-      }
-    );
+      );
   }
 
   applyErrorClass() {
@@ -340,6 +349,9 @@ export class ClusterAddComponent implements OnInit {
     lake.dcName = this.cluster.dcName;
     lake.state = 'TO_SYNC';
     lake.ambariIpAddress = this.cluster.ipAddress;
+    lake.allowUntrusted = this.allowUntrusted;
+    lake.behindGateway = this.behindGateway;
+
     if (this._clusterState.knoxDetected) {
       lake.knoxEnabled = true;
       lake.knoxUrl = this._clusterState.knoxUrl;

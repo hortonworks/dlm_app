@@ -40,14 +40,14 @@ class AmbariWebServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
 
   }
 
-  override def checkAmbariStatus(endpoint: Ambari.AmbariEndpoint)(
+  override def checkAmbariStatus(ambariUrl: String, allowUntrusted: Boolean, behindGateway: Boolean)(
       implicit token: Option[Entities.HJwtToken])
     : Future[Either[Errors, AmbariCheckResponse]] = {
-    ws.url(s"$url/ambari/status")
+    ws.url(s"$url/ambari/status?url=$ambariUrl&allowUntrusted=$allowUntrusted&behindGateway=$behindGateway")
       .withToken(token)
       .withHeaders("Content-Type" -> "application/json",
                    "Accept" -> "application/json")
-      .post(Json.toJson(endpoint))
+      .get()
       .map(mapResponse)
   }
 

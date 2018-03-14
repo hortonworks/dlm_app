@@ -25,8 +25,6 @@ object Ambari {
                            services: Seq[String],
                            knoxUrl:Option[String])
 
-  case class AmbariEndpoint(url: String)
-
   case class ServiceInfo(serviceName: String,
                          state: String,
                          serviceVersion: String)
@@ -154,8 +152,6 @@ object Ambari {
   implicit val clusterHealthReads = Json.reads[ClusterHost]
   implicit val nameNodeWrites = Json.writes[NameNodeInfo]
   implicit val nameNodeReads = Json.reads[NameNodeInfo]
-  implicit val endPointWrites = Json.writes[AmbariEndpoint]
-  implicit val endPointReads = Json.reads[AmbariEndpoint]
   implicit val seviceInfoReads = Json.reads[ServiceInfo]
   implicit val serviceInfoWrites = Json.writes[ServiceInfo]
   implicit val configTypeReads = Json.reads[ConfigType]

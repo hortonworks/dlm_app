@@ -130,7 +130,7 @@ GET           /api/workspaces/:workspaceId/notebooks                 controllers
 
 # Query Clusters
 # ===========================================
-GET           /api/ambari/status                                     controllers.DataplaneClusters.ambariCheck(url: String)
+GET           /api/ambari/status                                     controllers.DataplaneClusters.ambariCheck(url: String, allowUntrusted: Boolean, behindGateway: Boolean)
 POST          /api/ambari/details                                    controllers.Clusters.getDetails
 
 # Configuration

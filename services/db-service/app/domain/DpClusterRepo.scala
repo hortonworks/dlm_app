@@ -207,7 +207,9 @@ class DpClusterRepo @Inject()(
 
     def knoxEnabled = column[Option[Boolean]]("knox_enabled")
 
-    def allowUntrusted = column[Option[Boolean]]("allow_untrusted")
+    def allowUntrusted = column[Boolean]("allow_untrusted")
+
+    def behindGateway = column[Boolean]("behind_gateway")
 
     def knoxUrl = column[Option[String]]("knox_url")
 
@@ -229,6 +231,7 @@ class DpClusterRepo @Inject()(
        isDataLake,
        knoxEnabled,
        allowUntrusted,
+       behindGateway,
        knoxUrl,
        created,
        updated) <> ((DataplaneCluster.apply _).tupled, DataplaneCluster.unapply)

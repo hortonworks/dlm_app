@@ -109,6 +109,23 @@ input[type="text"].dp-input {
 
 }
 
+.form-toggle-comments {
+  display: flex;
+  align-items: center;
+
+  & > label {
+    margin-bottom: 0;
+    margin-left: 10px;
+  }
+
+  .more-information {
+    margin-left: 10px;
+    color: $black_80;
+    cursor: pointer;
+  }
+}
+
+
 .notification-bar {
   padding: 15px;
   background: $concrete;

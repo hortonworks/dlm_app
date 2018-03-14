@@ -49,7 +49,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
   val logger = Logger(classOf[AmbariRoute])
 
   def mapToCluster(json: Option[JsValue],
-                   cluster: String,dataplaneCluster: DataplaneCluster): Future[Option[AmbariCluster]] =
+                   cluster: String, dataplaneCluster: DataplaneCluster): Future[Option[AmbariCluster]] =
     Future.successful(
       json
         .map { j =>
@@ -95,7 +95,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
       properties = None,
       location = None,
       knoxEnabled = Some(ambariDetailRequest.knoxDetected),
-      allowUntrusted = Some(false),
+      allowUntrusted = false,
+      behindGateway = false,
       knoxUrl = ambariDetailRequest.knoxUrl
     )
 
@@ -106,7 +107,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
                                             ws,
                                             config,
                                             creds))
-      clusters <- dli.discoverClusters
+      clusters <- dli.discoverClusters()
       details <- getDetails(dataplaneCluster,clusters, dli)
     } yield details
 
