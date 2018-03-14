@@ -36,14 +36,26 @@ describe('Policy Util', () => {
     });
 
     it('should return full info', () => {
-      const id = '/sdc/s/tdc/t/policy/0/1494924228843/000000002/jobId@j';
+      const id = '/sdc/s/tdc/t/policy/0/1494924228843/000000002@j';
       expect(policyUtil.parsePolicyId(id)).toEqual({
         policyName: 'policy',
         timeStamp: 1494924228843,
-        policyBeaconId: 'jobId',
-        jobId: 'jobId',
+        policyBeaconId: '000000002',
+        jobId: '000000002',
         clusterName: 't',
         dataCenter: 'tdc'
+      } as ParsedPolicyId);
+    });
+
+    it('should return correct info when event related to cloud to cluster policy event', () => {
+      const id = '/default/c7/d-test/0/1520998730698/000000001@1';
+      expect(policyUtil.parsePolicyId(id)).toEqual({
+        policyName: 'd-test',
+        timeStamp: 1520998730698,
+        policyBeaconId: '000000001',
+        clusterName: 'c7',
+        dataCenter: 'default',
+        jobId: '000000001',
       } as ParsedPolicyId);
     });
   });
