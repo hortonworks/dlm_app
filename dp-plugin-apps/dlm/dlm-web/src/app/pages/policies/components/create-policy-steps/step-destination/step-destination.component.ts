@@ -95,6 +95,14 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     return this.filterCloudAccounts(this.form.value.destination.type);
   }
 
+  get isClusterType(): boolean {
+    return this.destinationType === SOURCE_TYPES.CLUSTER;
+  }
+
+  get isClusterSelected(): boolean {
+    return this.form.get('destination.cluster').value !== '';
+  }
+
   get destinationClusters() {
     const sourceType = this.source.type;
     if (sourceType === SOURCE_TYPES.CLUSTER) {
@@ -212,7 +220,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   }
 
   private setPending(control: AbstractControl, pending = true) {
-    control.setErrors(pending ? {...control.errors, pending: true } : omit(control.errors, 'pending'));
+    control.setErrors(pending ? {...(control.errors || {}), pending: true } : omit(control.errors || {}, 'pending'));
   }
 
   private subscribeToDestinationPath(form: FormGroup) {

@@ -35,7 +35,7 @@
 
             <!-- DESTINATION CLUSTER -->
             <div class="row">
-              <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.CLUSTER">
+              <div class="col-xs-4" *ngIf="isClusterType">
                 <dlm-form-field
                   [label]="'page.policies.form.fields.destinationCluster.self' | translate"
                   [fieldClass]="'col-xs-12'"
@@ -55,7 +55,7 @@
 
             <!-- DESTINATION PATH -->
             <div class="row">
-              <div class="col-xs-4">
+              <div class="col-xs-4" *ngIf="isClusterType && isClusterSelected">
                 <dlm-form-field
                   [label]="destinationPathLabel"
                   [fieldClass]="'col-xs-12'"
@@ -74,7 +74,8 @@
             </div>
             <!-- DESTINATION PATH END -->
 
-            <div class="row" *ngIf="isSourceEncrypted">
+            <!-- DESTINATION TDE KEY -->
+            <div class="row" *ngIf="isSourceEncrypted && isClusterSelected && isClusterType">
               <div class="col-xs-4">
                 <dlm-form-field
                   [label]="'page.policies.form.fields.destinationCluster.tdeKey' | translate"
@@ -88,6 +89,7 @@
                 </dlm-form-field>
               </div>
             </div>
+            <!-- DESTINATION TDE KEY END -->
 
             <!-- DESTINATION CLOUD ACCOUNT -->
             <div class="row">
@@ -124,23 +126,25 @@
             </div>
 
             <!-- DESTINATION S3 ENDPOINT -->
-            <div class="col-xs-4" *ngIf="form.get('destination.cloudAccount').value && form.get('destination.type').value === SOURCE_TYPES.S3">
-              <dlm-form-field
-                [label]="'page.policies.form.fields.s3.endpoint' | translate"
-                [errorClass]="'col-xs-12'"
-                [fieldClass]="'col-xs-12'"
-                [required]="true">
-                <div class="input-group">
-                  <div class="input-group-addon">{{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}://</div>
-                  <input
-                    type="text"
-                    class="form-control"
-                    qe-attr="destinationS3endpoint"
-                    formField
-                    formControlName="s3endpoint"/>
-                </div>
-              </dlm-form-field>
-              <button type="button" class="btn btn-success pull-right">{{"page.policies.form.validateBtn" | translate}}</button>
+            <div class="row">
+              <div class="col-xs-4" *ngIf="form.get('destination.cloudAccount').value && form.get('destination.type').value === SOURCE_TYPES.S3">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.s3.endpoint' | translate"
+                  [errorClass]="'col-xs-12'"
+                  [fieldClass]="'col-xs-12'"
+                  [required]="true">
+                  <div class="input-group">
+                    <div class="input-group-addon">{{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}://</div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      qe-attr="destinationS3endpoint"
+                      formField
+                      formControlName="s3endpoint"/>
+                  </div>
+                </dlm-form-field>
+                <button type="button" class="btn btn-success pull-right">{{"page.policies.form.validateBtn" | translate}}</button>
+              </div>
             </div>
             <!-- DESTINATION S3 ENDPOINT END -->
           </div>
