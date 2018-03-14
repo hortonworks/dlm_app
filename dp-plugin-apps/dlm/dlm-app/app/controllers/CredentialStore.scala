@@ -66,14 +66,13 @@ class CredentialStore @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def syncCredentialAccount = AuthenticatedAction.async (parse.json) { request =>
+  def syncCredentialAccount(cloudAccountId: String) = AuthenticatedAction.async { request =>
     Logger.info("Received sync cloud credential request")
     implicit val token = request.token
-    request.body.validate[CloudAccountWithCredentials].map { credentialAccount =>
-      beaconService.syncCloudCred(credentialAccount).map {
-        dlmApiErrors => Ok(Json.toJson(dlmApiErrors))
-      }
-    }.getOrElse(Future.successful(BadRequest))
+    beaconService.syncCloudCred(cloudAccountId).map {
+      case Left(error) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(error)}"))
+      case Right(dlmApiErrors) => Ok(Json.toJson(dlmApiErrors))
+    }
   }
 
   def deleteCredentialAccount(cloudAccountId: String) = AuthenticatedAction.async { request =>

@@ -112,7 +112,7 @@ export class CloudAccountsEffects {
     .ofType(accountActions.SYNC_CLOUD_STORE.START)
     .map(toPayload)
     .switchMap(payload => this.accountService
-      .syncCloudStore(payload.cloudAccount)
+      .syncCloudStore(payload.cloudAccountId)
       .map(response => {
         if (response.errors.length) {
           return syncCloudStoreFailure(response.errors, payload.meta);

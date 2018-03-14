@@ -54,29 +54,16 @@ class BeaconCloudCredServiceImpl()(implicit ws: KnoxProxyWsClient) extends Beaco
   }
 
   private def mapToCloudCredRequest(cloudCredRequest : CloudCredRequest) = {
-    "version = " + cloudCredRequest.version + "\n" +
-     (cloudCredRequest.name match {
-        case Some(name) => "name=" + name + "\n"
-        case None => ""
-      }) +
-      (cloudCredRequest.provider match {
-        case Some(provider) => "provider=" + provider + "\n"
-        case None => ""
-      }) +
-       (cloudCredRequest.authtype match {
-         case Some(authtype) => "authtype=" + authtype + "\n"
-         case None => ""
-       }) +
-      (cloudCredRequest.`aws.access.key` match {
-        case Some(s3AccessKey) => "aws.access.key=" + s3AccessKey + "\n"
-        case None => ""
-      }) +
+    "name=" + cloudCredRequest.name +
+    "\nversion = " + cloudCredRequest.version +
+    "\nprovider=" + cloudCredRequest. provider +
+    "\nauthtype=" + cloudCredRequest.authtype +
       (cloudCredRequest.`aws.secret.key` match {
-        case Some(s3SecretKey) => "aws.secret.key=" + s3SecretKey + "\n"
+        case Some(s3SecretKey) => "\naws.secret.key=" + s3SecretKey
         case None => ""
       }) +
-      (cloudCredRequest.`aws.encryption.key` match {
-        case Some(s3EncryptionKey) => "aws.encryption.key=" + s3EncryptionKey
+      (cloudCredRequest.`aws.access.key` match {
+        case Some(s3AccessKey) => "\naws.access.key=" + s3AccessKey
         case None => ""
       })
   }

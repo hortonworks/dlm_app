@@ -199,7 +199,7 @@ export class CloudAccountsListComponent implements OnInit {
   }
 
   sync(account) {
-    this.syncAccount.emit(this.getAccountBody(account));
+    this.syncAccount.emit(account.id);
   }
 
   deleteUnregistered(account) {

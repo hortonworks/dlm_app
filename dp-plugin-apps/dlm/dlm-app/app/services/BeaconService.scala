@@ -572,8 +572,8 @@ class BeaconService @Inject()(
                               val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
                               val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
                               val credentialType = cloudAccount.accountCredentials.credentialType
-                              val cloudCredRequest = CloudCredRequest(Some(cloudCredName), cloudAccount.version.get,
-                                Some(accountDetails.provider), Some(credentialType), accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
+                              val cloudCredRequest = CloudCredRequest(cloudCredName, cloudAccount.version.get,
+                                accountDetails.provider, credentialType, accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
                               createCloudCred(clusterId, cloudCredRequest) map  {
                                 case Left(errors) => p.success(Left(errors))
                                 case Right(cloudCredPostResponse) =>
@@ -632,8 +632,8 @@ class BeaconService @Inject()(
                           val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
                           val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
                           val credentialType = cloudAccount.accountCredentials.credentialType
-                          val cloudCredRequest = CloudCredRequest(Some(cloudCredName), cloudAccount.version.get, Some(accountDetails.provider),
-                            Some(credentialType), accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
+                          val cloudCredRequest = CloudCredRequest(cloudCredName, cloudAccount.version.get, accountDetails.provider,
+                            credentialType, accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
                           createCloudCred(clusterId, cloudCredRequest) map  {
                             case Left(errors) => p.success(Left(errors))
                             case Right(cloudCredPostResponse) =>
@@ -1010,9 +1010,21 @@ class BeaconService @Inject()(
                       (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors,DlmApiErrors]] = {
     val p: Promise[Either[DlmApiErrors,DlmApiErrors]] = Promise()
     dlmKeyStore.updateCloudAccount(cloudAccount) map {
-      case Right(result) =>
-        val versionedCloudAccount = cloudAccount.copy(version=Some(cloudAccount.version.get + 1))
-        syncCloudCred(versionedCloudAccount).map {
+      case Right(versionedCloudAccount) =>
+        updateBeaconCloudCred(versionedCloudAccount).map {
+          dlmApiErrors => p.success(Right(dlmApiErrors))
+        }
+      case Left(error) =>  p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message))))))
+    }
+    p.future
+  }
+
+  def syncCloudCred(cloudAccountId: String)
+                                 (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors,DlmApiErrors]] = {
+    val p: Promise[Either[DlmApiErrors,DlmApiErrors]] = Promise()
+    dlmKeyStore.getCloudAccount(cloudAccountId) map {
+      case Right(versionedCloudAccount) =>
+        updateBeaconCloudCred(versionedCloudAccount).map {
           dlmApiErrors => p.success(Right(dlmApiErrors))
         }
       case Left(error) =>  p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, None, Some(error.message))))))
@@ -1026,7 +1038,7 @@ class BeaconService @Inject()(
     * @param token
     * @return
     */
-  def syncCloudCred(cloudAccount: CloudAccountWithCredentials)
+  def updateBeaconCloudCred(cloudAccount: CloudAccountWithCredentials)
                       (implicit token:Option[HJwtToken]): Future[DlmApiErrors] = {
     val p: Promise[DlmApiErrors] = Promise()
     val queryString = Map(("numResults","200"))
@@ -1040,7 +1052,9 @@ class BeaconService @Inject()(
           CloudAccountProvider.withName(cloudAccount.accountDetails.provider) match {
             case CloudAccountProvider.AWS =>
               val accountCredentials = cloudAccount.accountCredentials.asInstanceOf[S3AccountCredential]
-              val cloudCredRequest = CloudCredRequest(None, cloudAccount.version.get, None, None,
+              val accountDetails = cloudAccount.accountDetails.asInstanceOf[S3AccountDetails]
+              val credentialType = cloudAccount.accountCredentials.credentialType
+              val cloudCredRequest = CloudCredRequest(cloudAccount.id, cloudAccount.version.get, accountDetails.provider, credentialType,
                 accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
               Future.sequence(filteredCloudCreds.map(x => {
                 beaconCloudCredService.updateCloudCred(x.beaconUrl, x.clusterId, x.cloudCreds.cloudCred.head.id, cloudCredRequest)

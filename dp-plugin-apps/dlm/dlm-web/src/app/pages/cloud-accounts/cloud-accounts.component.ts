@@ -110,8 +110,8 @@ export class CloudAccountsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  handleSyncAccount(account: CloudAccount): void {
-    this.asyncActions.dispatch(syncCloudStore(account))
+  handleSyncAccount(accountId: String): void {
+    this.asyncActions.dispatch(syncCloudStore(accountId))
       .subscribe(progressState => {
         this.cloudAccountService.notifyOnCRUD(progressState, CloudAccountActions.SYNC);
         this.refreshAccounts();

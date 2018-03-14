@@ -106,8 +106,8 @@ object RequestEntities {
   case class PolicyTestRequest(`type`: String, cloudCred: String, sourceCluster: Option[String], sourceDataset: Option[String],
                                targetDataset: Option[String], targetCluster: Option[String])
 
-  case class CloudCredRequest(name: Option[String], version: Long, provider: Option[String], authtype: Option[String], `aws.access.key`: Option[String],
-                              `aws.secret.key`: Option[String], `aws.encryption.key`: Option[String] = None)
+  case class CloudCredRequest(name: String, version: Long, provider: String, authtype: String, `aws.access.key`: Option[String],
+                              `aws.secret.key`: Option[String])
 }
 
 object JsonFormatters {

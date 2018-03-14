@@ -114,7 +114,7 @@ export const {
   syncCloudStoreSuccess,
   syncCloudStoreFailure
 } = createRequestAction(ActionTypes.SYNC_CLOUD_STORE, {
-  start: (cloudAccount, meta = {}) => ({ meta, cloudAccount })
+  start: (cloudAccountId, meta = {}) => ({ meta, cloudAccountId })
 });
 
 export const {
