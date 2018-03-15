@@ -16,6 +16,7 @@ import javax.net.ssl.SSLException
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, WrappedErrorException}
 import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
+import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -45,6 +46,7 @@ class BasicKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExecutor{
       }
       .recoverWith {
         case ex: SSLException => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.knox.tls-error"))
+        case ex: ConnectException if ExceptionUtils.indexOfThrowable(ex, classOf[SSLException]) >= 0 => throw WrappedErrorException(Error(500, "TLS error. Please ensure your Knox server has been configured with a correct keystore. If you are using self-signed certificates, you would need to get it added to Dataplane truststore.", "cluster.ambari.status.knox.tls-error"))
         case ex: ConnectException => throw WrappedErrorException(Error(500, "Connection to remote address was refused.", "cluster.ambari.status.knox.connection-refused"))
       }
   }
