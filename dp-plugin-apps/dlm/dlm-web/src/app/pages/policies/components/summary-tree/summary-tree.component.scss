@@ -41,6 +41,12 @@
         font-size: 14px;
         line-height: 1.3em;
       }
+      .header {
+        padding-top: 15px;
+        color: $black-color;
+        font-weight: 600;
+        font-size: 1.2em;
+      }
     }
     &:first-child {
       .step-icon {

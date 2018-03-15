@@ -28,6 +28,7 @@ import { getAllClusters } from 'selectors/cluster.selector';
 import { TableFilterItem } from 'common/table/table-filter/table-filter-item.type';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { PolicyContent } from './policy-details/policy-content.type';
+import { loadBeaconCloudCreds } from 'actions/beacon-cloud-cred.action';
 import { isEqual } from 'utils/object-utils';
 import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { ProgressState } from 'models/progress-state.model';
@@ -39,6 +40,7 @@ export const ALL = 'all';
 const POLICIES_REQUEST = '[POLICY_PAGE] POLICIES_REQUEST';
 const CLUSTERS_REQUEST = '[POLICY_PAGE] CLUSTERS_REQUEST';
 const PAIRINGS_REQUEST = '[POLICY_PAGE] PAIRINGS_REQUEST';
+const CLOUD_CREDENTIALS_REQUEST = '[POLICY_PAGE] CLOUD_CREDENTIALS_REQUEST';
 const ADMIN_STATUS_REQUEST = '[POLICY_PAGE] ADMIN_STATUS_REQUEST';
 
 @Component({
@@ -119,6 +121,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     this.store.dispatch(loadBeaconAdminStatus({requestId: ADMIN_STATUS_REQUEST}));
+    this.store.dispatch(loadBeaconCloudCreds({requestId: CLOUD_CREDENTIALS_REQUEST}));
     const getPairings = this.clusters$.subscribe(clusters => {
       this.store.dispatch(loadPairings(PAIRINGS_REQUEST));
     });

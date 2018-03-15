@@ -13,6 +13,7 @@ export const HDFS = 'FS';
 export const HIVE = 'HIVE';
 export const HBASE = 'HBASE';
 export const HDFS_SNAPSHOT = 'FS_SNAPSHOT';
+export const HDFS_CLOUD = 'FS_HCFS';
 
 export const EVERY = 'EVERY';
 export const NEVER = 'NEVER';
@@ -58,6 +59,7 @@ export enum POLICY_TYPES {
 export const POLICY_EXECUTION_TYPES = {
   HDFS,
   HDFS_SNAPSHOT,
+  HDFS_CLOUD,
   HIVE
 };
 

@@ -15,12 +15,13 @@ import { Cluster } from 'models/cluster.model';
 import { Policy } from 'models/policy.model';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { getAllClusters } from './cluster.selector';
+import { getEntities as getBeaconCloudCredentials } from './beacon-cloud-cred.selector';
 import { getAllJobs } from './job.selector';
 import { sortByDateField, contains } from 'utils/array-util';
 import { JOB_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
 import { getAllBeaconAdminStatuses } from 'selectors/beacon.selector';
-import { POLICY_MODES, POLICY_EXECUTION_TYPES } from 'constants/policy.constant';
+import { POLICY_MODES, POLICY_EXECUTION_TYPES, SOURCE_TYPES } from 'constants/policy.constant';
 import { SERVICES } from 'constants/cluster.constant';
 
 const hasStoppedServices = (cluster: Cluster, services: string[]): boolean => {
@@ -50,7 +51,21 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
   });
 });
 
-export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, getAllJobs, (policies, jobs) => {
+export const getAllPoliciesWithCloud = createSelector(getAllPoliciesWithClusters, getBeaconCloudCredentials, (policies, credentials) => {
+  return policies.map(policy => {
+    const cloudCred = 'customProperties' in policy && 'cloudCred' in policy.customProperties ? policy.customProperties.cloudCred : '';
+    const p = {
+      ...policy,
+      cloudCredentialResource: cloudCred ? cloudCred in credentials ? credentials[cloudCred] : {} : {},
+      sourceType: 'sourceCluster' in policy ? SOURCE_TYPES.CLUSTER : SOURCE_TYPES.S3,
+      targetType: 'targetCluster' in policy ? SOURCE_TYPES.CLUSTER : SOURCE_TYPES.S3
+    };
+    p.clusterResourceForRequests = p.targetClusterResource.id ? p.targetClusterResource : p.sourceClusterResource;
+    return p;
+  });
+});
+
+export const getPolicyClusterJob = createSelector(getAllPoliciesWithCloud, getAllJobs, (policies, jobs) => {
   return policies.map(policy => {
     let policyJobs = jobs.filter(job => job.policyId === policy.id);
     policyJobs = policyJobs.length ? policyJobs : policy.jobs || [];
