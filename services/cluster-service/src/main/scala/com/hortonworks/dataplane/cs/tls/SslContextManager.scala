@@ -3,12 +3,14 @@ package com.hortonworks.dataplane.cs.tls
 import javax.inject.Inject
 import javax.net.ssl.SSLContext
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Scheduler}
+import akka.pattern.after
 import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.Materializer
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, WrappedErrorException}
 import com.hortonworks.dataplane.db.Webservice.{CertificateService, DpClusterService}
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.Logger
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{ConfigSSLContextBuilder, DefaultKeyManagerFactoryWrapper, DefaultTrustManagerFactoryWrapper, SSLConfigSettings, SSLLooseConfig, TrustManagerConfig, TrustStoreConfig}
 import com.typesafe.sslconfig.util.NoopLogger
@@ -17,15 +19,18 @@ import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.ahc.AhcWSClient
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 class SslContextManager @Inject()(val config: Config, val dpClusterService: DpClusterService, certificateService: CertificateService, val materializer: Materializer, val actorSystem: ActorSystem) {
+
+  private lazy val log = Logger(classOf[SslContextManager])
+
   implicit val actorSystemImplicit = actorSystem
 
-  val timeout = Duration(Try(config.getString("dp.certificate.query.timeout")).getOrElse("30 seconds)"))
+  val timeout = Duration(Try(config.getString("dp.certificate.query.timeout")).getOrElse("4 minutes"))
 
   import scala.collection.JavaConverters._
   val keyWhitelist = Try(config.getStringList("dp.certificate.algorithm.whitelist.key").asScala).getOrElse(Nil)
@@ -58,6 +63,8 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
   }
 
   def reload(): Unit = {
+    log.info("recieved reload request")
+
     strict = Await.result(buildStrict(), timeout)
     strictHttpsContext = Http().createClientHttpsContext(AkkaSSLConfig().withSettings(strict))
     strictWsClient = buildWSClient(allowUntrusted = false)
@@ -117,12 +124,22 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
 
   private def buildStrict(): Future[SSLConfigSettings] = {
 
+    implicit val actorSchedulerImplicit = actorSystem.scheduler
+
+    import scala.concurrent.duration._
+    retry(buildStrictFuture, 8 seconds, 30)
+  }
+
+  private def buildStrictFuture =
     certificateService.list(active = Some(true))
       .map { certificates =>
 
         val trusts =
           certificates
-            .map(cCertificate => TrustStoreConfig(Some(cCertificate.data), None).withStoreType(cCertificate.format))
+            .map(cCertificate => {
+              log.info(s"loaded certificate: $cCertificate")
+              TrustStoreConfig(Some(cCertificate.data), None).withStoreType(cCertificate.format)
+            })
 
         val trustManagerConfig =
           TrustManagerConfig()
@@ -132,11 +149,20 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
           .withTrustManagerConfig(trustManagerConfig)
           .withDisabledKeyAlgorithms(keyWhitelist.toList)
       }
-  }
 
   private def buildContext(sslConfig: SSLConfigSettings): SSLContext = {
     val keyManagerFactory = new DefaultKeyManagerFactoryWrapper(sslConfig.keyManagerConfig.algorithm)
     val trustManagerFactory = new DefaultTrustManagerFactoryWrapper(sslConfig.trustManagerConfig.algorithm)
     new ConfigSSLContextBuilder(NoopLogger.factory(), sslConfig, keyManagerFactory, trustManagerFactory).build()
+  }
+
+  //  https://gist.github.com/viktorklang/9414163#gistcomment-1612263
+  private def retry[T](f: => Future[T], delay: FiniteDuration, retries: Int)(implicit ec: ExecutionContext, s: Scheduler): Future[T] = {
+    f recoverWith {
+      case _ if retries > 0 => {
+        log.info(s"retries left: $retries")
+        after(delay, s)(retry(f, delay, retries - 1))
+      }
+    }
   }
 }
