@@ -119,6 +119,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
   }
 
   private def loadDefaultCluster(ambariDetailRequest: AmbariDetailRequest) = {
+    val ws = sslContextManager.getWSClient(ambariDetailRequest.allowUntrusted)
+
     val clusters = ws.url(s"${ambariDetailRequest.url}/api/v1/clusters")
         .withAuth(ambariDetailRequest.ambariUser.get,ambariDetailRequest.ambariPass.get,WSAuthScheme.BASIC).get()
     clusters.map { cl =>
@@ -131,6 +133,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
     val items =  (groups.json \ "items").as[Seq[JsValue]]
     val groupIds = items.map(i =>(i \ "ConfigGroup" \ "id").as[Int])
     val groupNames = groupIds.map { gid =>
+      val ws = sslContextManager.getWSClient(ambariDetailRequest.allowUntrusted)
+
       ws.url(s"${ambariDetailRequest.url}/api/v1/clusters/$clusterName/config_groups/$gid")
         .withAuth(ambariDetailRequest.ambariUser.get,ambariDetailRequest.ambariPass.get,WSAuthScheme.BASIC).get().map { r =>
         val name = (r.json \ "ConfigGroup" \ "group_name").as[String]
@@ -152,8 +156,10 @@ class AmbariRoute @Inject()(val ws: WSClient,
     tokenHost.map(th => s"${jwtProviderUrl.getProtocol}://$th:" +jwtProviderUrl.getPort)
   }
 
-  private def loadKnoxUrl(clusterName: String, ambariDetailRequest: AmbariDetailRequest) = {
+  private def loadKnoxUrl(clusterName: String, ambariDetailRequest: AmbariDetailRequest, allowUntrusted: Boolean) = {
     // get all config group ids
+    val ws = sslContextManager.getWSClient(allowUntrusted)
+
     val configGroups =  ws.url(s"${ambariDetailRequest.url}/api/v1/clusters/$clusterName/config_groups")
       .withAuth(ambariDetailRequest.ambariUser.get,ambariDetailRequest.ambariPass.get,WSAuthScheme.BASIC).get()
     for {
@@ -166,7 +172,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
   private def getTargetUrl(ambariDetailRequest: AmbariDetailRequest) = {
     for {
       clusterName <- loadDefaultCluster(ambariDetailRequest)
-      newUrl <- loadKnoxUrl(clusterName,ambariDetailRequest)
+      newUrl <- loadKnoxUrl(clusterName,ambariDetailRequest, ambariDetailRequest.allowUntrusted)
     } yield newUrl
   }
 
@@ -194,6 +200,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
       url: String,
       dataplaneCluster: DataplaneCluster,
       hJwtToken: Option[HJwtToken]): Future[WSRequest] = {
+    val ws = sslContextManager.getWSClient(dataplaneCluster.allowUntrusted)
+
     val baseReq = ws.url(url)
     if (knoxEnabledAndTokenPresent(dataplaneCluster, hJwtToken))
       Future.successful(baseReq)
