@@ -463,6 +463,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
           this.sourceCluster = cluster.id;
           this.hdfsRootPath = policy.sourceDataset;
         }
+      } else {
+        this.sourceCluster = null;
       }
     }
   }

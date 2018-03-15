@@ -35,7 +35,7 @@
     >
     </dlm-jobs-table>
     <div *ngIf="contentType===policyContent.Files">
-      <div *ngIf="sourceCluster; else messageTemplate">
+      <div *ngIf="isSourceCluster; else messageTemplate">
         <dlm-hdfs-browser *ngIf="fileBasedPolicy()"
           [rootPath]="hdfsRootPath"
           [clusterId]="sourceCluster"

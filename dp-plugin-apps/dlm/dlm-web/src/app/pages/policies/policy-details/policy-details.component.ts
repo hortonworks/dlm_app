@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import {Component, Input, Output, EventEmitter, HostBinding, ChangeDetectorRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, HostBinding, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
 import { Policy, SummaryTreeItem } from 'models/policy.model';
 import { Job } from 'models/job.model';
 import { PolicyContent } from './policy-content.type';
@@ -146,6 +146,11 @@ export class PolicyDetailsComponent {
 
   handleFilterApplied(event) {
     this.onTablesFilter.emit(event);
+  }
+
+  get isSourceCluster() {
+    console.log('source', this.sourceCluster);
+    return this.sourceCluster && Number(this.sourceCluster) > 0;
   }
 
   get filteredJobs() {
