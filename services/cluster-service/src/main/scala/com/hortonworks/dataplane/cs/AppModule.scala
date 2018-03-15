@@ -56,18 +56,20 @@ object AppModule extends AbstractModule {
                        config: Config,
                        dPKeystore: DPTrustStore): HttpsConnectionContext = {
     // provides a custom ssl config with the dp keystore
-    val c = AkkaSSLConfig().mapSettings { sslConfig =>
-      val settings = sslConfig
-        .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
-        .withTrustManagerConfig(
-          TrustManagerConfig()
-            .withTrustStoreConfigs(scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
-      if (config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
-        settings.withLoose(sslConfig.loose.withDisableHostnameVerification(true))
-      else
-        settings
-    }
-    val dpCtx = Http().createClientHttpsContext(c)
+    val sslConfig = AkkaSSLConfig()
+      .mapSettings { sslConfigSettings =>
+        val settings = sslConfigSettings
+          .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
+          .withTrustManagerConfig(
+            TrustManagerConfig()
+              .withTrustStoreConfigs(scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
+        if (config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
+          settings.withLoose(sslConfigSettings.loose.withDisableHostnameVerification(true))
+        else
+          settings
+      }
+
+    val dpCtx = Http().createClientHttpsContext(sslConfig)
     dpCtx
   }
 
@@ -201,14 +203,12 @@ object AppModule extends AbstractModule {
                             actorMaterializer: ActorMaterializer,
                             clusterData: ClusterDataApi,
                             config: Config,
-                            @Named("connectionContext") sslContext: Provider[HttpsConnectionContext],
-                            dPKeystore: DPTrustStore): HdpRoute = {
+                            @Named("connectionContext") sslContext: Provider[HttpsConnectionContext]): HdpRoute = {
     new HdpRoute(actorSystem,
       actorMaterializer,
       clusterData,
       sslContext,
-      config,
-      dPKeystore)
+      config)
   }
 
   @Provides
