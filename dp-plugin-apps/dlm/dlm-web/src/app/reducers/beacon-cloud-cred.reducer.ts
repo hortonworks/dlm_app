@@ -24,7 +24,7 @@ export const initialState: State = {
 export function reducer(state = initialState, action): State {
   switch (action.type) {
     case fromBeacon.ActionTypes.LOAD_BEACON_CLOUD_CREDS.SUCCESS:
-      const creds = flatten(action.payload.response.cloudCreds.map(c => c.cloudCreds.cloudCred));
+      const creds = flatten(action.payload.response.allCloudCreds.map(c => c.cloudCreds.cloudCred));
       return {
         ...state,
         entities: toEntities<BeaconCloudCred>(creds)

@@ -324,6 +324,7 @@
   }, {
     "policyId": "/dc-Europe/c1/dc-Europe/c2/hive-1/0/1501199282746/000000001",
     "name": "hive-1",
+    "description": "Sample description",
     "type": "HIVE",
     "executionType": "HIVE",
     "status": "RUNNING",

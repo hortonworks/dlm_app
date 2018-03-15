@@ -9,41 +9,7 @@
 
 <div class="row">
   <div class="col-xs-2 summary">
-    <div class="summary-item">
-      <h4 class="title">{{"page.policies.settings" | translate}}</h4>
-    </div>
-    <div class="summary-item">
-      <h6>{{"common.name" | translate}}</h6>
-      <p class="detail">{{policy?.name}}</p>
-    </div>
-    <div class="summary-item" *ngIf="policy?.description">
-      <h6>{{"common.description" | translate}}</h6>
-      <p class="detail">{{policy?.description}}</p>
-    </div>
-    <div class="summary-item" *ngIf="policy?.executionType && !databaseBasedPolicy()">
-      <h6>{{"common.snapshot" | translate}}</h6>
-      <p class="detail">{{snapshotEnabledStatus}}</p>
-    </div>
-    <div class="summary-item">
-      <h6>{{"common.path" | translate}}</h6>
-      <p class="detail">{{policy?.sourceDataset}}</p>
-    </div>
-    <div class="summary-item" *ngIf="policy?.frequency">
-      <h6>{{"common.frequency.self" | translate}}</h6>
-      <p class="detail">
-        {{policy?.frequency | frequency}}
-        <span *ngIf="policy?.startTime">from {{policy?.startTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
-        <span *ngIf="policy?.endTime">to {{policy?.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
-      </p>
-    </div>
-    <div class="summary-item" *ngIf="policy?.customProperties?.queueName">
-      <h6>{{"common.queue_name" | translate}}</h6>
-      <p class="detail">{{policy?.customProperties?.queueName}}</p>
-    </div>
-    <div class="summary-item" *ngIf="policy?.customProperties?.distcpMapBandwidth">
-      <h6>{{"common.max_bandwidth" | translate}}</h6>
-      <p class="detail">{{policy?.customProperties?.distcpMapBandwidth}} MBps</p>
-    </div>
+    <dlm-summary-tree [items]="summaryItems" [header]="summaryHeader"></dlm-summary-tree>
   </div>
   <div class="col-xs-10">
     <dlm-jobs-table
@@ -69,21 +35,29 @@
     >
     </dlm-jobs-table>
     <div *ngIf="contentType===policyContent.Files">
-      <dlm-hdfs-browser *ngIf="fileBasedPolicy()"
-        [rootPath]="hdfsRootPath"
-        [clusterId]="sourceCluster"
-        [page]="fileBrowserPage"
-        (changePage)="handleOnFilePageChange($event)"
-        (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
-      <dlm-progress-container [progressState]="loadingDatabases" *ngIf="databaseBasedPolicy()">
-        <dlm-hive-browser
-          *ngIf="!loadingDatabases.isInProgress"
-          [tablesLoadingMap]="loadingTables"
-          [databases]="[policyDatabase]"
-          [searchPattern]="tablesSearchPattern"
-          (filterApplied)="handleFilterApplied($event)">
-        </dlm-hive-browser>
-      </dlm-progress-container>
+      <div *ngIf="sourceCluster; else messageTemplate">
+        <dlm-hdfs-browser *ngIf="fileBasedPolicy()"
+          [rootPath]="hdfsRootPath"
+          [clusterId]="sourceCluster"
+          [page]="fileBrowserPage"
+          (changePage)="handleOnFilePageChange($event)"
+          (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
+        <dlm-progress-container [progressState]="loadingDatabases" *ngIf="databaseBasedPolicy()">
+          <dlm-hive-browser
+            *ngIf="!loadingDatabases.isInProgress"
+            [tablesLoadingMap]="loadingTables"
+            [databases]="[policyDatabase]"
+            [searchPattern]="tablesSearchPattern"
+            (filterApplied)="handleFilterApplied($event)">
+          </dlm-hive-browser>
+        </dlm-progress-container>
+      </div>
     </div>
   </div>
 </div>
+
+<ng-template #messageTemplate>
+  <div class="info-message">
+    <span>{{'page.policies.no_file_browser_info' | translate}}</span>
+  </div>
+</ng-template>

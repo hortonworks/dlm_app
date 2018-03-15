@@ -25,7 +25,7 @@ describe('HTTP Util', () => {
       const err = new HttpErrorResponse({
         error: 'Some message'
       });
-      expect(httpUtil.getError(err)).toEqual({message: 'common.errors.unknown'});
+      expect(httpUtil.getError(err)).toEqual({message: 'Something went wrong.'});
     });
 
     it('should parse message from "message" attribute after "Failed with"', () => {

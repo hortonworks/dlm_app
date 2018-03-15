@@ -13,6 +13,8 @@ import { User } from 'models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { APIError, APIErrorDetails } from 'models/error.model';
 
+const unknown = 'Something went wrong.';
+
 export const getHeaders = (): HttpHeaders => {
   const headers = {
     'Content-Type': 'application/json',
@@ -22,7 +24,7 @@ export const getHeaders = (): HttpHeaders => {
 };
 
 export const getError = (errResponse: HttpErrorResponse): APIErrorDetails => {
-  const message = (errResponse.error.message || 'common.errors.unknown').replace('Failed with ', '');
+  const message = (errResponse.error.message || unknown).replace('Failed with ', '');
   let error;
   try {
     const apiError = JSON.parse(message) as APIError;
