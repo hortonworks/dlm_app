@@ -12,7 +12,7 @@ import com.typesafe.config.Config
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{ConfigSSLContextBuilder, DefaultKeyManagerFactoryWrapper, DefaultTrustManagerFactoryWrapper, SSLConfigSettings, SSLLooseConfig, TrustManagerConfig, TrustStoreConfig}
 import com.typesafe.sslconfig.util.NoopLogger
-import io.netty.handler.ssl.JdkSslContext
+import io.netty.handler.ssl.{ClientAuth, JdkSslContext}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.ahc.{AhcWSClient, AhcWSClientConfig}
 import play.api.libs.ws.ssl.{KeyManagerConfig, KeyStoreConfig, SSLConfig}
@@ -27,6 +27,9 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
   implicit val actorSystemImplicit = actorSystem
 
   val timeout = Duration(Try(config.getString("dp.certificate.query.timeout")).getOrElse("30 seconds)"))
+
+  val home = System.getProperty("java.home")
+  val system = TrustStoreConfig(data=None, filePath = Some(s"$home/lib/security/cacerts"))
 
   private val loose = buildLoose()
   private var strict = Await.result(buildStrict(), timeout)
@@ -75,7 +78,7 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
 
   private def buildWSClient(allowUntrusted: Boolean): WSClient = {
     implicit val materializerImplicit = materializer
-    val context = new JdkSslContext(getContext(allowUntrusted=false), true, null)
+    val context = new JdkSslContext(getContext(allowUntrusted=false), true, ClientAuth.NONE)
     val clientConfig = new DefaultAsyncHttpClientConfig.Builder()
       .setSslContext(context)
       .build()
@@ -93,8 +96,6 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
       .withLoose(loose)
       .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
   }
-
-  val system = TrustStoreConfig(data=None, filePath = Some("${java.home}/lib/security/cacerts"))
 
   private def buildStrict(): Future[SSLConfigSettings] = {
     certificateService.list(active = Some(true))
