@@ -175,6 +175,8 @@ class AmbariClusterInterfaceV2(
   private def getWrappedRequest(
       url: String,
       hJwtToken: Option[HJwtToken]): Future[WSRequest] = {
+    val ws = sslContextManager.getWSClient(dataplaneCluster.allowUntrusted)
+
     val baseReq = ws.url(url)
     if (hJwtToken.isDefined && dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined)
       Future.successful(baseReq)
