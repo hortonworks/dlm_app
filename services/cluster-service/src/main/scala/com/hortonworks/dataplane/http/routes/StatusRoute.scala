@@ -119,7 +119,9 @@ class StatusRoute @Inject()(val ws: WSClient,
     * 5. make initial call without auth to probe if cluster is secured by Knox
     *
     */
-  private def probeCluster(endpoint: String): Future[Option[String]] = {
+  private def probeCluster(endpoint: String, allowUntrusted: Boolean): Future[Option[String]] = {
+    val ws = sslContextManager.getWSClient(allowUntrusted)
+
     ws.url(endpoint)
       .withRequestTimeout(NETWORK_TIMEOUT seconds)
       .get()
@@ -165,7 +167,9 @@ class StatusRoute @Inject()(val ws: WSClient,
     * *A8. make Knox calls to check condition of Knox
     *
     */
-  private def probeKnox(endpoint: String, knoxUrl: String, token: String): Future[JsValue] = {
+  private def probeKnox(endpoint: String, knoxUrl: String, token: String, allowUntrusted: Boolean): Future[JsValue] = {
+    val ws = sslContextManager.getWSClient(allowUntrusted)
+
     val delegatedRequest = ws.url(endpoint).withRequestTimeout(NETWORK_TIMEOUT seconds)
 
     val response =
@@ -198,7 +202,7 @@ class StatusRoute @Inject()(val ws: WSClient,
     * *B7. check keystore for seeded user credentials
     * *B8. attempt ambari connection
     */
-  private def probeAmbari(endpoint: String): Future[JsValue] = {
+  private def probeAmbari(endpoint: String, allowUntrusted: Boolean): Future[JsValue] = {
     credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       .map { credential =>
         (credential.user, credential.pass) match {
@@ -207,6 +211,8 @@ class StatusRoute @Inject()(val ws: WSClient,
         }
       }
       .flatMap { case (username, password) =>
+        val ws = sslContextManager.getWSClient(allowUntrusted)
+
         ws.url(endpoint)
           .withAuth(username, password, WSAuthScheme.BASIC)
           .withRequestTimeout(NETWORK_TIMEOUT seconds)
@@ -229,8 +235,9 @@ class StatusRoute @Inject()(val ws: WSClient,
   }
 
 
-  private def probeAccessViaKnox(href: String, knoxUrl: String, token: String): Future[WSResponse] = {
-//    val ws =
+  private def probeAccessViaKnox(href: String, knoxUrl: String, token: String, allowUntrusted: Boolean): Future[WSResponse] = {
+    val ws = sslContextManager.getWSClient(allowUntrusted)
+
     val delegatedRequest = ws.url(href).withRequestTimeout(NETWORK_TIMEOUT seconds)
 
     KnoxApiExecutor.withExceptionHandling(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)
@@ -238,7 +245,7 @@ class StatusRoute @Inject()(val ws: WSClient,
   }
 
 
-  private def probeAccessViaAmbari(href: String): Future[WSResponse] = {
+  private def probeAccessViaAmbari(href: String, allowUntrusted: Boolean): Future[WSResponse] = {
     credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       .map { credential =>
         (credential.user, credential.pass) match {
@@ -247,6 +254,8 @@ class StatusRoute @Inject()(val ws: WSClient,
         }
       }
       .flatMap { case (username, password) =>
+        val ws = sslContextManager.getWSClient(allowUntrusted)
+
         ws.url(href)
           .withAuth(username, password, WSAuthScheme.BASIC)
           .withRequestTimeout(NETWORK_TIMEOUT seconds)
@@ -255,7 +264,7 @@ class StatusRoute @Inject()(val ws: WSClient,
   }
 
 
-  private def probeAccess(clusterHrefs: Seq[String], knoxUrl: Option[String] = None, token: Option[String] = None): Future[Unit] = {
+  private def probeAccess(clusterHrefs: Seq[String], knoxUrl: Option[String] = None, token: Option[String] = None, allowUntrusted: Boolean): Future[Unit] = {
     Future
       .fromTry(clusterHrefs.size match {
         case 0 => Failure(WrappedErrorException(Error(404, "There are no clusters attached to this Ambari instance.", "cluster.ambari.status.detail.0-clusters-on-ambari")))
@@ -264,8 +273,8 @@ class StatusRoute @Inject()(val ws: WSClient,
       })
       .flatMap { href =>
         (knoxUrl, token) match {
-          case (Some(knoxUrl), Some(token)) => probeAccessViaKnox(href, knoxUrl, token)
-          case (None, None) => probeAccessViaAmbari(href)
+          case (Some(knoxUrl), Some(token)) => probeAccessViaKnox(href, knoxUrl, token, allowUntrusted)
+          case (None, None) => probeAccessViaAmbari(href, allowUntrusted)
           case (_, _) => Future.failed(WrappedErrorException(Error(500, "Unknown error: One of Knox URL or Token is unavailable. This should not happen.", "cluster.ambari.status.detail.missing-data")))
         }
       }
@@ -281,7 +290,7 @@ class StatusRoute @Inject()(val ws: WSClient,
       }
   }
 
-  private def probeStatus(knoxUrlAsOptional: Option[String], endpoint: String, request: HttpRequest): Future[AmbariCheckResponse] = {
+  private def probeStatus(knoxUrlAsOptional: Option[String], endpoint: String, request: HttpRequest, allowUntrusted: Boolean): Future[AmbariCheckResponse] = {
     knoxUrlAsOptional match {
       case Some(knoxUrl) => {
         //        knox
@@ -295,9 +304,9 @@ class StatusRoute @Inject()(val ws: WSClient,
           inet <- Future.fromTry(probeNetwork(url))
           knoxUrl <- Future.successful(getKnoxUrlWithGatewaySuffix(url))
           token <- Future.fromTry(tokenTryable)
-          json <- probeKnox(endpoint, knoxUrl, token)
+          json <- probeKnox(endpoint, knoxUrl, token, allowUntrusted)
           hrefs <- Future.successful((json \ "items" \\ "href").map(_.asOpt[String]).toList.filter(_.isDefined).map(_.get))
-          _ <- probeAccess(hrefs, Some(knoxUrl), Some(token))
+          _ <- probeAccess(hrefs, Some(knoxUrl), Some(token), allowUntrusted)
         } yield AmbariCheckResponse(ambariApiCheck = true,
           knoxDetected = true,
           ambariApiStatus = 200,
@@ -310,9 +319,9 @@ class StatusRoute @Inject()(val ws: WSClient,
         for {
           url <- Future.fromTry(constructUrl(endpoint))
           inet <- Future.fromTry(probeNetwork(url))
-          json <- probeAmbari(endpoint)
+          json <- probeAmbari(endpoint, allowUntrusted)
           hrefs <- Future.successful((json \ "items" \\ "href").map(_.asOpt[String]).toList.filter(_.isDefined).map(_.get))
-          _ <- probeAccess(hrefs)
+          _ <- probeAccess(hrefs, allowUntrusted = allowUntrusted)
         } yield AmbariCheckResponse(ambariApiCheck = true,
           knoxDetected = false,
           ambariApiStatus = 200,
@@ -342,13 +351,13 @@ class StatusRoute @Inject()(val ws: WSClient,
     *  *B8. attempt ambari connection
     *
     */
-  private def probe(urlString: String, request: HttpRequest): Future[AmbariCheckResponse] = {
+  private def probe(urlString: String, request: HttpRequest, allowUntrusted: Boolean): Future[AmbariCheckResponse] = {
     for {
       url <- Future.fromTry(constructUrl(urlString))
       inet <- Future.fromTry(probeNetwork(url))
       endpoint <- Future.successful(s"${url.toString}$API_ENDPOINT")
-      knoxUrlAsOptional <- probeCluster(endpoint)
-      response <- probeStatus(knoxUrlAsOptional, endpoint, request)
+      knoxUrlAsOptional <- probeCluster(endpoint, allowUntrusted)
+      response <- probeStatus(knoxUrlAsOptional, endpoint, request, allowUntrusted)
       //    TODO: remove this hack
       transformed <- Future.successful(response.copy(ambariIpAddress = new URL(url.getProtocol, inet.getHostAddress, url.getPort, url.getFile).toString))
     } yield transformed
@@ -364,7 +373,7 @@ class StatusRoute @Inject()(val ws: WSClient,
         get {
           parameters("url".as[String], "allowUntrusted".as[Boolean], "behindGateway".as[Boolean]) {
             (url, allowUntrusted, behindGateway) =>
-              onComplete(probe(url, request)) {
+              onComplete(probe(url, request, allowUntrusted)) {
                 case Success(res) =>
                   context.stop()
                   complete(success(Json.toJson(res)))
