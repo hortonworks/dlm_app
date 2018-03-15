@@ -14,9 +14,8 @@ import com.typesafe.sslconfig.ssl.{ConfigSSLContextBuilder, DefaultKeyManagerFac
 import com.typesafe.sslconfig.util.NoopLogger
 import io.netty.handler.ssl.{ClientAuth, JdkSslContext}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
-import play.api.libs.ws.ahc.{AhcWSClient, AhcWSClientConfig}
-import play.api.libs.ws.ssl.{KeyManagerConfig, KeyStoreConfig, SSLConfig}
-import play.api.libs.ws.{WSClient, WSClientConfig}
+import play.api.libs.ws.ahc.AhcWSClient
+import play.api.libs.ws.WSClient
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -27,6 +26,9 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
   implicit val actorSystemImplicit = actorSystem
 
   val timeout = Duration(Try(config.getString("dp.certificate.query.timeout")).getOrElse("30 seconds)"))
+
+  import scala.collection.JavaConverters._
+  val keyWhitelist = Try(config.getStringList("dp.certificate.algorithm.whitelist.key").asScala).getOrElse(Nil)
 
   val home = System.getProperty("java.home")
   val system = TrustStoreConfig(data=None, filePath = Some(s"$home/lib/security/cacerts"))
@@ -82,11 +84,13 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
     val clientConfig = new DefaultAsyncHttpClientConfig.Builder()
       .setSslContext(context)
       .build()
+
     AhcWSClient(clientConfig)
   }
 
   private def buildLoose(): SSLConfigSettings = {
     val disableHostnameVerification = Try(config.getBoolean("dp.services.ssl.config.disable.hostname.verification")).getOrElse(false)
+
     val loose =
       SSLLooseConfig()
         .withAcceptAnyCertificate(true)
@@ -94,10 +98,11 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
 
     SSLConfigSettings()
       .withLoose(loose)
-      .withDisabledKeyAlgorithms(Seq("RSA keySize < 1024").toList)
+      .withDisabledKeyAlgorithms(keyWhitelist.toList)
   }
 
   private def buildStrict(): Future[SSLConfigSettings] = {
+
     certificateService.list(active = Some(true))
       .map { certificates =>
 
@@ -111,6 +116,7 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
 
         SSLConfigSettings()
           .withTrustManagerConfig(trustManagerConfig)
+          .withDisabledKeyAlgorithms(keyWhitelist.toList)
       }
   }
 
