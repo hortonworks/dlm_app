@@ -80,21 +80,35 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
 
   private def buildWSClient(allowUntrusted: Boolean): WSClient = {
     implicit val materializerImplicit = materializer
-    val context = new JdkSslContext(getContext(allowUntrusted), true, ClientAuth.NONE)
-    val clientConfig = new DefaultAsyncHttpClientConfig.Builder()
-      .setSslContext(context)
-      .build()
 
-    AhcWSClient(clientConfig)
+    val timeout = Try(config.getInt("dp.services.ws.client.requestTimeout.mins") * 60 * 1000).getOrElse(4 * 60 * 1000)
+
+    allowUntrusted match {
+      case true => {
+        val config = new DefaultAsyncHttpClientConfig.Builder()
+          .setAcceptAnyCertificate(true)
+          .setRequestTimeout(timeout)
+          .build
+        AhcWSClient(config)
+      }
+      case false => {
+        val context = new JdkSslContext(getContext(allowUntrusted), true, ClientAuth.NONE)
+        val clientConfig = new DefaultAsyncHttpClientConfig.Builder()
+          .setSslContext(context)
+          .setRequestTimeout(timeout)
+          .build()
+
+        AhcWSClient(clientConfig)
+      }
+    }
   }
 
   private def buildLoose(): SSLConfigSettings = {
-    val disableHostnameVerification = Try(config.getBoolean("dp.services.ssl.config.disable.hostname.verification")).getOrElse(false)
 
     val loose =
       SSLLooseConfig()
         .withAcceptAnyCertificate(true)
-        .withDisableHostnameVerification(disableHostnameVerification)
+        .withDisableHostnameVerification(true)
 
     SSLConfigSettings()
       .withLoose(loose)
