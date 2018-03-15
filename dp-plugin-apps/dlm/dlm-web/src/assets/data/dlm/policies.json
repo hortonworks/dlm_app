@@ -12,7 +12,9 @@
     "endTime":"9999-12-31T00:00:00",
     "sourceCluster":"dc-Europe$c2",
     "customProperties":{
-      "cloudCred":"14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+      "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0",
+      "queueName": "default",
+      "distcpMapBandwidth": "100"
     },
     "jobs":[{
       "id":"/default/c1/default/c1/s3Policy/0/1519434462287/000000001@1",

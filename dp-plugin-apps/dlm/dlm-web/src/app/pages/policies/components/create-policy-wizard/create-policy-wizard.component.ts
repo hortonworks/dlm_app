@@ -156,9 +156,11 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
       general: {value: general},
       source: {value: {source}},
       destination: {value: {destination}},
-      schedule: {value: {job: schedule}},
-      advanced: {value: advanced}
+      schedule: {value: {job: schedule}}
     } = formsData;
+
+    // This will guarantee that the advanced settings information is always the latest
+    const {advanced} = this.viewChildStepIdMap[this.activeStepId].getFormValue();
 
     const policyData = {
       policyDefinition: <PolicyDefinition>{
@@ -174,7 +176,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
         startTime: this.formatDateValue(schedule.startTime),
         endTime: this.formatDateValue(schedule.endTime),
         queueName: advanced.queue_name,
-        distcpMapBandwidth: advanced.max_bandwidth,
+        distcpMapBandwidth: null,
         cloudCred: ''
       }
     };
@@ -220,6 +222,11 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
         policyData.policyDefinition['tde.sameKey'] = true;
       }
     }
+
+    if (advanced.max_bandwidth) {
+      policyData.policyDefinition.distcpMapBandwidth = Number(advanced.max_bandwidth);
+    }
+
     policyData.policyDefinition = <PolicyDefinition>omitEmpty(policyData.policyDefinition);
 
     const notification = {
