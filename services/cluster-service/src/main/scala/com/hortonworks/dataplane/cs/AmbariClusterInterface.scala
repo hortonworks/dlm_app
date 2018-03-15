@@ -30,10 +30,12 @@ class AmbariClusterInterface(
     private val dpCluster: DataplaneCluster,
     private val credentials: Credentials,
     private val appConfig: Config,
-    private val sslContextManager: SslContextManager)(implicit ws: WSClient)
+    private val sslContextManager: SslContextManager)(implicit wsImplicit: WSClient)
     extends AmbariInterface {
 
   val logger = Logger(classOf[AmbariClusterInterface])
+
+  val ws = sslContextManager.getWSClient(dpCluster.allowUntrusted)
 
   override def ambariConnectionCheck: Future[AmbariConnection] = {
     // use the cluster definition to get Ambari
@@ -51,8 +53,6 @@ class AmbariClusterInterface(
     )
     val url = Try(new URL(cluster.clusterUrl.get))
     require(url.isSuccess, "registered Ambari url is invalid")
-
-    val ws = sslContextManager.getWSClient(dpCluster.allowUntrusted)
 
     //Hit ambari URL
     ws.url(s"${url.get.toString}")
