@@ -1057,7 +1057,8 @@ class BeaconService @Inject()(
               val cloudCredRequest = CloudCredRequest(cloudAccount.id, cloudAccount.version.get, accountDetails.provider, credentialType,
                 accountCredentials.accessKeyId, accountCredentials.secretAccessKey)
               Future.sequence(filteredCloudCreds.map(x => {
-                beaconCloudCredService.updateCloudCred(x.beaconUrl, x.clusterId, x.cloudCreds.cloudCred.head.id, cloudCredRequest)
+                val cloudCredToUpdate = x.cloudCreds.cloudCred.find(item => item.name == cloudAccount.id)
+                beaconCloudCredService.updateCloudCred(x.beaconUrl, x.clusterId, cloudCredToUpdate.get.id, cloudCredRequest)
               })).map({
                 cloudCredUpdateResponse => {
                   val failedResponses: Seq[BeaconApiErrors] = cloudCredUpdateResponse.filter(_.isLeft).map(_.left.get)
@@ -1265,8 +1266,15 @@ class BeaconService @Inject()(
                                       case None => newAcc :+ CloudCredWithPolicies(cloudCredName, List(nextPolicyInCluster), List(clusterCred), Some(cloudCredResponse))
                                       case Some(cloudCredWithPolicies) =>
                                         val index = newAcc.indexOf(cloudCredWithPolicies)
-                                        val updatedPoliciesList = cloudCredWithPolicies.policies :+ nextPolicyInCluster
-                                        val updatedClusterList = cloudCredWithPolicies.clusters :+ clusterCred
+                                        val updatedClusterList = cloudCredWithPolicies.clusters.find(x => x.clusterId == clusterCred.clusterId) match {
+                                          case None => cloudCredWithPolicies.clusters :+ clusterCred
+                                          case Some(result) => cloudCredWithPolicies.clusters
+                                        }
+                                        val updatedPoliciesList = cloudCredWithPolicies.policies.find(x => x.policyId == nextPolicyInCluster.policyId) match {
+                                          case None => cloudCredWithPolicies.policies :+ nextPolicyInCluster
+                                          case Some(result) => cloudCredWithPolicies.policies
+                                        }
+
                                         newAcc.updated(index, CloudCredWithPolicies(cloudCredWithPolicies.name, updatedPoliciesList, updatedClusterList, cloudCredWithPolicies.cloudCred))
                                     }
                                 }

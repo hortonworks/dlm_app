@@ -328,6 +328,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       .subscribe(isFormValid => this.onFormValidityChange.emit(isFormValid));
     this.subscriptions.push(validationSubscription);
     this.subscriptions.push(prevStepsSubscription);
+    /*
     this.subscriptions.push(this.form.valueChanges.subscribe(value => {
       if (value.destination.validationStatus) {
         this.form.patchValue({
@@ -337,7 +338,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
           }
         });
       }
-    }));
+    }));*/
     this.subscribeToDestinationType();
     this.subscribeToDestinationPath(this.form);
   }

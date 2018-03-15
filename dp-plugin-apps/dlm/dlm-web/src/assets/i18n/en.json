@@ -624,8 +624,8 @@
               "encryption": "Encrypted data cannot be replicated to an unencrypted path. Please enter an encrypted path to continue."
             },
             "tde_warning": {
-              "title": "Alert: Incorrect key selection",
-              "body": "Selecting same key when different keys was configured as the encryption type will cause policy to fail."
+              "title": "Alert: Same key impact",
+              "body": "Selecting same key option when different keys were used for encrypting source and destination will cause policy to fail."
             },
             "skipValidation": "Skip Validation",
             "validationFailed": "Validation failed",
