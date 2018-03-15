@@ -66,7 +66,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
   override def discoverClusters()(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
 
     val url = s"${dataplaneCluster.ambariUrl}$prefix"
-    val response = getAmbariResponse(url)
+    val response = getAmbariResponse(url, dataplaneCluster.allowUntrusted)
     response.map { res =>
       val items = (res.json \ "items" \\ "Clusters").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
       // each item is a Some(cluster)
@@ -80,7 +80,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 
   override def getHdpVersion(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
     val url = s"${dataplaneCluster.ambariUrl}$prefix"
-    val response = getAmbariResponse(url)
+    val response = getAmbariResponse(url, dataplaneCluster.allowUntrusted)
 
     response.map { res =>
       val items = (res.json \ "items" \\ "Clusters").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
@@ -93,7 +93,9 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     }
   }
 
-  def getAmbariResponse(requestUrl: String)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse] = {
+  def getAmbariResponse(requestUrl: String, allowUntrusted: Boolean)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse] = {
+    val ws = sslContextManager.getWSClient(dataplaneCluster.allowUntrusted)
+
     val request = ws.url(requestUrl)
     val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
     val delegatedCall:ApiCall = {req => req.get()}
@@ -106,7 +108,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 
   override def getClusterDetails(clusterName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]] = {
     val url = s"${dataplaneCluster.ambariUrl}$prefix/$clusterName"
-    val response = getAmbariResponse(url)
+    val response = getAmbariResponse(url, dataplaneCluster.allowUntrusted)
 
     response.map { res =>
       (res.json \ "Clusters").toOption
@@ -119,7 +121,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 
   override def getServiceInfo(clusterName: String, serviceName: String)(implicit hJwtToken: Option[HJwtToken]): Future[Option[JsValue]] = {
     val url = s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services/$serviceName"
-    val response = getAmbariResponse(url)
+    val response = getAmbariResponse(url, dataplaneCluster.allowUntrusted)
 
     response.map { res =>
       (res.json \ "ServiceInfo").toOption
@@ -131,7 +133,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 
   override def getServices(clusterName: String)(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
     val url = s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services"
-    val response = getAmbariResponse(url)
+    val response = getAmbariResponse(url, dataplaneCluster.allowUntrusted)
 
     response.map { res =>
       val items = (res.json \ "items" \\ "ServiceInfo").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
@@ -146,7 +148,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 
   override def getServiceVersion(stack: String, stackVersion: String, serviceName: String)(implicit hJwtToken: Option[HJwtToken]):Future[String]  = {
     val url = s"${dataplaneCluster.ambariUrl}$stackApiPrefix/$stack/versions/$stackVersion/services/$serviceName"
-    val response = getAmbariResponse(url)
+    val response = getAmbariResponse(url, dataplaneCluster.allowUntrusted)
 
     response.map { res =>
       (res.json \ "StackServices" \ "service_version").validate[String].getOrElse("UNKNOWN")
