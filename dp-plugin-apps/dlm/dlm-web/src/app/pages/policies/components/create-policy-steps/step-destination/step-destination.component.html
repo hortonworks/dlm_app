@@ -147,9 +147,9 @@
             </div>
             <!-- DESTINATION S3 ENDPOINT END -->
           </div>
-          <div class="row" *ngIf="showValidation">
+          <div class="row" *ngIf="cloudIsUsedForPolicy && formIsFilled">
             <div class="col-xs-12">
-              <dlm-checkbox (onSelect)="handleSkipValidation($event)">
+              <dlm-checkbox [disabled]="validationInProgress" (onSelect)="handleSkipValidation($event)">
                 {{'page.policies.form.fields.destinationCluster.skipValidation' | translate}}
               </dlm-checkbox>
               <button
@@ -162,7 +162,7 @@
               </button>
               <div *ngIf="form.get('destination.validationPerformed').value && !form.get('destination.skipValidation').value && !validationInProgress">
                 <div *ngIf="!form.get('destination.validationStatus').value">
-                  <dlm-field-error>{{"page.policies.form.fields.destinationCluster.validationFailed" | translate}}</dlm-field-error>
+                  <dlm-field-error>{{validationMessage}}</dlm-field-error>
                 </div>
               </div>
             </div>
