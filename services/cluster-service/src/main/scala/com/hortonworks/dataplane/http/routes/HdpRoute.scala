@@ -53,7 +53,8 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                          private val actorMaterializer: ActorMaterializer,
                          private val clusterData: ClusterDataApi,
                          private val sslContext: Provider[HttpsConnectionContext],
-                         private val config: Config,dPKeystore: DPTrustStore)
+                         private val config: Config,
+                         private val dPKeystore: DPTrustStore)
     extends BaseRoute {
 
   private implicit val system = actorSystem

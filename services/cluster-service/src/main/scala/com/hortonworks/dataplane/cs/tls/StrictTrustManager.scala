@@ -1,24 +1,26 @@
 package com.hortonworks.dataplane.cs.tls
 
 import javax.inject.Inject
+import javax.net.ssl.SSLContext
 
 import com.hortonworks.dataplane.db.Webservice.CertificateService
 import com.typesafe.config.Config
-import com.typesafe.sslconfig.ssl.{SSLConfigSettings, TrustManagerConfig, TrustStoreConfig}
+import com.typesafe.sslconfig.ssl.{ConfigSSLContextBuilder, DefaultKeyManagerFactoryWrapper, DefaultTrustManagerFactoryWrapper, SSLConfigSettings, TrustManagerConfig, TrustStoreConfig}
+import com.typesafe.sslconfig.util.NoopLogger
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class TrustManager @Inject()(val config: Config, val certificateService: CertificateService) {
+class StrictTrustManager @Inject()(val config: Config, val certificateService: CertificateService) {
   val system = TrustStoreConfig(data=None, filePath = Some("${java.home}/lib/security/cacerts"))
 
   val timeout = Duration(Try(config.getString("dp.certificate.query.timeout")).getOrElse("30 seconds)"))
 
   var tlsConfig = Await.result(build, timeout)
 
-  private def build: Future[SSLConfigSettings] = {
+  private def build: Future[SSLContext] = {
     certificateService.list(active = Some(true))
       .map { certificates =>
 
@@ -30,14 +32,21 @@ class TrustManager @Inject()(val config: Config, val certificateService: Certifi
           TrustManagerConfig()
             .withTrustStoreConfigs((trusts :+ system).toList)
 
-        SSLConfigSettings()
-          .withTrustManagerConfig(trustManagerConfig)
+        val sslConfig =
+          SSLConfigSettings()
+            .withTrustManagerConfig(trustManagerConfig)
+
+
+
+        val keyManagerFactory = new DefaultKeyManagerFactoryWrapper(sslConfig.keyManagerConfig.algorithm)
+        val trustManagerFactory = new DefaultTrustManagerFactoryWrapper(sslConfig.trustManagerConfig.algorithm)
+        new ConfigSSLContextBuilder(NoopLogger.factory(), sslConfig, keyManagerFactory, trustManagerFactory).build()
       }
   }
 
-  def get: SSLConfigSettings = tlsConfig
+  def get: SSLContext = tlsConfig
 
-  def reload: SSLConfigSettings = {
+  def reload: SSLContext = {
     tlsConfig = Await.result(build, timeout)
     tlsConfig
   }
