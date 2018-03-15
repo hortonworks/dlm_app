@@ -33,18 +33,18 @@ import { HiveBrowserTablesLoadingMap } from 'components/hive-browser';
 import { simpleSearch } from 'utils/string-utils';
 import { getAllProgressStates, getMergedProgress } from 'selectors/progress.selector';
 import { loadDatabases } from 'actions/hivelist.action';
-import { getAllDatabases, getDatabaseForCluster } from 'selectors/hive.selector';
-import { getAllFilesForClusterPath } from 'selectors/hdfs.selector';
+import { getAllDatabases } from 'selectors/hive.selector';
 import { merge } from 'utils/object-utils';
 import { wizardResetStep } from 'actions/policy.action';
 import { clusterToListOption } from 'utils/policy-util';
-import { getClusterEntities } from 'utils/policy-util';
-import { contains } from 'utils/array-util';
 import { ListStatus } from 'models/list-status.model';
 import { AsyncActionsService } from 'services/async-actions.service';
-import { listFiles } from 'actions/hdfslist.action';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
+import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
+import { filterClustersByTDE } from 'utils/cluster-util';
+import { SERVICES } from 'constants/cluster.constant';
+import { uniqBy } from 'utils/array-util';
 
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
@@ -59,6 +59,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
 
   @Input() pairings: Pairing[] = [];
   @Input() containers: any = {};
+  @Input() beaconStatuses: BeaconAdminStatus[] = [];
   @Input() accounts: CloudAccount[] = [];
   @Input() clusters: Cluster[] = [];
   @Input() containersList: CloudContainer[] = [];
@@ -70,7 +71,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
   SOURCE_TYPES = SOURCE_TYPES;
   SOURCE_TYPES_LABELS = SOURCE_TYPES_LABELS;
   form: FormGroup;
-  general: {};
+  general: any = {};
   WIZARD_STEP_ID = WIZARD_STEP_ID;
   root = '/';
   hdfsRootPath = '/';
@@ -105,7 +106,19 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
   }
 
   get sourceClusters() {
-    return this.clusters.map(cluster => clusterToListOption(cluster));
+    const clusters = this.general.type === POLICY_TYPES.HDFS ? this.sourceHdfsClusters : this.clusters;
+    return clusters.map(cluster => clusterToListOption(cluster));
+  }
+
+  get sourceHdfsClusters() {
+    const pairedClusters = [];
+    this.pairings.forEach(pair => {
+      pairedClusters.push(pair.pair[0]);
+      pairedClusters.push(pair.pair[1]);
+    });
+    let clustersWithHdfs = this.clusters.filter(c => !!c.status.find(s => s.service_name === SERVICES.HDFS));
+    clustersWithHdfs = filterClustersByTDE(clustersWithHdfs, this.beaconStatuses);
+    return uniqBy([...pairedClusters, ...clustersWithHdfs], 'id');
   }
 
   get sourceCloudAccount() {

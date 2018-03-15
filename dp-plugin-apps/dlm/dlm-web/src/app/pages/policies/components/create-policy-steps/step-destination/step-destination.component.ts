@@ -40,6 +40,7 @@ import { AsyncActionsService } from 'services/async-actions.service';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { loadDatabases } from 'actions/hivelist.action';
 import { omit, isEmpty } from 'utils/object-utils';
+import { filterClustersByTDE } from 'utils/cluster-util';
 
 export function validationStatusValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
@@ -172,10 +173,10 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
         value: ''
       }];
     }
-    return this.clusters.filter(cluster => {
+    return filterClustersByTDE(this.clusters.filter(cluster => {
       const status = this.beaconStatuses.find(c => c.clusterId === cluster.id);
       return status ? status.beaconAdminStatus.replication_cloud_fs : false;
-    }).map(cluster => clusterToListOption(cluster));
+    }), this.beaconStatuses).map(cluster => clusterToListOption(cluster));
   }
 
   /**

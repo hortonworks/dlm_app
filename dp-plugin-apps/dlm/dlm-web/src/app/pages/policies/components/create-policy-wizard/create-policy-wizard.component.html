@@ -33,7 +33,7 @@
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SOURCE">
               <dlm-wizard-content [stepIndex]="step?.index" [stepLabel]="step?.label">
                 <div wizard-content-body>
-                  <dlm-step-source #source [accounts]="accounts" [clusters]="clusters" [pairings]="pairings" [sourceClusterId]="sourceClusterId"
+                  <dlm-step-source #source [accounts]="accounts" [clusters]="clusters" [pairings]="pairings" [beaconStatuses]="beaconStatuses" [sourceClusterId]="sourceClusterId"
                                    (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-source>
                 </div>
                 <div wizard-content-summary>

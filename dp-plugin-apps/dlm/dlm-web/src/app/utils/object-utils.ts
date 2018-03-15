@@ -60,4 +60,13 @@ export const multiLevelResolve = (obj, path) => {
   return current;
 };
 
+export const toMapByField = (collection, fieldName) => {
+  const ret = new Map();
+  collection.forEach(item => {
+    const val = multiLevelResolve(item, fieldName);
+    ret.set(val, item);
+  });
+  return ret;
+};
+
 export const merge = _merge;
