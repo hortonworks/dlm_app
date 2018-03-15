@@ -261,16 +261,17 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         flexGrow: 4
       },
       {
+        prop: 'name',
         name: this.t.instant('common.name'),
         cellTemplate: this.policyInfoColumn.cellRef,
-        sortable: false,
+        comparator: this.nameComparator.bind(this),
         flexGrow: 8
       },
       {
         prop: 'sourceDataset',
         name: this.t.instant('common.source'),
         cellTemplate: this.sourceCellTemplateRef,
-        comparator: this.clusterResourceComparator.bind(this),
+        comparator: this.sourceNameComparator.bind(this),
         flexGrow: 9
       },
       {
@@ -282,7 +283,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         flexGrow: 7
       },
       {prop: 'targetDataset', name: this.t.instant('common.destination'), flexGrow: 9,
-        cellTemplate: this.targetCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
+        cellTemplate: this.targetCellTemplateRef, comparator: this.targetNameComparator.bind(this)},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'),
         sortable: false, flexGrow: 4},
       {prop: 'lastJobDuration', name: this.t.instant('common.duration'),
@@ -299,8 +300,20 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.initJobsLoading();
   }
 
-  clusterResourceComparator(cluster1: Cluster, cluster2: Cluster) {
-    return cluster1.name.toLowerCase() > cluster2.name.toLowerCase() ? 1 : -1;
+  sourceNameComparator(pathOne, pathTwo, rowOne: Policy, rowTwo: Policy) {
+    const nameOne = rowOne.sourceType === SOURCE_TYPES.CLUSTER ? rowOne.sourceClusterResource.name : rowOne.cloudCredentialResource.name;
+    const nameTwo = rowTwo.sourceType === SOURCE_TYPES.CLUSTER ? rowTwo.sourceClusterResource.name : rowTwo.cloudCredentialResource.name;
+    return nameOne.toLowerCase() > nameTwo.toLowerCase() ? 1 : -1;
+  }
+
+  targetNameComparator(pathOne, pathTwo, rowOne: Policy, rowTwo: Policy) {
+    const nameOne = rowOne.targetType === SOURCE_TYPES.CLUSTER ? rowOne.targetClusterResource.name : rowOne.cloudCredentialResource.name;
+    const nameTwo = rowTwo.targetType === SOURCE_TYPES.CLUSTER ? rowTwo.targetClusterResource.name : rowTwo.cloudCredentialResource.name;
+    return nameOne.toLowerCase() > nameTwo.toLowerCase() ? 1 : -1;
+  }
+
+  nameComparator(nameOne, nameTwo) {
+    return nameOne.toLowerCase() > nameTwo.toLowerCase() ? 1 : -1;
   }
 
   initJobsLoading() {
