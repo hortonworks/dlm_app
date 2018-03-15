@@ -11,12 +11,9 @@
 
 package com.hortonworks.dataplane.cs
 
-import javax.inject.Named
-
 import akka.actor.ActorSystem
-import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
-import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
+import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.tls.SslContextManager
@@ -26,8 +23,6 @@ import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
 import com.typesafe.config.{Config, ConfigFactory}
-import com.typesafe.sslconfig.akka.AkkaSSLConfig
-import com.typesafe.sslconfig.ssl.{TrustManagerConfig, TrustStoreConfig}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -56,6 +51,7 @@ object AppModule extends AbstractModule {
   def provideWsClient(implicit actorSystem: ActorSystem,
                       materializer: ActorMaterializer,
                       configuration: Config): WSClient = {
+
     val config = new DefaultAsyncHttpClientConfig.Builder()
       .setAcceptAnyCertificate(true)
       .setRequestTimeout(Try(configuration.getInt(

@@ -9,6 +9,11 @@ import com.typesafe.config.Config
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{ConfigSSLContextBuilder, DefaultKeyManagerFactoryWrapper, DefaultTrustManagerFactoryWrapper, SSLConfigSettings, SSLLooseConfig, TrustManagerConfig, TrustStoreConfig}
 import com.typesafe.sslconfig.util.NoopLogger
+import io.netty.handler.ssl.JdkSslContext
+import org.asynchttpclient.DefaultAsyncHttpClientConfig
+import play.api.libs.ws.ahc.{AhcWSClient, AhcWSClientConfig}
+import play.api.libs.ws.ssl.{KeyManagerConfig, KeyStoreConfig, SSLConfig}
+import play.api.libs.ws.{WSClient, WSClientConfig}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -23,6 +28,9 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
 
   private val looseHttpsContext = Http().createClientHttpsContext(AkkaSSLConfig().withSettings(loose))
   private var strictHttpsContext = Http().createClientHttpsContext(AkkaSSLConfig().withSettings(strict))
+
+  private val looseWsClient = buildWSClient(allowUntrusted = true)
+  private var strictWsClient = buildWSClient(allowUntrusted = false)
 
   def getContext(allowUntrusted: Boolean): SSLContext = {
     allowUntrusted match {
@@ -45,9 +53,25 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
     }
   }
 
-  def reload():Unit = {
+  def getWSClient(allowUntrusted: Boolean): WSClient = {
+    allowUntrusted match {
+      case true => looseWsClient
+      case false => strictWsClient
+    }
+  }
+
+  def reload(): Unit = {
     strict = Await.result(buildStrict(), timeout)
     strictHttpsContext = Http().createClientHttpsContext(AkkaSSLConfig().withSettings(strict))
+    strictWsClient = buildWSClient(allowUntrusted = false)
+  }
+
+  private def buildWSClient(allowUntrusted: Boolean): WSClient = {
+    val context = new JdkSslContext(getContext(allowUntrusted=false), true, null)
+    val clientConfig = new DefaultAsyncHttpClientConfig.Builder()
+      .setSslContext(context)
+      .build()
+    AhcWSClient(clientConfig)
   }
 
   private def buildLoose(): SSLConfigSettings = {
