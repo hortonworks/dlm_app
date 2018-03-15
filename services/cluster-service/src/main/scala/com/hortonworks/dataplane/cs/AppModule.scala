@@ -19,14 +19,9 @@ import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterHostsService,
-  ClusterService,
-  ConfigService,
-  DpClusterService
-}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
@@ -47,30 +42,6 @@ object AppModule extends AbstractModule {
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
     bind(classOf[MetricsRegistry])
       .toInstance(MetricsRegistry("cluster-service"))
-  }
-
-  @Provides
-  @Named("connectionContext")
-  def provideSSLConfig(implicit actorSystem: ActorSystem,
-                       materializer: ActorMaterializer,
-                       config: Config,
-                       dPKeystore: DPTrustStore): HttpsConnectionContext = {
-    // provides a custom ssl config with the dp keystore
-    val sslConfig = AkkaSSLConfig()
-      .mapSettings { sslConfigSettings =>
-        val settings = sslConfigSettings
-          .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
-          .withTrustManagerConfig(
-            TrustManagerConfig()
-              .withTrustStoreConfigs(scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
-        if (config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
-          settings.withLoose(sslConfigSettings.loose.withDisableHostnameVerification(true))
-        else
-          settings
-      }
-
-    val dpCtx = Http().createClientHttpsContext(sslConfig)
-    dpCtx
   }
 
   @Provides
@@ -202,12 +173,14 @@ object AppModule extends AbstractModule {
                             actorSystem: ActorSystem,
                             actorMaterializer: ActorMaterializer,
                             clusterData: ClusterDataApi,
-                            config: Config,
-                            @Named("connectionContext") sslContext: Provider[HttpsConnectionContext]): HdpRoute = {
+                            dpClusterService: DpClusterService,
+                            sslContextManager: SslContextManager,
+                            config: Config): HdpRoute = {
     new HdpRoute(actorSystem,
       actorMaterializer,
       clusterData,
-      sslContext,
+      dpClusterService: DpClusterService,
+      sslContextManager: SslContextManager,
       config)
   }
 

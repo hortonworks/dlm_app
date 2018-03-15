@@ -12,7 +12,6 @@
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
-import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
@@ -20,15 +19,15 @@ import akka.http.scaladsl.model.HttpHeader.ParsingResult
 import akka.http.scaladsl.model.headers.Cookie
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
 import akka.http.scaladsl.server.{Route, RouteResult, ValidationRejection}
-import akka.http.scaladsl.{Http, HttpsConnectionContext}
+import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.google.common.cache.{CacheBuilder, CacheLoader}
-import com.google.inject.Provider
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, WrappedErrorException}
 import com.hortonworks.dataplane.cs.ClusterDataApi
-import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
+import com.hortonworks.dataplane.cs.tls.SslContextManager
+import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -52,9 +51,9 @@ import scala.util.{Failure, Success}
 class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                          private val actorMaterializer: ActorMaterializer,
                          private val clusterData: ClusterDataApi,
-                         private val sslContext: Provider[HttpsConnectionContext],
-                         private val config: Config,
-                         private val dPKeystore: DPTrustStore)
+                         private val dpClusterService: DpClusterService,
+                         private val sslContextManager: SslContextManager,
+                         private val config: Config)
     extends BaseRoute {
 
   private implicit val system = actorSystem
@@ -79,8 +78,6 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
   def valid(request: HttpRequest): Boolean = {
     pathRegex.pattern.matcher(request.uri.path.toString()).matches()
   }
-
-  private lazy val sslConnectionContext = new AtomicReference[HttpsConnectionContext](sslContext.get())
 
   import com.hortonworks.dataplane.http.JsonSupport._
 
@@ -169,6 +166,11 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
               }
             }
 
+            dpCluster <- dpClusterService.retrieve(cluster).map {
+              case Left(errors) => throw WrappedErrorException(errors.errors.head)
+              case Right(dpCluster) => dpCluster
+            }
+
             h <- {
 
               // The filter is needed to clean the dummy auth header added
@@ -183,7 +185,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                   hi.isInstanceOf[Cookie]
                     || hi.lowercaseName() == Constants.DPTOKEN.toLowerCase)
 
-              val finalPath = if(shouldUseKnox(jwtToken, url) && serviceEnabled(service)) s"${targetUrl.getPath}/$service/$targetPath" else s"${targetUrl.getPath}/$targetPath"
+              val finalPath = if (shouldUseKnox(jwtToken, url) && serviceEnabled(service)) s"${targetUrl.getPath}/$service/$targetPath" else s"${targetUrl.getPath}/$targetPath"
               val target = HttpRequest(
                 method = request.method,
                 entity = request.entity,
@@ -200,26 +202,18 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
               log.info(s"The forwarded request is $target, path $targetPath")
 
 
+              val flow = {
+                if ((shouldUseKnox(jwtToken, url) && serviceEnabled(service)) || targetUrl.getProtocol == "https") {
+                  // reload context by cluster type
+                  val httpsConnectionContext = sslContextManager.getHttpsConnectionContext(dpCluster.allowUntrusted)
 
-              val flow = if((shouldUseKnox(jwtToken, url) && serviceEnabled(service)) || targetUrl.getProtocol == "https") {
-                // set up cert chain
-                dPKeystore.storeCertificate(targetUrl) match {
-                  case Success(status) =>
-                    if (status) {
-                      log.info(s"Certificate for ${targetUrl.getHost} was saved")
-                      log.info("reloading SSL context")
-                      sslConnectionContext.set(sslContext.get())
-                    } else {
-                      log.info(s"The certificate for ${targetUrl.getHost} is already in the keystore")
-                    }
-                  case Failure(e) => log.warn(s"The certificate for ${targetUrl.getHost} was not updated",e)
+                  Http(system)
+                    .outgoingConnectionHttps(targetUrl.getHost, targetUrl.getPort, httpsConnectionContext)
                 }
-
-                Http(system)
-                  .outgoingConnectionHttps(targetUrl.getHost, targetUrl.getPort, sslConnectionContext.get())
+                else Http(system)
+                  .outgoingConnection(targetUrl.getHost, targetUrl.getPort)
               }
-              else Http(system)
-                .outgoingConnection(targetUrl.getHost, targetUrl.getPort)
+
               val handler = Source
                 .single(target)
                 .via(flow)

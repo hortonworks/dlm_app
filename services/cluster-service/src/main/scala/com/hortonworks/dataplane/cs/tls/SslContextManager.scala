@@ -3,8 +3,10 @@ package com.hortonworks.dataplane.cs.tls
 import javax.inject.Inject
 import javax.net.ssl.SSLContext
 
+import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import com.hortonworks.dataplane.db.Webservice.CertificateService
 import com.typesafe.config.Config
+import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{ConfigSSLContextBuilder, DefaultKeyManagerFactoryWrapper, DefaultTrustManagerFactoryWrapper, SSLConfigSettings, SSLLooseConfig, TrustManagerConfig, TrustStoreConfig}
 import com.typesafe.sslconfig.util.NoopLogger
 
@@ -19,33 +21,51 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
   private val loose = buildLoose()
   private var strict = Await.result(buildStrict(), timeout)
 
-  def get(allowUntrusted: Boolean): SSLContext = {
+  private val looseHttpsContext = Http().createClientHttpsContext(AkkaSSLConfig().withSettings(loose))
+  private var strictHttpsContext = Http().createClientHttpsContext(AkkaSSLConfig().withSettings(strict))
+
+  def getContext(allowUntrusted: Boolean): SSLContext = {
+    allowUntrusted match {
+      case true => buildContext(loose)
+      case false => buildContext(strict)
+    }
+  }
+
+  def getConfig(allowUntrusted: Boolean): SSLConfigSettings = {
     allowUntrusted match {
       case true => loose
       case false => strict
     }
   }
 
-  def reload():Unit = {
-    strict = Await.result(buildStrict(), timeout)
+  def getHttpsConnectionContext(allowUntrusted: Boolean): HttpsConnectionContext = {
+    allowUntrusted match {
+      case true => looseHttpsContext
+      case false => strictHttpsContext
+    }
   }
 
-  private def buildLoose(): SSLContext = {
+  def reload():Unit = {
+    strict = Await.result(buildStrict(), timeout)
+    strictHttpsContext = Http().createClientHttpsContext(AkkaSSLConfig().withSettings(strict))
+  }
+
+  private def buildLoose(): SSLConfigSettings = {
+    val disableHostnameVerification = Try(config.getBoolean("dp.services.ssl.config.disable.hostname.verification")).getOrElse(false)
     val loose =
       SSLLooseConfig()
         .withAcceptAnyCertificate(true)
-        .withDisableHostnameVerification(true)
+        .withDisableHostnameVerification(disableHostnameVerification)
 
     val sslConfig =
       SSLConfigSettings()
         .withLoose(loose)
-
-    buildContext(sslConfig)
+        .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
   }
 
   val system = TrustStoreConfig(data=None, filePath = Some("${java.home}/lib/security/cacerts"))
 
-  private def buildStrict(): Future[SSLContext] = {
+  private def buildStrict(): Future[SSLConfigSettings] = {
     certificateService.list(active = Some(true))
       .map { certificates =>
 
@@ -60,8 +80,6 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
         val sslConfig =
           SSLConfigSettings()
             .withTrustManagerConfig(trustManagerConfig)
-
-        buildContext(sslConfig)
       }
   }
 
