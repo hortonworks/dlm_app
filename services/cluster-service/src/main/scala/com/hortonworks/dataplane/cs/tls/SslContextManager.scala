@@ -78,7 +78,7 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
 
   private def buildWSClient(allowUntrusted: Boolean): WSClient = {
     implicit val materializerImplicit = materializer
-    val context = new JdkSslContext(getContext(allowUntrusted=false), true, ClientAuth.NONE)
+    val context = new JdkSslContext(getContext(allowUntrusted), true, ClientAuth.NONE)
     val clientConfig = new DefaultAsyncHttpClientConfig.Builder()
       .setSslContext(context)
       .build()
