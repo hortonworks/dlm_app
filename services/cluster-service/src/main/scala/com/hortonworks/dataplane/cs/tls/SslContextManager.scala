@@ -94,7 +94,7 @@ class SslContextManager @Inject()(val config: Config, val dpClusterService: DpCl
 
     SSLConfigSettings()
       .withLoose(loose)
-      .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
+      .withDisabledKeyAlgorithms(Seq("RSA keySize < 1024").toList)
   }
 
   private def buildStrict(): Future[SSLConfigSettings] = {
