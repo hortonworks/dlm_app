@@ -44,13 +44,13 @@
 										</thead>
 										<tbody>
 										<tr *ngFor="let profiler of profilers">
-											<td>{{profiler.name}}</td>
-											<td>{{profiler.version}}</td>
+											<td>{{profiler.profilerInfo.displayName}}</td>
+											<td>{{profiler.profilerInfo.version}}</td>
 											<td>{{profiler.assetsCount}}</td>
 											<td class="numeric-column">
                                                 <span class="toggle-active" (click)="toggleActive(profiler)">
-                                                    <span>{{(profiler.isActive)?'Active':'Inactive'}}</span>
-                                                    <i class="fa" [ngClass]="(profiler.isActive)?'fa-toggle-on':'fa-toggle-off'"></i>
+                                                    <span>{{(profiler.profilerInfo.active)?'Active':'Inactive'}}</span>
+                                                    <i class="fa" [ngClass]="(profiler.profilerInfo.active)?'fa-toggle-on':'fa-toggle-off'"></i>
                                                 </span>
                                             </td>
 										</tr>

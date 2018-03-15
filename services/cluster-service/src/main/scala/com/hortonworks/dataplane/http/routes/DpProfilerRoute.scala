@@ -205,7 +205,7 @@ class DpProfilerRoute @Inject()(
   val getProfilersStatusWithJobSummary =
     path("cluster" / LongNumber / "dp-profiler" / "status" / "jobs-summary") { clusterId =>
       get {
-        parameters('startTime.as[String], 'endTine.as[String]) { (startTime, endTime) =>
+        parameters('startTime.as[String], 'endTime.as[String]) { (startTime, endTime) =>
           onComplete(getProfilersJobsSummary(clusterId, startTime, endTime)) {
             case Success(res) => res.status match {
               case 200 => complete(success(res.json))
@@ -225,7 +225,7 @@ class DpProfilerRoute @Inject()(
   val getProfilersStatusWithAssetsCount =
     path("cluster" / LongNumber / "dp-profiler" / "status" / "asset-count") { clusterId =>
       get {
-        parameters('startTime.as[String], 'endTine.as[String]) { (startTime, endTime) =>
+        parameters('startTime.as[String], 'endTime.as[String]) { (startTime, endTime) =>
           onComplete(getProfilersAssetsSummary(clusterId, startTime, endTime)) {
             case Success(res) => res.status match {
               case 200 => complete(success(res.json))
@@ -369,6 +369,7 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/profilerjobs/jobscount?startTime=$startTime&endTime=$endTime")
+        _ <- Future.successful(println(urlToHit))
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .get()
@@ -396,7 +397,7 @@ class DpProfilerRoute @Inject()(
         config <- getConfigOrThrowException(clusterId)
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
-        urlToHit <- Future.successful(s"${baseUrls.head}/profilerjobs/jobsonfilters?$queryString")
+        urlToHit <- Future.successful(s"${baseUrls.head}/profilerjobs?$queryString")
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .get()
