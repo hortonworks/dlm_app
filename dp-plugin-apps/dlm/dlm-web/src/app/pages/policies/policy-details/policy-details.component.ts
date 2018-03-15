@@ -149,7 +149,6 @@ export class PolicyDetailsComponent {
   }
 
   get isSourceCluster() {
-    console.log('source', this.sourceCluster);
     return this.sourceCluster && Number(this.sourceCluster) > 0;
   }
 
