@@ -55,7 +55,7 @@ class BeaconCloudCredServiceImpl()(implicit ws: KnoxProxyWsClient) extends Beaco
 
   private def mapToCloudCredRequest(cloudCredRequest : CloudCredRequest) = {
     "name=" + cloudCredRequest.name +
-    "\nversion = " + cloudCredRequest.version +
+    "\nversion=" + cloudCredRequest.version +
     "\nprovider=" + cloudCredRequest. provider +
     "\nauthtype=" + cloudCredRequest.authtype +
       (cloudCredRequest.`aws.secret.key` match {

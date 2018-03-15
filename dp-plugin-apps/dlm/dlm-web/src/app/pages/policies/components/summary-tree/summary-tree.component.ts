@@ -25,6 +25,9 @@ import { SummaryTreeItem } from 'models/policy.model';
         <span class="step-icon">
           <i class="fa fa-fw fa-circle"></i>
         </span>
+        <div class="details">
+          <div class="header">{{header}}</div>
+        </div>
       </li>
       <li [attr.qe-attr]="'summary-tree-item-' + i" class="summary-tree-item" *ngFor="let item of items; let i = index;">
         <span class="step-icon">
@@ -42,6 +45,7 @@ import { SummaryTreeItem } from 'models/policy.model';
 export class SummaryTreeComponent {
 
   @Input() items: SummaryTreeItem[] = [];
+  @Input() header = '';
   @HostBinding('class') className = 'dlm-summary-tree';
   subscriptions: Subscription[] = [];
 

@@ -139,22 +139,23 @@ class DlmKeyStore @Inject()(keyStoreManager: KeyStoreManager) extends
     * @param cloudAccount
     */
   def addCloudAccount(cloudAccount: CloudAccountWithCredentials) : Future[Either[KeyStoreWriteError,Unit]] = {
+    val versionedCloudAccount = cloudAccount.version match {
+      case None => cloudAccount.copy(version=Some(1))
+      case Some(result) => cloudAccount
+    }
+
     getCloudAccountsFromKeyStore(DpKeyStore.ALIAS) map {
       case Right(cloudAccounts) =>
-        if (cloudAccounts.exists(_.id == cloudAccount.id)) {
+        if (cloudAccounts.exists(_.id == versionedCloudAccount.id)) {
           Left(KeyStoreWriteError(DpKeyStore.credentialNameExistsErrMsg))
         } else {
-          val versionedCloudAccount = cloudAccount.version match {
-            case None => cloudAccount.copy(version=Some(1))
-            case Some(result) => cloudAccount
-          }
           saveCloudAccountsToKeyStore(cloudAccounts :+ versionedCloudAccount) match {
             case Success(v) => Right(Unit)
             case Failure(ex) => Left(KeyStoreWriteError(ex.getMessage))
           }
         }
       case Left(error) =>
-        saveCloudAccountsToKeyStore(List(cloudAccount)) match {
+        saveCloudAccountsToKeyStore(List(versionedCloudAccount)) match {
           case Success(v) => Right(Unit)
           case Failure(ex) => Left(KeyStoreWriteError(ex.getMessage))
         }

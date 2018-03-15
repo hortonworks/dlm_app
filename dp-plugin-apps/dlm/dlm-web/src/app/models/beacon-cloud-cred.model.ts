@@ -31,3 +31,32 @@ export interface BeaconCloudCredWithPoliciesResponse {
     clusters: CloudAccountSyncStatus[];
   }[];
 }
+
+interface CloudCredentialConfigs {
+  version: string;
+}
+
+export interface CloudCredential {
+  id: string;
+  name: string;
+  provider: string;
+  creationTime: string;
+  lastModifiedTime: string;
+  configs: CloudCredentialConfigs;
+}
+
+interface CloudCredsResponse {
+  requestId: string;
+  totalResults: number;
+  results: number;
+  cloudCred: CloudCredential[];
+}
+
+export interface BeaconCloudCredentialsResponse {
+  unreachableBeacon: any[];
+  allCloudCreds: {
+    clusterId: string;
+    beaconUrl: string;
+    cloudCreds: CloudCredsResponse;
+  }[];
+}

@@ -150,8 +150,8 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
         case Some(sourceCluster) => "\nsourceCluster = " + sourceCluster
         case None => ""
       }) +
-      (policyTestRequest.sourceDataset match {
-        case Some(sourceDataset) => "\nsourceDataset = " + sourceDataset
+      (policyTestRequest.targetCluster match {
+        case Some(targetCluster) => "\ntargetCluster = " + targetCluster
         case None => ""
       })
   }
