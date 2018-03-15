@@ -12,6 +12,7 @@
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
@@ -42,7 +43,8 @@ sealed trait AmbariDataplaneClusterInterface {
 class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
                                           val ws: WSClient,
                                           val config: Config,
-                                          private val credentials: Credentials)
+                                          private val credentials: Credentials,
+                                          private val sslContextManager: SslContextManager)
     extends AmbariDataplaneClusterInterface {
 
   val logger = Logger(classOf[AmbariDataplaneClusterInterfaceImpl])
@@ -155,6 +157,6 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 object AmbariDataplaneClusterInterfaceImpl {
   def apply(dataplaneCluster: DataplaneCluster,
             ws: WSClient,
-            config: Config, credentials: Credentials): AmbariDataplaneClusterInterfaceImpl =
-    new AmbariDataplaneClusterInterfaceImpl(dataplaneCluster, ws, config,credentials)
+            config: Config, credentials: Credentials, sslContextManager: SslContextManager): AmbariDataplaneClusterInterfaceImpl =
+    new AmbariDataplaneClusterInterfaceImpl(dataplaneCluster, ws, config,credentials, sslContextManager)
 }

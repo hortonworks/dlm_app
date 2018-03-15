@@ -13,6 +13,7 @@ package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.knox.Knox.KnoxApiRequest
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
@@ -28,7 +29,8 @@ class AmbariClusterInterfaceV2(
     private val dataplaneCluster: DataplaneCluster,
     private val appConfig: Config,
     private val credentialInterface: CredentialInterface,
-    knoxApiExecutor: KnoxApiExecutor)(implicit ws: WSClient)
+    knoxApiExecutor: KnoxApiExecutor,
+    private val sslContextManager: SslContextManager)(implicit ws: WSClient)
     extends AmbariInterfaceV2 {
 
   val logger = Logger(classOf[AmbariClusterInterfaceV2])

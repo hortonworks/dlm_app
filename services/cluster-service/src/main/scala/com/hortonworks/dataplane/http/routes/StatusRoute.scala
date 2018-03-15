@@ -27,6 +27,7 @@ import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
@@ -47,7 +48,8 @@ class StatusRoute @Inject()(val ws: WSClient,
                             val config: Config,
                             clusterSync: ClusterSync,
                             dpClusterSync: DpClusterSync,
-                            metricsRegistry: MetricsRegistry)
+                            metricsRegistry: MetricsRegistry,
+                            sslContextManager: SslContextManager)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
@@ -228,6 +230,7 @@ class StatusRoute @Inject()(val ws: WSClient,
 
 
   private def probeAccessViaKnox(href: String, knoxUrl: String, token: String): Future[WSResponse] = {
+//    val ws =
     val delegatedRequest = ws.url(href).withRequestTimeout(NETWORK_TIMEOUT seconds)
 
     KnoxApiExecutor.withExceptionHandling(KnoxConfig(TOKEN_TOPOLOGY_NAME, Some(knoxUrl)), ws)

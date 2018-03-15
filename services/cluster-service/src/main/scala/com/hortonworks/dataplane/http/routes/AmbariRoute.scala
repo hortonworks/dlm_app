@@ -21,6 +21,7 @@ import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
 import com.hortonworks.dataplane.cs._
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.db.Webservice.{ClusterService, DpClusterService}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
@@ -39,7 +40,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
                             val clusterService: ClusterService,
                             val credentialInterface: CredentialInterface,
                             val dpClusterService: DpClusterService,
-                            val config: Config)
+                            val config: Config,
+                            val sslContextManager: SslContextManager)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
@@ -106,7 +108,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
                                             ws,
                                             config,
-                                            creds))
+                                            creds,
+                                            sslContextManager))
       clusters <- dli.discoverClusters()
       details <- getDetails(dataplaneCluster,clusters, dli)
     } yield details
@@ -331,7 +334,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
         AmbariDataplaneClusterInterfaceImpl(dpcwServices.dataplaneCluster,
           ws,
           config,
-          creds))
+          creds,
+          sslContextManager))
       hdpVersion <- dli.getHdpVersion
       services <- dli.getServices(dataplaneCluster.name)
       availableDpServices <- Future.successful(services.intersect(dpServices))

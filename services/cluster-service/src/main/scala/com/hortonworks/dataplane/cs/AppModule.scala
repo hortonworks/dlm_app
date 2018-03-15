@@ -18,8 +18,8 @@ import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
-import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
-import com.hortonworks.dataplane.db._
+import com.hortonworks.dataplane.db.Webservice.{CertificateService, ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
+import com.hortonworks.dataplane.db.{CertificateServiceImpl, _}
 import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
 import com.typesafe.config.{Config, ConfigFactory}
@@ -137,14 +137,16 @@ object AppModule extends AbstractModule {
                          wSClient: WSClient,
                          clusterSync: ClusterSync,
                          dpClusterSync: DpClusterSync,
-                         metricsRegistry: MetricsRegistry): StatusRoute = {
+                         metricsRegistry: MetricsRegistry,
+                         sslContextManager: SslContextManager): StatusRoute = {
     new StatusRoute(wSClient,
                     storageInterface,
                     credentialInterface,
                     config,
                     clusterSync,
                     dpClusterSync,
-                    metricsRegistry)
+                    metricsRegistry,
+                    sslContextManager)
   }
 
   @Provides
@@ -154,13 +156,15 @@ object AppModule extends AbstractModule {
                          config: Config,
                          clusterService: ClusterService,
                          dpClusterService: DpClusterService,
-                         wSClient: WSClient): AmbariRoute = {
+                         wSClient: WSClient,
+                         sslContextManager: SslContextManager): AmbariRoute = {
     new AmbariRoute(wSClient,
                     storageInterface,
                     clusterService,
                     credentialInterface,
                     dpClusterService,
-                    config)
+                    config,
+                    sslContextManager)
   }
 
   @Provides
@@ -182,11 +186,30 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideConfigurationRoute(wsClient: WSClient, config: Config): ConfigurationRoute = {
+  def provideConfigurationRoute(wsClient: WSClient, config: Config, sslContextManager: SslContextManager): ConfigurationRoute = {
     new ConfigurationRoute(
       wsClient,
-      config
+      config,
+      sslContextManager
     )
+  }
+
+  @Provides
+  @Singleton
+  def provideSslContextManager(config: Config, dpClusterService: DpClusterService, certificateService: CertificateService, materializer: ActorMaterializer, actorSystem: ActorSystem): SslContextManager = {
+    new SslContextManager(
+      config,
+      dpClusterService,
+      certificateService,
+      materializer,
+      actorSystem
+    )
+  }
+
+  @Provides
+  @Singleton
+  def provideCertificateService(implicit ws: WSClient, config: Config): CertificateService = {
+    new CertificateServiceImpl(config)
   }
 
   @Provides
@@ -320,13 +343,15 @@ object AppModule extends AbstractModule {
                            clusterInterface: StorageInterface,
                            credentialInterface: CredentialInterface,
                            dpClusterService: DpClusterService,
-                           wSClient: WSClient): DpClusterSync = {
+                           wSClient: WSClient,
+                           sslContextManager: SslContextManager): DpClusterSync = {
     new DpClusterSync(actorSystem,
                       config,
                       clusterInterface,
                       credentialInterface,
                       dpClusterService,
-                      wSClient)
+                      wSClient,
+                      sslContextManager)
   }
 
 }

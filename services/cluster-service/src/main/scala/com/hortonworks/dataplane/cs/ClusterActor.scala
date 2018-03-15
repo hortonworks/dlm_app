@@ -13,12 +13,9 @@ package com.hortonworks.dataplane.cs
 
 import akka.actor.Status.Failure
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Cluster,
-  DataplaneCluster,
-  ClusterService => ClusterData
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, ClusterService => ClusterData}
 import com.hortonworks.dataplane.commons.service.api.Poll
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
 
@@ -44,12 +41,13 @@ class ClusterActor(cluster: Cluster,
                    storageInterface: StorageInterface,
                    credentials: Credentials,
                    val dbActor: ActorRef,
-                   config: Config)
+                   config: Config,
+                   sslContextManager: SslContextManager)
     extends Actor
     with ActorLogging {
 
   val ambariInterface =
-    new AmbariClusterInterface(cluster, credentials, config)
+    new AmbariClusterInterface(cluster, credentials, config, sslContextManager)
   val clusterSaveState =
     collection.mutable.Map("NAMENODE" -> false, "HOST_INFO" -> false)
 

@@ -3,8 +3,11 @@ package com.hortonworks.dataplane.cs.tls
 import javax.inject.Inject
 import javax.net.ssl.SSLContext
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.{Http, HttpsConnectionContext}
-import com.hortonworks.dataplane.db.Webservice.CertificateService
+import akka.stream.Materializer
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, WrappedErrorException}
+import com.hortonworks.dataplane.db.Webservice.{CertificateService, DpClusterService}
 import com.typesafe.config.Config
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{ConfigSSLContextBuilder, DefaultKeyManagerFactoryWrapper, DefaultTrustManagerFactoryWrapper, SSLConfigSettings, SSLLooseConfig, TrustManagerConfig, TrustStoreConfig}
@@ -17,9 +20,11 @@ import play.api.libs.ws.{WSClient, WSClientConfig}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
-class SslContextManager @Inject()(val config: Config, val certificateService: CertificateService) {
+class SslContextManager @Inject()(val config: Config, val dpClusterService: DpClusterService, certificateService: CertificateService, val materializer: Materializer, val actorSystem: ActorSystem) {
+  implicit val actorSystemImplicit = actorSystem
 
   val timeout = Duration(Try(config.getString("dp.certificate.query.timeout")).getOrElse("30 seconds)"))
 
@@ -32,19 +37,6 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
   private val looseWsClient = buildWSClient(allowUntrusted = true)
   private var strictWsClient = buildWSClient(allowUntrusted = false)
 
-  def getContext(allowUntrusted: Boolean): SSLContext = {
-    allowUntrusted match {
-      case true => buildContext(loose)
-      case false => buildContext(strict)
-    }
-  }
-
-  def getConfig(allowUntrusted: Boolean): SSLConfigSettings = {
-    allowUntrusted match {
-      case true => loose
-      case false => strict
-    }
-  }
 
   def getHttpsConnectionContext(allowUntrusted: Boolean): HttpsConnectionContext = {
     allowUntrusted match {
@@ -66,7 +58,23 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
     strictWsClient = buildWSClient(allowUntrusted = false)
   }
 
+  private def getDataplaneCluster(dpClusterId: Option[String], clusterId: Option[String] = None): Future[DataplaneCluster] = {
+    dpClusterService.retrieve(dpClusterId.get)
+      .map {
+        case Left(errors) => throw WrappedErrorException(errors.errors.head)
+        case Right(dpCluster) => dpCluster
+      }
+  }
+
+  private def getContext(allowUntrusted: Boolean): SSLContext = {
+    allowUntrusted match {
+      case true => buildContext(loose)
+      case false => buildContext(strict)
+    }
+  }
+
   private def buildWSClient(allowUntrusted: Boolean): WSClient = {
+    implicit val materializerImplicit = materializer
     val context = new JdkSslContext(getContext(allowUntrusted=false), true, null)
     val clientConfig = new DefaultAsyncHttpClientConfig.Builder()
       .setSslContext(context)
@@ -81,10 +89,9 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
         .withAcceptAnyCertificate(true)
         .withDisableHostnameVerification(disableHostnameVerification)
 
-    val sslConfig =
-      SSLConfigSettings()
-        .withLoose(loose)
-        .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
+    SSLConfigSettings()
+      .withLoose(loose)
+      .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
   }
 
   val system = TrustStoreConfig(data=None, filePath = Some("${java.home}/lib/security/cacerts"))
@@ -101,9 +108,8 @@ class SslContextManager @Inject()(val config: Config, val certificateService: Ce
           TrustManagerConfig()
             .withTrustStoreConfigs((trusts :+ system).toList)
 
-        val sslConfig =
-          SSLConfigSettings()
-            .withTrustManagerConfig(trustManagerConfig)
+        SSLConfigSettings()
+          .withTrustManagerConfig(trustManagerConfig)
       }
   }
 

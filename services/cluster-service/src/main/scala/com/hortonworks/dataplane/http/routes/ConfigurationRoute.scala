@@ -14,21 +14,23 @@ package com.hortonworks.dataplane.http.routes
 import javax.inject.Inject
 
 import akka.http.scaladsl.server.Directives._
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
 import com.hortonworks.dataplane.http.JsonSupport._
-
 import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Try}
 
-class ConfigurationRoute @Inject()(val ws: WSClient, val config: Config) extends BaseRoute {
+class ConfigurationRoute @Inject()(val ws: WSClient, val config: Config, val sslContextManager: SslContextManager) extends BaseRoute {
 
   val route =
     path("configuration" / "actions" / "reloadCertificates") {
       get {
         complete {
+          Try(sslContextManager.reload())
           success(Json.obj("status" -> 200))
         }
       }
