@@ -13,7 +13,7 @@ package com.hortonworks.dataplane.cs
 
 import java.net.{MalformedURLException, URL}
 
-import com.hortonworks.dataplane.commons.domain.Entities.Cluster
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
@@ -27,6 +27,7 @@ import scala.util.Try
 
 class AmbariClusterInterface(
     private val cluster: Cluster,
+    private val dpCluster: DataplaneCluster,
     private val credentials: Credentials,
     private val appConfig: Config,
     private val sslContextManager: SslContextManager)(implicit ws: WSClient)
@@ -50,6 +51,9 @@ class AmbariClusterInterface(
     )
     val url = Try(new URL(cluster.clusterUrl.get))
     require(url.isSuccess, "registered Ambari url is invalid")
+
+    val ws = sslContextManager.getWSClient(dpCluster.allowUntrusted)
+
     //Hit ambari URL
     ws.url(s"${url.get.toString}")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
