@@ -13,6 +13,7 @@ import {Component, OnInit} from '@angular/core';
 import {ProfilerService} from '../../../../services/profiler.service';
 import {LakeService} from '../../../../services/lake.service';
 import {JobsCountModel, ProfilerModel, ProfilerInfoWithAssetsCount, JobInfoModel} from '../../models/profilerModels';
+import { Lake } from '../../../../models/lake';
 
 // export class JobsCountModel {
 // 	Completed:number;
@@ -54,10 +55,9 @@ const senstivityProfilerData = [
 export class ProfilerConfigsComponent implements OnInit {
   
   clusters = [];
-  selectedLake = null;
+  selectedLake:Lake = null;
   profilers:Array<ProfilerInfoWithAssetsCount> = [];
   senstivityProfilerData = [];
-  currentClusterId:number;
 
   constructor( private lakeService: LakeService
              , private profilerService:ProfilerService
@@ -66,7 +66,6 @@ export class ProfilerConfigsComponent implements OnInit {
   ngOnInit() {
   	this.lakeService.listWithClusterId().subscribe(lakes => {
   	  this.clusters = lakes;
-      this.currentClusterId = lakes[0].clusterId;
   	  this.selectLake(lakes[0]);
 	  }); 
   }
@@ -92,7 +91,7 @@ export class ProfilerConfigsComponent implements OnInit {
     d.setHours(0,0,0,0);
     const startTime = d.getTime();
 
-    this.profilerService.getStatusWithAssetsCounts(this.currentClusterId, startTime, endTime)
+    this.profilerService.getStatusWithAssetsCounts(this.selectedLake.clusterId, startTime, endTime)
       .subscribe(infoAndCounts => {
         this.profilers = infoAndCounts
       });
