@@ -19,7 +19,6 @@ import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEnti
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
 import com.hortonworks.dataplane.cs.ClusterDataApi
-import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
@@ -60,8 +59,7 @@ object ClientExtension {
 
 class DefaultAtlasInterface(private val clusterId: Long,
                             private val config: Config,
-                            private val atlasApiData: ClusterDataApi,
-                            private val dpClusterService: DpClusterService)
+                            private val atlasApiData: ClusterDataApi)
     extends AtlasInterface {
 
   import scala.collection.JavaConverters._
