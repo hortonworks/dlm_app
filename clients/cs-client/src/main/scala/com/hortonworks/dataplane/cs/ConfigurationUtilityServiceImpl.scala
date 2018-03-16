@@ -28,7 +28,7 @@ class ConfigurationUtilityServiceImpl(val config: Config)(implicit ws: WSClient)
       .get()
       .map { res =>
         res.status match {
-          case 200 => res.json
+          case 200 => (res.json \ "results" \ "data").as[JsValue]
           case _ => throw WrappedErrorException(Error(status = 500, message = "Unable to reload certificates", code = "cluster.configuration.cert-reload-failed"))
         }
       }

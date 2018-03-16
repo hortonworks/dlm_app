@@ -22,7 +22,7 @@ import com.google.common.cache.{Cache, CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
-import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Error, HJwtToken, WrappedErrorException, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, DpClusterService}
 import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
@@ -174,12 +174,21 @@ class ClusterDataApi @Inject()(
 
   private def getKnoxUrl(dpc: Entities.DataplaneCluster, cs: CS) = {
     val topology = config.getString("dp.services.knox.token.target.topology")
+
     cs.properties match {
-      case Some(json) =>
+      case Some(json) => {
         val item = (json \ "items").as[JsArray].head
         val target = (item \ "configurations").as[List[JsValue]].find(v => (v \ "type").as[String] == "gateway-site")
         val gatewayPath = (target.get \ "properties" \ "gateway.path").as[String]
-        Some(s"${dpc.knoxUrl.get.stripSuffix("/")}/$gatewayPath/$topology")
+
+        // FIXME: We do not append gateway path if it is already saved in knoxUrl
+        var urlWithoutSuffix = dpc.knoxUrl.get.stripSuffix("/")
+        if (!urlWithoutSuffix.endsWith(gatewayPath)) {
+          urlWithoutSuffix = s"$urlWithoutSuffix/$gatewayPath"
+        }
+
+        Some(s"$urlWithoutSuffix/$topology")
+      }
       case None => None
     }
   }
@@ -190,7 +199,7 @@ class ClusterDataApi @Inject()(
       c <- Future.successful(cl.right.get)
       dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
       dpc <- Future.successful(dpce.right.get)
-      service <- clusterComponentService.getServiceByName(clusterId,Constants.KNOX)
+      service <- clusterComponentService.getServiceByName(clusterId, Constants.KNOX)
       cs <- Future.successful(service.right.get)
     } yield getKnoxUrl(dpc,cs)
   }
@@ -203,6 +212,15 @@ class ClusterDataApi @Inject()(
       dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
       dpc <- Future.successful(dpce.right.get)
     } yield dpc.ambariUrl
+  }
+
+  def getDataplaneCluster(clusterId: Long): Future[DataplaneCluster] = {
+    for{
+      cl <- clusterService.retrieve(clusterId.toString)
+      c <- Future.successful(cl.right.get)
+      dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
+      dpc <- Future.successful(dpce.right.get)
+    } yield dpc
   }
 
 }

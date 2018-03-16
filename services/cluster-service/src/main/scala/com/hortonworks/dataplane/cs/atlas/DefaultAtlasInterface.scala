@@ -15,17 +15,9 @@ import java.net.URL
 import javax.ws.rs.core.Cookie
 
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Atlas.{
-  AtlasAttribute,
-  AtlasEntities,
-  AtlasSearchQuery,
-  Entity
-}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, Entity}
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  HJwtToken,
-  ClusterService => CS
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
 import com.hortonworks.dataplane.cs.ClusterDataApi
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -235,21 +227,28 @@ sealed class AtlasApiSupplier(clusterId: Long,
     for {
       f <- for {
         url <- clusterDataApi.getAtlasUrl(clusterId)
+        dpCluster <- clusterDataApi.getDataplaneCluster(clusterId)
         shouldUseToken <- clusterDataApi.shouldUseToken(clusterId)
         array <- {
           val arr = url.map(_.toString).toArray
-          if (Try(config.getBoolean("dp.service.ambari.single.node.cluster"))
-                .getOrElse(false)) {
-            clusterDataApi.getAmbariUrl(clusterId).map { ambariUrl =>
-              arr.map { h =>
-                val oldUrl = new URL(h)
-                new URL(oldUrl.getProtocol,
-                        new URL(ambariUrl).getHost,
-                        oldUrl.getPort,
-                        oldUrl.getFile).toString
-              }
+          val isSingleNodeCluster = Try(config.getBoolean("dp.service.ambari.single.node.cluster")).getOrElse(false)
+
+          (isSingleNodeCluster, dpCluster.behindGateway) match {
+            case (_, true) => clusterDataApi.getKnoxUrl(clusterId).map(url => Array(s"${url.get}/atlas"))
+            case (true, false) => {
+              clusterDataApi.getAmbariUrl(clusterId)
+                .map { ambariUrl =>
+                  arr.map { h =>
+                    val oldUrl = new URL(h)
+                    new URL(oldUrl.getProtocol,
+                      new URL(ambariUrl).getHost,
+                      oldUrl.getPort,
+                      oldUrl.getFile).toString
+                  }
+                }
             }
-          } else Future.successful(arr)
+            case (_, _) => Future.successful(arr)
+          }
         }
         client <- {
           log.info(s"Atlas URL's loaded $url")

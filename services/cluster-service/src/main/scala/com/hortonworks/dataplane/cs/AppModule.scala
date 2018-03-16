@@ -302,7 +302,7 @@ object AppModule extends AbstractModule {
         ambariRoute.serviceStateRoute ~
         ambariRoute.ambariClusterProxy ~
         ambariRoute.ambariGenericProxy ~
-        configurationRoute.route
+        configurationRoute.reloadCertificates
     )
   }
 
