@@ -66,7 +66,7 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       }
     }
 
-    val hiveConfigs = clusterDefinitionRequest.nameNodeConfigs.foldLeft("": String) {
+    val hiveConfigs = clusterDefinitionRequest.hiveConfigs.foldLeft("": String) {
       (acc, next) => {
         next._2 match {
           case Some(value) => acc + s"${next._1} = $value\n"
