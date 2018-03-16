@@ -43,7 +43,7 @@ export class ProfilerService {
   }
 
   getStatusWithJobCounts(clusterId:number, startTime:number, endTime:number) : Observable<Array<ProfilerInfoWithJobsCount>> {
-    const uri = `/api/dpProfiler/status-with-jobs-count?clusterId=${clusterId}&startTime=${startTime}&endTime=${endTime}`;
+    const uri = `/api/dpProfiler/${clusterId}/status-with-jobs-count?startTime=${startTime}&endTime=${endTime}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -52,7 +52,7 @@ export class ProfilerService {
   }
 
   getStatusWithAssetsCounts(clusterId:number, startTime:number, endTime:number) : Observable<Array<ProfilerInfoWithAssetsCount>> {
-    const uri = `/api/dpProfiler/status-with-assets-count?clusterId=${clusterId}&startTime=${startTime}&endTime=${endTime}`;
+    const uri = `/api/dpProfiler/${clusterId}/status-with-assets-count?startTime=${startTime}&endTime=${endTime}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)

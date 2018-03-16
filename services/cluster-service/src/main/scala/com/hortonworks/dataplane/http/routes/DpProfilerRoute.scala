@@ -204,19 +204,11 @@ class DpProfilerRoute @Inject()(
 
   val getProfilersStatusWithJobSummary =
     path("cluster" / LongNumber / "dp-profiler" / "status" / "jobs-summary") { clusterId =>
-      get {
-        parameters('startTime.as[String], 'endTime.as[String]) { (startTime, endTime) =>
-          onComplete(getProfilersJobsSummary(clusterId, startTime, endTime)) {
-            case Success(res) => res.status match {
-              case 200 => complete(success(res.json))
-              case 404 => complete(StatusCodes.NotFound, notFound)
-              case 503 => complete(StatusCodes.ServiceUnavailable, serverError)
-              case _ => complete(StatusCodes.InternalServerError, serverError)
-            }
-            case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
-              case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
-            }
+      extractRequest { request =>
+        get {
+          val queryString = request.uri.queryString()
+          onComplete(getFromProfiler(clusterId, "/profilerjobs/jobscount", queryString.getOrElse(""))) {
+            case res => mapResponse(res)
           }
         }
       }
@@ -224,19 +216,11 @@ class DpProfilerRoute @Inject()(
 
   val getProfilersStatusWithAssetsCount =
     path("cluster" / LongNumber / "dp-profiler" / "status" / "asset-count") { clusterId =>
-      get {
-        parameters('startTime.as[String], 'endTime.as[String]) { (startTime, endTime) =>
-          onComplete(getProfilersAssetsSummary(clusterId, startTime, endTime)) {
-            case Success(res) => res.status match {
-              case 200 => complete(success(res.json))
-              case 404 => complete(StatusCodes.NotFound, notFound)
-              case 503 => complete(StatusCodes.ServiceUnavailable, serverError)
-              case _ => complete(StatusCodes.InternalServerError, serverError)
-            }
-            case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
-              case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
-            }
+      extractRequest { request =>
+        get {
+          val queryString = request.uri.queryString()
+          onComplete(getFromProfiler(clusterId, "/profilerjobs/assetscount", queryString.getOrElse(""))) {
+            case res => mapResponse(res)
           }
         }
       }
@@ -247,22 +231,42 @@ class DpProfilerRoute @Inject()(
       extractRequest { request =>
         get {
           val queryString = request.uri.queryString()
-          onComplete(getProfilersJobs(clusterId, queryString.getOrElse(""))) {
-            case Success(res) => res.status match {
-              case 200 => complete(success(res.json))
-              case 404 => complete(StatusCodes.NotFound, notFound)
-              case 503 => complete(StatusCodes.ServiceUnavailable, serverError)
-              case _ => complete(StatusCodes.InternalServerError, serverError)
-            }
-            case Failure(th) => th match {
-              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
-              case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
-            }
+          onComplete(getFromProfiler(clusterId, "/profilerjobs", queryString.getOrElse(""))) {
+            case res => mapResponse(res)
           }
         }
       }
     }
 
+  private def mapResponse(resposneTry: Try[WSResponse]) = {
+    resposneTry match {
+      case Success(res) => res.status match {
+        case 200 => complete(success(res.json))
+        case 404 => complete(StatusCodes.NotFound, notFound)
+        case 503 => complete(StatusCodes.ServiceUnavailable, serverError)
+        case _ => complete(StatusCodes.InternalServerError, serverError)
+      }
+      case Failure(th) => th match {
+        case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+        case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
+      }
+    }
+
+  }
+
+  private def getFromProfiler(clusterId: Long, uriPath:String, queryString: String): Future[WSResponse] = {
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}${uriPath}?$queryString")
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json")
+        .get()
+    } yield {
+      response
+    }
+  }
 
   private def getAuditResults(clusterId: Long, dbName: String, tableName: String, userName: String, startDate: String, endDate: String): Future[WSResponse] = {
     val postData = Json.obj(
@@ -358,49 +362,6 @@ class DpProfilerRoute @Inject()(
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .delete()
-      } yield {
-        response
-      }
-    }
-
-    private def getProfilersJobsSummary(clusterId: Long, startTime: String, endTime: String): Future[WSResponse] = {
-      for {
-        config <- getConfigOrThrowException(clusterId)
-        url <- getUrlFromConfig(config)
-        baseUrls <- extractUrlsWithIp(url, clusterId)
-        urlToHit <- Future.successful(s"${baseUrls.head}/profilerjobs/jobscount?startTime=$startTime&endTime=$endTime")
-        _ <- Future.successful(println(urlToHit))
-        response <- ws.url(urlToHit)
-          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-          .get()
-      } yield {
-        response
-      }
-    }
-
-    private def getProfilersAssetsSummary(clusterId: Long, startTime: String, endTime: String): Future[WSResponse] = {
-      for {
-        config <- getConfigOrThrowException(clusterId)
-        url <- getUrlFromConfig(config)
-        baseUrls <- extractUrlsWithIp(url, clusterId)
-        urlToHit <- Future.successful(s"${baseUrls.head}/profilerjobs/assetscount?startTime=$startTime&endTime=$endTime")
-        response <- ws.url(urlToHit)
-          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-          .get()
-      } yield {
-        response
-      }
-    }
-
-    private def getProfilersJobs(clusterId: Long, queryString: String): Future[WSResponse] = {
-      for {
-        config <- getConfigOrThrowException(clusterId)
-        url <- getUrlFromConfig(config)
-        baseUrls <- extractUrlsWithIp(url, clusterId)
-        urlToHit <- Future.successful(s"${baseUrls.head}/profilerjobs?$queryString")
-        response <- ws.url(urlToHit)
-          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-          .get()
       } yield {
         response
       }
