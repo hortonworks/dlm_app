@@ -9,11 +9,12 @@
 
 import { ActionWithPayload } from 'actions/actions.type';
 
-import { requestType } from 'utils/type-action';
+import { requestType, createRequestAction } from 'utils/type-action';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 
 export const ActionTypes = {
-  LOAD_BEACON_ADMIN_STATUS: requestType('LOAD_BEACON_ADMIN_STATUS')
+  LOAD_BEACON_ADMIN_STATUS: requestType('LOAD_BEACON_ADMIN_STATUS'),
+  LOAD_BEACON_CONFIG_STATUS: requestType('LOAD_BEACON_CONFIG_STATUS')
 };
 
 export const loadBeaconAdminStatus = (meta = {}): ActionWithPayload<any> => ({
@@ -29,4 +30,12 @@ export const loadBeaconAdminStatusSuccess = (response, meta): ActionSuccess => (
 export const loadBeaconAdminStatusFailure = (error, meta): ActionFailure => ({
   type: ActionTypes.LOAD_BEACON_ADMIN_STATUS.FAILURE,
   payload: {error, meta}
+});
+
+export const {
+  loadBeaconConfigStatus,
+  loadBeaconConfigStatusSuccess,
+  loadBeaconConfigStatusFailure
+} = createRequestAction(ActionTypes.LOAD_BEACON_CONFIG_STATUS, {
+  start: (meta) => ({ meta })
 });

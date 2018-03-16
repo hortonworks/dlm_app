@@ -34,6 +34,7 @@ import * as fromCloudAccount from './cloud-account.reducer';
 import * as fromCloudContainer from './cloud-container.reducer';
 import * as fromCloudContainerItem from './cloud-container-item.reducer';
 import * as fromBeaconCloudCred from './beacon-cloud-cred.reducer';
+import * as fromBeaconConfigStatus from './beacon-config-status.reducer';
 
 export interface State {
   router: RouterReducerState;
@@ -56,6 +57,7 @@ export interface State {
   cloudContainerItems: fromCloudContainerItem.State;
   beaconCloudCreds: fromBeaconCloudCred.State;
   createPolicyWizard: fromCreatePolicy.State;
+  beaconConfigStatuses: fromBeaconConfigStatus.State;
 }
 
 export const reducers: ActionReducerMap<State> = {
@@ -78,7 +80,8 @@ export const reducers: ActionReducerMap<State> = {
   cloudContainers: fromCloudContainer.reducer,
   cloudContainerItems: fromCloudContainerItem.reducer,
   beaconCloudCreds: fromBeaconCloudCred.reducer,
-  createPolicyWizard: fromCreatePolicy.reducer
+  createPolicyWizard: fromCreatePolicy.reducer,
+  beaconConfigStatuses: fromBeaconConfigStatus.reducer
 };
 
 export const logger = (reducer: ActionReducer<State>) => {

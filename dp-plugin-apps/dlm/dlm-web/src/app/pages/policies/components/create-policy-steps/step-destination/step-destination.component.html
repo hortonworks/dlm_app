@@ -55,7 +55,7 @@
 
             <!-- DESTINATION PATH -->
             <div class="row">
-              <div class="col-xs-4" *ngIf="isClusterType && isClusterSelected">
+              <div class="col-xs-4" *ngIf="shouldShowDestination">
                 <dlm-form-field
                   [label]="destinationPathLabel"
                   [fieldClass]="'col-xs-12'"
@@ -75,7 +75,7 @@
             <!-- DESTINATION PATH END -->
 
             <!-- DESTINATION TDE KEY -->
-            <div class="row" *ngIf="isSourceEncrypted && isClusterSelected && isClusterType">
+            <div class="row" *ngIf="shouldShowTDEKey">
               <div class="col-xs-4">
                 <dlm-form-field
                   [label]="'page.policies.form.fields.destinationCluster.tdeKey' | translate"
@@ -93,7 +93,7 @@
 
             <!-- DESTINATION CLOUD ACCOUNT -->
             <div class="row">
-              <div class="col-xs-4" *ngIf="form.get('destination.type').value === SOURCE_TYPES.S3">
+              <div class="col-xs-4" *ngIf="isCloudReplication">
                 <dlm-form-field
                   [label]="'page.policies.form.fields.s3.account' | translate"
                   [required]="true"
@@ -127,7 +127,7 @@
 
             <!-- DESTINATION S3 ENDPOINT -->
             <div class="row">
-              <div class="col-xs-4" *ngIf="form.get('destination.cloudAccount').value && form.get('destination.type').value === SOURCE_TYPES.S3">
+              <div class="col-xs-4" *ngIf="shouldShowS3Endpoint">
                 <dlm-form-field
                   [label]="'page.policies.form.fields.s3.endpoint' | translate"
                   [errorClass]="'col-xs-12'"
@@ -136,8 +136,9 @@
                   <div class="input-group">
                     <div class="input-group-addon">{{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}://</div>
                     <input
+                      [readonly]="isHivePolicy && !isHiveOnPremReplication"
                       type="text"
-                      class="form-control"
+                      class="form-control s3endpoint"
                       qe-attr="destinationS3endpoint"
                       formField
                       formControlName="s3endpoint"/>
@@ -156,6 +157,7 @@
                 [disabled]="form.get('destination.skipValidation').value || validationInProgress"
                 type="button"
                 class="btn btn-success"
+                qe-attr="validate-policy"
                 (click)="validate()">
                 &nbsp;{{"page.policies.form.validateBtn" | translate}} <i *ngIf="validationInProgress" class="fa fa-fw fa-spinner fa-spin"></i>
                 <i class="glyphicon glyphicon-ok" *ngIf="form.get('destination.validationStatus').value && !validationInProgress"></i>
@@ -167,6 +169,7 @@
               </div>
             </div>
           </div>
+
         </fieldset>
       </div>
     </div>

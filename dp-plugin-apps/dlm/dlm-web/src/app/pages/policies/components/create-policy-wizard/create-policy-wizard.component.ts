@@ -40,6 +40,8 @@ import { ProgressState } from 'models/progress-state.model';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 import { truncate } from 'pipes/truncate.pipe';
 import { TranslateService } from '@ngx-translate/core';
+import { getUnderlyingHiveFS } from 'utils/cluster-util';
+import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -183,13 +185,16 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
 
     let clusterId;
     const sc = this.clusters.find(c => c.id === source.cluster);
+    const dc = this.clusters.find(c => c.id === destination.cluster);
+    const isHiveCloud = general.type === POLICY_TYPES.HIVE && getUnderlyingHiveFS(dc) === UnderlyingFsForHive.S3;
 
     if (destination.type === SOURCE_TYPES.CLUSTER) {
-      // destination cluster
-      const dc = this.clusters.find(c => c.id === destination.cluster);
-      clusterId = dc.id;
+      clusterId = isHiveCloud ? sc.id : dc.id;
       policyData.policyDefinition.targetCluster = PolicyService.makeClusterId(dc.dataCenter, dc.name);
       policyData.policyDefinition.targetDataset = destination.path;
+      if (isHiveCloud) {
+        policyData.policyDefinition.cloudCred = destination.cloudAccount;
+      }
     } else {
       clusterId = sc.id;
       if (destination.type === SOURCE_TYPES.S3) {

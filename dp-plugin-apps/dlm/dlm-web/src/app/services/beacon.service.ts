@@ -10,6 +10,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BeaconCloudCredWithPoliciesResponse, BeaconCloudCredentialsResponse } from 'models/beacon-cloud-cred.model';
+import { BeaconConfigStatusResponse } from 'models/beacon-config-status.model';
 import { Observable } from 'rxjs/Observable';
 import { PolicyService } from 'services/policy.service';
 
@@ -52,6 +53,10 @@ export class BeaconService {
         allCloudCreds
       };
     });
+  }
+
+  fetchBeaconConfigStatus(): Observable<BeaconConfigStatusResponse> {
+    return this.httpClient.get<BeaconConfigStatusResponse>('clusters/beacon/config/status');
   }
 
   constructor(private httpClient: HttpClient, private policyService: PolicyService) { }

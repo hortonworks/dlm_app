@@ -29,7 +29,7 @@ import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Subscription } from 'rxjs/Subscription';
 import { getClusterEntities, clusterToListOption } from 'utils/policy-util';
 import { validatePolicy } from 'actions/policy.action';
-import { multiLevelResolve, omitEmpty } from 'utils/object-utils';
+import { multiLevelResolve, omitEmpty, isEmpty, omit } from 'utils/object-utils';
 import { getPolicyValidationProgress } from 'selectors/create-policy.selector';
 import { PROGRESS_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
@@ -39,8 +39,8 @@ import { HiveService } from 'services/hive.service';
 import { AsyncActionsService } from 'services/async-actions.service';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { loadDatabases } from 'actions/hivelist.action';
-import { omit, isEmpty } from 'utils/object-utils';
 import { filterClustersByTDE } from 'utils/cluster-util';
+import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
 
 export function validationStatusValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
@@ -57,7 +57,8 @@ export function validationStatusValidator(): ValidatorFn {
   selector: 'dlm-step-destination',
   templateUrl: './step-destination.component.html',
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./step-destination.component.scss']
 })
 export class StepDestinationComponent implements OnInit, OnDestroy, StepComponent {
 
@@ -107,6 +108,21 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     return this.isCloudType && this.isCloudAccountSelected && form.get('destination.s3endpoint').value ||
       this.isClusterType && this.isClusterSelected && form.get('destination.path').value;
   }
+  get selectedCluster(): Cluster {
+    return this.clusters.find(cluster => cluster.id === +this.form.get('destination.cluster').value);
+  }
+
+  get isHdfsPolicy(): boolean {
+    return this.general.type === POLICY_TYPES.HDFS;
+  }
+
+  get isHivePolicy(): boolean {
+    return this.general.type === POLICY_TYPES.HIVE;
+  }
+
+  get isHiveOnPremReplication(): boolean {
+    return this.isClusterSelected && this.checkHiveOnPrem(this.selectedCluster.id);
+  }
 
   get destinationType() {
     return this.form.value.destination.type;
@@ -132,8 +148,14 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     return '';
   }
 
+  // TODO: add more types once we will support more providers than S3
   get destinationCloudAccounts() {
-    return this.filterCloudAccounts(this.form.value.destination.type);
+    return this.filterCloudAccounts(SOURCE_TYPES.S3);
+  }
+
+  get isCloudReplication(): boolean {
+    return this.form.get('destination.type').value === SOURCE_TYPES.S3 ||
+      (this.isHivePolicy && this.selectedCluster && !this.isHiveOnPremReplication);
   }
 
   get isClusterType(): boolean {
@@ -214,7 +236,22 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   }
 
   get shouldShowTDEWarning(): boolean {
-    return this.isSourceEncrypted && this.form.get('destination.tdeKey').value === TDE_KEY_TYPE.SAME_KEY;
+    return this.shouldShowTDEKey && this.form.get('destination.tdeKey').value === TDE_KEY_TYPE.SAME_KEY;
+  }
+
+  get shouldShowTDEKey(): boolean {
+    if (this.isSourceEncrypted && this.isClusterSelected) {
+      return this.isHdfsPolicy || this.isHiveOnPremReplication;
+    }
+    return false;
+  }
+
+  get shouldShowS3Endpoint(): boolean {
+    return this.form.get('destination.cloudAccount').value;
+  }
+
+  get shouldShowDestination(): boolean {
+    return this.isClusterSelected && this.isHdfsPolicy || this.isHiveOnPremReplication;
   }
 
   get isSourceEncrypted(): boolean {
@@ -250,6 +287,22 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     });
   }
 
+  private skipValidation(skip = true): void {
+    this.form.patchValue({
+      destination: {
+        skipValidation: skip
+      }
+    });
+  }
+
+  private disableFields(fields: string[]): void {
+    fields.forEach(f => this.form.get('destination').get(f).disable());
+  }
+
+  private enableFields(fields: string[]): void {
+    fields.forEach(f => this.form.get('destination').get(f).enable());
+  }
+
   /**
    * Reset destination form group if Source Type is changed
    * Reset other fields in the Source form group
@@ -269,21 +322,13 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       }
       if (type === SOURCE_TYPES.CLUSTER && this.source.type === SOURCE_TYPES.CLUSTER) {
         this.cloudIsUsedForPolicy = false;
-        this.form.patchValue({
-          destination: {
-            skipValidation: true
-          }
-        });
+        this.skipValidation();
       } else {
         this.cloudIsUsedForPolicy = true;
-        this.form.patchValue({
-          destination: {
-            skipValidation: false
-          }
-        });
+        this.skipValidation(false);
       }
-      toDisable.forEach(p => destinationControls[p].disable());
-      toEnable.forEach(p => destinationControls[p].enable());
+      this.enableFields(toEnable);
+      this.disableFields(toDisable);
     });
     this.subscriptions.push(subscription);
   }
@@ -337,6 +382,46 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     this.subscriptions.push();
   }
 
+  private subscribeToCluster(form: FormGroup): void {
+    const clusterChange$ = form.get('destination.cluster').valueChanges.distinctUntilChanged();
+    const updateHiveFieldsAccess = clusterChange$.subscribe(value => {
+      if (this.form.get('destination.cluster').disabled) {
+        return;
+      }
+      if (this.isHivePolicy) {
+        if (!this.checkHiveOnPrem(value)) {
+          this.cloudIsUsedForPolicy = true;
+          this.enableFields(['path'].concat(this.s3Fields));
+          const selectedCluster = this.clusters.find(c => c.id === +value);
+          if (selectedCluster) {
+            const configs = multiLevelResolve(selectedCluster, 'beaconConfigStatus.configs');
+            const s3Dir = (configs || {})['hive.metastore.warehouse.dir'];
+            if (s3Dir) {
+              const matched = s3Dir.match(/:\/\/(.+)/);
+              form.patchValue({ destination: {
+                s3endpoint: matched && matched[1] || ''
+              }});
+            }
+          }
+        } else {
+          this.cloudIsUsedForPolicy = false;
+          this.disableFields(this.s3Fields);
+        }
+        return;
+      }
+      if (this.isCloudReplication) {
+        this.cloudIsUsedForPolicy = true;
+        this.disableFields(['path']);
+        this.enableFields(this.s3Fields);
+      } else {
+        this.cloudIsUsedForPolicy = false;
+        this.enableFields(['path']);
+        this.disableFields(this.s3Fields);
+      }
+    });
+    this.subscriptions.push(updateHiveFieldsAccess);
+  }
+
   ngOnInit() {
     this.form = this.initForm();
     const validationSubscription = this.store.select(getPolicyValidationProgress)
@@ -386,6 +471,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
     }));
     this.subscribeToDestinationType();
     this.subscribeToDestinationPath(this.form);
+    this.subscribeToCluster(this.form);
   }
 
   policyFieldsUpdated(currentFormValue): boolean {
@@ -398,6 +484,12 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
         s.unsubscribe();
       }
     });
+  }
+
+  checkHiveOnPrem(clusterId): boolean {
+    const cluster = this.clusters.find(c => c.id === +clusterId);
+    return cluster && cluster.beaconConfigStatus &&
+      cluster.beaconConfigStatus.underlyingFsForHive === UnderlyingFsForHive.HDFS;
   }
 
   isFormValid() {

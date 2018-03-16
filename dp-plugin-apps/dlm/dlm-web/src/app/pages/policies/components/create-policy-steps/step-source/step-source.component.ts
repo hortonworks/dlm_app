@@ -18,7 +18,7 @@ import { CloudContainer } from 'models/cloud-container.model';
 import { CloudAccount } from 'models/cloud-account.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
 import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS} from 'constants/policy.constant';
 import { getStep } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
@@ -44,7 +44,10 @@ import { HiveService } from 'services/hive.service';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { filterClustersByTDE } from 'utils/cluster-util';
 import { SERVICES } from 'constants/cluster.constant';
-import { uniqBy } from 'utils/array-util';
+import { uniqBy, contains } from 'utils/array-util';
+import { loadBeaconConfigStatus } from 'actions/beacon.action';
+import { StepGeneralValue } from 'models/create-policy-form.model';
+import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
 
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
@@ -71,7 +74,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
   SOURCE_TYPES = SOURCE_TYPES;
   SOURCE_TYPES_LABELS = SOURCE_TYPES_LABELS;
   form: FormGroup;
-  general: any = {};
+  general: StepGeneralValue = {} as StepGeneralValue;
   WIZARD_STEP_ID = WIZARD_STEP_ID;
   root = '/';
   hdfsRootPath = '/';
@@ -90,6 +93,9 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
    */
   clusterFields = ['cluster'];
 
+  hiveFields = ['databases'];
+  hdfsFields = ['directories'];
+
   /**
    * List of field-names related to cloud (source or destination)
    *
@@ -106,8 +112,14 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
   }
 
   get sourceClusters() {
-    const clusters = this.general.type === POLICY_TYPES.HDFS ? this.sourceHdfsClusters : this.clusters;
+    const clusters = this.general.type === POLICY_TYPES.HDFS ? this.sourceHdfsClusters : this.sourceHiveClusters;
     return clusters.map(cluster => clusterToListOption(cluster));
+  }
+
+  get sourceHiveClusters() {
+    return this.clusters.filter(cluster => cluster.beaconConfigStatus &&
+      cluster.beaconConfigStatus.underlyingFsForHive === UnderlyingFsForHive.HDFS &&
+      this.hasPair(cluster, this.pairings));
   }
 
   get sourceHdfsClusters() {
@@ -166,18 +178,23 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
     });
   }
 
+  private getControlSafe(name: string, form: AbstractControl = this.form): AbstractControl {
+    const f = () => '';
+    const mock = {disable: f, enable: f};
+    return (form.get(name) || mock) as AbstractControl;
+  }
+
   ngOnInit() {
     this.form = this.initForm();
     this.store.select(getStep(this.WIZARD_STEP_ID.GENERAL)).subscribe(general => {
       this.general = general && 'value' in general ? general['value'] : {};
       if ('type' in this.general) {
         const selectedServiceType = this.general['type'];
-        const sourceControls = this.form.controls.source['controls'];
-        if (selectedServiceType === POLICY_TYPES.HDFS) {
-          sourceControls['databases'].disable();
-        } else if (selectedServiceType === POLICY_TYPES.HIVE) {
-          sourceControls['directories'].disable();
-        }
+        const sourceControls = this.form.get('source');
+        const enable = POLICY_TYPES.HDFS ? this.hdfsFields : this.hiveFields;
+        const disable = POLICY_TYPES.HDFS ? this.hiveFields : this.hdfsFields;
+        enable.forEach(f => this.getControlSafe(f, sourceControls).enable());
+        disable.forEach(f => this.getControlSafe(f, sourceControls).disable());
       }
     });
     const formSubscription = this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
@@ -259,15 +276,11 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
       let toEnable = [], toDisable = [];
       if (type === this.SOURCE_TYPES.S3) {
         toEnable = this.s3Fields;
-        toDisable = this.clusterFields;
-        sourceControls['directories'].disable();
+        toDisable = this.clusterFields.concat(this.hdfsFields, this.hiveFields);
       }
       if (type === this.SOURCE_TYPES.CLUSTER) {
-        toEnable = this.clusterFields;
-        toDisable = this.s3Fields;
-        if (this.general['type'] === POLICY_TYPES.HDFS) {
-          sourceControls['directories'].enable();
-        }
+        toEnable = this.clusterFields.concat(this.general.type === POLICY_TYPES.HDFS ? this.hdfsFields : this.hiveFields);
+        toDisable = this.s3Fields.concat(this.general.type === POLICY_TYPES.HDFS ? this.hiveFields : this.hdfsFields);
       }
       toDisable.forEach(p => sourceControls[p].disable());
       toEnable.forEach(p => sourceControls[p].enable());
@@ -358,6 +371,10 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
       form.patchValue({source: {datasetEncrypted: isEncrypted}});
     });
     this.subscriptions.push(updateEncryptionValue);
+  }
+
+  private hasPair(cluster: Cluster, pairings: Pairing[]): boolean {
+    return pairings.some(pairing => contains(pairing.pair.map(p => p.id), cluster.id));
   }
 
   ngOnDestroy() {

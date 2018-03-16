@@ -11,7 +11,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 
-import { loadBeaconAdminStatusSuccess, loadBeaconAdminStatusFailure, ActionTypes as beaconActions } from 'actions/beacon.action';
+import {
+  ActionTypes as beaconActions,
+  loadBeaconAdminStatusSuccess,
+  loadBeaconAdminStatusFailure,
+  loadBeaconConfigStatusSuccess,
+  loadBeaconConfigStatusFailure } from 'actions/beacon.action';
 import { BeaconService } from 'services/beacon.service';
 
 @Injectable()
@@ -25,6 +30,15 @@ export class BeaconEffects {
       .fetchBeaconAdminStatus()
       .map(result => loadBeaconAdminStatusSuccess(result, payload.meta))
       .catch(err => Observable.of(loadBeaconAdminStatusFailure(err, payload.meta))));
+
+  @Effect()
+  loadBeaconConfigStatus$: Observable<any> = this.actions$
+    .ofType(beaconActions.LOAD_BEACON_CONFIG_STATUS.START)
+    .map(toPayload)
+    .switchMap(payload => this.beaconService
+      .fetchBeaconConfigStatus()
+      .map(response => loadBeaconConfigStatusSuccess(response, payload.meta))
+      .catch(err => Observable.of(loadBeaconConfigStatusFailure(err, payload.meta))));
 
   constructor(private actions$: Actions, private beaconService: BeaconService) {}
 }

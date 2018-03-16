@@ -125,7 +125,8 @@ export class CloudAccountsListComponent implements OnInit {
   }
 
   isOutOfSync(account: CloudAccountUI): boolean {
-    return account.clusters.some(cluster => cluster.isInSync === false) && !this.isUnregistered(account);
+    const clusters = account.clusters || [];
+    return clusters.some(cluster => cluster.isInSync === false) && !this.isUnregistered(account);
   }
 
   isUnregistered(account: CloudAccountUI): boolean {

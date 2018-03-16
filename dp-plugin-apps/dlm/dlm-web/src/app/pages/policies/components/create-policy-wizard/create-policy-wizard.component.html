@@ -75,6 +75,7 @@
                 <div wizard-content-body>
                   <dlm-step-advanced
                     #advanced
+                    [clusters]="clusters"
                     (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-advanced>
                 </div>
                 <div wizard-content-summary>
