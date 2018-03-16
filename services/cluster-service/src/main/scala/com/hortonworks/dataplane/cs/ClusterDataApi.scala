@@ -174,12 +174,21 @@ class ClusterDataApi @Inject()(
 
   private def getKnoxUrl(dpc: Entities.DataplaneCluster, cs: CS) = {
     val topology = config.getString("dp.services.knox.token.target.topology")
+
     cs.properties match {
-      case Some(json) =>
+      case Some(json) => {
         val item = (json \ "items").as[JsArray].head
         val target = (item \ "configurations").as[List[JsValue]].find(v => (v \ "type").as[String] == "gateway-site")
         val gatewayPath = (target.get \ "properties" \ "gateway.path").as[String]
-        Some(s"${dpc.knoxUrl.get.stripSuffix("/")}/$gatewayPath/$topology")
+
+        // FIXME: We do not append gateway path if it is already saved in knoxUrl
+        var urlWithoutSuffix = dpc.knoxUrl.get.stripSuffix("/")
+        if (!urlWithoutSuffix.endsWith(gatewayPath)) {
+          urlWithoutSuffix = s"$urlWithoutSuffix/$gatewayPath"
+        }
+
+        Some(s"$urlWithoutSuffix/$topology")
+      }
       case None => None
     }
   }
