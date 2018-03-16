@@ -18,7 +18,7 @@ import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.google.common.annotations.VisibleForTesting
 import com.hortonworks.dataplane.CSConstants
-import com.hortonworks.dataplane.commons.domain.Entities.ClusterService
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService, Error, WrappedErrorException}
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.{ClusterDataApi, CredentialInterface, Credentials, StorageInterface}
@@ -149,9 +149,7 @@ class RangerRoute @Inject()(
                                     offset,
                                     pageSize)
       case _ =>
-        throw UnsupportedInputException(
-          1001,
-          "This is not a supported Ranger service.")
+        throw WrappedErrorException(Error(500, "This is not a supported Ranger service.", "cluster.ranger.unsupported-service"))
     }
   }
 
