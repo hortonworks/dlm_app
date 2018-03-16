@@ -22,7 +22,7 @@ import com.google.common.cache.{Cache, CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
-import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Error, HJwtToken, WrappedErrorException, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, DpClusterService}
 import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
@@ -203,6 +203,15 @@ class ClusterDataApi @Inject()(
       dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
       dpc <- Future.successful(dpce.right.get)
     } yield dpc.ambariUrl
+  }
+
+  def getDataplaneCluster(clusterId: Long): Future[DataplaneCluster] = {
+    for{
+      cl <- clusterService.retrieve(clusterId.toString)
+      c <- Future.successful(cl.right.get)
+      dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
+      dpc <- Future.successful(dpce.right.get)
+    } yield dpc
   }
 
 }

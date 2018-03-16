@@ -436,20 +436,23 @@ class DpProfilerRoute @Inject()(
   }
 
   def extractUrlsWithIp(urlObj: URL, clusterId: Long): Future[Seq[String]] = {
-    if (Try(config.getBoolean("dp.service.ambari.single.node.cluster"))
-      .getOrElse(false)) {
-      clusterDataApi.getAmbariUrl(clusterId).map { ambari =>
-        Seq(
-          s"${urlObj.getProtocol}://${new URL(ambari).getHost}:${urlObj.getPort}")
-      }
-    } else {
+    val isSingleNodeCluster = Try(config.getBoolean("dp.service.ambari.single.node.cluster")).getOrElse(false)
 
-      clusterHostsService.getHostByClusterAndName(clusterId, urlObj.getHost)
-        .map {
-          case Right(host) => Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
-          case Left(errors) => throw new Exception(s"Cannot translate the hostname into an IP address $errors")
+    clusterDataApi.getDataplaneCluster(clusterId)
+      .flatMap { dpCluster =>
+
+        (isSingleNodeCluster, dpCluster.behindGateway) match {
+          case (_, true) => clusterDataApi.getKnoxUrl(clusterId).map(url => Seq(s"${url.get}/profiler-agent"))
+          case (true, false) => clusterDataApi.getAmbariUrl(clusterId).map { ambari =>
+            Seq(s"${urlObj.getProtocol}://${new URL(ambari).getHost}:${urlObj.getPort}")
+          }
+          case (_, _) => clusterHostsService.getHostByClusterAndName(clusterId, urlObj.getHost)
+            .map {
+              case Right(host) => Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
+              case Left(errors) => throw new Exception(s"Cannot translate the hostname into an IP address $errors")
+            }
         }
-    }
+      }
   }
 
 }
