@@ -21,6 +21,7 @@ import com.hortonworks.dataplane.commons.domain.Entities
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.cs.sync.TaskStatus.TaskStatus
 import com.hortonworks.dataplane.cs._
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import com.hortonworks.dataplane.knox.Knox.KnoxConfig
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
@@ -38,7 +39,8 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                               val storageInterface: StorageInterface,
                               val credentialInterface: CredentialInterface,
                               val dpClusterService: DpClusterService,
-                              val wSClient: WSClient) {
+                              val wSClient: WSClient,
+                              val sslContextManager: SslContextManager) {
 
   val logger = Logger(classOf[DpClusterSync])
 
@@ -68,7 +70,8 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
           wSClient,
           config,
-          creds))
+          creds,
+          sslContextManager))
       clusterNames <- interface.discoverClusters
       clusterDetails <- interface.getClusterDetails(clusterNames.head)
     } yield (clusterNames.head, clusterDetails)
@@ -150,7 +153,8 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                 wSClient,
                 storageInterface,
                 credentialInterface,
-                completionCallback))
+                completionCallback,
+                sslContextManager))
             actorRef.set(sync)
             storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNC_IN_PROGRESS")))
             logger.info(s"Starting cluster sync for ${dataplaneCluster.ambariUrl}")

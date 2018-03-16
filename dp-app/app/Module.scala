@@ -16,7 +16,7 @@ import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
-import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
+import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService, ConfigurationUtilityService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.cs._
@@ -86,6 +86,13 @@ class Module extends AbstractModule {
   @Named("certificateService")
   def provideCertificateService(implicit ws: WSClient, configuration: Configuration): CertificateService = {
     new CertificateServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("clusterUtilityService")
+  def provideClusterUtilityService(implicit ws: WSClient, configuration: Configuration): ConfigurationUtilityService = {
+    new ConfigurationUtilityServiceImpl(configuration.underlying)
   }
 
 

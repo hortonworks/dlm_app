@@ -200,6 +200,6 @@ private[http] class AtlasInterfaceSupplier(
     extends Supplier[AtlasInterface] {
 
   override def get(): AtlasInterface = {
-    new DefaultAtlasInterface(clusterId,config,atlasApiData)
+    new DefaultAtlasInterface(clusterId, config, atlasApiData)
   }
 }

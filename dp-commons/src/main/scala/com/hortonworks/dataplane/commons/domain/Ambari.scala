@@ -41,7 +41,8 @@ object Ambari {
                                  knoxUrl: Option[String],
                                  ambariUser: Option[String],
                                  ambariPass: Option[String],
-                                 knoxTopology: Option[String]) {
+                                 knoxTopology: Option[String],
+                                 allowUntrusted: Boolean) {
 
     def hasCredentials =  ambariUser.isDefined && ambariPass.isDefined && knoxTopology.isEmpty
     def hasTopology = knoxTopology.isDefined && ambariUser.isEmpty && ambariPass.isEmpty

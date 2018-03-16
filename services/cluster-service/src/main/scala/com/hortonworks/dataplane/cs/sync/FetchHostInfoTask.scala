@@ -17,6 +17,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.ClusterHost
 import com.hortonworks.dataplane.cs.{CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.cs.sync.TaskStatus.TaskStatus
 import com.hortonworks.dataplane.cs.sync.TaskType.TaskType
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
 
@@ -24,7 +25,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FetchHostInfoTask(cl: ClusterData, c: Config, w: WSClient, si: StorageInterface,
-                        credentialInterface: CredentialInterface, cs: ActorRef) extends ClusterSyncTask(cl,c,w,si, credentialInterface, cs) {
+                        credentialInterface: CredentialInterface, cs: ActorRef, sslContextManager: SslContextManager) extends ClusterSyncTask(cl,c,w,si, credentialInterface, cs, sslContextManager) {
 
   override val taskType: TaskType = TaskType.HostInfo
 

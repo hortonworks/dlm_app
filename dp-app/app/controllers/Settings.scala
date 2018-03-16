@@ -19,6 +19,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import com.hortonworks.dataplane.cs.Webservice.ConfigurationUtilityService
 import com.hortonworks.dataplane.db.Webservice.{CertificateService, DpClusterService, SkuService}
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.{Configuration, Logger}
@@ -29,14 +30,18 @@ import services.AmbariService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Settings @Inject()( @Named("certificateService") certificateService: CertificateService,
-                          configuration: Configuration) extends Controller {
+class Settings @Inject()(@Named("certificateService") certificateService: CertificateService,
+                         @Named("clusterUtilityService") clusterUtilityService: ConfigurationUtilityService,
+                         configuration: Configuration) extends Controller {
 
   def createCert = AuthenticatedAction.async(parse.json) { req =>
     req.body.validate[Certificate].map { certificate =>
-      certificateService
-        .create(certificate.copy(createdBy = req.user.id))
-        .map { createdCert =>
+      (
+        for {
+          response <- certificateService.create(certificate.copy(createdBy = req.user.id))
+          _ <- clusterUtilityService.doReloadCertificates()
+        } yield response
+      ).map { createdCert =>
          Ok(Json.toJson(createdCert))
         }.recoverWith {
           case e: Throwable =>
@@ -47,7 +52,12 @@ class Settings @Inject()( @Named("certificateService") certificateService: Certi
   }
 
   def deleteCert(certificateId: String) = Action.async { req =>
-      certificateService.delete(certificateId).map { response =>
+    (
+      for {
+        response <- certificateService.delete(certificateId)
+        _ <- clusterUtilityService.doReloadCertificates()
+      } yield response
+    ).map { response =>
         Ok(Json.toJson(response))
       }.recoverWith {
         case e: Throwable =>
