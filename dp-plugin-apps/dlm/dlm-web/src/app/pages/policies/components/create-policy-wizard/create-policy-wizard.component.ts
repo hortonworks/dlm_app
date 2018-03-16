@@ -42,6 +42,7 @@ import { truncate } from 'pipes/truncate.pipe';
 import { TranslateService } from '@ngx-translate/core';
 import { getUnderlyingHiveFS } from 'utils/cluster-util';
 import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -64,6 +65,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   isFormValid: true;
   creationState: ProgressState;
   subscriptions: Subscription[] = [];
+  policyRequestInProgress = false;
 
   @Input() pairings: Pairing[] = [];
   @Input() containers: any = {};
@@ -92,6 +94,9 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   }
 
   get isBackButtonDisabled() {
+    if (this.policyRequestInProgress) {
+      return true;
+    }
     let isBackButtonDisabled = false;
     if (this.activeStepId !== null) {
       isBackButtonDisabled = getStepById(this._steps, this.activeStepId).previousStepId === null;
@@ -103,7 +108,10 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
     this.isFormValid = isValid;
   }
 
-  constructor(private store: Store<State>, private timeZone: TimeZoneService, private t: TranslateService) {
+  constructor(private store: Store<State>,
+              private timeZone: TimeZoneService,
+              private t: TranslateService,
+              private asyncActions: AsyncActionsService) {
     this.subscriptions.push(store
       .select(getProgressState(CREATE_POLICY_REQUEST))
       .subscribe((progressState: ProgressState) => this.creationState = progressState));
@@ -247,7 +255,9 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
       requestId: CREATE_POLICY_REQUEST,
       notification
     };
-    this.store.dispatch(createPolicy(policyData, clusterId, meta));
+    this.policyRequestInProgress = true;
+    this.asyncActions.dispatch(createPolicy(policyData, clusterId, meta))
+      .subscribe(() => this.policyRequestInProgress = false);
   }
 
   formatDateValue(timeField, timezone = true) {
