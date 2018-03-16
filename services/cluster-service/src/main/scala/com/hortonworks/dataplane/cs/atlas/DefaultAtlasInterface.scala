@@ -234,7 +234,7 @@ sealed class AtlasApiSupplier(clusterId: Long,
           val isSingleNodeCluster = Try(config.getBoolean("dp.service.ambari.single.node.cluster")).getOrElse(false)
 
           (isSingleNodeCluster, dpCluster.behindGateway) match {
-            case (_, true) => clusterDataApi.getKnoxUrl(clusterId).map(url => Array(s"${url.get}/atlas-api"))
+            case (_, true) => clusterDataApi.getKnoxUrl(clusterId).map(url => Array(s"${url.get}/atlas"))
             case (true, false) => {
               clusterDataApi.getAmbariUrl(clusterId)
                 .map { ambariUrl =>
