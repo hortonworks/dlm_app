@@ -27,15 +27,15 @@ import services.AmbariService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
-import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService, ConfigurationUtilityService}
+import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 
 import scala.util.Try
+
 import scala.util.Try
 
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     @Named("skuService") val skuService: SkuService,
-    @Named("clusterUtilityService") clusterUtilityService: ConfigurationUtilityService,
     configuration: Configuration,
     ambariService: AmbariService)
     extends Controller {
@@ -56,20 +56,11 @@ class DataplaneClusters @Inject()(
     request.body
       .validate[DataplaneCluster]
       .map { dataplaneCluster =>
-        (dataplaneCluster.behindGateway match {
-          case true => {
-            clusterUtilityService
-              .doGetGatewayEndpoint(dataplaneCluster.ambariUrl)
-              .map { gatewayEndpoint => dataplaneCluster.copy(knoxUrl = Some(gatewayEndpoint))}
-          }
-          case _ => Future.successful(dataplaneCluster)
-        })
-          .flatMap { dataplaneCluster =>
-            dpClusterService
-              .create(dataplaneCluster.copy(
-                  createdBy = request.user.id,
-                  ambariUrl = dataplaneCluster.ambariUrl.replaceFirst("/$", "")))
-          }
+        dpClusterService
+          .create(
+            dataplaneCluster.copy(
+              createdBy = request.user.id,
+              ambariUrl = dataplaneCluster.ambariUrl.replaceFirst("/$", "")))
           .map {
             case Left(errors) =>
               InternalServerError(Json.toJson(errors))
