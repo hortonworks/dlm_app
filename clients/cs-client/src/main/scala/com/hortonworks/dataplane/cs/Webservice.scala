@@ -153,5 +153,7 @@ object Webservice {
 
   trait ConfigurationUtilityService extends CsClientService {
     def doReloadCertificates() : Future[JsValue]
+
+    def doGetGatewayEndpoint(ambariEndpoint: String): Future[String]
   }
 }

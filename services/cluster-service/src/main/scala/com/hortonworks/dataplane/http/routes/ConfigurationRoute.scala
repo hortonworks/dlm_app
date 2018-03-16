@@ -26,7 +26,7 @@ import scala.util.{Success, Try}
 
 class ConfigurationRoute @Inject()(val ws: WSClient, val config: Config, val sslContextManager: SslContextManager) extends BaseRoute {
 
-  val route =
+  val reloadCertificates =
     path("configuration" / "actions" / "reloadCertificates") {
       get {
         complete {

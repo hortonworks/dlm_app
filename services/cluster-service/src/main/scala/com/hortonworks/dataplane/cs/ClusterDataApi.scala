@@ -190,7 +190,7 @@ class ClusterDataApi @Inject()(
       c <- Future.successful(cl.right.get)
       dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
       dpc <- Future.successful(dpce.right.get)
-      service <- clusterComponentService.getServiceByName(clusterId,Constants.KNOX)
+      service <- clusterComponentService.getServiceByName(clusterId, Constants.KNOX)
       cs <- Future.successful(service.right.get)
     } yield getKnoxUrl(dpc,cs)
   }

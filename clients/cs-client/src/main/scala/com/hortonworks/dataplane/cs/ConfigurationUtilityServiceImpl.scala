@@ -28,8 +28,20 @@ class ConfigurationUtilityServiceImpl(val config: Config)(implicit ws: WSClient)
       .get()
       .map { res =>
         res.status match {
-          case 200 => res.json
+          case 200 => (res.json \ "results" \ "data").as[JsValue]
           case _ => throw WrappedErrorException(Error(status = 500, message = "Unable to reload certificates", code = "cluster.configuration.cert-reload-failed"))
+        }
+      }
+  }
+
+  override def doGetGatewayEndpoint(ambariEndpoint: String): Future[String] = {
+    ws.url(s"$url/configuration/actions/buildGatewayEndpoint?ambariEndpoint=$ambariEndpoint")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map { res =>
+        res.status match {
+          case 200 => (res.json \ "results" \ "data").as[String]
+          case _ => throw WrappedErrorException(Error(status = 500, message = "Unable to get gateway endpoint", code = "cluster.configuration.gateway-endpoint-construct-failed"))
         }
       }
   }
