@@ -24,9 +24,8 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DataSetService
 import com.hortonworks.dataplane.commons.domain.Entities
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.{AssetResolvedProfilerMetricRequest, ProfilerMetricRequest}
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.ProfilerMetricRequest
 import com.hortonworks.dataplane.commons.domain.profiler.parsers.RequestParser._
-import controllers.helpers.AssetRetriever
 import services.UtilityService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -154,11 +153,7 @@ class DpProfilerAttributes @Inject()(
     request.body.validate[ProfilerMetricRequest] match {
       case JsSuccess(simpleRequest, _) =>
         Logger.debug(s"Received Metrics request for  $simpleRequest for user $userName ")
-        AssetRetriever.getAssets(simpleRequest.context, dataSetService) flatMap {
-          assets =>
-            val request = AssetResolvedProfilerMetricRequest(simpleRequest.clusterId, assets, simpleRequest.metrics)
-            dpProfilerService.getMetrics(request, userName)
-        } map {
+        dpProfilerService.getMetrics(simpleRequest, userName) map {
           case Left(errors) =>
             errors.errors.head.status match {
               case 404 => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))

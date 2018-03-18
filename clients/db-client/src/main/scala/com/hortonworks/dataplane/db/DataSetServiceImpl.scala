@@ -141,12 +141,6 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataAssetsAndCount)
   }
 
-  def allAssetsWithDatasetId(id: Long): Future[Either[Errors, List[DataAsset]]] = {
-    ws.url(s"$url/dataassets/list/$id")
-      .withHeaders("Accept" -> "application/json")
-      .get()
-      .map(mapToDataAssets)
-  }
 
   override def retrieve(datasetId: String): Future[Either[Errors, DatasetAndCategories]] = {
     ws.url(s"$url/datasets/$datasetId")
@@ -242,15 +236,5 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToDataAssets(res: WSResponse): Either[Errors, List[DataAsset]] = {
-    res.status match {
-      case 200 => (res.json \ "results" \\ "data").head.validate[List[DataAsset]] match {
-        case JsSuccess(result, _) => Right(result)
-        case error: JsError => Left(Errors(Seq(Error(500, JsError.toFlatForm(error).toString()))))
-      }
-      case 404 => Left(Errors(Seq(Error(404, "Resource not found"))))
-      case _ => mapErrors(res)
-    }
-  }
 
 }

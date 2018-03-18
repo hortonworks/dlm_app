@@ -23,11 +23,19 @@ object Results {
 
   case class QueriesAndSensitivityDistributionResult(totalQueries: Long, queriesRunningOnSensitiveData: Long) extends ResultDefinition
 
-  case class SecureAssetAccessUserCountResultForADay(date: String, numberOfAccesses: Long) extends ResultDefinition
+  case class SecureAssetAccessUserCountResultForADay(date: String, numberOfAccesses: Long)
 
   case class SecureAssetAccessUserCountResult(accessPerDay: List[SecureAssetAccessUserCountResultForADay]) extends ResultDefinition
 
   case class SensitivityDistributionResult(totalAssets: Long, assetsHavingSensitiveData: Long) extends ResultDefinition
+
+  case class TopKCollectionsResult(collectionsAndCount: Map[String, Long]) extends ResultDefinition
+
+  case class TopKAssetsResult(assetsAndCount: Map[String, Long]) extends ResultDefinition
+
+  case class AssetCountsResultForADay(date: String, totalAssets: Long, newAssets: Long)
+
+  case class AssetCountsResult(assetsAndCount: List[AssetCountsResultForADay]) extends ResultDefinition
 
   case class MetricErrorDefinition(errorMessage: String) extends ResultDefinition
 

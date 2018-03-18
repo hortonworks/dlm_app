@@ -17,21 +17,28 @@ object Metrics {
     type MetricType = Value
     val TopKUsersPerAsset, AssetDistributionBySensitivityTag,
     QueriesAndSensitivityDistribution,
-    SecureAssetAccessUserCount, SensitivityDistribution = Value
+    SecureAssetAccessUserCount, SensitivityDistribution,
+    TopKCollections, TopKAssets, AssetCounts = Value
   }
 
   trait MetricDefinition
 
   case class ProfilerMetric(metricType: MetricType, definition: MetricDefinition)
 
-  case class TopKUsersPerAssetMetric(k: Int, lookBackDays: Int) extends MetricDefinition
+  case class TopKUsersPerAssetMetric(k: Int, startDate: String, endDate: String) extends MetricDefinition
 
   case class AssetDistributionBySensitivityTagMetric(k: Int) extends MetricDefinition
 
-  case class QueriesAndSensitivityDistributionMetric(lookBackDays: Int) extends MetricDefinition
+  case class QueriesAndSensitivityDistributionMetric(startDate: String, endDate: String) extends MetricDefinition
 
-  case class SecureAssetAccessUserCountMetric(lookBackDays: Int) extends MetricDefinition
+  case class SecureAssetAccessUserCountMetric(startDate: String, endDate: String) extends MetricDefinition
 
   case object SensitivityDistributionMetric extends MetricDefinition
+
+  case class TopKCollectionsMetric(k: Int, startDate: String, endDate: String) extends MetricDefinition
+
+  case class TopKAssetsMetric(k: Int, startDate: String, endDate: String) extends MetricDefinition
+
+  case class AssetCountsMetric(startDate: String, endDate: String) extends MetricDefinition
 
 }

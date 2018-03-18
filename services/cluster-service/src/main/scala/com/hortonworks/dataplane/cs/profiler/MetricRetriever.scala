@@ -10,7 +10,7 @@
 package com.hortonworks.dataplane.cs.profiler
 
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.ProfilerMetric
-import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.AssetResolvedProfilerMetricRequest
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.ProfilerMetricRequest
 import com.hortonworks.dataplane.commons.domain.profiler.models.Responses.ProfilerMetricResults
 import com.hortonworks.dataplane.cs.profiler.MultiMetricProcessor.MetricProcessorType.MetricProcessorType
 import play.api.libs.ws.WSClient
@@ -20,7 +20,7 @@ import scala.concurrent.Future
 
 object MetricRetriever {
 
-  def retrieveMetrics(ws: WSClient, profilerConfigs: GlobalProfilerConfigs, metricRequest: AssetResolvedProfilerMetricRequest, userName: String): Future[ProfilerMetricResults] = {
+  def retrieveMetrics(ws: WSClient, profilerConfigs: GlobalProfilerConfigs, metricRequest: ProfilerMetricRequest, userName: String): Future[ProfilerMetricResults] = {
     val processorTypeToRequestGroup: Map[MetricProcessorType, MetricRequestGroup] = segregateMetricRequestsBasedOnProcessor(metricRequest.metrics)
     val unsupportedMetricsExist = processorTypeToRequestGroup.keys.exists(MultiMetricProcessor.getProcessor(_).isEmpty)
     if (unsupportedMetricsExist)
@@ -31,7 +31,7 @@ object MetricRetriever {
       )
       val eventualMetricResults = processorToGroup.map(
         processorAndGroup =>
-          processorAndGroup._1.retrieveMetrics(ws, profilerConfigs, userName, metricRequest.clusterId, metricRequest.assets, processorAndGroup._2)
+          processorAndGroup._1.retrieveMetrics(ws, profilerConfigs, userName, metricRequest.clusterId, metricRequest.context, processorAndGroup._2)
       )
       Future.sequence(eventualMetricResults).map(
         resultGroups => {
