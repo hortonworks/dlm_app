@@ -37,7 +37,7 @@ private[cs] sealed case class HostInfoSaved(cluster: Cluster)
 
 class ClusterActor(cluster: Cluster,
                    dpCluster: DataplaneCluster,
-                   implicit val wSClient: WSClient,
+                   wsClient: WSClient,
                    storageInterface: StorageInterface,
                    credentials: Credentials,
                    val dbActor: ActorRef,
@@ -47,7 +47,7 @@ class ClusterActor(cluster: Cluster,
     with ActorLogging {
 
   val ambariInterface =
-    new AmbariClusterInterface(cluster, dpCluster, credentials, config, sslContextManager)
+    new AmbariClusterInterface(cluster, dpCluster, credentials, config, wsClient)
   val clusterSaveState =
     collection.mutable.Map("NAMENODE" -> false, "HOST_INFO" -> false)
 

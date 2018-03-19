@@ -31,16 +31,15 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
                      private val credentials: Credentials,
                      private val config: Config,
                      private val storageInterface: StorageInterface,
-                     private val wSClient: WSClient,
-                     private val dbActor: ActorRef,
-                     private val sslContextManager: SslContextManager)
+                     private val wsClient: WSClient,
+                     private val dbActor: ActorRef)
     extends Actor
     with ActorLogging {
 
   val clusterMap = collection.mutable.Map[Long, ActorRef]()
 
   val dpClusterInterface =
-    AmbariDataplaneClusterInterfaceImpl(dpCluster, sslContextManager.getWSClient(dpCluster.allowUntrusted), config, credentials)
+    AmbariDataplaneClusterInterfaceImpl(dpCluster, wsClient, config, credentials)
 
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
     .getOrElse("/api/v1/clusters")
@@ -104,12 +103,11 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
                                    context.actorOf(Props(classOf[ClusterActor],
                                                          c,
                                                          dpCluster,
-                                                         wSClient,
+                                                         wsClient,
                                                          storageInterface,
                                                          credentials,
                                                          dbActor,
-                                                         config,
-                                                         sslContextManager),
+                                                         config),
                                                    s"Cluster_${c.id.get}"))
       }
       val toClear = clusterMap.keySet -- current

@@ -84,7 +84,7 @@ abstract class ClusterSyncTask(cl: ClusterData,
     if (knoxEnabled) KnoxApiExecutor.withTokenCaching(knoxConfig, w)
     else KnoxApiExecutor.withTokenDisabled(knoxConfig, w)
   final protected val ambariInterface: AmbariInterfaceV2 =
-    new AmbariClusterInterfaceV2(cl.cluster,cl.dataplaneCluster, c, credentialInterface, executor, sslContextManager)
+    new AmbariClusterInterfaceV2(cl.cluster,cl.dataplaneCluster, c, credentialInterface, executor, sslContextManager.getWSClient(cl.dataplaneCluster.allowUntrusted))
 
   import akka.pattern.pipe
   override final def receive: Receive = {
