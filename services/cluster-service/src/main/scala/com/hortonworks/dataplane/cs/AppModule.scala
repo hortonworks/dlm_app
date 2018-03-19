@@ -156,8 +156,7 @@ object AppModule extends AbstractModule {
                          dpClusterService: DpClusterService,
                          wSClient: WSClient,
                          sslContextManager: SslContextManager): AmbariRoute = {
-    new AmbariRoute(wSClient,
-                    storageInterface,
+    new AmbariRoute(storageInterface,
                     clusterService,
                     credentialInterface,
                     dpClusterService,
