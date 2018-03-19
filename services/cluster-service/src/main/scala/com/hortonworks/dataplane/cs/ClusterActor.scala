@@ -47,7 +47,7 @@ class ClusterActor(cluster: Cluster,
     with ActorLogging {
 
   val ambariInterface =
-    new AmbariClusterInterface(cluster, dpCluster, credentials, config, wsClient)
+    new AmbariClusterInterface(cluster, credentials, config, wsClient)
   val clusterSaveState =
     collection.mutable.Map("NAMENODE" -> false, "HOST_INFO" -> false)
 
