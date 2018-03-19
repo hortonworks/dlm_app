@@ -493,7 +493,48 @@ destroy_all_but_state() {
     echo "Stop complete."
 }
 
+migrate_configurations()
+{
+    old_config_migration_dir="$1"
+    config_file="$DP_PATH"/config.env.sh
+    config_migration_dir="$DP_PATH"/config-migrations
+
+    for entry in "$config_migration_dir"/*
+    do
+      if [ -d "$old_config_migration_dir" ] && [ -f "$old_config_migration_dir"/$(basename "$entry") ]; then
+        continue
+      fi
+      while IFS=" " read -r action key value; do
+         if [ ${#action} -gt 0 ] && [[ "$action" != \#* ]] ; then
+            case "$action" in
+                ADD)
+                    echo "Adding new config: $key"
+                    echo "$key"="$value" >> "$config_file"
+                ;;
+                RENAME)
+                    echo "Renaming config $key to $value"
+                    $(sed -i.tmp "s|$key|$value|g" "$config_file")
+                ;;
+                REMOVE)
+                    echo "Removing config $key (No longer supported)"
+                    line_number=$(grep -n "$key"  "$config_file" | head -n 1 | cut -d: -f1)
+                    $(sed -i.tmp ""${line_number}"d" "$config_file")
+                ;;
+                *)
+                    echo "Unknown option - Ignoring"
+                ;;
+            esac
+
+        fi
+      done < "$entry"
+    done
+    $(rm -f "$DP_PATH"/config.env.sh.tmp)
+
+    echo "Migrated config properties."
+}
+
 upgrade() {
+
     if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
         source "$DP_PATH"/help.sh "upgrade"
         exit -1
@@ -515,6 +556,8 @@ upgrade() {
     echo "Moving configuration..."
     mv "$DP_PATH"/config.env.sh "$DP_PATH"/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
     cp $2/config.env.sh "$DP_PATH"/config.env.sh
+    migrate_configurations $2/config-migrations
+
     # sourcing again to overwrite values
     source "$DP_PATH"/config.env.sh
 

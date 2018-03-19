@@ -28,6 +28,3 @@ CREATE INDEX idx_dp_locations on dataplane.locations(city);
  --user-groups
  CREATE INDEX idx_dp_user_groups_user_id on dataplane.user_groups(user_id);
  CREATE INDEX idx_dp_user_groups_group_id on dataplane.user_groups(group_id);
-
- --blacklisted tokens
- CREATE INDEX idx_dp_blacklisted_tokens on dataplane.blacklisted_tokens(token);
