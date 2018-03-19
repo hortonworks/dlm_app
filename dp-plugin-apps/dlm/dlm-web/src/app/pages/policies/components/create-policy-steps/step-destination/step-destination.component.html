@@ -147,29 +147,32 @@
               </div>
             </div>
             <!-- DESTINATION S3 ENDPOINT END -->
-          </div>
-          <div class="row" *ngIf="cloudIsUsedForPolicy && formIsFilled">
-            <div class="col-xs-12">
-              <dlm-checkbox [disabled]="validationInProgress" (onSelect)="handleSkipValidation($event)">
-                {{'page.policies.form.fields.destinationCluster.skipValidation' | translate}}
-              </dlm-checkbox>
-              <button
-                [disabled]="form.get('destination.skipValidation').value || validationInProgress"
-                type="button"
-                class="btn btn-success"
-                qe-attr="validate-policy"
-                (click)="validate()">
-                &nbsp;{{"page.policies.form.validateBtn" | translate}} <i *ngIf="validationInProgress" class="fa fa-fw fa-spinner fa-spin"></i>
-                <i class="glyphicon glyphicon-ok" *ngIf="form.get('destination.validationStatus').value && !validationInProgress"></i>
-              </button>
-              <div *ngIf="form.get('destination.validationPerformed').value && !form.get('destination.skipValidation').value && !validationInProgress">
-                <div *ngIf="!form.get('destination.validationStatus').value">
-                  <dlm-field-error>{{validationMessage}}</dlm-field-error>
+
+            <!-- SKIP VALIDATION CHECKBOX AND VALIDATE BUTTON -->
+            <div class="row" *ngIf="isCloudUsedForPolicy && formIsFilled">
+              <div class="col-xs-12">
+                <dlm-checkbox [disabled]="validationInProgress" (onSelect)="handleSkipValidation($event)">
+                  {{'page.policies.form.fields.destinationCluster.skipValidation' | translate}}
+                </dlm-checkbox>
+                <button
+                  [disabled]="form.get('destination.skipValidation').value || validationInProgress"
+                  type="button"
+                  class="btn btn-success"
+                  qe-attr="validate-policy"
+                  (click)="validate()">
+                  &nbsp;{{"page.policies.form.validateBtn" | translate}} <i *ngIf="validationInProgress" class="fa fa-fw fa-spinner fa-spin"></i>
+                  <i class="glyphicon glyphicon-ok" *ngIf="form.get('destination.validationStatus').value && !validationInProgress"></i>
+                </button>
+                <div *ngIf="form.get('destination.validationPerformed').value && !form.get('destination.skipValidation').value && !validationInProgress">
+                  <div *ngIf="!form.get('destination.validationStatus').value">
+                    <dlm-field-error>{{validationMessage}}</dlm-field-error>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+            <!-- SKIP VALIDATION CHECKBOX AND VALIDATE BUTTON END -->
 
+          </div>
         </fieldset>
       </div>
     </div>

@@ -73,7 +73,6 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   @HostBinding('class') className = 'dlm-step-destination';
 
   validationResults: HttpProgress;
-  cloudIsUsedForPolicy = true;
   validationInProgress = false;
   form: FormGroup;
   source: SourceValue = {} as SourceValue;
@@ -105,9 +104,10 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
 
   get formIsFilled() {
     const form = this.form;
-    return this.isCloudType && this.isCloudAccountSelected && form.get('destination.s3endpoint').value ||
-      this.isClusterType && this.isClusterSelected && form.get('destination.path').value;
+    return (this.isCloudType && this.isCloudAccountSelected && this.form.get('destination.s3endpoint').value) ||
+      (this.isClusterType && this.isClusterSelected && this.form.get('destination.path').value);
   }
+
   get selectedCluster(): Cluster {
     return this.clusters.find(cluster => cluster.id === +this.form.get('destination.cluster').value);
   }
@@ -154,8 +154,12 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   }
 
   get isCloudReplication(): boolean {
-    return this.form.get('destination.type').value === SOURCE_TYPES.S3 ||
+    return (this.form.get('destination.type').value === SOURCE_TYPES.S3) ||
       (this.isHivePolicy && this.selectedCluster && !this.isHiveOnPremReplication);
+  }
+
+  get isCloudUsedForPolicy() {
+    return (this.source.type === SOURCE_TYPES.S3) || this.isCloudReplication;
   }
 
   get isClusterType(): boolean {
@@ -321,10 +325,8 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
         toDisable = this.s3Fields;
       }
       if (type === SOURCE_TYPES.CLUSTER && this.source.type === SOURCE_TYPES.CLUSTER) {
-        this.cloudIsUsedForPolicy = false;
         this.skipValidation();
       } else {
-        this.cloudIsUsedForPolicy = true;
         this.skipValidation(false);
       }
       this.enableFields(toEnable);
@@ -346,6 +348,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       .combineLatest(typeChanges$, clusterChanges$, destinationPathChanges$)
       .switchMap(([type, cluster, path]) => {
         const noErrors = Observable.of(null);
+        this.cdRef.detectChanges();
         this.setPending(form.get('destination.path'));
         if (!this.isSourceEncrypted || !cluster || contains([this.source.type, type], SOURCE_TYPES.S3)) {
           return noErrors;
@@ -390,7 +393,6 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       }
       if (this.isHivePolicy) {
         if (!this.checkHiveOnPrem(value)) {
-          this.cloudIsUsedForPolicy = true;
           this.enableFields(['path'].concat(this.s3Fields));
           const selectedCluster = this.clusters.find(c => c.id === +value);
           if (selectedCluster) {
@@ -404,17 +406,14 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
             }
           }
         } else {
-          this.cloudIsUsedForPolicy = false;
           this.disableFields(this.s3Fields);
         }
         return;
       }
       if (this.isCloudReplication) {
-        this.cloudIsUsedForPolicy = true;
         this.disableFields(['path']);
         this.enableFields(this.s3Fields);
       } else {
-        this.cloudIsUsedForPolicy = false;
         this.enableFields(['path']);
         this.disableFields(this.s3Fields);
       }
