@@ -17,7 +17,6 @@ import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.tls.SslContextManager
-import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.db.Webservice.{CertificateService, ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db.{CertificateServiceImpl, _}
 import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
@@ -32,7 +31,6 @@ import scala.util.Try
 object AppModule extends AbstractModule {
 
   override def configure() = {
-    bind(classOf[DPTrustStore]).asEagerSingleton()
     bind(classOf[Config]).toInstance(ConfigFactory.load())
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
     bind(classOf[MetricsRegistry])
