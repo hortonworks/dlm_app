@@ -166,8 +166,7 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideHdpProxyRoute(
-                            actorSystem: ActorSystem,
+  def provideHdpProxyRoute(actorSystem: ActorSystem,
                             actorMaterializer: ActorMaterializer,
                             clusterData: ClusterDataApi,
                             dpClusterService: DpClusterService,
@@ -183,9 +182,8 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideConfigurationRoute(wsClient: WSClient, config: Config, sslContextManager: SslContextManager): ConfigurationRoute = {
+  def provideConfigurationRoute(config: Config, sslContextManager: SslContextManager): ConfigurationRoute = {
     new ConfigurationRoute(
-      wsClient,
       config,
       sslContextManager
     )
