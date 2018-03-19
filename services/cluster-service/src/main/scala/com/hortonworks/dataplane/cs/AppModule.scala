@@ -243,7 +243,7 @@ object AppModule extends AbstractModule {
                          clusterService: ClusterService,
                          clusterDataApi: ClusterDataApi,
                          config: Config,
-                         wSClient: WSClient): RangerRoute = {
+                         sslContextManager: SslContextManager): RangerRoute = {
     new RangerRoute(clusterComponentService,
                     clusterHostsService,
                     storageInterface,
@@ -252,7 +252,7 @@ object AppModule extends AbstractModule {
                     clusterService,
                     clusterDataApi,
                     config,
-                    wSClient)
+                    sslContextManager)
   }
 
   @Provides
