@@ -11,11 +11,10 @@
 
 package com.hortonworks.dataplane.cs.sync
 
-import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
-import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
+import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
@@ -23,8 +22,6 @@ import com.hortonworks.dataplane.cs.sync.TaskStatus.TaskStatus
 import com.hortonworks.dataplane.cs._
 import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
-import com.hortonworks.dataplane.knox.Knox.KnoxConfig
-import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.JsValue

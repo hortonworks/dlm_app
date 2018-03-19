@@ -13,8 +13,7 @@ package com.hortonworks.dataplane.cs
 
 import java.net.{MalformedURLException, URL}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster}
-import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
+import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
@@ -26,7 +25,6 @@ import scala.util.Try
 
 class AmbariClusterInterface(
     private val cluster: Cluster,
-    private val dpCluster: DataplaneCluster,
     private val credentials: Credentials,
     private val appConfig: Config,
     private val ws: WSClient)

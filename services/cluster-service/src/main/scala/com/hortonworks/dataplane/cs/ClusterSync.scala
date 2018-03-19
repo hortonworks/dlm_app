@@ -15,13 +15,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.{Inject, Singleton}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
-import com.google.common.base.Supplier
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.hortonworks.dataplane.commons.service.api.Poll
 import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
-import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -124,7 +124,7 @@ class ClusterSynchronizer(private val config: Config,
                           private val wSClient: WSClient,
                           private val storageInterface: StorageInterface,
                           private val credentialInterface: CredentialInterface,
-                          callback:PartialFunction[TaskStatus,Unit]) extends Actor with ActorLogging{
+                          callback: PartialFunction[TaskStatus,Unit]) extends Actor with ActorLogging{
 
 
 
