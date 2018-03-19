@@ -224,13 +224,13 @@ object AppModule extends AbstractModule {
                             clusterHostsService: ClusterHostsService,
                             clusterDataApi: ClusterDataApi,
                             config: Config,
-                            wSClient: WSClient): DpProfilerRoute = {
+                            sslContextManager: SslContextManager): DpProfilerRoute = {
     new DpProfilerRoute(clusterComponentService,
                         clusterHostsService,
                         storageInterface,
                         clusterDataApi,
                         config,
-                        wSClient)
+                        sslContextManager)
   }
 
   @Provides
