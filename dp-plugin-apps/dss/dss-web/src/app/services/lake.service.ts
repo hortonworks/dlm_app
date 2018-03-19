@@ -87,14 +87,19 @@ export class LakeService {
   }
 
 
-  listWithClusters(type: string = 'all'): Observable<{
-    data: Lake,
-    clusters: Cluster[]
-  }[]> {
+  listWithClusters(type: string = 'all'): Observable<{ data: Lake, clusters: Cluster[] }[]> {
     return this.http
       .get(`api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
+  }
+
+  listWithClustersAsPromise(type: string = 'all'): Promise<{ data: Lake, clusters: Cluster[] }[]> {
+    return this.http
+    .get(`api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
+    .map(HttpUtil.extractData)
+    .toPromise()
+    .catch(HttpUtil.handleError);
   }
 
   validate(ambariUrl: string): Observable<any> {
