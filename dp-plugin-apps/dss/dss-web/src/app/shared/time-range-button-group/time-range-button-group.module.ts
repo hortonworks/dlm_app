@@ -8,13 +8,15 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-import {Routes} from "@angular/router";
-import {ProfilersDashboardComponent} from './views/profilers-dashboard.component';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { TimeRangeButtonGroupComponent } from './time-range-button-group.component';
 
-export const routes: Routes = [
-  { path: 'dss/profilers', children: [
-      {path: '', pathMatch: 'full', component: ProfilersDashboardComponent, data: {crumb: 'profilers'}}
-  ]}
-];
-
-
+@NgModule({
+  imports: [
+    CommonModule
+  ],
+  declarations: [TimeRangeButtonGroupComponent],
+  exports: [TimeRangeButtonGroupComponent]
+})
+export class TimeRangeButtonGroupModule { }

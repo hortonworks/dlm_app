@@ -10,22 +10,25 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {LakeService} from '../../../services/lake.service';
+import {ProfilerService} from '../../../../services/profiler.service';
+import {LakeService} from '../../../../services/lake.service';
+import {JobsCountModel, ProfilerModel, ProfilerInfoWithAssetsCount, JobInfoModel} from '../../models/profilerModels';
+import { Lake } from '../../../../models/lake';
 
-export class JobsCountModel {
-	Completed:number;
-	Running:number;
-	Failed:number;
-}
+// export class JobsCountModel {
+// 	Completed:number;
+// 	Running:number;
+// 	Failed:number;
+// }
 
-export class ProfilerModel {
-	id:number;
-	name:string;
-	version:string;
-	isActive:boolean;
-	assetsCount:number;
-	counts:JobsCountModel;
-}
+// export class ProfilerModel {
+// 	id:number;
+// 	name:string;
+// 	version:string;
+// 	isActive:boolean;
+// 	assetsCount:number;
+// 	counts:JobsCountModel;
+// }
 
 const profilersObjList = [
 	{"id":1, "name":"Sensitivity", "version":"1.1", "isActive":false, "assetsCount":30, "counts":{Completed:5,Running:2,Failed:0}},
@@ -52,24 +55,26 @@ const senstivityProfilerData = [
 export class ProfilerConfigsComponent implements OnInit {
   
   clusters = [];
-  selectedLake = null;
-  profilers:Array<ProfilerModel> = [];
+  selectedLake:Lake = null;
+  profilers:Array<ProfilerInfoWithAssetsCount> = [];
   senstivityProfilerData = [];
 
-  constructor(private lakeService: LakeService){}
+  constructor( private lakeService: LakeService
+             , private profilerService:ProfilerService
+             ){}
 
   ngOnInit() {
-  	this.lakeService.list().subscribe(lakes => {
-  	  this.clusters = lakes.filter(lake => lake.isDatalake).sort((a, b) => a.name.localeCompare(b.name));
-  	  this.selectLake(this.clusters[0]);
-	}); 
+  	this.lakeService.listWithClusterId().subscribe(lakes => {
+  	  this.clusters = lakes;
+  	  this.selectLake(lakes[0]);
+	  }); 
   }
 
   selectLake(lake) {
   	this.selectedLake =lake;
   	this.profilers = [];
   	//TODO send request to fetch list from server
-  	setTimeout(()=>this.profilers =profilersObjList, 500);
+  	this.relodeProfilerStatus();
 
   	this.senstivityProfilerData = [];
   	//TODO send request to fetch list from server
@@ -78,6 +83,20 @@ export class ProfilerConfigsComponent implements OnInit {
   		this.senstivityProfilerData =senstivityProfilerData;
   	}, 500);
   }
+
+  relodeProfilerStatus () {
+    this.profilers = [];
+    var d = new Date();
+    const endTime = d.getTime();
+    d.setHours(0,0,0,0);
+    const startTime = d.getTime();
+
+    this.profilerService.getStatusWithAssetsCounts(this.selectedLake.clusterId, startTime, endTime)
+      .subscribe(infoAndCounts => {
+        this.profilers = infoAndCounts
+      });
+  }
+
   toggleActive(profiler) {
   	profiler.isActive = !profiler.isActive;
   	//TODO send request to toggle at server as well

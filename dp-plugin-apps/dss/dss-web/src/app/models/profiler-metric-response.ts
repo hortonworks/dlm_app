@@ -23,6 +23,7 @@ export class AccessPerDayItems {
 
 export class AccessPerDayResponse {
   accessPerDay: AccessPerDayItems[] = [];
+  errorMessage: string;
 
   constructor(accessPerDay: AccessPerDayItems[]) {
     this.accessPerDay = accessPerDay;
@@ -33,6 +34,7 @@ export class AccessPerDayResponse {
 export class SensitivityDistributionResponse {
   totalAssets: number;
   assetsHavingSensitiveData: number;
+  errorMessage: string;
 
   constructor(totalAssets: number, assetsHavingSensitiveData: number) {
     this.totalAssets = totalAssets;
@@ -55,6 +57,7 @@ export class SensitivityDistributionResponse {
 export class QueriesAndSensitivityDistributionResponse {
   totalQueries: number;
   queriesRunningOnSensitiveData: number;
+  errorMessage: string;
 
   constructor(totalQueries: number, queriesRunningOnSensitiveData: number) {
     this.totalQueries = totalQueries;
@@ -76,6 +79,7 @@ export class QueriesAndSensitivityDistributionResponse {
 
 export class AssetDistributionBySensitivityTagResponse {
   tagToAssetCount: {[p: string]: Number};
+  errorMessage: string;
 
   constructor(tagToAssetCount: { [p: string]: Number }) {
     this.tagToAssetCount = tagToAssetCount;
@@ -84,22 +88,49 @@ export class AssetDistributionBySensitivityTagResponse {
 
 export class SecureAssetAccessUserCountResponse {
   accessCounts: {[key: string]: Number};
+  errorMessage: string;
 
   constructor(accessPerDay: { [p: string]: Number }) {
     this.accessCounts = accessPerDay;
   }
 }
 
+export class AssetCountsResultForADay {
+  date: string;
+  totalAssets: number;
+  newAssets: number;
+
+  constructor(date: string, totalAssets: number, newAssets: number) {
+    this.date = date;
+    this.totalAssets = totalAssets;
+    this.newAssets = newAssets;
+  }
+}
+
+export class AssetsAndCount {
+  assetsAndCount: AssetCountsResultForADay[] |  {[p: string]: Number};
+
+  constructor(assetsAndCount: AssetCountsResultForADay[] = []) {
+    this.assetsAndCount = assetsAndCount;
+  }
+}
+
+export class CollectionsAndCount {
+  collectionsAndCount: {[p: string]: Number};
+}
+
 export class Metric {
   status: boolean;
   metricType: MetricType;
   definition: AssetDistributionBySensitivityTagResponse | AccessPerDayResponse | SensitivityDistributionResponse |
-                QueriesAndSensitivityDistributionResponse | SecureAssetAccessUserCountResponse;
+                QueriesAndSensitivityDistributionResponse | SecureAssetAccessUserCountResponse | AssetsAndCount |
+                CollectionsAndCount;
 
   constructor(status: boolean,
               metricType: MetricType,
               definition: AssetDistributionBySensitivityTagResponse | AccessPerDayResponse | SensitivityDistributionResponse |
-                  QueriesAndSensitivityDistributionResponse | SecureAssetAccessUserCountResponse) {
+                  QueriesAndSensitivityDistributionResponse | SecureAssetAccessUserCountResponse | AssetsAndCount |
+                  CollectionsAndCount) {
     this.status = status;
     this.metricType = metricType;
     this.definition = definition;

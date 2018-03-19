@@ -8,13 +8,11 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-import {Routes} from "@angular/router";
-import {ProfilersDashboardComponent} from './views/profilers-dashboard.component';
+export class DomUtils {
 
-export const routes: Routes = [
-  { path: 'dss/profilers', children: [
-      {path: '', pathMatch: 'full', component: ProfilersDashboardComponent, data: {crumb: 'profilers'}}
-  ]}
-];
-
-
+  public static removeAllChildNodes(node: Node) {
+    while (node.lastChild) {
+      node.removeChild(node.lastChild);
+    }
+  }
+}

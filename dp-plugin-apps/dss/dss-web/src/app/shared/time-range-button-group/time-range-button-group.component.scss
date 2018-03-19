@@ -1,4 +1,4 @@
-/*
+/*!
  *
  *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *  *
@@ -8,33 +8,35 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-@import '../../../styles/variables';
-@import '../../../styles/charts';
+@import "../../../styles/variables";
 
-.data-lake-container {
-  padding: 15px 30px;
-}
+.time-range-button-group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  vertical-align: top;
+  font-weight: 400;
+  font-size: 14px;
 
-.total-assets {
-  font-size: 2.4em;
-  font-weight: 500;
-}
+  li {
+    display:inline;
+    padding: 4px 8px;
+    border-radius: 2px;
+    min-width: 24px;
+    text-align: center;
+    cursor: pointer;
 
-.charts-cards-container {
-  .charts-card {
-    min-height: 350px;
+    &.active {
+      background: #444f62;
+      color: #fff;
+    }
   }
 }
 
-.loader {
-  width: 20px;
-  height: 20px;
-  margin-left: 48%;
-  vertical-align: middle;
+.range-format {
+  font-size: 8px;
+  margin-top: 5px;
   text-align: center;
-  margin-top: 15%;
 }
 
-:host ::ng-deep .nv-multiBarWithLegend .tick line {
-  stroke: transparent;
-}
+

@@ -5,6 +5,10 @@ export const chartColors = {
   RED: '#EC6963'
 };
 export const MetricTypeConst: any = {
+  AssetCounts: 'AssetCounts',
+  TopKAssets: 'TopKAssets',
+  TopKCollections: 'TopKCollections',
+  TopKAssetsForCollection: 'TopKAssetsForCollection',
   ProfilerMetric: 'ProfilerMetric',
   TopKUsersPerAssetMetric: 'TopKUsersPerAsset',
   AssetDistributionBySensitivityTagMetric: 'AssetDistributionBySensitivityTag',
@@ -13,5 +17,6 @@ export const MetricTypeConst: any = {
   SensitivityDistributionMetric: 'SensitivityDistribution'
 };
 export const ContextTypeConst: any = {
-  COLLECTION: 'COLLECTION'
+  COLLECTION: 'COLLECTION',
+  CLUSTER: 'CLUSTER'
 };
