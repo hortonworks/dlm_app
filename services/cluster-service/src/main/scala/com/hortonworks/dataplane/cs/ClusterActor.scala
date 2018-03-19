@@ -15,7 +15,6 @@ import akka.actor.Status.Failure
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, ClusterService => ClusterData}
 import com.hortonworks.dataplane.commons.service.api.Poll
-import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
 
@@ -41,8 +40,7 @@ class ClusterActor(cluster: Cluster,
                    storageInterface: StorageInterface,
                    credentials: Credentials,
                    val dbActor: ActorRef,
-                   config: Config,
-                   sslContextManager: SslContextManager)
+                   config: Config)
     extends Actor
     with ActorLogging {
 

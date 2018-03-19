@@ -46,7 +46,7 @@ private[sync] case class ClusterData(dataplaneCluster: DataplaneCluster,
 
 sealed trait SyncTaskBase extends Actor with ActorLogging {
   val taskType: TaskType
-  val wSClient: WSClient
+  val wsClient: WSClient
   val config: Config
   val clusterData: ClusterData
   val storageInterface: StorageInterface
@@ -67,7 +67,7 @@ abstract class ClusterSyncTask(cl: ClusterData,
     extends SyncTaskBase {
 
   final override val config: Config = c
-  final override val wSClient: WSClient = w
+  final override val wsClient: WSClient = w
   final override val storageInterface: StorageInterface = si
   final override val clusterData: ClusterData = cl
   final override val clusterSynchronizer:ActorRef = cs
@@ -76,14 +76,13 @@ abstract class ClusterSyncTask(cl: ClusterData,
   private val knoxConfig = KnoxConfig(
     Try(c.getString("dp.services.knox.token.topology")).getOrElse("token"),
     cl.dataplaneCluster.knoxUrl)
-  private implicit val ws: WSClient = w
   final protected def knoxEnabled =
     cl.dataplaneCluster.knoxEnabled.isDefined && cl.dataplaneCluster.knoxEnabled.get && cl.dataplaneCluster.knoxUrl.isDefined
   final protected val executor =
     if (knoxEnabled) KnoxApiExecutor.withTokenCaching(knoxConfig, w)
     else KnoxApiExecutor.withTokenDisabled(knoxConfig, w)
   final protected val ambariInterface: AmbariInterfaceV2 =
-    new AmbariClusterInterfaceV2(cl.cluster,cl.dataplaneCluster, c, credentialInterface, executor, ws)
+    new AmbariClusterInterfaceV2(cl.cluster, cl.dataplaneCluster, c, credentialInterface, executor, wsClient)
 
   import akka.pattern.pipe
   override final def receive: Receive = {

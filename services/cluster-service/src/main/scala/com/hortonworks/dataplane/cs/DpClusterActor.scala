@@ -14,7 +14,6 @@ package com.hortonworks.dataplane.cs
 import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.commons.service.api.Poll
-import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
 import play.api.libs.json.JsValue
 import play.api.libs.ws.WSClient
