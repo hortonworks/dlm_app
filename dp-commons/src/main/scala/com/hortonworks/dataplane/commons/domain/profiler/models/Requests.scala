@@ -9,7 +9,6 @@
 
 package com.hortonworks.dataplane.commons.domain.profiler.models
 
-import com.hortonworks.dataplane.commons.domain.profiler.models.Assets.Asset
 import com.hortonworks.dataplane.commons.domain.profiler.models.MetricContext.ProfilerMetricContext
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.ProfilerMetric
 
@@ -18,7 +17,5 @@ object Requests {
 
 
   case class ProfilerMetricRequest(clusterId: Long, context: ProfilerMetricContext, metrics: List[ProfilerMetric])
-
-  case class AssetResolvedProfilerMetricRequest(clusterId: Long, assets: List[Asset], metrics: List[ProfilerMetric])
 
 }

@@ -113,7 +113,7 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       .map(mapResultsGeneric)
   }
 
-  override def getMetrics(metricRequest: Requests.AssetResolvedProfilerMetricRequest, userName: String)(implicit token: Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+  override def getMetrics(metricRequest: Requests.ProfilerMetricRequest, userName: String)(implicit token: Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
     ws.url(s"$url/cluster/dp-profiler/metrics?userName=$userName")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")

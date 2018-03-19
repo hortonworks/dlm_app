@@ -39,7 +39,14 @@ object ResultParser {
     Json.format[SecureAssetAccessUserCountResult]
   private implicit val sensitivityDistributionResultFormat: Format[SensitivityDistributionResult] =
     Json.format[SensitivityDistributionResult]
-
+  private implicit val topKCollectionsResultFormat: Format[TopKCollectionsResult] =
+    Json.format[TopKCollectionsResult]
+  private implicit val topKAssetsResultFormat: Format[TopKAssetsResult] =
+    Json.format[TopKAssetsResult]
+  private implicit val assetCountsResultForADayFormat: Format[AssetCountsResultForADay] =
+    Json.format[AssetCountsResultForADay]
+  private implicit val assetCountsResultFormat: Format[AssetCountsResult] =
+    Json.format[AssetCountsResult]
   private implicit val metricErrorDefinitionFormat: Format[MetricErrorDefinition] =
     Json.format[MetricErrorDefinition]
 
@@ -56,9 +63,15 @@ object ResultParser {
           case MetricType.QueriesAndSensitivityDistribution => Left(MetricResult(status, MetricType.QueriesAndSensitivityDistribution
             , definition.as[QueriesAndSensitivityDistributionResult]))
           case MetricType.SecureAssetAccessUserCount => Left(MetricResult(status, MetricType.SecureAssetAccessUserCount
-            , definition.as[SecureAssetAccessUserCountResultForADay]))
+            , definition.as[SecureAssetAccessUserCountResult]))
           case MetricType.SensitivityDistribution => Left(MetricResult(status, MetricType.SensitivityDistribution
             , definition.as[SensitivityDistributionResult]))
+          case MetricType.TopKCollections => Left(MetricResult(status, MetricType.TopKCollections
+            , definition.as[TopKCollectionsResult]))
+          case MetricType.TopKAssets => Left(MetricResult(status, MetricType.TopKAssets
+            , definition.as[TopKAssetsResult]))
+          case MetricType.AssetCounts => Left(MetricResult(status, MetricType.AssetCounts
+            , definition.as[AssetCountsResult]))
           case _ => Right(s"unsupported result type ${metricType.toString}")
         }
       }
@@ -85,6 +98,12 @@ object ResultParser {
         case definition: SecureAssetAccessUserCountResult => Json.toJson(Map(resultStatusIdentifier -> JsBoolean(metric.status),
           metricTypeIdentifier -> JsString(metric.metricType.toString), resultDefinitionIdentifier -> Json.toJson(definition)))
         case definition: SensitivityDistributionResult => Json.toJson(Map(resultStatusIdentifier -> JsBoolean(metric.status),
+          metricTypeIdentifier -> JsString(metric.metricType.toString), resultDefinitionIdentifier -> Json.toJson(definition)))
+        case definition: TopKCollectionsResult => Json.toJson(Map(resultStatusIdentifier -> JsBoolean(metric.status),
+          metricTypeIdentifier -> JsString(metric.metricType.toString), resultDefinitionIdentifier -> Json.toJson(definition)))
+        case definition: TopKAssetsResult => Json.toJson(Map(resultStatusIdentifier -> JsBoolean(metric.status),
+          metricTypeIdentifier -> JsString(metric.metricType.toString), resultDefinitionIdentifier -> Json.toJson(definition)))
+        case definition: AssetCountsResult => Json.toJson(Map(resultStatusIdentifier -> JsBoolean(metric.status),
           metricTypeIdentifier -> JsString(metric.metricType.toString), resultDefinitionIdentifier -> Json.toJson(definition)))
         case definition: MetricErrorDefinition => Json.toJson(Map(resultStatusIdentifier -> JsBoolean(metric.status),
           metricTypeIdentifier -> JsString(metric.metricType.toString), resultDefinitionIdentifier -> Json.toJson(definition)))

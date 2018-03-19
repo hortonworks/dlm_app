@@ -44,11 +44,6 @@ class DataAssetRepo @Inject()(
     }
   }
 
-  def allAssetsWithDatasetId(datasetId: Long): Future[List[DataAsset]] = db.run {
-    DatasetAssets.filter(_.datasetId === datasetId).to[List].result
-  }
-
-
 
   def insert(dataAsset: DataAsset): Future[DataAsset] = {
     db.run {

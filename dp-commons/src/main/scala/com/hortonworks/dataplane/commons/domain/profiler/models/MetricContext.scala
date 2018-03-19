@@ -9,27 +9,20 @@
 
 package com.hortonworks.dataplane.commons.domain.profiler.models
 
-import com.hortonworks.dataplane.commons.domain.profiler.models.Assets.Asset
 import com.hortonworks.dataplane.commons.domain.profiler.models.MetricContext.MetricContextType.MetricContextType
 
 object MetricContext {
 
-  trait MetricContextDefinition {
-    def retrieveAssets(assetListFromContext: Long => List[Asset]): List[Asset]
-  }
+  trait MetricContextDefinition
 
   object MetricContextType extends Enumeration {
     type MetricContextType = Value
     val CLUSTER, COLLECTION, ASSET = Value
   }
 
-  case class CollectionContext(collectionId: Long) extends MetricContextDefinition {
-    override def retrieveAssets(assetListFromContext: Long => List[Asset]): List[Asset] = assetListFromContext(collectionId)
-  }
+  case class CollectionContext(collectionId: String) extends MetricContextDefinition
 
-  case object ClusterContext extends MetricContextDefinition {
-    override def retrieveAssets(assetListFromContext: Long => List[Asset]): List[Asset] = List()
-  }
+  case object ClusterContext extends MetricContextDefinition
 
 
   case class ProfilerMetricContext(contextType: MetricContextType, definition: MetricContextDefinition)

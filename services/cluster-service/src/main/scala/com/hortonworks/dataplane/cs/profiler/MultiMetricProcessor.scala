@@ -9,7 +9,7 @@
 
 package com.hortonworks.dataplane.cs.profiler
 
-import com.hortonworks.dataplane.commons.domain.profiler.models.Assets.Asset
+import com.hortonworks.dataplane.commons.domain.profiler.models.MetricContext.ProfilerMetricContext
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.MetricType
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.MetricType.MetricType
 import com.hortonworks.dataplane.cs.profiler.MultiMetricProcessor.MetricProcessorType.MetricProcessorType
@@ -20,7 +20,7 @@ import scala.concurrent.Future
 
 trait MultiMetricProcessor {
 
-  def retrieveMetrics(ws: WSClient, profilerConfigs: GlobalProfilerConfigs, userName: String, clusterId: Long, assets: List[Asset], metricRequests: MetricRequestGroup): Future[MetricResultGroup]
+  def retrieveMetrics(ws: WSClient, profilerConfigs: GlobalProfilerConfigs, userName: String, clusterId: Long, context: ProfilerMetricContext, metricRequests: MetricRequestGroup): Future[MetricResultGroup]
 }
 
 
@@ -30,7 +30,9 @@ object MultiMetricProcessor {
     type MetricProcessorType = Value
     val TopKUsersPerAssetProcessor, AssetDistributionBySensitivityTagProcessor,
     QueriesAndSensitivityDistributionProcessor,
-    SecureAssetAccessUserCountProcessor, SensitivityDistributionProcessor = Value
+    SecureAssetAccessUserCountProcessor, SensitivityDistributionProcessor,
+    AssetCountsProcessor, TopKAssetsProcessor,
+    TopKCollectionsProcessor = Value
   }
 
   private val metricToProcessorRelationship: Map[MetricType, MetricProcessorType] = Map(
@@ -38,7 +40,10 @@ object MultiMetricProcessor {
     MetricType.AssetDistributionBySensitivityTag -> MetricProcessorType.AssetDistributionBySensitivityTagProcessor,
     MetricType.QueriesAndSensitivityDistribution -> MetricProcessorType.QueriesAndSensitivityDistributionProcessor,
     MetricType.SecureAssetAccessUserCount -> MetricProcessorType.SecureAssetAccessUserCountProcessor,
-    MetricType.SensitivityDistribution -> MetricProcessorType.SensitivityDistributionProcessor
+    MetricType.SensitivityDistribution -> MetricProcessorType.SensitivityDistributionProcessor,
+    MetricType.AssetCounts -> MetricProcessorType.AssetCountsProcessor,
+    MetricType.TopKAssets -> MetricProcessorType.TopKAssetsProcessor,
+    MetricType.TopKCollections -> MetricProcessorType.TopKCollectionsProcessor
   )
 
   def processorOf(metricType: MetricType): MetricProcessorType = metricToProcessorRelationship(metricType)
@@ -50,6 +55,9 @@ object MultiMetricProcessor {
       case MetricProcessorType.QueriesAndSensitivityDistributionProcessor => Some(QueriesAndSensitivityDistributionProcessor)
       case MetricProcessorType.SecureAssetAccessUserCountProcessor => Some(SecureAssetAccessUserCountProcessor)
       case MetricProcessorType.SensitivityDistributionProcessor => Some(SensitivityDistributionProcessor)
+      case MetricProcessorType.AssetCountsProcessor => Some(AssetCountProcessor)
+      case MetricProcessorType.TopKAssetsProcessor => Some(TopKAssetsProcessor)
+      case MetricProcessorType.TopKCollectionsProcessor => Some(TopKCollectionsProcessor)
       case _ => None
     }
   }

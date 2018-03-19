@@ -11,15 +11,13 @@ package com.hortonworks.dataplane.commons.domain.profiler.parsers
 
 
 import play.api.libs.json._
-import AssetParser._
 import MetricParser._
 import ProfilerMetricContextParser._
-import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.{AssetResolvedProfilerMetricRequest, ProfilerMetricRequest}
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.ProfilerMetricRequest
 
 object RequestParser {
 
 
   implicit val profilerMetricRequestFormat: Format[ProfilerMetricRequest] = Json.format[ProfilerMetricRequest]
-  implicit val assetResolvedProfilerMetricRequest: Format[AssetResolvedProfilerMetricRequest] = Json.format[AssetResolvedProfilerMetricRequest]
 
 }

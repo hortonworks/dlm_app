@@ -21,9 +21,7 @@ object Assets {
 
   trait AssetDefinition
 
-  case class Asset(assetType: AssetType, definition: AssetDefinition) extends MetricContextDefinition {
-    override def retrieveAssets(assetListFromContext: Long => List[Asset]): List[Asset] = List(this)
-  }
+  case class Asset(assetType: AssetType, definition: AssetDefinition) extends MetricContextDefinition
 
   case class HiveAssetDefinition(database: String, table: String) extends AssetDefinition
 

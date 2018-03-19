@@ -10,32 +10,18 @@
 
 package com.hortonworks.dataplane.commons.domain
 
-import com.hortonworks.dataplane.commons.domain.profiler.models.Assets.{Asset, AssetType, HiveAssetDefinition}
 import com.hortonworks.dataplane.commons.domain.profiler.models.MetricContext.{ClusterContext, MetricContextType, ProfilerMetricContext}
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.{MetricType, ProfilerMetric, SensitivityDistributionMetric, TopKUsersPerAssetMetric}
-import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.{AssetResolvedProfilerMetricRequest, ProfilerMetricRequest}
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.ProfilerMetricRequest
 import com.hortonworks.dataplane.commons.domain.profiler.parsers.RequestParser._
 import org.scalatest.AsyncFlatSpec
 import play.api.libs.json.{JsValue, Json}
 
 class RequestParsersSpec extends AsyncFlatSpec {
 
-  "RequestParser" should "Parse AssetResolvedProfilerMetricRequest  to json and back" in {
-    val assets = List(Asset(AssetType.Hive, HiveAssetDefinition("test", "test")), Asset(AssetType.Hive, HiveAssetDefinition("test1", "test1")))
-    val metrics = List(ProfilerMetric(MetricType.TopKUsersPerAsset, TopKUsersPerAssetMetric(10, 10)), ProfilerMetric(MetricType.SensitivityDistribution, SensitivityDistributionMetric))
-
-
-    val simpleRequest = AssetResolvedProfilerMetricRequest(1l, assets, metrics)
-
-    val simpleRequestJson: JsValue = Json.toJson(simpleRequest)
-
-    assert(simpleRequestJson.as[AssetResolvedProfilerMetricRequest] == simpleRequest)
-
-  }
-
 
   "RequestParser" should "Parse ProfilerMetricRequest  to json and back" in {
-    val metrics = List(ProfilerMetric(MetricType.TopKUsersPerAsset, TopKUsersPerAssetMetric(10, 10)), ProfilerMetric(MetricType.SensitivityDistribution, SensitivityDistributionMetric))
+    val metrics = List(ProfilerMetric(MetricType.TopKUsersPerAsset, TopKUsersPerAssetMetric(10, "a", "b")), ProfilerMetric(MetricType.SensitivityDistribution, SensitivityDistributionMetric))
 
     val profilerMetricRequest = ProfilerMetricRequest(1l, ProfilerMetricContext(MetricContextType.CLUSTER, ClusterContext), metrics)
 

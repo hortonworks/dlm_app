@@ -9,13 +9,11 @@
 
 package com.hortonworks.dataplane.cs.profiler.processors
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
-
-import com.hortonworks.dataplane.commons.domain.profiler.models.Assets.{Asset, HiveAssetDefinition}
+import com.hortonworks.dataplane.commons.domain.profiler.models.MetricContext.{ClusterContext, CollectionContext, ProfilerMetricContext}
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.{MetricType, ProfilerMetric, SecureAssetAccessUserCountMetric}
-import com.hortonworks.dataplane.commons.domain.profiler.models.Results.{MetricErrorDefinition, MetricResult, SecureAssetAccessUserCountResult, SecureAssetAccessUserCountResultForADay}
-import com.hortonworks.dataplane.cs.profiler.{GlobalProfilerConfigs, MetricRequestGroup, MetricResultGroup, MultiMetricProcessor}
+import com.hortonworks.dataplane.commons.domain.profiler.models.Results._
+import com.hortonworks.dataplane.cs.profiler._
+import com.hortonworks.dataplane.cs.profiler.processors.helpers.DateValidator
 import play.api.libs.json.{Format, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
@@ -24,34 +22,41 @@ import scala.concurrent.Future
 
 object SecureAssetAccessUserCountProcessor extends MultiMetricProcessor {
 
-  val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
 
   private case class LivyResponse(date: String, count: Long)
 
 
   private implicit val livyResponseFormatter: Format[LivyResponse] = Json.format[LivyResponse]
 
-  override def retrieveMetrics(ws: WSClient, profilerConfigs: GlobalProfilerConfigs, userName: String, clusterId: Long, assets: List[Asset], metricRequests: MetricRequestGroup): Future[MetricResultGroup] = {
-    validateMetricsAndAssets(metricRequests, assets).flatMap(
-      metricAndHiveAssets =>
-        if (assets.isEmpty) {
-          Future.successful(List(MetricResult(false, MetricType.SecureAssetAccessUserCount, MetricErrorDefinition("Query at lake level is not supported yet"))))
+  def retrieveMetrics(ws: WSClient, profilerConfigs: GlobalProfilerConfigs, userName: String, clusterId: Long, context: ProfilerMetricContext, metricRequests: MetricRequestGroup): Future[MetricResultGroup] = {
+
+    validateMetrics(metricRequests).flatMap(metric =>
+      getQuery(context, metric).flatMap(
+        postData => {
+          val future: Future[WSResponse] = ws.url(profilerConfigs.assetMetricsUrl)
+            .withHeaders("Accept" -> "application/json")
+            .post(postData)
+          future.flatMap(response => response.status match {
+            case 202 =>
+              val sensitivityQueryDistribution =   (response.json \ "data").as[List[LivyResponse]]
+              Future.successful(List(MetricResult(true, MetricType.SecureAssetAccessUserCount,
+                SecureAssetAccessUserCountResult(
+                  sensitivityQueryDistribution.map(p => SecureAssetAccessUserCountResultForADay(p.date, p.count))))))
+            case _ =>
+              Future.successful(List(MetricResult(false, MetricType.SecureAssetAccessUserCount,
+                MetricErrorDefinition(s"failed to retrieve  SecureAssetAccessUserCount from profiler agent." +
+                  s" status: ${response.status}   , response :${response.json.toString()} "))))
+          })
         }
-        else {
-          val inClause = convertToInClause(metricAndHiveAssets._2)
-          val endDay = {
-            val cal = Calendar.getInstance
-            cal.add(Calendar.DATE, -1)
-            dateFormat.format(cal.getTime)
-          }
+      )
+    )
+  }
 
-
-          val startDay = {
-            val cal = Calendar.getInstance
-            cal.add(Calendar.DATE, -1 * metricAndHiveAssets._1.lookBackDays)
-            dateFormat.format(cal.getTime)
-          }
-          val postData = Json.obj(
+  def getQuery(context: ProfilerMetricContext, metricRequest: SecureAssetAccessUserCountMetric): Future[AssetMetricRequest] = {
+    context.definition match {
+      case ClusterContext =>
+        Future.successful {
+          Json.obj(
             "metrics" -> List(Map("metric" -> "hivesensitivity",
               "aggType" -> "Snapshot"),
               Map("metric" -> "hiveagg",
@@ -63,53 +68,66 @@ object SecureAssetAccessUserCountProcessor extends MultiMetricProcessor {
                  |  (SELECT CONCAT(DATABASE,'.',TABLE) AS TABLE,
                  |          COUNT,date
                  |   FROM hiveagg_Daily
-                 |   WHERE CONCAT(DATABASE,'.',TABLE) IN $inClause
-                 |     AND date <= '$endDay'
-                 |     AND date >= '$startDay') t1
+                 |   WHERE  date <= '${metricRequest.endDate}'
+                 |     AND date >= '${metricRequest.startDate}') t1
                  | JOIN
                  |  (SELECT distinct(CONCAT(DATABASE,'.',TABLE)) AS TABLE
-                 |   FROM hivesensitivity_Snapshot
-                 |   WHERE CONCAT(DATABASE,'.',TABLE) IN $inClause) t2 ON t1.table=t2.table
+                 |   FROM hivesensitivity_Snapshot ) t2 ON t1.table=t2.table
                  | GROUP BY t1.date
                  | ORDER BY t1.date""".stripMargin.replace("\n", "")
           )
-          val future: Future[WSResponse] = ws.url(profilerConfigs.assetMetricsUrl)
-            .withHeaders("Accept" -> "application/json")
-            .post(postData)
-          future.flatMap(response => response.status match {
-            case 202 =>
-              val sensitivityQueryDistribution = (response.json \ "data").as[List[LivyResponse]]
-              Future.successful(List(MetricResult(true, MetricType.SecureAssetAccessUserCount,
-                SecureAssetAccessUserCountResult(
-                  sensitivityQueryDistribution.map(p => SecureAssetAccessUserCountResultForADay(p.date, p.count))))))
-            case _ =>
-              Future.successful(List(MetricResult(false, MetricType.SecureAssetAccessUserCount,
-                MetricErrorDefinition(s"failed to retrieve  SecureAssetAccessUserCount from profiler agent. status: ${response.status}"))))
-          })
         }
-    )
+      case CollectionContext(collectionId) =>
+        Future.successful {
+          Json.obj(
+            "metrics" -> List(Map("metric" -> "hivesensitivity",
+              "aggType" -> "Snapshot"),
+              Map("metric" -> "hiveagg",
+                "aggType" -> "Daily"),
+              Map("metric" -> "dataset",
+                "aggType" -> "Snapshot")),
+            "sql" ->
+              s"""SELECT t1.date       AS date,
+                 |       Sum(t1.count) AS count
+                 |  FROM   (SELECT a1.*
+                 |        FROM   (SELECT Concat(database, '.', table) AS table,
+                 |                       count,
+                 |                       date
+                 |                FROM   hiveagg_daily
+                 |                WHERE  date <= '${metricRequest.endDate}'
+                 |                       AND date >= '${metricRequest.startDate}') a1
+                 |               JOIN (SELECT assetid AS table
+                 |                     FROM   dataset_snapshot
+                 |                     WHERE  dataset = '$collectionId') a2
+                 |                 ON a1.table = a2.table) t1
+                 |       JOIN (SELECT DISTINCT( a1.table ) AS table
+                 |             FROM   (SELECT DISTINCT( Concat(database, '.', table) ) AS TABLE
+                 |                     FROM   hivesensitivity_snapshot) a1
+                 |                    JOIN (SELECT assetid AS table
+                 |                          FROM   dataset_snapshot
+                 |                          WHERE  dataset = '$collectionId') a2
+                 |                      ON a1.table = a2.table) t2
+                 |         ON t1.table = t2.table
+                 |  GROUP  BY t1.date
+                 |  ORDER  BY t1.date""".stripMargin.replace("\n", "")
+          )
+        }
+      case x =>
+        Future.failed(new Exception(s"SecureAssetAccessUserCountMetric is not available for context $x"))
+    }
   }
 
-
-  private def convertToInClause(hiveAssets: List[HiveAssetDefinition]): String = {
-    hiveAssets.map(asset => s"'${asset.database}.${asset.table}'").mkString("(", ",", ")")
-  }
-
-
-  private def validateMetricsAndAssets(metrics: List[ProfilerMetric], assets: List[Asset]): Future[(SecureAssetAccessUserCountMetric, List[HiveAssetDefinition])] = {
+  private def validateMetrics(metrics: List[ProfilerMetric]): Future[SecureAssetAccessUserCountMetric] = {
     metrics.size match {
       case 1 =>
         metrics.head.definition match {
           case metric: SecureAssetAccessUserCountMetric =>
-            Future.sequence(assets.map(
-              _.definition match {
-                case x: HiveAssetDefinition => Future.successful(x)
-                case temp => Future.failed(new Exception(s"Invalid asset $temp"))
-              }
-            )).map((metric, _))
+            DateValidator.validateDate(metric.startDate).flatMap(
+              _ => DateValidator.validateDate(metric.endDate)
+            ).map(_ => metric)
           case _ => Future.failed(new Exception(s"Invalid metric type ${metrics.head.metricType}"))
         }
-      case _ => Future.failed(new Exception("Invalid number of metrics for SecureAssetAccessUserCountProcessor"))
+      case _ => Future.failed(new Exception("Invalid number of metrics for SecureAssetAccessUserCountMetricProcessor"))
     }
   }
 }
