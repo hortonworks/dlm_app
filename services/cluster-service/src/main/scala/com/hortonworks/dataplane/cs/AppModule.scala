@@ -105,7 +105,7 @@ object AppModule extends AbstractModule {
                           clusterHostsService: ClusterHostsService,
                           dpClusterService: DpClusterService,
                           clusterService: ClusterService,
-                          wSClient: WSClient,
+                          sslContextManager: SslContextManager,
                           config: Config): ClusterDataApi = {
     new ClusterDataApi(actorSystem,
                        materializer,
@@ -114,7 +114,7 @@ object AppModule extends AbstractModule {
                        clusterHostsService,
                        dpClusterService,
                        clusterService,
-                       wSClient,
+                       sslContextManager,
                        config)
   }
 
@@ -132,13 +132,11 @@ object AppModule extends AbstractModule {
   def provideStatusRoute(storageInterface: StorageInterface,
                          credentialInterface: CredentialInterface,
                          config: Config,
-                         wSClient: WSClient,
                          clusterSync: ClusterSync,
                          dpClusterSync: DpClusterSync,
                          metricsRegistry: MetricsRegistry,
                          sslContextManager: SslContextManager): StatusRoute = {
-    new StatusRoute(wSClient,
-                    storageInterface,
+    new StatusRoute(storageInterface,
                     credentialInterface,
                     config,
                     clusterSync,
@@ -154,7 +152,6 @@ object AppModule extends AbstractModule {
                          config: Config,
                          clusterService: ClusterService,
                          dpClusterService: DpClusterService,
-                         wSClient: WSClient,
                          sslContextManager: SslContextManager): AmbariRoute = {
     new AmbariRoute(storageInterface,
                     clusterService,
@@ -327,8 +324,8 @@ object AppModule extends AbstractModule {
   def provideClusterSync(actorSystem: ActorSystem,
                          config: Config,
                          clusterInterface: StorageInterface,
-                         wSClient: WSClient): ClusterSync = {
-    new ClusterSync(actorSystem, config, clusterInterface, wSClient)
+                         sslContextManager: SslContextManager): ClusterSync = {
+    new ClusterSync(actorSystem, config, clusterInterface, sslContextManager)
   }
 
   @Provides
@@ -338,14 +335,12 @@ object AppModule extends AbstractModule {
                            clusterInterface: StorageInterface,
                            credentialInterface: CredentialInterface,
                            dpClusterService: DpClusterService,
-                           wSClient: WSClient,
                            sslContextManager: SslContextManager): DpClusterSync = {
     new DpClusterSync(actorSystem,
                       config,
                       clusterInterface,
                       credentialInterface,
                       dpClusterService,
-                      wSClient,
                       sslContextManager)
   }
 

@@ -42,8 +42,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-class StatusRoute @Inject()(val ws: WSClient,
-                            storageInterface: StorageInterface,
+class StatusRoute @Inject()(storageInterface: StorageInterface,
                             val credentialInterface: CredentialInterface,
                             val config: Config,
                             clusterSync: ClusterSync,

@@ -26,7 +26,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class FetchBeaconTask(cl: ClusterData, c: Config, w: WSClient, si: StorageInterface,
-                      credentialInterface: CredentialInterface, cs: ActorRef, sslContextManager: SslContextManager) extends ClusterSyncTask(cl,c,w,si,credentialInterface, cs, sslContextManager) {
+                      credentialInterface: CredentialInterface, cs: ActorRef) extends ClusterSyncTask(cl,c,w,si,credentialInterface, cs) {
 
   override val taskType: TaskType = TaskType.Beacon
 

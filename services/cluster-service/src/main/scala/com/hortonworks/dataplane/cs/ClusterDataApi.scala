@@ -24,6 +24,7 @@ import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Error, HJwtToken, WrappedErrorException, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, DpClusterService}
 import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
@@ -45,7 +46,7 @@ class ClusterDataApi @Inject()(
     private val clusterHostsService: ClusterHostsService,
     private val dpClusterService: DpClusterService,
     private val clusterService: ClusterService,
-    private val wSClient: WSClient,
+    private val sslContextManager: SslContextManager,
     private val config: Config) {
 
   //Create a new Execution context for use in our proxy
@@ -125,7 +126,7 @@ class ClusterDataApi @Inject()(
           KnoxConfig(Try(config.getString("dp.services.knox.token.topology"))
             .getOrElse("token"),
             dpc.knoxUrl),
-          wSClient)
+         sslContextManager.getWSClient(dpc.allowUntrusted))
 
         executor.getKnoxApiToken(s"${Constants.HJWT}=$t")
       })

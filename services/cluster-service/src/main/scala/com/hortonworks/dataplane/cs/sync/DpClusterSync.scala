@@ -28,7 +28,6 @@ import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.JsValue
-import play.api.libs.ws.WSClient
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -39,7 +38,6 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                               val storageInterface: StorageInterface,
                               val credentialInterface: CredentialInterface,
                               val dpClusterService: DpClusterService,
-                              val wSClient: WSClient,
                               val sslContextManager: SslContextManager) {
 
   val logger = Logger(classOf[DpClusterSync])
@@ -149,11 +147,10 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
               Props(classOf[ClusterSynchronizer],
                 config,
                 ClusterData(dataplaneCluster, cl),
-                wSClient,
+                sslContextManager.getWSClient(dataplaneCluster.allowUntrusted),
                 storageInterface,
                 credentialInterface,
-                completionCallback,
-                sslContextManager))
+                completionCallback))
             actorRef.set(sync)
             storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNC_IN_PROGRESS")))
             logger.info(s"Starting cluster sync for ${dataplaneCluster.ambariUrl}")
