@@ -52,7 +52,7 @@
 					<tbody>
 					<tr *ngFor="let pInfo of profilersList" (click)="profFilChanged(pInfo.profilerInfo.name);">
 						<td><i class="fa" [ngClass]="profState[pInfo.profilerInfo.name]?'fa-check-square-o hwx-external':'fa-square-o'"></i> {{pInfo.profilerInfo.displayName}}</td>
-						<td class="numeric-column">{{pInfo.jobsCount.success}}</td>
+						<td class="numeric-column">{{pInfo.jobsCount.SUCCESS}}</td>
 					</tr>
 					</tbody>
 				</table>

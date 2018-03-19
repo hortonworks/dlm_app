@@ -11,9 +11,11 @@
 
 
 export class JobsCountModel {
-	success:number;
-	running:number;
-	failed:number;
+	SUCCESS?:number;
+	RUNNING?:number;
+	STARTED?:number;
+	FAILED?:number;
+	UNKNOWN?:number;
 }
 
 export class ProfilerModel {

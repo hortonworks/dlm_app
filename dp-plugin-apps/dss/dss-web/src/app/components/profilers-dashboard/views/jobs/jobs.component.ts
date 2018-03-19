@@ -16,9 +16,9 @@ import {JobsCountModel, ProfilerModel, ProfilerInfoWithJobsCount, JobInfoModel} 
 
 
 export class JobStatusFilterState {
-	"success":boolean = false;
-	"running":boolean = false;
-	"failed":boolean = false;	
+	"SUCCESS":boolean = false;
+	"RUNNING":boolean = false;
+	"FAILED":boolean = false;	
 }
 
 export class ProfilersFilterState {
@@ -51,10 +51,10 @@ export class ProfilerJobsComponent  implements OnInit {
 
   jobs:Array<JobInfoModel> = [];
 
-  jobsCountModel:JobsCountModel = {success:0,running:0,failed:0};
+  jobsCountModel:JobsCountModel = {SUCCESS:0,RUNNING:0,FAILED:0};
   profilersList:Array<ProfilerInfoWithJobsCount> = [];
 
-  statusDisplayMap = {"success":"Compleated", "running":"Running", "failed":"Failed"};
+  statusDisplayMap = {"SUCCESS":"Compleated", "RUNNING":"Running", "FAILED":"Failed"};
   timeTabs = TimeTabs;
   timeSelect:TimeTabs = TimeTabs.D;
 
@@ -90,11 +90,11 @@ export class ProfilerJobsComponent  implements OnInit {
   }
 
   updateJobsCountModel () {
-    this.jobsCountModel = {success:0,running:0,failed:0}
+    this.jobsCountModel = {SUCCESS:0,RUNNING:0,FAILED:0}
     this.profilersList.forEach(pInfo => {
-      this.jobsCountModel.success += pInfo.jobsCount.success
-      this.jobsCountModel.running += pInfo.jobsCount.running
-      this.jobsCountModel.failed += pInfo.jobsCount.failed
+      this.jobsCountModel.SUCCESS += pInfo.jobsCount.SUCCESS
+      this.jobsCountModel.RUNNING += pInfo.jobsCount.RUNNING
+      this.jobsCountModel.FAILED += pInfo.jobsCount.FAILED
     })
   }
 
