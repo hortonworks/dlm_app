@@ -18,7 +18,6 @@ import { NotificationsPageComponent } from 'pages/notifications/notifications.co
 import { HelpComponent } from 'pages/help/help.component';
 import { CreatePolicyComponent } from 'pages/policies/subpages/create-policy/create-policy.component';
 import { CreatePairingComponent } from 'pages/pairings/subpages/create-pairing/create-pairing.component';
-import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 
@@ -80,14 +79,6 @@ export const routes: Routes = [{
         path: 'create',
         pathMatch: 'full',
         component: CreatePolicyComponent
-      },
-      {
-        path: 'review',
-        pathMatch: 'full',
-        component: ReviewPolicyComponent,
-        data: {
-          breadcrumb: 'page.policies.header_create'
-        }
       }
     ]
   },
