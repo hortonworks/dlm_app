@@ -102,12 +102,10 @@ export class DsFullView implements OnInit {
     });
   }
   loadDsModel () {
-    this.richDatasetService
-      .getById(+this.dsId, this.EditState)
-      .subscribe(dsObj => {
-        this.dsModel = dsObj
+    this.richDatasetService.getById(+this.dsId, this.EditState).subscribe(dsObj => {
+        this.dsModel = dsObj;
         this.setEditState();
-      });
+    });
   }
   setEditState () {
     console.log(this.dsModel.editDetails);

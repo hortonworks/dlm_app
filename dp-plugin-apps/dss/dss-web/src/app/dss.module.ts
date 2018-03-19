@@ -29,11 +29,11 @@ export function HttpLoaderFactory(http: Http) {
 
 export function startupServiceFactory(authenticationService: AuthenticationService, lakeService: LakeService) {
   return () => authenticationService.loadUser()
-              .then(() => lakeService.listAsPromise())
+              .then(() => lakeService.listWithClustersAsPromise())
               .then((lakes) => {
                 let dashboard = navigation.find(n => (n.name === 'Dashboard'));
-                lakes = lakes.sort((a, b) => a.name.localeCompare(b.name));
-                dashboard.children = lakes.map(lake => ({name: `${lake.name}, ${lake.dcName}`, url: `/dss/data-lake-dashboard/${lake.id}`, iconClassName: ''}));
+                lakes = lakes.sort((a, b) => a.data.name.localeCompare(b.data.name));
+                dashboard.children = lakes.map(lake => ({name: `${lake.data.name}, ${lake.data.dcName}`, url: `/dss/data-lake-dashboard/${lake.clusters[0].id}`, iconClassName: ''}));
               });
 }
 
