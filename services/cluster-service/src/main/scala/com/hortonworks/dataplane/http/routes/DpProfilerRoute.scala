@@ -109,6 +109,25 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val datasetProfiledAssetCount =
+    path("cluster" / LongNumber / "dpprofiler" / "datasetasset" / Segment / "assetcount") { (clusterId,datasetname) =>
+      get {
+        parameters('profilerInstanceName.as[String]) { profilerInstanceName =>
+          onComplete(getDatasetProfiledAssetsCount(clusterId, profilerInstanceName, datasetname)) {
+            case Success(res) => res.status match {
+              case 200 => complete(success(res.json))
+              case 404 => complete(StatusCodes.NotFound, notFound)
+              case _ => complete(res.status)
+            }
+            case Failure(th) => th match {
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(405, "cluster.profiler.service-not-found", "Unable to find Profiler configured for this cluster", th))
+              case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.profiler.generic", "A generic error occured while communicating with Profiler.", th))
+            }
+          }
+        }
+      }
+    }
+
   val jobStatus =
     path ("cluster" / LongNumber / "dp-profiler" / "job-status" / Segment / Segment) { (clusterId, dbName, tableName) =>
       get {
@@ -330,6 +349,21 @@ class DpProfilerRoute @Inject()(
         response
       }
     }
+
+  private def getDatasetProfiledAssetsCount(clusterId: Long, profilerInstanceName: String, datasetName: String): Future[WSResponse] = {
+
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset/assetcount/$datasetName?profilerinstancename=$profilerInstanceName")
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json")
+        .get()
+    } yield {
+      response
+    }
+  }
 
   private def postAndScheduleJob(clusterId: Long, jobName: String, list: Seq[String]): Future[WSResponse] = {
     val postData = Json.obj(
