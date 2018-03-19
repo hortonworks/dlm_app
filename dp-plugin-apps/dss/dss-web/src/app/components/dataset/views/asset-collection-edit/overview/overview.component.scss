@@ -83,10 +83,6 @@ button.date-range {
   fill: #455A64;
 }
 
-:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .tick line{
-  opacity: 0;
-}
-
 :host ::ng-deep .nvd3.nv-multiBarHorizontalChart nv-zeroLine {
   stroke-width: 2;
 }

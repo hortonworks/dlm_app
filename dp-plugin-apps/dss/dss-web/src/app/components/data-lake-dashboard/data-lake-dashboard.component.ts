@@ -15,7 +15,7 @@ import {Chart} from 'nvd3';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ProfilerService} from 'app/services/profiler.service';
 import {DataLakeDashboard} from '../../models/data-lake-dashboard';
-import {chartColors, ContextTypeConst, MetricTypeConst} from '../../shared/utils/constants';
+import {chartColors, ContextTypeConst, MetricTypeConst, ProfilerName} from '../../shared/utils/constants';
 import {DssAppEvents} from '../../services/dss-app-events';
 import {
   MetricContextDefinition, ProfilerMetric,
@@ -27,6 +27,10 @@ import {
   AssetCountsResultForADay, CollectionsAndCount, SensitivityDistributionResponse
 } from '../../models/profiler-metric-response';
 import {DomUtils} from '../../shared/utils/dom-utils';
+import * as moment from 'moment';
+import {ProfilerInfoWithJobsCount, ProfilerInfoWithAssetsCount} from '../../models/profiler-models';
+import {Observable} from 'rxjs/Observable';
+import {StringUtils} from '../../shared/utils/stringUtils';
 
 declare let d3: any;
 declare let nv: any;
@@ -46,6 +50,8 @@ export class DataLakeDashboardComponent implements OnInit {
   @ViewChild('secureData') secureData: ElementRef;
   @ViewChild('topAssetCollections') topAssetCollections: ElementRef;
   @ViewChild('topAssets') topAssets : ElementRef;
+
+  LABEL_LENGTH  = 13;
 
   clusterId: number;
   metricTypeConst = MetricTypeConst;
@@ -78,21 +84,62 @@ export class DataLakeDashboardComponent implements OnInit {
       new ProfilerMetric(MetricTypeConst.SensitivityDistributionMetric, new ProfilerMetricDefinition())
     ]);
 
-    this.profileService.assetCollectionStats(metricsRequests).subscribe(assetCollectionDashboard => {
-      this.initCharts(assetCollectionDashboard);
-    });
+    Observable.forkJoin([
+      this.profileService.assetCollectionStats(metricsRequests),
+      this.profileService.getStatusWithAssetsCounts(this.clusterId, 0, new Date().getTime())
+    ]).subscribe((resp: any[]) => this.initCharts(resp));
 
     this.dssAppEvents.sideNavCollapsed$.subscribe(collapsed => this.updateChartDimensions());
   }
 
-  private initCharts(profilerMetricResponse: ProfilerMetricResponse) {
-    this.createProfiledNonProfiledChart();
-    this.createSensitiveDataChart(profilerMetricResponse);
-    this.createProfilerJobsChart();
+  private initCharts(resp: any[]) {
+    const profilerMetricResponse = resp[0];
+    const profilerAssetCount = resp[1];
 
-    // this.createTotalAssetsChart();
-    // this.createTopAssetCollectionsChart();
-    // this.createTopAssetsChart();
+    this.createProfiledNonProfiledChart(profilerAssetCount, profilerMetricResponse);
+    this.createSensitiveDataChart(profilerMetricResponse);
+  }
+
+  private createProfiledNonProfiledChart(profilerAssetCount: ProfilerInfoWithAssetsCount[], profilerMetricResponse: ProfilerMetricResponse) {
+    this.profiledNonProfiled.nativeElement.classList.remove('loader');
+
+    const data = [];
+    const sensitiveJobsCount = profilerAssetCount.filter(p => p.profilerInfo.name === ProfilerName.SENSITIVEINFO)[0];
+    const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.SensitivityDistributionMetric)[0];
+
+    if (sensitiveJobsCount && metrics) {
+      const sensitivityDistributionData = metrics.definition as SensitivityDistributionResponse;
+      const nonProfiledAssetCount = sensitivityDistributionData.totalAssets - sensitiveJobsCount.assetsCount;
+      data.push({'key': `Non Profiled Assets - ${nonProfiledAssetCount}`, 'y': nonProfiledAssetCount});
+      data.push({'key': `Profiled Assets - ${sensitiveJobsCount.assetsCount}`, 'y': sensitiveJobsCount.assetsCount});
+    }
+
+    nv.addGraph(() => {
+      let chart = nv.models.pieChart()
+      .x(function (d) {
+        return d.key
+      })
+      .y(function (d) {
+        return d.y
+      })
+      .donut(true)
+      .color([chartColors.BLUE, chartColors.RED])
+      .valueFormat((val) => `${val}%`)
+      .labelType('percent');
+
+      chart.pie.labelsOutside(true).donut(true);
+      chart.legend.align(false);
+
+      d3.select(this.profiledNonProfiled.nativeElement)
+      .datum(data)
+      .transition().duration(1200)
+      .call(chart);
+
+      nv.utils.windowResize(chart.update);
+      this.charts.push(chart);
+
+      return chart;
+    });
   }
 
   private createSensitiveDataChart(profilerMetricResponse: ProfilerMetricResponse) {
@@ -107,8 +154,8 @@ export class DataLakeDashboardComponent implements OnInit {
       const nonSensitiveDataValue = SensitivityDistributionResponse.getNonSensitiveDataValue(this.sensitivityDistributionData);
       const sensitiveDataValue = this.sensitivityDistributionData.assetsHavingSensitiveData;
       data = [
-        {key: "Sensitive", y: sensitiveDataPercentage, tooltip: sensitiveDataValue},
-        {key: "Non Sensitive", y:  nonSensitiveDataPercentage, tooltip: nonSensitiveDataValue}
+        {key: `Sensitive - ${sensitiveDataValue}`, y: sensitiveDataPercentage, tooltip: sensitiveDataValue},
+        {key: `Non Sensitive - ${nonSensitiveDataValue}`, y:  nonSensitiveDataPercentage, tooltip: nonSensitiveDataValue}
       ];
     }
 
@@ -121,7 +168,7 @@ export class DataLakeDashboardComponent implements OnInit {
         return d.y
       })
       .donut(true)
-      .color([chartColors.GREEN, chartColors.BLUE])
+      .color([chartColors.BLUE, chartColors.RED])
       .valueFormat((val) => `${val}%`)
       .labelType('percent');
 
@@ -204,41 +251,34 @@ export class DataLakeDashboardComponent implements OnInit {
     });
   }
 
-  private createProfiledNonProfiledChart() {
-    this.profiledNonProfiled.nativeElement.classList.remove('loader');
+  private getProfilerJobs(startDate: number, endDate: number) {
+    this.totalAssets.nativeElement.classList.add('loader');
 
-    const data = DataLakeDashboard.getData().profiledNonProfiled.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
-    nv.addGraph(() => {
-      let chart = nv.models.pieChart()
-      .x(function (d) {
-        return d.key
-      })
-      .y(function (d) {
-        return d.y
-      })
-      .donut(true)
-      .color(['#2DB075', '#2891C0'])
-      .valueFormat((val) => `${val}%`)
-      .labelType('percent');
-
-      chart.pie.labelsOutside(true).donut(true);
-
-      d3.select(this.profiledNonProfiled.nativeElement)
-      .datum(data)
-      .transition().duration(1200)
-      .call(chart);
-
-      nv.utils.windowResize(chart.update);
-      this.charts.push(chart);
-
-      return chart;
+    this.profileService.getStatusWithJobCounts(this.clusterId, startDate, endDate).subscribe(profilerInfoWithJobsCount => {
+      this.createProfilerJobsChart(profilerInfoWithJobsCount)
     });
   }
 
-  private createProfilerJobsChart() {
+  private createProfilerJobsChart(profilerInfoWithJobsCount: ProfilerInfoWithJobsCount[]) {
     this.profilerJobs.nativeElement.classList.remove('loader');
+    DomUtils.removeAllChildNodes(this.totalAssets.nativeElement);
 
-    const data = DataLakeDashboard.getData().profilerJobs.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
+    let success = 0, running = 0, started = 0, failed = 0, unknown = 0;
+    profilerInfoWithJobsCount.forEach(p => {
+      success += p.jobsCount.SUCCESS ? p.jobsCount.SUCCESS : 0;
+      running += p.jobsCount.RUNNING ? p.jobsCount.RUNNING : 0;
+      started += p.jobsCount.STARTED ? p.jobsCount.STARTED : 0;
+      failed  += p.jobsCount.FAILED  ? p.jobsCount.FAILED  : 0;
+      unknown += p.jobsCount.UNKNOWN ? p.jobsCount.UNKNOWN : 0;
+    });
+
+    const data = [];
+    data.push({'key' : 'SUCCESS', 'y':  success});
+    data.push({'key' : 'RUNNING', 'y':  running});
+    data.push({'key' : 'STARTED', 'y':  started});
+    data.push({'key' : 'FAILED' , 'y':  failed});
+    data.push({'key' : 'UNKNOWN', 'y':  unknown});
+
     nv.addGraph(() => {
       let chart = nv.models.pieChart()
       .x(function (d) {
@@ -248,7 +288,8 @@ export class DataLakeDashboardComponent implements OnInit {
         return d.y
       })
       .donut(true)
-      .color([chartColors.GREEN, chartColors.BLUE, chartColors.RED])
+      .height(320)
+      .color([chartColors.GREEN, chartColors.BLUE, chartColors.YELLOW, chartColors.RED, chartColors.GREY])
       .valueFormat((val) => `${val}%`)
       .labelType('percent');
 
@@ -300,10 +341,10 @@ export class DataLakeDashboardComponent implements OnInit {
     let chart;
     nv.addGraph(() => {
       chart = nv.models.multiBarHorizontalChart()
-      .x(function (d) {
-        return d.label
+      .x(d => {
+        return StringUtils.centerEllipses(d.label, this.LABEL_LENGTH);
       })
-      .y(function (d) {
+      .y(d => {
         return d.value
       })
       .showValues(false)
@@ -312,12 +353,15 @@ export class DataLakeDashboardComponent implements OnInit {
       .showControls(false)
       .showLegend(false)
       .showYAxis(true)
-      .groupSpacing(0.2)
-      .margin({left: 85});
+      .groupSpacing(0.2 + ((10 - data.length) * 0.07))
+      .margin({left: 85, bottom: 75});
 
       chart.dispatch.on('renderEnd', () => {
         this.renderLockIcon(this.topAssetCollections);
       });
+
+      chart.yAxis.tickFormat(d3.format('f'))
+      chart.yAxis.axisLabel('Number of accesses');
 
       d3.select(this.topAssetCollections.nativeElement)
       .datum(topUsersData)
@@ -375,25 +419,28 @@ export class DataLakeDashboardComponent implements OnInit {
     let chart;
     nv.addGraph(() => {
       chart = nv.models.multiBarHorizontalChart()
-      .x(function (d) {
-        return d.label
+      .options({
+        useInteractiveGuideline: true
       })
-      .y(function (d) {
+      .x(d => {
+        return StringUtils.centerEllipses(d.label, this.LABEL_LENGTH);
+      })
+      .y(d => {
         return d.value
       })
-      .showValues(false)
-      .duration(350)
       .showControls(true)
       .stacked(false)
       .showControls(false)
       .showLegend(false)
-      .showYAxis(true)
-      .groupSpacing(0.2)
-      .margin({left: 85});
+      .groupSpacing(0.2 + ((10 - data.length) * 0.07))
+      .margin({left: 85, bottom: 75});
 
       chart.dispatch.on('renderEnd', () => {
         this.renderLockIcon(this.topAssets);
       });
+
+      chart.yAxis.tickFormat(d3.format('f'));
+      chart.yAxis.axisLabel('Number of accesses');
 
       d3.select(this.topAssets.nativeElement)
       .datum(topUsersData)
@@ -434,6 +481,10 @@ export class DataLakeDashboardComponent implements OnInit {
 
     if (type === MetricTypeConst.TopKCollections) {
       this.getTopKCollections($event[0], $event[1]);
+    }
+
+    if (type === MetricTypeConst.ProfilerJobs) {
+      this.getProfilerJobs(moment($event[0], "YYYYMMDD").valueOf(), moment($event[1], "YYYYMMDD").valueOf());
     }
   }
 }

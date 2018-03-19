@@ -12,8 +12,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ProfilerService} from '../../../../services/profiler.service';
 import {LakeService} from '../../../../services/lake.service';
-import {JobsCountModel, ProfilerModel, ProfilerInfoWithAssetsCount, JobInfoModel} from '../../models/profilerModels';
 import { Lake } from '../../../../models/lake';
+import {ProfilerInfoWithAssetsCount} from '../../../../models/profiler-models';
 
 // export class JobsCountModel {
 // 	Completed:number;

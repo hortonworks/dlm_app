@@ -31,8 +31,8 @@
     </div>
     <div class="charts-card">
       <div class="charts-card-header">
-        <div class="title"> {{"pages.dataset.data-lake-dashboard.profiler-jobs-in-last-24hr" | translate}} </div>
-        <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, '')"> </dss-time-range-button-group>
+        <div class="title"> {{"pages.dataset.data-lake-dashboard.profiler-jobs" | translate}} </div>
+        <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, metricTypeConst.ProfilerJobs)"> </dss-time-range-button-group>
       </div>
       <svg #profilerJobs class="loader"></svg>
     </div>
@@ -41,14 +41,14 @@
   <div class="charts-cards-container two-col card-margin-top">
     <div class="charts-card">
       <div class="charts-card-header">
-        <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-asset-collections-last-24hr" | translate}} </div>
+        <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-asset-collections" | translate}} </div>
         <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, metricTypeConst.TopKCollections)"> </dss-time-range-button-group>
       </div>
       <svg #topAssetCollections class="loader"></svg>
     </div>
     <div class="charts-card">
       <div class="charts-card-header">
-        <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-assets-last-24hr" | translate}}  </div>
+        <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-assets" | translate}}  </div>
         <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, metricTypeConst.TopKAssets)"> </dss-time-range-button-group>
       </div>
       <svg #topAssets class="loader"></svg>

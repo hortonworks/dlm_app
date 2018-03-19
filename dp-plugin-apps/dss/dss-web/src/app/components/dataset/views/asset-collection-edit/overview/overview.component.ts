@@ -104,8 +104,6 @@ export class OverviewComponent implements OnChanges {
       this.initCharts();
     });
 
-    // this.getTopKUsers();
-
     this.dssAppEvents.sideNavCollapsed$.subscribe(collapsed => this.updateChartDimensions());
     this.dssAppEvents.dataSetCollaborationPaneCollapsed$.subscribe(collapsed => this.updateChartDimensions());
   }
@@ -126,9 +124,6 @@ export class OverviewComponent implements OnChanges {
 
     this.createDistributionByTagChart();
     this.createSensitiveNonSensitiveChart();
-
-    // this.createQuiresRunningSensitiveDataChart();
-    // this.createUsersAccessingSensitiveDataChart();
   }
 
   private createDistributionByTagChart() {
