@@ -127,4 +127,29 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       .post(Json.obj("assetIds" -> assetIds))
       .map(mapToResultsGeneric)
   }
+
+  override def getProfilersStatusWithJobSummary (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/status/jobs-summary?$queryString")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResultsGeneric)
+  }
+
+  override def getProfilersStatusWithAssetsCount (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/status/asset-count?$queryString")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResultsGeneric)
+  }
+
+  override def getProfilersJobs (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/jobs?$queryString")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResultsGeneric)
+  }
+
 }

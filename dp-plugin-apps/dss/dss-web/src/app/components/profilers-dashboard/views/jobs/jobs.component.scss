@@ -8,8 +8,8 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-@import '../../../../styles/variables';
-@import '../../../../styles/charts';
+@import '../../../../../styles/variables';
+@import '../../../../../styles/charts';
 
 
 .flex-grid {
@@ -125,4 +125,35 @@ table td.numeric-column, table th.numeric-column {
 
 .pull-right {
     float: right;
+}
+
+.duration-control {
+    min-width: 120px;
+    vertical-align: top;
+    background: #fff;
+}
+
+.duration-control {
+    background: transparent;
+    min-width: 0;
+    margin:0px;
+}
+
+ul.duration-control li {
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    min-width: 26px;
+    text-align: center;
+    cursor: pointer;
+    list-style: none;
+}
+
+ul.duration-control li + li {
+    margin-left: 5px;
+}
+
+ul.duration-control li.active {
+    background: #444f62;
+    color: #fff;
 }

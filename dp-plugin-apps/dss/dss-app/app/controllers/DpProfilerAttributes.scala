@@ -168,4 +168,46 @@ class DpProfilerAttributes @Inject()(
     }
   }
 
+  def getProfilersStatusWithJobSummary(clusterId: String) = {
+    AuthenticatedAction.async { req =>
+      val queryString = req.rawQueryString
+      Logger.info(s"Received getProfilersStatusWithJobSummary for clusterId - $clusterId with query params - $queryString")
+      implicit val token = req.token
+      dpProfilerService
+        .getProfilersStatusWithJobSummary(clusterId, queryString)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
+  def getProfilersStatusWithAssetsCount(clusterId: String) = {
+    AuthenticatedAction.async { req =>
+      val queryString = req.rawQueryString
+      Logger.info(s"Received getProfilersStatusWithAssetsCount for clusterId - $clusterId with query params - $queryString")
+      implicit val token = req.token
+      dpProfilerService
+        .getProfilersStatusWithAssetsCount(clusterId, queryString)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
+  def getProfilersJobs(clusterId: String) = {
+    AuthenticatedAction.async { req =>
+      val queryString = req.rawQueryString
+      Logger.info(s"Received getProfilersJobs for clusterId - $clusterId with query params - $queryString")
+      implicit val token = req.token
+      dpProfilerService
+        .getProfilersJobs(clusterId, queryString)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
 }

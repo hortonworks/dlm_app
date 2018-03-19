@@ -94,6 +94,21 @@ export class LakeService {
       .catch(HttpUtil.handleError);
   }
 
+  listWithClusterId(type: string = 'all'): Observable<Array<Lake>> {
+    return this.http
+      .get(`api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(lakes => {
+        var lakesWithClusterId = [];
+        lakes.forEach(lake => {
+          lake.data.clusterId = lake.clusters[0].id;
+          lakesWithClusterId.push(lake.data);
+        })
+        return lakesWithClusterId;
+      })
+      .catch(HttpUtil.handleError);
+  }
+
   listWithClustersAsPromise(type: string = 'all'): Promise<{ data: Lake, clusters: Cluster[] }[]> {
     return this.http
     .get(`api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))

@@ -79,6 +79,11 @@ GET           /api/dpProfiler/auditActions                            controller
 POST          /api/dpProfiler/metrics                                 controllers.DpProfilerAttributes.getMetrics(userName: String ?="")
 
 
+GET           /api/dpProfiler/:clusterId/status-with-jobs-count       controllers.DpProfilerAttributes.getProfilersStatusWithJobSummary(clusterId: String)
+GET           /api/dpProfiler/:clusterId/status-with-assets-count     controllers.DpProfilerAttributes.getProfilersStatusWithAssetsCount(clusterId: String)
+GET           /api/dpProfiler/:clusterId/jobs                         controllers.DpProfilerAttributes.getProfilersJobs(clusterId: String)
+
+
 # Ranger
 # ===========================================
 GET           /api/ranger/audit/:clusterId/:dbName/:tableName         controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
