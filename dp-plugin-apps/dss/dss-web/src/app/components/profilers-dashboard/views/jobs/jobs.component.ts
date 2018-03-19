@@ -47,14 +47,14 @@ export class ProfilerJobsComponent  implements OnInit {
   clstrFilState = {};
   currentClusterId = 0;
   currentClusterName = "";
-  sortInfo = {'col':'jobId', 'order':'desc'}
+  sortInfo = {'col':'id', 'order':'desc'}
 
   jobs:Array<JobInfoModel> = [];
 
   jobsCountModel:JobsCountModel = {SUCCESS:0,RUNNING:0,FAILED:0};
   profilersList:Array<ProfilerInfoWithJobsCount> = [];
 
-  statusDisplayMap = {"SUCCESS":"Compleated", "RUNNING":"Running", "FAILED":"Failed"};
+  statusDisplayMap = {"SUCCESS":"Completed", "RUNNING":"Running", "FAILED":"Failed"};
   timeTabs = TimeTabs;
   timeSelect:TimeTabs = TimeTabs.D;
 
@@ -118,7 +118,7 @@ export class ProfilerJobsComponent  implements OnInit {
         statusArray.push(key.toUpperCase())
     }
     
-    this.profilerService.jobsList(this.currentClusterId, 0, 50, "id", "desc", startTime, endTime, profilerIds, statusArray)
+    this.profilerService.jobsList(this.currentClusterId, 0, 50, this.sortInfo.col, this.sortInfo.order, startTime, endTime, profilerIds, statusArray)
       .subscribe(jobs => {
         this.jobs = jobs;
       })

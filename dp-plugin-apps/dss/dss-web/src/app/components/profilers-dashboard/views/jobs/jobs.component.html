@@ -89,12 +89,12 @@
 				<table id="Jobs"  class="mdl-data-table">
 					<thead>
 					<tr>
-						<th class="sortable-column" (click)="sordBy('jobId')"    [ngClass]="sortInfo.col==='jobId'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Jobs ID</span></th>
+						<th class="sortable-column" (click)="sordBy('id')"    [ngClass]="sortInfo.col==='id'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Jobs ID</span></th>
 						<th class="sortable-column" (click)="sordBy('status')"   [ngClass]="sortInfo.col==='status'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Status</span></th>
-						<th class="sortable-column" (click)="sordBy('sTime')"    [ngClass]="sortInfo.col==='sTime'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Start Time</span></th>
-						<th class="sortable-column" (click)="sordBy('cluster')"  [ngClass]="sortInfo.col==='cluster'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Cluster</span></th>
+						<th class="sortable-column" (click)="sordBy('start')"    [ngClass]="sortInfo.col==='start'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Start Time</span></th>
+						<th class="sortable-column" (click)="sordBy('id')"  [ngClass]="sortInfo.col==='cluster'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Cluster</span></th>
 						<th class="sortable-column" (click)="sordBy('queue')"    [ngClass]="sortInfo.col==='queue'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Queue</span></th>
-						<th class="sortable-column" (click)="sordBy('profiler')" [ngClass]="sortInfo.col==='profiler'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Profilers</span></th>
+						<th class="sortable-column" (click)="sordBy('profilers')" [ngClass]="sortInfo.col==='profilers'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Profilers</span></th>
 					</tr>
 					</thead>
 					<tbody>
