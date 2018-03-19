@@ -7,18 +7,20 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Policy } from 'models/policy.model';
+import {Component, Input, Output, EventEmitter, HostBinding, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
+import { Policy, SummaryTreeItem } from 'models/policy.model';
 import { Job } from 'models/job.model';
 import { PolicyContent } from './policy-content.type';
-import { POLICY_TYPES, POLICY_EXECUTION_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_EXECUTION_TYPES, SOURCE_TYPES, POLICY_MODES } from 'constants/policy.constant';
 import { HiveDatabase } from 'models/hive-database.model';
 import { JOB_STATUS } from 'constants/status.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { TranslateService } from '@ngx-translate/core';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 import { HiveBrowserTablesLoadingMap } from 'components/hive-browser';
-
+import { FrequencyPipe } from 'pipes/frequency.pipe';
+import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
+import { TimeZoneService } from 'services/time-zone.service';
 
 @Component({
   selector: 'dlm-policy-details',
@@ -42,7 +44,9 @@ export class PolicyDetailsComponent {
   @Output() onOpenDirectory = new EventEmitter<any>();
   @Output() onPageChangeFiles = new EventEmitter<any>();
   @Output() onTablesFilter = new EventEmitter<any>();
+  @HostBinding('class') className = 'dlm-policy-details';
 
+  private translateNS = 'page.policies.flow_status';
   @Input()
   policy: Policy;
 
@@ -84,8 +88,14 @@ export class PolicyDetailsComponent {
 
   @Input() tablesSearchPattern = '';
 
+  summaryHeader = this.t.instant('page.policies.settings');
+  fmtTzPipe = new FmtTzPipe(this.cdRef, this.timezoneService);
+
   constructor(
-    private t: TranslateService
+    private t: TranslateService,
+    private frequencyPipe: FrequencyPipe,
+    private cdRef: ChangeDetectorRef,
+    private timezoneService: TimeZoneService
   ) {
 
   }
@@ -138,8 +148,19 @@ export class PolicyDetailsComponent {
     this.onTablesFilter.emit(event);
   }
 
+  get isSourceCluster() {
+    return this.sourceCluster && Number(this.sourceCluster) > 0;
+  }
+
   get filteredJobs() {
     return this.jobs ? this.jobs.filter(job => job.status !== JOB_STATUS.IGNORED) : [];
+  }
+
+  getAccessValue(mode): string {
+    return this.t.instant({
+      [POLICY_MODES.READ_ONLY]: `${this.translateNS}.read_only`,
+      [POLICY_MODES.READ_WRITE]: `${this.translateNS}.read_write`,
+    }[mode] || ' ');
   }
 
   /**
@@ -153,5 +174,92 @@ export class PolicyDetailsComponent {
     }
     return (this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ?
       this.t.instant('common.enabled') : this.t.instant('common.disabled');
+  }
+
+  /**
+   * Returns an array of summary items to display policy settings
+   * in the left pane
+   */
+  get summaryItems(): SummaryTreeItem[]  {
+    const summaryItems = [];
+    if (this.policy) {
+      if (this.policy.description) {
+        summaryItems.push({
+          label: this.t.instant('common.description'),
+          value: this.policy.description,
+          iconClass: 'fa-file-text'
+        });
+      }
+
+      const sourceName = this.policy.sourceType === SOURCE_TYPES.CLUSTER ?
+        this.policy.sourceClusterResource.name : this.policy.cloudCredentialResource.name;
+      const destinationName = this.policy.targetType === SOURCE_TYPES.CLUSTER ?
+        this.policy.targetClusterResource.name : this.policy.cloudCredentialResource.name;
+
+      const sourceIcon = this.policy.sourceType === SOURCE_TYPES.CLUSTER ? 'fa-cube' : 'fa-cloud';
+      const destinationIcon = this.policy.targetType === SOURCE_TYPES.CLUSTER ? 'fa-cube' : 'fa-cloud';
+
+      const frequency = this.frequencyPipe.transform(this.policy.frequency);
+      const startTime = 'startTime' in this.policy && this.policy['startTime'] ?
+        this.fmtTzPipe.transform(+new Date(this.policy['startTime']), 'MMM DD, Y HH:mm') : '';
+      const endTime = this.policy.endTime ? this.fmtTzPipe.transform(+new Date(this.policy.endTime), 'MMM DD, Y HH:mm') : '';
+      let frequencyText = `${frequency}`;
+      if (startTime) {
+        frequencyText += ` from ${startTime}`;
+      }
+      if (endTime) {
+        frequencyText += ` until ${endTime}`;
+      }
+
+      summaryItems.push({
+        label: this.t.instant('common.source'),
+        value: `${sourceName} ${this.policy.sourceDataset}`,
+        iconClass: sourceIcon
+      });
+
+      summaryItems.push({
+        label: this.t.instant('common.destination'),
+        value: `${destinationName} ${this.policy.targetDataset}`,
+        iconClass: destinationIcon
+      });
+
+      summaryItems.push({
+        label: this.t.instant('common.frequency.self'),
+        value: frequencyText,
+        iconClass: 'fa-clock-o'
+      });
+
+      if (this.policy.executionType && !this.databaseBasedPolicy() && this.policy.sourceType === SOURCE_TYPES.CLUSTER
+      && this.policy.targetType === SOURCE_TYPES.CLUSTER) {
+        summaryItems.push({
+          label: this.t.instant('common.snapshot'),
+          value: this.snapshotEnabledStatus,
+          iconClass: 'fa-clone'
+        });
+      }
+
+      summaryItems.push({
+        label: this.t.instant('common.permissions'),
+        value: this.getAccessValue(this.policy.accessMode),
+        iconClass: 'fa-pencil-square-o'
+      });
+
+      if (this.policy.customProperties.queueName) {
+        summaryItems.push({
+          label: this.t.instant('common.queue_name'),
+          value: this.policy.customProperties.queueName,
+          iconClass: 'fa-list'
+        });
+      }
+
+      if (this.policy.customProperties.distcpMapBandwidth) {
+        summaryItems.push({
+          label: this.t.instant('common.max_bandwidth'),
+          value: `${this.policy.customProperties.distcpMapBandwidth} MBps`,
+          iconClass: 'fa-signal'
+        });
+      }
+    }
+    return summaryItems;
   }
 }

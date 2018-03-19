@@ -23,7 +23,7 @@ import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ActionItemType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';
-import { StatusColumnComponent } from '../../../components/table-columns/policy-status-column/policy-status-column.component';
+import { StatusColumnComponent } from 'components/table-columns/policy-status-column/policy-status-column.component';
 import { PolicyInfoComponent } from './policy-info/policy-info.component';
 import { IconColumnComponent } from 'components/table-columns/icon-column/icon-column.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -42,7 +42,7 @@ import { ProgressState } from 'models/progress-state.model';
 import { PolicyContent } from '../policy-details/policy-content.type';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { POLICY_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, SOURCE_TYPES } from 'constants/policy.constant';
 import { loadDatabases, loadTables } from 'actions/hivelist.action';
 import { HiveDatabase } from 'models/hive-database.model';
 import { getDatabase } from 'selectors/hive.selector';
@@ -58,13 +58,12 @@ import {
   ConfirmationOptions,
   confirmationOptionsDefaults
 } from 'components/confirmation-modal/confirmation-options.type';
-import { POLICY_STATUS, POLICY_UI_STATUS } from 'constants/status.constant';
 import { suspendDisabled, activateDisabled } from 'utils/policy-util';
 import { HiveBrowserTablesLoadingMap } from 'components/hive-browser';
 import { isEqual, merge, cloneDeep } from 'utils/object-utils';
 import { removeProgressState } from 'actions/progress.action';
 
-const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
+const DATABASE_REQUEST = '[POLICY_TABLE] DATABASE_REQUEST';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -129,7 +128,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
-  @ViewChild('clusterCellTemplate') clusterCellTemplateRef: TemplateRef<any>;
+  @ViewChild('sourceCellTemplate') sourceCellTemplateRef: TemplateRef<any>;
+  @ViewChild('targetCellTemplate') targetCellTemplateRef: TemplateRef<any>;
   @ViewChild('table') table: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
@@ -261,17 +261,18 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         flexGrow: 4
       },
       {
+        prop: 'name',
         name: this.t.instant('common.name'),
         cellTemplate: this.policyInfoColumn.cellRef,
-        sortable: false,
-        flexGrow: 13
+        comparator: this.nameComparator.bind(this),
+        flexGrow: 8
       },
       {
-        prop: 'sourceClusterResource',
+        prop: 'sourceDataset',
         name: this.t.instant('common.source'),
-        cellTemplate: this.clusterCellTemplateRef,
-        comparator: this.clusterResourceComparator.bind(this),
-        flexGrow: 6
+        cellTemplate: this.sourceCellTemplateRef,
+        comparator: this.sourceNameComparator.bind(this),
+        flexGrow: 9
       },
       {
         prop: 'accessMode',
@@ -281,10 +282,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         sortable: false,
         flexGrow: 7
       },
-      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), flexGrow: 8,
-        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
-      {prop: 'sourceDataset', name: this.t.instant('common.path'),
-        cellTemplate: this.pathCellRef, flexGrow: 9, sortable: false},
+      {prop: 'targetDataset', name: this.t.instant('common.destination'), flexGrow: 9,
+        cellTemplate: this.targetCellTemplateRef, comparator: this.targetNameComparator.bind(this)},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'),
         sortable: false, flexGrow: 4},
       {prop: 'lastJobDuration', name: this.t.instant('common.duration'),
@@ -301,8 +300,20 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.initJobsLoading();
   }
 
-  clusterResourceComparator(cluster1: Cluster, cluster2: Cluster) {
-    return cluster1.name.toLowerCase() > cluster2.name.toLowerCase() ? 1 : -1;
+  sourceNameComparator(pathOne, pathTwo, rowOne: Policy, rowTwo: Policy) {
+    const nameOne = rowOne.sourceType === SOURCE_TYPES.CLUSTER ? rowOne.sourceClusterResource.name : rowOne.cloudCredentialResource.name;
+    const nameTwo = rowTwo.sourceType === SOURCE_TYPES.CLUSTER ? rowTwo.sourceClusterResource.name : rowTwo.cloudCredentialResource.name;
+    return nameOne.toLowerCase() > nameTwo.toLowerCase() ? 1 : -1;
+  }
+
+  targetNameComparator(pathOne, pathTwo, rowOne: Policy, rowTwo: Policy) {
+    const nameOne = rowOne.targetType === SOURCE_TYPES.CLUSTER ? rowOne.targetClusterResource.name : rowOne.cloudCredentialResource.name;
+    const nameTwo = rowTwo.targetType === SOURCE_TYPES.CLUSTER ? rowTwo.targetClusterResource.name : rowTwo.cloudCredentialResource.name;
+    return nameOne.toLowerCase() > nameTwo.toLowerCase() ? 1 : -1;
+  }
+
+  nameComparator(nameOne, nameTwo) {
+    return nameOne.toLowerCase() > nameTwo.toLowerCase() ? 1 : -1;
   }
 
   initJobsLoading() {
@@ -452,17 +463,21 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadContentDetails(policy, contentType) {
+  loadContentDetails(policy: Policy, contentType) {
     if (!this.tableComponent.isRowExpanded(policy)) {
       return;
     }
     if (contentType === PolicyContent.Files) {
-      const cluster = this.clusterByDatacenterId(policy.sourceCluster);
-      if (policy.type === POLICY_TYPES.HIVE) {
-        this.store.dispatch(loadDatabases(cluster.id, { requestId: DATABASE_REQUEST }));
+      if (policy.sourceType === SOURCE_TYPES.CLUSTER) {
+        const cluster = this.clusterByDatacenterId(policy.sourceCluster);
+        if (policy.type === POLICY_TYPES.HIVE) {
+          this.store.dispatch(loadDatabases(cluster.id, {requestId: DATABASE_REQUEST}));
+        } else {
+          this.sourceCluster = cluster.id;
+          this.hdfsRootPath = policy.sourceDataset;
+        }
       } else {
-        this.sourceCluster = cluster.id;
-        this.hdfsRootPath = policy.sourceDataset;
+        this.sourceCluster = null;
       }
     }
   }
@@ -530,5 +545,19 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   handleTablesFilterApplied(event) {
     this.tablesSearchPattern = event;
+  }
+
+  getSourceName(policy: Policy) {
+    if (policy.sourceType === SOURCE_TYPES.CLUSTER) {
+      return policy.sourceClusterResource.name;
+    }
+    return policy.cloudCredentialResource.name;
+  }
+
+  getTargetName(policy: Policy) {
+    if (policy.targetType === SOURCE_TYPES.CLUSTER) {
+      return policy.targetClusterResource.name;
+    }
+    return policy.cloudCredentialResource.name;
   }
 }

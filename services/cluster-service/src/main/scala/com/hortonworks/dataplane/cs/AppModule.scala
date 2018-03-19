@@ -11,28 +11,17 @@
 
 package com.hortonworks.dataplane.cs
 
-import javax.inject.Named
-
 import akka.actor.ActorSystem
-import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
-import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
+import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
-import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterHostsService,
-  ClusterService,
-  ConfigService,
-  DpClusterService
-}
-import com.hortonworks.dataplane.db._
+import com.hortonworks.dataplane.cs.tls.SslContextManager
+import com.hortonworks.dataplane.db.Webservice.{CertificateService, ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
+import com.hortonworks.dataplane.db.{CertificateServiceImpl, _}
 import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
 import com.typesafe.config.{Config, ConfigFactory}
-import com.typesafe.sslconfig.akka.AkkaSSLConfig
-import com.typesafe.sslconfig.ssl.{TrustManagerConfig, TrustStoreConfig}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -42,33 +31,10 @@ import scala.util.Try
 object AppModule extends AbstractModule {
 
   override def configure() = {
-    bind(classOf[DPTrustStore]).asEagerSingleton()
     bind(classOf[Config]).toInstance(ConfigFactory.load())
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
     bind(classOf[MetricsRegistry])
       .toInstance(MetricsRegistry("cluster-service"))
-  }
-
-  @Provides
-  @Named("connectionContext")
-  def provideSSLConfig(implicit actorSystem: ActorSystem,
-                       materializer: ActorMaterializer,
-                       config: Config,
-                       dPKeystore: DPTrustStore): HttpsConnectionContext = {
-    // provides a custom ssl config with the dp keystore
-    val c = AkkaSSLConfig().mapSettings { sslConfig =>
-      val settings = sslConfig
-        .withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024"))
-        .withTrustManagerConfig(
-          TrustManagerConfig()
-            .withTrustStoreConfigs(scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
-      if (config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
-        settings.withLoose(sslConfig.loose.withDisableHostnameVerification(true))
-      else
-        settings
-    }
-    val dpCtx = Http().createClientHttpsContext(c)
-    dpCtx
   }
 
   @Provides
@@ -83,8 +49,8 @@ object AppModule extends AbstractModule {
   def provideWsClient(implicit actorSystem: ActorSystem,
                       materializer: ActorMaterializer,
                       configuration: Config): WSClient = {
-    val config = new DefaultAsyncHttpClientConfig.Builder()
 
+    val config = new DefaultAsyncHttpClientConfig.Builder()
       .setAcceptAnyCertificate(true)
       .setRequestTimeout(Try(configuration.getInt(
         "dp.services.ws.client.requestTimeout.mins") * 60 * 1000)
@@ -169,14 +135,16 @@ object AppModule extends AbstractModule {
                          wSClient: WSClient,
                          clusterSync: ClusterSync,
                          dpClusterSync: DpClusterSync,
-                         metricsRegistry: MetricsRegistry): StatusRoute = {
+                         metricsRegistry: MetricsRegistry,
+                         sslContextManager: SslContextManager): StatusRoute = {
     new StatusRoute(wSClient,
                     storageInterface,
                     credentialInterface,
                     config,
                     clusterSync,
                     dpClusterSync,
-                    metricsRegistry)
+                    metricsRegistry,
+                    sslContextManager)
   }
 
   @Provides
@@ -186,29 +154,60 @@ object AppModule extends AbstractModule {
                          config: Config,
                          clusterService: ClusterService,
                          dpClusterService: DpClusterService,
-                         wSClient: WSClient): AmbariRoute = {
+                         wSClient: WSClient,
+                         sslContextManager: SslContextManager): AmbariRoute = {
     new AmbariRoute(wSClient,
                     storageInterface,
                     clusterService,
                     credentialInterface,
                     dpClusterService,
-                    config)
+                    config,
+                    sslContextManager)
   }
+
   @Provides
   @Singleton
   def provideHdpProxyRoute(
-      actorSystem: ActorSystem,
-      actorMaterializer: ActorMaterializer,
-      clusterData: ClusterDataApi,
-      config: Config,
-      @Named("connectionContext") sslContext: Provider[HttpsConnectionContext],
-      dPKeystore: DPTrustStore): HdpRoute = {
+                            actorSystem: ActorSystem,
+                            actorMaterializer: ActorMaterializer,
+                            clusterData: ClusterDataApi,
+                            dpClusterService: DpClusterService,
+                            sslContextManager: SslContextManager,
+                            config: Config): HdpRoute = {
     new HdpRoute(actorSystem,
-                 actorMaterializer,
-                 clusterData,
-                 sslContext,
-                 config,
-                 dPKeystore)
+      actorMaterializer,
+      clusterData,
+      dpClusterService: DpClusterService,
+      sslContextManager: SslContextManager,
+      config)
+  }
+
+  @Provides
+  @Singleton
+  def provideConfigurationRoute(wsClient: WSClient, config: Config, sslContextManager: SslContextManager): ConfigurationRoute = {
+    new ConfigurationRoute(
+      wsClient,
+      config,
+      sslContextManager
+    )
+  }
+
+  @Provides
+  @Singleton
+  def provideSslContextManager(config: Config, dpClusterService: DpClusterService, certificateService: CertificateService, materializer: ActorMaterializer, actorSystem: ActorSystem): SslContextManager = {
+    new SslContextManager(
+      config,
+      dpClusterService,
+      certificateService,
+      materializer,
+      actorSystem
+    )
+  }
+
+  @Provides
+  @Singleton
+  def provideCertificateService(implicit ws: WSClient, config: Config): CertificateService = {
+    new CertificateServiceImpl(config)
   }
 
   @Provides
@@ -268,7 +267,8 @@ object AppModule extends AbstractModule {
                         rangerRoute: RangerRoute,
                         dpProfilerRoute: DpProfilerRoute,
                         statusRoute: StatusRoute,
-                        ambariRoute: AmbariRoute): Webserver = {
+                        ambariRoute: AmbariRoute,
+                        configurationRoute: ConfigurationRoute): Webserver = {
     import akka.http.scaladsl.server.Directives._
     new Webserver(
       actorSystem,
@@ -302,7 +302,8 @@ object AppModule extends AbstractModule {
         ambariRoute.configRoute ~
         ambariRoute.serviceStateRoute ~
         ambariRoute.ambariClusterProxy ~
-        ambariRoute.ambariGenericProxy
+        ambariRoute.ambariGenericProxy ~
+        configurationRoute.reloadCertificates
     )
   }
 
@@ -343,13 +344,15 @@ object AppModule extends AbstractModule {
                            clusterInterface: StorageInterface,
                            credentialInterface: CredentialInterface,
                            dpClusterService: DpClusterService,
-                           wSClient: WSClient): DpClusterSync = {
+                           wSClient: WSClient,
+                           sslContextManager: SslContextManager): DpClusterSync = {
     new DpClusterSync(actorSystem,
                       config,
                       clusterInterface,
                       credentialInterface,
                       dpClusterService,
-                      wSClient)
+                      wSClient,
+                      sslContextManager)
   }
 
 }

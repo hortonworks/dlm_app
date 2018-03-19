@@ -47,6 +47,19 @@ export const groupByKey = (collection, keyName) => {
   return group;
 };
 
+export const uniqBy = (collection, keyName) => {
+  const ret = [];
+  const seen = new Set();
+  collection.forEach(item => {
+    const val = multiLevelResolve(item, keyName);
+    if (!seen.has(val)) {
+      seen.add(val);
+      ret.push(item);
+    }
+  });
+  return ret;
+};
+
 export const sortByDateField = (collection, keyName) =>
   collection.sort((a, b) =>
     new Date(a[keyName]).getTime() > new Date(b[keyName]).getTime() ? -1 : 1);

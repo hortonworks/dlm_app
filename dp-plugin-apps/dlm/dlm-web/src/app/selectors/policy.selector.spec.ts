@@ -13,6 +13,7 @@ import { Policy } from 'models/policy.model';
 import * as stateUtils from 'testing/state';
 import { Cluster } from 'models/cluster.model';
 import { Job } from 'models/job.model';
+import { SOURCE_TYPES } from 'constants/policy.constant';
 
 describe('Policy Selectors', () => {
 
@@ -50,10 +51,26 @@ describe('Policy Selectors', () => {
         }
       }
     };
+    const beaconCloudCredsState = {
+      beaconCloudCreds: {
+        entities: {
+          'afc67ab0-f359-4fd0-a78a-96d6e6e7e8e5': {
+            'id': 'afc67ab0-f359-4fd0-a78a-96d6e6e7e8e5',
+            'name': 'Denys-HWX-Credential',
+            'provider': 'AWS',
+            'creationTime': '2018-03-14T10:58:13',
+            'lastModifiedTime': '2018-03-14T23:51:13',
+            'configs': {'version': '1'}
+          }
+        }
+      }
+    };
+
     state = stateUtils.getInitialState();
     state = stateUtils.changeState(state, policiesState);
     state = stateUtils.changeState(state, clustersState);
     state = stateUtils.changeState(state, jobsState);
+    state = stateUtils.changeState(state, beaconCloudCredsState);
   });
 
   describe('#getEntities', () => {
@@ -110,7 +127,10 @@ describe('Policy Selectors', () => {
           lastJobResource: this.job1,
           lastJobDuration: 12,
           lastGoodJobResource: undefined,
-          lastTenJobs: [this.job1]
+          lastTenJobs: [this.job1],
+          cloudCredentialResource: {},
+          sourceType: SOURCE_TYPES.CLUSTER,
+          targetType: SOURCE_TYPES.CLUSTER
         },
         {
           ...this.policy2,
@@ -121,7 +141,10 @@ describe('Policy Selectors', () => {
           lastJobResource: this.job2,
           lastJobDuration: 20,
           lastGoodJobResource: undefined,
-          lastTenJobs: [this.job2]
+          lastTenJobs: [this.job2],
+          cloudCredentialResource: {},
+          sourceType: SOURCE_TYPES.CLUSTER,
+          targetType: SOURCE_TYPES.CLUSTER
         },
         {
           ...this.policy3,
@@ -132,7 +155,10 @@ describe('Policy Selectors', () => {
           lastJobResource: null,
           lastJobDuration: null,
           lastGoodJobResource: null,
-          lastTenJobs: []
+          lastTenJobs: [],
+          cloudCredentialResource: {},
+          sourceType: SOURCE_TYPES.CLUSTER,
+          targetType: SOURCE_TYPES.CLUSTER
         }
       ];
       expect(result).toEqual(expectedResult);

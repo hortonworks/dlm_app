@@ -11,39 +11,47 @@
 <div class="data-lake-container">
   <div class="charts-cards-container two-col">
     <div class="charts-card">
-      <div class="title"> {{"pages.dataset.data-lake-dashboard.no-of-total-assets" | translate}} </div>
-      <div class="total-assets"> {{ dataLakeDashboardData.summary.noOfTables }}</div>
-      <svg #totalAssets></svg>
+      <div class="title"> {{"pages.dataset.data-lake-dashboard.profiled-vs-non-profiled" | translate}} </div>
+      <svg #profiledNonProfiled class="loader"></svg>
     </div>
     <div class="charts-card">
-      <div class="title"> {{"pages.dataset.data-lake-dashboard.profiled-vs-non-profiled" | translate}} </div>
-      <svg #profiledNonProfiled></svg>
+      <div class="title"> {{"pages.dataset.data-lake-dashboard.sensitive-data" | translate}} </div>
+      <svg #sensitiveData class="loader"></svg>
     </div>
   </div>
 
   <div class="charts-cards-container three-col card-margin-top">
     <div class="charts-card">
-      <div class="title"> {{"pages.dataset.data-lake-dashboard.sensitive-data" | translate}} </div>
-      <svg #sensitiveData></svg>
+      <div class="charts-card-header">
+        <div class="title"> {{"pages.dataset.data-lake-dashboard.no-of-total-assets" | translate}} </div>
+        <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, metricTypeConst.AssetCounts)"> </dss-time-range-button-group>
+      </div>
+      <div class="total-assets"> {{ sensitivityDistributionData.totalAssets }}</div>
+      <svg #totalAssets class="loader"></svg>
     </div>
     <div class="charts-card">
-      <div class="title"> {{"pages.dataset.data-lake-dashboard.profiler-jobs-in-last-24hr" | translate}} </div>
-      <svg #profilerJobs></svg>
-    </div>
-    <div class="charts-card">
-      <div class="title"> {{"pages.dataset.data-lake-dashboard.secure-data" | translate}} </div>
-      <svg #secureData></svg>
+      <div class="charts-card-header">
+        <div class="title"> {{"pages.dataset.data-lake-dashboard.profiler-jobs-in-last-24hr" | translate}} </div>
+        <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, '')"> </dss-time-range-button-group>
+      </div>
+      <svg #profilerJobs class="loader"></svg>
     </div>
   </div>
 
   <div class="charts-cards-container two-col card-margin-top">
     <div class="charts-card">
-      <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-asset-collections-last-24hr" | translate}} </div>
-      <svg #topAssetCollections></svg>
+      <div class="charts-card-header">
+        <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-asset-collections-last-24hr" | translate}} </div>
+        <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, metricTypeConst.TopKCollections)"> </dss-time-range-button-group>
+      </div>
+      <svg #topAssetCollections class="loader"></svg>
     </div>
     <div class="charts-card">
-      <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-assets-last-24hr" | translate}}  </div>
-      <svg #topAssets></svg>
+      <div class="charts-card-header">
+        <div class="title"> {{"pages.dataset.data-lake-dashboard.top-10-assets-last-24hr" | translate}}  </div>
+        <dss-time-range-button-group [formats]="['D', 'W', 'M', 'Y']" (change)="timeRangeChange($event, metricTypeConst.TopKAssets)"> </dss-time-range-button-group>
+      </div>
+      <svg #topAssets class="loader"></svg>
     </div>
   </div>
 </div>

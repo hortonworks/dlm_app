@@ -9,6 +9,7 @@
 
 import { Location } from './location.model';
 import { Service } from './service.model';
+import { BeaconConfigStatusDetails } from 'models/beacon-config-status.model';
 
 export interface ClusterStats {
   CapacityTotal: number;
@@ -25,6 +26,7 @@ export interface ClusterUI {
   healthStatus?: string;
   ambariWebUrl: string;
   idByDatacenter: string;
+  beaconConfigStatus: BeaconConfigStatusDetails;
 }
 
 export interface Cluster extends ClusterUI {

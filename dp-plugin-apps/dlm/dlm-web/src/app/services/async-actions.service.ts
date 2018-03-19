@@ -43,7 +43,7 @@ export class AsyncActionsService {
    * so we can put `requestId` here and track it progress within progress reducer
    *
    * @param action action to dispatch
-   * @returns obserable that emits once on action finish
+   * @returns observable that emits once on action finish
    */
   dispatch(action: ActionWithPayload<any>): Observable<ProgressState> {
     const requestId = genId();

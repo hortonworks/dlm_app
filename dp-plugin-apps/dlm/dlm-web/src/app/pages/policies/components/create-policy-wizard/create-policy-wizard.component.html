@@ -33,7 +33,7 @@
             <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SOURCE">
               <dlm-wizard-content [stepIndex]="step?.index" [stepLabel]="step?.label">
                 <div wizard-content-body>
-                  <dlm-step-source #source [accounts]="accounts" [clusters]="clusters" [pairings]="pairings" [sourceClusterId]="sourceClusterId"
+                  <dlm-step-source #source [accounts]="accounts" [clusters]="clusters" [pairings]="pairings" [beaconStatuses]="beaconStatuses" [sourceClusterId]="sourceClusterId"
                                    (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-source>
                 </div>
                 <div wizard-content-summary>
@@ -75,6 +75,7 @@
                 <div wizard-content-body>
                   <dlm-step-advanced
                     #advanced
+                    [clusters]="clusters"
                     (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-advanced>
                 </div>
                 <div wizard-content-summary>
@@ -87,8 +88,11 @@
       </tabset>
     </div>
     <div class="wizard-footer col-xs-12">
-      <button class="btn btn-default" (click)="handleCancelClick($event)">Cancel</button>
-      <button class="btn btn-success pull-right" (click)="handleNextButtonClick($event)" [disabled]="!isFormValid">{{getNextButtonText}} →</button>
+      <button class="btn btn-default" (click)="handleCancelClick($event)" [disabled]="policyRequestInProgress">Cancel</button>
+      <button class="btn btn-success pull-right" (click)="handleNextButtonClick($event)" [disabled]="!isFormValid || policyRequestInProgress">
+        <i *ngIf="policyRequestInProgress" class="fa fa-spin fa-spinner"></i>
+        {{getNextButtonText}} →
+      </button>
       <button class="btn btn-default pull-right" (click)="handleBackButtonClick($event)" [disabled]="isBackButtonDisabled">Back</button>
     </div>
   </div>

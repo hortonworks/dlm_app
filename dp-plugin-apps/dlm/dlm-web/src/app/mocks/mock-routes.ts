@@ -66,6 +66,9 @@ export const routes: MockRoute[] = [
   // cloud accounts
   new MockRoute('store/credentials', 'cloud_credentials.json'),
 
+  // beacon cloud creds
+  new MockRoute('cluster/cloudCredentials', 'beacon_cloud_creds.json'),
+
   // update cloud account
   new MockRoute('store/credential', (request) => {
     const { body } = request;
@@ -85,5 +88,9 @@ export const routes: MockRoute[] = [
   new MockRoute('cluster/cloudCredWithPolicies', 'cloud_cred_with_policies.json'),
 
   // accounts statuses
-  new MockRoute('cloud/accounts/status', 'accounts_status.json')
+  new MockRoute('cloud/accounts/status', 'accounts_status.json'),
+
+  // beacon config status
+  new MockRoute('clusters/beacon/config/status', 'beacon_config_status.json')
+
 ];

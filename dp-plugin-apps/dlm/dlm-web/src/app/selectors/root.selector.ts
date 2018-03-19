@@ -28,3 +28,4 @@ export const getCloudContainers = (state: State) => state.cloudContainers;
 export const getCloudContainerItems = (state: State) => state.cloudContainerItems;
 export const getBeaconCloudCreds = (state: State) => state.beaconCloudCreds;
 export const getCreatePolicyWizardState = (state: State) => state.createPolicyWizard;
+export const getBeaconConfigStatuses = (state: State) => state.beaconConfigStatuses;

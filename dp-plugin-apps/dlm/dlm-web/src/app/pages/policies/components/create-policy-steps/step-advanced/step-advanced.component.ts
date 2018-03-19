@@ -9,13 +9,13 @@
 
 import {
   Component, Output, OnInit, ViewEncapsulation, EventEmitter,
-  HostBinding, ChangeDetectionStrategy, OnDestroy
+  HostBinding, ChangeDetectionStrategy, OnDestroy, Input
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, FormBuilder, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
-import { WIZARD_STEP_ID, SOURCE_TYPES } from 'constants/policy.constant';
+import { WIZARD_STEP_ID, SOURCE_TYPES, POLICY_TYPES } from 'constants/policy.constant';
 import { getStepValue } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs/Subscription';
@@ -24,6 +24,10 @@ import { isEqual } from 'utils/object-utils';
 import { loadYarnQueues } from 'actions/yarnqueues.action';
 import { getYarnQueueEntities } from 'selectors/yarn.selector';
 import { SelectOption } from 'components/forms/select-field';
+import { Cluster } from 'models/cluster.model';
+import { SourceValue, DestinationValue, StepSourceValue, StepDestinationValue, StepGeneralValue } from 'models/create-policy-form.model';
+import { getUnderlyingHiveFS } from 'utils/cluster-util';
+import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
 
 function isInteger(value: string): boolean {
   const numberValue = Number(value);
@@ -50,6 +54,7 @@ export class StepAdvancedComponent implements OnInit, OnDestroy, StepComponent {
 
   @Output() onFormValidityChange = new EventEmitter<boolean>();
   @HostBinding('class') className = 'dlm-step-advanced';
+  @Input() clusters: Cluster[] = [];
 
   form: FormGroup;
   WIZARD_STEP_ID = WIZARD_STEP_ID;
@@ -58,6 +63,7 @@ export class StepAdvancedComponent implements OnInit, OnDestroy, StepComponent {
   destination = null;
   sourceSelector$: Observable<any>;
   destinationSelector$: Observable<any>;
+  generalSelector$: Observable<StepGeneralValue>;
 
   constructor(private store: Store<State>, private formBuilder: FormBuilder, private t: TranslateService) {}
 
@@ -72,15 +78,20 @@ export class StepAdvancedComponent implements OnInit, OnDestroy, StepComponent {
 
   ngOnInit() {
     this.form = this.initForm();
-    this.sourceSelector$ = this.store.select(getStepValue(this.WIZARD_STEP_ID.SOURCE)).pluck<any, any>('source');
-    this.destinationSelector$ = this.store.select(getStepValue(this.WIZARD_STEP_ID.DESTINATION)).pluck<any, any>('destination');
+    this.generalSelector$ = this.store.select(getStepValue(this.WIZARD_STEP_ID.GENERAL));
+    this.sourceSelector$ = this.store.select(getStepValue(this.WIZARD_STEP_ID.SOURCE))
+      .pluck<StepSourceValue, SourceValue>('source');
+    this.destinationSelector$ = this.store.select(getStepValue(this.WIZARD_STEP_ID.DESTINATION))
+      .pluck<StepDestinationValue, DestinationValue>('destination');
     const formSubscription = this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
       .subscribe(isFormValid => this.onFormValidityChange.emit(isFormValid));
     const sourceOrDestinationTypeChanges$ = Observable.combineLatest(this.sourceSelector$,
-      this.destinationSelector$)
-      .switchMap(([source, destination]) => {
+      this.destinationSelector$,
+      this.generalSelector$)
+      .switchMap(([source, destination, general]) => {
         let sourceType = null;
         let destinationType = null;
+        const policyType = general && general.type || null;
         if (source && 'type' in source) {
           sourceType = source['type'];
         }
@@ -88,7 +99,9 @@ export class StepAdvancedComponent implements OnInit, OnDestroy, StepComponent {
           destinationType = destination['type'];
         }
         if (sourceType && destinationType) {
-          if (sourceType === SOURCE_TYPES.CLUSTER && destinationType === SOURCE_TYPES.S3) {
+          const destinationCluster = this.clusters.find(c => c.id === +destination.cluster);
+          const isHiveCloud = policyType === POLICY_TYPES.HIVE && getUnderlyingHiveFS(destinationCluster) === UnderlyingFsForHive.S3;
+          if (sourceType === SOURCE_TYPES.CLUSTER && destinationType === SOURCE_TYPES.S3 || isHiveCloud) {
             return this.sourceSelector$;
           } else {
             return this.destinationSelector$;

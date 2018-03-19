@@ -11,9 +11,11 @@ package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.profiler.models.Metrics.ProfilerMetric
 import com.hortonworks.dataplane.commons.domain.profiler.models.Results.MetricResult
+import play.api.libs.json.JsObject
 
 package object profiler {
 
   type MetricRequestGroup = List[ProfilerMetric]
   type MetricResultGroup = List[MetricResult]
+  type AssetMetricRequest = JsObject
 }

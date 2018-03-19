@@ -15,7 +15,7 @@ import com.google.common.base.Strings
 import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, ServiceInfo}
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
-import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.AssetResolvedProfilerMetricRequest
+import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.ProfilerMetricRequest
 import com.typesafe.config.Config
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsResult, JsSuccess, JsValue}
@@ -143,7 +143,7 @@ object Webservice {
 
     def getAuditActions(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
-    def getMetrics(metricRequest: AssetResolvedProfilerMetricRequest, userName: String)(implicit token: Option[HJwtToken]): Future[Either[Errors, JsObject]]
+    def getMetrics(metricRequest: ProfilerMetricRequest, userName: String)(implicit token: Option[HJwtToken]): Future[Either[Errors, JsObject]]
 
     def datasetAssetMapping(clusterId: String, assetIds: Seq[String], datasetName: String)(implicit token:Option[HJwtToken]) : Future[JsObject]
 
@@ -153,5 +153,10 @@ object Webservice {
 
     def getProfilersJobs (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject]
 
+  }
+
+
+  trait ConfigurationUtilityService extends CsClientService {
+    def doReloadCertificates() : Future[JsValue]
   }
 }

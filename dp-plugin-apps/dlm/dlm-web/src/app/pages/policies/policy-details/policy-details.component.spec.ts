@@ -16,19 +16,14 @@ import { MomentModule } from 'angular2-moment';
 
 import { PolicyDetailsComponent } from './policy-details.component';
 import { JobsTableComponent } from '../../jobs/jobs-table/jobs-table.component';
-import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
-import { TableComponent } from 'common/table/table.component';
-import { HdfsBrowserComponent } from 'components/hdfs-browser/hdfs-browser.component';
-import { CheckboxComponent } from 'common/checkbox/checkbox.component';
-import { ActionColumnComponent } from 'components/table-columns/action-column/action-column.component';
-import { CheckboxColumnComponent } from 'components/table-columns/checkbox-column/checkbox-column.component';
-import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { NavbarService } from 'services/navbar.service';
 import { PipesModule } from 'pipes/pipes.module';
 import { LogService } from 'services/log.service';
 import { NotificationService } from 'services/notification.service';
-import { TableFilterComponent } from 'common/table/table-filter/table-filter.component';
 import { configureComponentTest } from 'testing/configure';
+import { SummaryTreeComponent } from '../components/summary-tree/summary-tree.component';
+import { FrequencyPipe } from 'pipes/frequency.pipe';
+import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
 
 describe('PolicyDetailsComponent', () => {
   let component: PolicyDetailsComponent;
@@ -48,7 +43,8 @@ describe('PolicyDetailsComponent', () => {
       ],
       declarations: [
         PolicyDetailsComponent,
-        JobsTableComponent
+        JobsTableComponent,
+        SummaryTreeComponent
       ],
       providers: [
         NavbarService,
@@ -57,6 +53,8 @@ describe('PolicyDetailsComponent', () => {
           useValue: jasmine.createSpyObj('notificationService', ['create'])
         },
         LogService,
+        FmtTzPipe,
+        FrequencyPipe
       ]
     })
       .compileComponents();

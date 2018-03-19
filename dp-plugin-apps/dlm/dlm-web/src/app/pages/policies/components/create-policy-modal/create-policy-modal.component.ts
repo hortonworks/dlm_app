@@ -23,12 +23,12 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { loadContainers } from 'actions/cloud-container.action';
 import { getAllContainers, getAllContainersGrouped } from 'selectors/cloud-container.selector';
 import { CloudContainer } from 'models/cloud-container.model';
-import { loadBeaconAdminStatus } from 'actions/beacon.action';
+import { loadBeaconAdminStatus, loadBeaconConfigStatus } from 'actions/beacon.action';
 import { getAllBeaconAdminStatuses } from 'selectors/beacon.selector';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { loadClusters } from 'actions/cluster.action';
 import { wizardResetAllSteps } from 'actions/policy.action';
-import { getAllClusters } from 'selectors/cluster.selector';
+import { getAllClusters, getClustersWithBeaconConfigs } from 'selectors/cluster.selector';
 import { Cluster } from 'models/cluster.model';
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
@@ -39,6 +39,7 @@ const CLUSTERS_REQUEST = '[CREATE POLICY] CLUSTERS_REQUEST';
 const ACCOUNTS_REQUEST = '[CREATE POLICY] ACCOUNTS_REQUEST';
 const CONTAINERS_REQUEST = '[CREATE POLICY] CONTAINERS_REQUEST';
 const ADMIN_STATUS_REQUEST = '[CREATE POLICY] ADMIN_STATUS_REQUEST';
+const BEACON_CONFIG_STATUS_REQUEST = '[CREATE POLICY] BEACON_CONFIG_STATUS_REQUEST';
 
 @Component({
   selector: 'dlm-create-policy-modal',
@@ -95,17 +96,25 @@ export class CreatePolicyModalComponent implements OnInit, OnDestroy {
     this.store.dispatch(loadAccounts(ACCOUNTS_REQUEST));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     this.store.dispatch(loadBeaconAdminStatus({requestId: ADMIN_STATUS_REQUEST}));
+    this.store.dispatch(loadBeaconConfigStatus({requestId: BEACON_CONFIG_STATUS_REQUEST}));
     this.pairings$ = this.store.select(getAllPairings);
     this.accounts$ = this.store.select(getAllAccounts);
-    this.clusters$ = this.store.select(getAllClusters);
+    this.clusters$ = this.store.select(getClustersWithBeaconConfigs);
     this.beaconStatuses$ = this.store.select(getAllBeaconAdminStatuses);
     this.containersGrouped$ = this.store.select(getAllContainersGrouped);
     this.containers$ = this.store.select(getAllContainers);
     this.loadAccountsSubscription$ = this.accounts$.subscribe(accounts => {
       this.store.dispatch(loadContainers(accounts, CONTAINERS_REQUEST));
     });
-    const progress = getMergedProgress(ACCOUNTS_REQUEST, CONTAINERS_REQUEST, PAIR_REQUEST, ADMIN_STATUS_REQUEST, CLUSTERS_REQUEST);
-    this.overallProgress$ = this.store.select(progress);
+    const requestIds = [
+      ACCOUNTS_REQUEST,
+      CONTAINERS_REQUEST,
+      PAIR_REQUEST,
+      ADMIN_STATUS_REQUEST,
+      CLUSTERS_REQUEST,
+      BEACON_CONFIG_STATUS_REQUEST
+    ];
+    this.overallProgress$ = this.store.select(getMergedProgress.apply(null, requestIds));
     this.loadParamsSubscription$ = this.route.queryParams
       .subscribe(params => {
         const clusterId = params['sourceClusterId'];

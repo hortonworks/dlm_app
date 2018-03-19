@@ -40,6 +40,9 @@ import { ProgressState } from 'models/progress-state.model';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 import { truncate } from 'pipes/truncate.pipe';
 import { TranslateService } from '@ngx-translate/core';
+import { getUnderlyingHiveFS } from 'utils/cluster-util';
+import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
+import { AsyncActionsService } from 'services/async-actions.service';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -62,6 +65,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   isFormValid: true;
   creationState: ProgressState;
   subscriptions: Subscription[] = [];
+  policyRequestInProgress = false;
 
   @Input() pairings: Pairing[] = [];
   @Input() containers: any = {};
@@ -90,6 +94,9 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   }
 
   get isBackButtonDisabled() {
+    if (this.policyRequestInProgress) {
+      return true;
+    }
     let isBackButtonDisabled = false;
     if (this.activeStepId !== null) {
       isBackButtonDisabled = getStepById(this._steps, this.activeStepId).previousStepId === null;
@@ -101,7 +108,10 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
     this.isFormValid = isValid;
   }
 
-  constructor(private store: Store<State>, private timeZone: TimeZoneService, private t: TranslateService) {
+  constructor(private store: Store<State>,
+              private timeZone: TimeZoneService,
+              private t: TranslateService,
+              private asyncActions: AsyncActionsService) {
     this.subscriptions.push(store
       .select(getProgressState(CREATE_POLICY_REQUEST))
       .subscribe((progressState: ProgressState) => this.creationState = progressState));
@@ -156,9 +166,11 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
       general: {value: general},
       source: {value: {source}},
       destination: {value: {destination}},
-      schedule: {value: {job: schedule}},
-      advanced: {value: advanced}
+      schedule: {value: {job: schedule}}
     } = formsData;
+
+    // This will guarantee that the advanced settings information is always the latest
+    const {advanced} = this.viewChildStepIdMap[this.activeStepId].getFormValue();
 
     const policyData = {
       policyDefinition: <PolicyDefinition>{
@@ -174,20 +186,23 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
         startTime: this.formatDateValue(schedule.startTime),
         endTime: this.formatDateValue(schedule.endTime),
         queueName: advanced.queue_name,
-        distcpMapBandwidth: advanced.max_bandwidth,
+        distcpMapBandwidth: null,
         cloudCred: ''
       }
     };
 
     let clusterId;
     const sc = this.clusters.find(c => c.id === source.cluster);
+    const dc = this.clusters.find(c => c.id === destination.cluster);
+    const isHiveCloud = general.type === POLICY_TYPES.HIVE && getUnderlyingHiveFS(dc) === UnderlyingFsForHive.S3;
 
     if (destination.type === SOURCE_TYPES.CLUSTER) {
-      // destination cluster
-      const dc = this.clusters.find(c => c.id === destination.cluster);
-      clusterId = dc.id;
+      clusterId = isHiveCloud ? sc.id : dc.id;
       policyData.policyDefinition.targetCluster = PolicyService.makeClusterId(dc.dataCenter, dc.name);
       policyData.policyDefinition.targetDataset = destination.path;
+      if (isHiveCloud) {
+        policyData.policyDefinition.cloudCred = destination.cloudAccount;
+      }
     } else {
       clusterId = sc.id;
       if (destination.type === SOURCE_TYPES.S3) {
@@ -220,6 +235,11 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
         policyData.policyDefinition['tde.sameKey'] = true;
       }
     }
+
+    if (advanced.max_bandwidth) {
+      policyData.policyDefinition.distcpMapBandwidth = Number(advanced.max_bandwidth);
+    }
+
     policyData.policyDefinition = <PolicyDefinition>omitEmpty(policyData.policyDefinition);
 
     const notification = {
@@ -235,7 +255,9 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
       requestId: CREATE_POLICY_REQUEST,
       notification
     };
-    this.store.dispatch(createPolicy(policyData, clusterId, meta));
+    this.policyRequestInProgress = true;
+    this.asyncActions.dispatch(createPolicy(policyData, clusterId, meta))
+      .subscribe(() => this.policyRequestInProgress = false);
   }
 
   formatDateValue(timeField, timezone = true) {

@@ -26,6 +26,15 @@
   }
 }
 
+.loader {
+  width: 20px;
+  height: 20px;
+  margin-left: 48%;
+  vertical-align: middle;
+  text-align: center;
+  margin-top: 15%;
+}
+
 :host ::ng-deep .nv-multiBarWithLegend .tick line {
   stroke: transparent;
 }

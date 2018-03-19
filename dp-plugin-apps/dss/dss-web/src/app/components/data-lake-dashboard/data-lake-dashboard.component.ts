@@ -15,8 +15,18 @@ import {Chart} from 'nvd3';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ProfilerService} from 'app/services/profiler.service';
 import {DataLakeDashboard} from '../../models/data-lake-dashboard';
-import {chartColors} from '../../shared/utils/constants';
+import {chartColors, ContextTypeConst, MetricTypeConst} from '../../shared/utils/constants';
 import {DssAppEvents} from '../../services/dss-app-events';
+import {
+  MetricContextDefinition, ProfilerMetric,
+  ProfilerMetricDefinition, ProfilerMetricRequest
+} from "app/models/profiler-metric-request";
+import {
+  AssetsAndCount, Metric,
+  ProfilerMetricResponse,
+  AssetCountsResultForADay, CollectionsAndCount, SensitivityDistributionResponse
+} from '../../models/profiler-metric-response';
+import {DomUtils} from '../../shared/utils/dom-utils';
 
 declare let d3: any;
 declare let nv: any;
@@ -37,7 +47,10 @@ export class DataLakeDashboardComponent implements OnInit {
   @ViewChild('topAssetCollections') topAssetCollections: ElementRef;
   @ViewChild('topAssets') topAssets : ElementRef;
 
+  clusterId: number;
+  metricTypeConst = MetricTypeConst;
   dataLakeDashboardData: DataLakeDashboard = new DataLakeDashboard();
+  sensitivityDistributionData = new  SensitivityDistributionResponse(0, 0);
   private charts: Chart[] = [];
 
   constructor(private router: Router,
@@ -47,11 +60,11 @@ export class DataLakeDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.activeRoute.params.subscribe(params => {
-      const dataLakeId = params['id'];
-      if (String(dataLakeId) === 'undefined') {
+      this.clusterId = parseInt(params['id']);
+      if (String(this.clusterId) === 'undefined') {
         this.redirectToRoot();
       } else {
-        this.getDataLakeDashboardData(dataLakeId);
+        this.getDataLakeDashboardData(this.clusterId);
       }
     });
   }
@@ -61,39 +74,116 @@ export class DataLakeDashboardComponent implements OnInit {
   }
 
   getDataLakeDashboardData(dataLakeId: number) {
-    this.profileService.dataLakeStats(dataLakeId).subscribe(data => {
-      this.dataLakeDashboardData = data;
-      this.initCharts();
+    const metricsRequests = this.createProfilerMetricRequest([
+      new ProfilerMetric(MetricTypeConst.SensitivityDistributionMetric, new ProfilerMetricDefinition())
+    ]);
+
+    this.profileService.assetCollectionStats(metricsRequests).subscribe(assetCollectionDashboard => {
+      this.initCharts(assetCollectionDashboard);
     });
 
     this.dssAppEvents.sideNavCollapsed$.subscribe(collapsed => this.updateChartDimensions());
   }
 
-  private initCharts() {
-    this.createTotalAssetsChart();
+  private initCharts(profilerMetricResponse: ProfilerMetricResponse) {
     this.createProfiledNonProfiledChart();
-    this.createSensitiveDataChart();
+    this.createSensitiveDataChart(profilerMetricResponse);
     this.createProfilerJobsChart();
-    this.createSecureDataChart();
-    this.createTopAssetCollectionsChart();
-    this.createTopAssetsChart();
+
+    // this.createTotalAssetsChart();
+    // this.createTopAssetCollectionsChart();
+    // this.createTopAssetsChart();
   }
 
-  private createTotalAssetsChart() {
-    const newAssetCount = [];
-    let prevVal = this.dataLakeDashboardData.assetCountHistogram.stats[0].value;
-    for (let i = 0; i < this.dataLakeDashboardData.assetCountHistogram.stats.length; i++) {
-      let newCount = this.dataLakeDashboardData.assetCountHistogram.stats[i].value - prevVal;
-      prevVal = this.dataLakeDashboardData.assetCountHistogram.stats[i].value;
-      newAssetCount.push({'x': this.dataLakeDashboardData.assetCountHistogram.stats[i].key, 'y': (newCount > 0 ? newCount : 0)});
+  private createSensitiveDataChart(profilerMetricResponse: ProfilerMetricResponse) {
+    this.sensitiveData.nativeElement.classList.remove('loader');
+
+    let data = [];
+    const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.SensitivityDistributionMetric)[0];
+    if (metrics.status) {
+      this.sensitivityDistributionData = metrics.definition as SensitivityDistributionResponse;
+      const sensitiveDataPercentage = SensitivityDistributionResponse.getSensitiveDataPercentage(this.sensitivityDistributionData);
+      const nonSensitiveDataPercentage = SensitivityDistributionResponse.getNonSensitiveDataPercentage(this.sensitivityDistributionData);
+      const nonSensitiveDataValue = SensitivityDistributionResponse.getNonSensitiveDataValue(this.sensitivityDistributionData);
+      const sensitiveDataValue = this.sensitivityDistributionData.assetsHavingSensitiveData;
+      data = [
+        {key: "Sensitive", y: sensitiveDataPercentage, tooltip: sensitiveDataValue},
+        {key: "Non Sensitive", y:  nonSensitiveDataPercentage, tooltip: nonSensitiveDataValue}
+      ];
     }
 
-    const test_data = [
-        {'key':'Existing','nonStackable':false, 'values': this.dataLakeDashboardData.assetCountHistogram.stats.map(stat => ({x: stat.key, y: stat.value}))},
-        {'key':'New','nonStackable':false, 'values': newAssetCount}
+    nv.addGraph(() => {
+      let chart = nv.models.pieChart()
+      .x(function (d) {
+        return d.key
+      })
+      .y(function (d) {
+        return d.y
+      })
+      .donut(true)
+      .color([chartColors.GREEN, chartColors.BLUE])
+      .valueFormat((val) => `${val}%`)
+      .labelType('percent');
+
+      chart.pie.labelsOutside(true).donut(true);
+      chart.tooltip.valueFormatter((v, i, d) => {
+        return data[i].tooltip;
+      });
+
+      d3.select(this.sensitiveData .nativeElement)
+      .datum(data)
+      .transition().duration(1200)
+      .call(chart);
+
+      nv.utils.windowResize(chart.update);
+      this.charts.push(chart);
+
+      return chart;
+    });
+  }
+
+  private createProfilerMetricRequest(metrics: ProfilerMetric[]) {
+    const profilerMetricRequest = new ProfilerMetricRequest();
+    profilerMetricRequest.clusterId = this.clusterId;
+
+    profilerMetricRequest.context.contextType = ContextTypeConst.CLUSTER;
+
+    profilerMetricRequest.metrics = metrics;
+    return profilerMetricRequest;
+  }
+
+  private getAssetCounts(startDate: string, endDate: string) {
+    const metricsRequests = this.createProfilerMetricRequest([
+      new ProfilerMetric(MetricTypeConst.AssetCounts, new ProfilerMetricDefinition(undefined, startDate, endDate))
+    ]);
+
+    this.totalAssets.nativeElement.classList.add('loader');
+
+    this.profileService.assetCollectionStats(metricsRequests).subscribe(assetCollectionDashboard => {
+      this.createAssetCountChart(assetCollectionDashboard)
+    });
+  }
+
+  private createAssetCountChart(profilerMetricResponse: ProfilerMetricResponse) {
+    this.totalAssets.nativeElement.classList.remove('loader');
+    DomUtils.removeAllChildNodes(this.totalAssets.nativeElement);
+
+    let assetCounts = [], newAssetCount = [];
+    const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.AssetCounts)[0];
+    if (metrics.status) {
+      const data = metrics.definition as AssetsAndCount;
+      const assetsAndCount = data.assetsAndCount as AssetCountsResultForADay[];
+      assetsAndCount.forEach(ac => {
+        assetCounts.push({'x': ac.date , 'y': ac.totalAssets});
+        newAssetCount.push({'x': ac.date , 'y': ac.newAssets});
+      });
+    }
+
+    const data = [
+      {'key':'Existing','nonStackable':false, 'values': assetCounts},
+      {'key':'New','nonStackable':false, 'values': newAssetCount}
     ];
 
-    const that = this;
     nv.addGraph(() => {
       const chart = nv.models.multiBarChart()
       .stacked(true)
@@ -101,9 +191,10 @@ export class DataLakeDashboardComponent implements OnInit {
       .showYAxis(false)
       .color([chartColors.GREEN, chartColors.RED])
       .groupSpacing(.4)
-      .reduceXTicks(false)
+      .height(320)
+      .reduceXTicks(false);
 
-      const svg = d3.select(that.totalAssets.nativeElement).datum(test_data);
+      const svg = d3.select(this.totalAssets.nativeElement).datum(data);
       svg.transition().duration(0).call(chart);
 
       nv.utils.windowResize(chart.update);
@@ -114,7 +205,9 @@ export class DataLakeDashboardComponent implements OnInit {
   }
 
   private createProfiledNonProfiledChart() {
-    const data = this.dataLakeDashboardData.profiledNonProfiled.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
+    this.profiledNonProfiled.nativeElement.classList.remove('loader');
+
+    const data = DataLakeDashboard.getData().profiledNonProfiled.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
     nv.addGraph(() => {
       let chart = nv.models.pieChart()
       .x(function (d) {
@@ -142,37 +235,10 @@ export class DataLakeDashboardComponent implements OnInit {
     });
   }
 
-  private createSensitiveDataChart() {
-    const data = this.dataLakeDashboardData.sensitiveNonSensitive.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
-    nv.addGraph(() => {
-      let chart = nv.models.pieChart()
-      .x(function (d) {
-        return d.key
-      })
-      .y(function (d) {
-        return d.y
-      })
-      .donut(true)
-      .color([chartColors.GREEN, chartColors.BLUE])
-      .valueFormat((val) => `${val}%`)
-      .labelType('percent');
-
-      chart.pie.labelsOutside(true).donut(true);
-
-      d3.select(this.sensitiveData .nativeElement)
-      .datum(data)
-      .transition().duration(1200)
-      .call(chart);
-
-      nv.utils.windowResize(chart.update);
-      this.charts.push(chart);
-
-      return chart;
-    });
-  }
-
   private createProfilerJobsChart() {
-    const data = this.dataLakeDashboardData.profilerJobs.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
+    this.profilerJobs.nativeElement.classList.remove('loader');
+
+    const data = DataLakeDashboard.getData().profilerJobs.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
     nv.addGraph(() => {
       let chart = nv.models.pieChart()
       .x(function (d) {
@@ -200,41 +266,35 @@ export class DataLakeDashboardComponent implements OnInit {
     });
   }
 
-  private createSecureDataChart() {
-    const data = this.dataLakeDashboardData.secureData.stats.map(stat => ({'key': stat.key, 'y': stat.value}));
-    nv.addGraph(() => {
-      let chart = nv.models.pieChart()
-      .x(function (d) {
-        return d.key
-      })
-      .y(function (d) {
-        return d.y
-      })
-      .donut(true)
-      .color([chartColors.GREEN, chartColors.BLUE, chartColors.RED])
-      .valueFormat((val) => `${val}%`)
-      .labelType('percent');
+  private getTopKCollections(startDate: any, endDate: any) {
+    const metricsRequests = this.createProfilerMetricRequest([
+      new ProfilerMetric(MetricTypeConst.TopKCollections, new ProfilerMetricDefinition(10, startDate, endDate))
+    ]);
 
-      chart.pie.labelsOutside(true).donut(true);
+    this.topAssetCollections.nativeElement.classList.add('loader');
 
-      d3.select(this.secureData .nativeElement)
-      .datum(data)
-      .transition().duration(1200)
-      .call(chart);
-
-      nv.utils.windowResize(chart.update);
-      this.charts.push(chart);
-
-      return chart;
+    this.profileService.assetCollectionStats(metricsRequests).subscribe(assetCollectionDashboard => {
+      this.createTopKCollectionssChart(assetCollectionDashboard)
     });
   }
 
-  private createTopAssetCollectionsChart() {
+  private createTopKCollectionssChart(profilerMetricResponse: ProfilerMetricResponse) {
+    this.topAssetCollections.nativeElement.classList.remove('loader');
+    DomUtils.removeAllChildNodes(this.topAssetCollections.nativeElement);
+
+    let data = [];
+    const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.TopKCollections)[0];
+    if (metrics.status) {
+      const definition = metrics.definition as CollectionsAndCount;
+      const assetsAndCount = definition.collectionsAndCount as {[p: string]: Number};
+      data = Object.keys(assetsAndCount).map(k => ({'label': k, 'value': assetsAndCount[k]}));
+    }
+
     const topUsersData = [
       {
         'key': '',
         'color': chartColors.GREEN,
-        'values': this.dataLakeDashboardData.topAssetCollections.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
+        'values': data
       }
     ];
     let chart;
@@ -281,12 +341,35 @@ export class DataLakeDashboardComponent implements OnInit {
     });
   }
 
-  private createTopAssetsChart() {
+  private getTopKAssets(startDate: string, endDate: string) {
+    const metricsRequests = this.createProfilerMetricRequest([
+      new ProfilerMetric(MetricTypeConst.TopKAssets, new ProfilerMetricDefinition(10, startDate, endDate))
+    ]);
+
+    this.topAssets.nativeElement.classList.add('loader');
+
+    this.profileService.assetCollectionStats(metricsRequests).subscribe(assetCollectionDashboard => {
+      this.createTopKAssetsChart(assetCollectionDashboard)
+    });
+  }
+
+  private createTopKAssetsChart(profilerMetricResponse: ProfilerMetricResponse) {
+    this.topAssets.nativeElement.classList.remove('loader');
+    DomUtils.removeAllChildNodes(this.topAssets.nativeElement);
+
+    let data = [];
+    const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.TopKAssets)[0];
+    if (metrics.status) {
+      const definition = metrics.definition as AssetsAndCount;
+      const assetsAndCount = definition.assetsAndCount as {[p: string]: Number};
+      data = Object.keys(assetsAndCount).map(k => ({'label': k, 'value': assetsAndCount[k]}));
+    }
+
     const topUsersData = [
       {
         'key': '',
         'color': chartColors.GREEN,
-        'values': this.dataLakeDashboardData.topAssets.stats.map(stat => ({'label': stat.key, 'value': stat.value}))
+        'values': data
       }
     ];
     let chart;
@@ -338,5 +421,19 @@ export class DataLakeDashboardComponent implements OnInit {
 
   private updateChartDimensions() {
     this.charts.forEach(chart => chart.update());
+  }
+
+  timeRangeChange($event, type: string) {
+    if (type === MetricTypeConst.AssetCounts) {
+      this.getAssetCounts($event[0], $event[1]);
+    }
+
+    if (type === MetricTypeConst.TopKAssets) {
+      this.getTopKAssets($event[0], $event[1]);
+    }
+
+    if (type === MetricTypeConst.TopKCollections) {
+      this.getTopKCollections($event[0], $event[1]);
+    }
   }
 }

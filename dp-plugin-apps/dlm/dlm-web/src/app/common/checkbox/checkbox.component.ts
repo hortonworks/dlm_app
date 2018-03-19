@@ -21,7 +21,7 @@ export const CUSTOM_CHECKBOX_CONTROL_VALUE_ACCESSOR: any = {
   styleUrls: ['./checkbox.component.scss'],
   template: `
     <div class="checkbox-item">
-      <input type="checkbox" [checked]="checked" />
+      <input type="checkbox" [disabled]="disabled" [checked]="checked" />
       <label class="checkbox" (click)="toggleChecked()">
         <ng-content></ng-content>
       </label>
@@ -31,6 +31,7 @@ export const CUSTOM_CHECKBOX_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class CheckboxComponent implements OnInit, ControlValueAccessor {
   @Input() checked: boolean;
+  @Input() disabled = false;
   @Output() onSelect = new EventEmitter<boolean>();
 
   onChange = (_: any) => {};
@@ -50,6 +51,9 @@ export class CheckboxComponent implements OnInit, ControlValueAccessor {
   registerOnTouched() {}
 
   toggleChecked() {
+    if (this.disabled) {
+      return;
+    }
     this.checked = !this.checked;
     this.onChange(this.checked);
     this.onSelect.emit(this.checked);

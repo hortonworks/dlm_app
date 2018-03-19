@@ -13,6 +13,9 @@ $details-content-height: $details-height - 35*2;
 :host {
   .summary {
     white-space: normal;
+    padding: 0;
+    height: $details-height - 50px;
+    overflow-y: scroll;
   }
 
   .policy-details {
@@ -60,5 +63,20 @@ $details-content-height: $details-height - 35*2;
         overflow: auto !important;
       }
     }
+  }
+}
+
+:host /deep/ {
+  .summary {
+    .dlm-summary-tree {
+      .summary-tree-wrapper {
+        margin: -25px 0 0 0;
+      }
+    }
+  }
+
+  .info-message {
+    background-color: #FFF;
+    padding: 15px;
   }
 }

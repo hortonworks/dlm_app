@@ -68,6 +68,7 @@ import {BookmarkService} from "../../services/bookmark.service";
 import {AssetCollectionEditComponent} from './views/asset-collection-edit/asset-collection-edit.component';
 import {OverviewComponent} from './views/asset-collection-edit/overview/overview.component';
 import {ProfilerService} from "app/services/profiler.service";
+import {TimeRangeButtonGroupModule} from '../../shared/time-range-button-group/time-range-button-group.module';
 
 @NgModule({
   declarations: [
@@ -117,7 +118,8 @@ import {ProfilerService} from "app/services/profiler.service";
     LineageModule,
     RouterModule,
     MyDateRangePickerModule,
-    CommentsModule
+    CommentsModule,
+    TimeRangeButtonGroupModule
   ],
   exports: [
     NavTagPanel,

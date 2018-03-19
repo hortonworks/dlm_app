@@ -41,9 +41,14 @@
   <dlm-flow-status [mode]="mode"></dlm-flow-status>
 </ng-template>
 
-<ng-template #clusterCellTemplate let-value="value" let-policy="row" let-index="rowIndex">
-  <div class="cluster-name" [attr.qe-attr]="'cluster-name-' + index">{{value.name}}</div>
-  <div class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + index">{{value.dataCenter}}</div>
+<ng-template #sourceCellTemplate let-value="value" let-policy="row" let-index="rowIndex">
+  <div class="cluster-name" [attr.qe-attr]="'source-id-' + index">{{getSourceName(policy)}}</div>
+  <div class="datacenter-name" [attr.qe-attr]="'path-' + index" [tooltip]="value">{{value}}</div>
+</ng-template>
+
+<ng-template #targetCellTemplate let-value="value" let-policy="row" let-index="rowIndex">
+  <div class="cluster-name" [attr.qe-attr]="'target-id-' + index">{{getTargetName(policy)}}</div>
+  <div class="datacenter-name" [attr.qe-attr]="'path-' + index" [tooltip]="value">{{value}}</div>
 </ng-template>
 
 <ng-template #iconCellTemplate>
@@ -98,10 +103,6 @@
     (abortJobAction)="abortJobAction($event)"
     (rerunJobAction)="rerunJobAction($event)"
   ></dlm-policy-details>
-</ng-template>
-
-<ng-template #pathCell let-row="row" let-value="value" let-index="rowIndex">
-  <span [tooltip]="value" [attr.qe-attr]="'policy-path-' + index">{{value}}</span>
 </ng-template>
 
 <ng-template #actionsCell let-row="row" let-index="rowIndex">

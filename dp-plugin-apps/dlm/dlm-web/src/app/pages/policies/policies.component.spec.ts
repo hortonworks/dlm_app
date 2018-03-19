@@ -37,6 +37,7 @@ import { PrevJobsComponent } from './components/prev-jobs/prev-jobs.component';
 import { HdfsBrowserComponent } from 'components/hdfs-browser/hdfs-browser.component';
 import { configureComponentTest } from 'testing/configure';
 import { AsyncActionsService } from 'services/async-actions.service';
+import { SummaryTreeComponent } from './components/summary-tree/summary-tree.component';
 
 describe('PoliciesComponent', () => {
   let component: PoliciesComponent;
@@ -67,7 +68,8 @@ describe('PoliciesComponent', () => {
         PolicyDetailsComponent,
         JobsTableComponent,
         PolicyServiceFilterComponent,
-        PrevJobsComponent
+        PrevJobsComponent,
+        SummaryTreeComponent
       ],
       providers: [
         AsyncActionsService,

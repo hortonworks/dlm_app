@@ -18,7 +18,7 @@ import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.google.common.annotations.VisibleForTesting
 import com.hortonworks.dataplane.CSConstants
-import com.hortonworks.dataplane.commons.domain.Entities.ClusterService
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService, Error, WrappedErrorException}
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.{ClusterDataApi, CredentialInterface, Credentials, StorageInterface}
@@ -149,9 +149,7 @@ class RangerRoute @Inject()(
                                     offset,
                                     pageSize)
       case _ =>
-        throw UnsupportedInputException(
-          1001,
-          "This is not a supported Ranger service.")
+        throw WrappedErrorException(Error(500, "This is not a supported Ranger service.", "cluster.ranger.unsupported-service"))
     }
   }
 
@@ -424,24 +422,23 @@ class RangerRoute @Inject()(
 
   @VisibleForTesting
   def extractUrlsWithIp(urlObj: URL, clusterId: Long): Future[Seq[String]] = {
-    if (Try(config.getBoolean("dp.service.ambari.single.node.cluster"))
-          .getOrElse(false)) {
-      clusterDataApi.getAmbariUrl(clusterId).map { ambari =>
-        Seq(
-          s"${urlObj.getProtocol}://${new URL(ambari).getHost}:${urlObj.getPort}")
-      }
-    } else {
-      clusterHostsService
-        .getHostByClusterAndName(clusterId, urlObj.getHost)
-        .map {
-          case Right(host) =>
-            Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
-          case Left(errors) =>
-            throw new Exception(
-              s"Cannot translate the hostname into an IP address $errors")
-        }
-    }
+    val isSingleNodeCluster = Try(config.getBoolean("dp.service.ambari.single.node.cluster")).getOrElse(false)
 
+    clusterDataApi.getDataplaneCluster(clusterId)
+      .flatMap { dpCluster =>
+
+        (isSingleNodeCluster, dpCluster.behindGateway) match {
+          case (_, true) => clusterDataApi.getKnoxUrl(clusterId).map(url => Seq(s"${url.get}/ranger"))
+          case (true, false) => clusterDataApi.getAmbariUrl(clusterId).map { ambari =>
+            Seq(s"${urlObj.getProtocol}://${new URL(ambari).getHost}:${urlObj.getPort}")
+          }
+          case (_, _) => clusterHostsService.getHostByClusterAndName(clusterId, urlObj.getHost)
+            .map {
+              case Right(host) => Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
+              case Left(errors) => throw new Exception(s"Cannot translate the hostname into an IP address $errors")
+            }
+        }
+      }
   }
 
   private def requestRangerForResourcePolicies(

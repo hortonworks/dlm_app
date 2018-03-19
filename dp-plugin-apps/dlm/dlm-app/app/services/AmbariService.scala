@@ -480,15 +480,30 @@ class AmbariService @Inject()(
                           "hive-site",
                           "hive.metastore.kerberos.principal"))
 
-                    val hiveServiceConfigMap: Map[String, Option[String]] = Map(
+                    val hiveServer2Authentication: Option[String] =
+                      convertEitherToOption(
+                        getPropertyValue(
+                          res,
+                          AmbariService.HIVE_SERVICE_NAME,
+                          "hive-site",
+                          "hive.server2.authentication"))
+
+                    val hiveServiceKerberosConfigMap: Map[String, Option[String]] = Map(
+                      "hive.metastore.kerberos.principal" -> hmsKerberosPrincipal,
+                      "hive.server2.authentication.kerberos.principal" -> hsKerberosPrincipal
+                    )
+
+                    var hiveServiceConfigMap: Map[String, Option[String]] = Map(
                       "hsEndpoint" -> Some(hsEndpoint),
-                      "hive.server2.authentication.kerberos.principal" -> hsKerberosPrincipal,
                       "hive.metastore.uris" -> hiveMetastoreUris,
                       "hive.metastore.warehouse.dir" -> hmsWarehouseDir,
                       "hive.warehouse.subdir.inherit.perms" -> hmsWarehouseDirPerms,
-                      "hive.repl.replica.functions.root.dir" -> hmsReplRootDir,
-                      "hive.metastore.kerberos.principal" -> hmsKerberosPrincipal
+                      "hive.repl.replica.functions.root.dir" -> hmsReplRootDir
                     )
+
+                    if (hiveServer2Authentication.get == AmbariService.HIVE_KERBEROS_AUTHENTICATION_VALUE) {
+                      hiveServiceConfigMap = hiveServiceConfigMap ++ hiveServiceKerberosConfigMap
+                    }
 
                     p.success(Right(hiveServiceConfigMap))
                   case Left(errors) => p.success(Left(errors))
@@ -642,6 +657,7 @@ object AmbariService {
   lazy val RANGER_HDFS_SECURITY_PROPERTIES = "ranger-hdfs-security"
   lazy val RANGER_HIVE_SECURITY_PROPERTIES = "ranger-hive-security"
   lazy val YARN_CAPACITY_SCHEDULER_PROPERTIES = "capacity-scheduler"
+  lazy val HIVE_KERBEROS_AUTHENTICATION_VALUE = "KERBEROS"
 
   def getNameNodeAmbariUrl =
     "services/HDFS/components/NAMENODE?fields=host_components/metrics/dfs/FSNamesystem/HAState,host_components/HostRoles/host_name&minimal_response=true"

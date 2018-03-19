@@ -13,6 +13,7 @@ export const HDFS = 'FS';
 export const HIVE = 'HIVE';
 export const HBASE = 'HBASE';
 export const HDFS_SNAPSHOT = 'FS_SNAPSHOT';
+export const HDFS_CLOUD = 'FS_HCFS';
 
 export const EVERY = 'EVERY';
 export const NEVER = 'NEVER';
@@ -58,6 +59,7 @@ export enum POLICY_TYPES {
 export const POLICY_EXECUTION_TYPES = {
   HDFS,
   HDFS_SNAPSHOT,
+  HDFS_CLOUD,
   HIVE
 };
 
@@ -82,15 +84,15 @@ export const POLICY_TIME_UNITS = {
   WEEKS
 };
 
-export const SOURCE_TYPES_LABELS = {
-  [CLUSTER]: 'CLUSTER',
-  [S3]: 'S3'
-};
-
 export enum SOURCE_TYPES {
   CLUSTER = 'CLUSTER',
-  S3 = 'S3'
+  S3 = 'AWS'
 }
+
+export const SOURCE_TYPES_LABELS = {
+  [SOURCE_TYPES.CLUSTER]: 'CLUSTER',
+  [SOURCE_TYPES.S3]: 'S3'
+};
 
 export const POLICY_TYPES_LABELS = {
   [HDFS]: 'HDFS',

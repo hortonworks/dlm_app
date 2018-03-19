@@ -22,7 +22,8 @@ export const ActionTypes = {
   WIZARD_SAVE_STEP: type('WIZARD_SAVE_STEP'),
   WIZARD_MOVE_TO_STEP: type('WIZARD_MOVE_TO_STEP'),
   WIZARD_RESET_ALL_STEPS: type('WIZARD_RESET_ALL_STEPS'),
-  WIZARD_RESET_STEP: type('WIZARD_RESET_STEP')
+  WIZARD_RESET_STEP: type('WIZARD_RESET_STEP'),
+  VALIDATE_POLICY: requestType('VALIDATE_POLICY')
 };
 
 export const loadPolicies = (queryParams = {}, meta = {}): ActionWithPayload<any> => ({
@@ -110,4 +111,19 @@ export const wizardResetStep = (stepId): ActionWithPayload<any> => ({
 export const wizardMoveToStep = (stepId: string): ActionWithPayload<any> => ({
   type: ActionTypes.WIZARD_MOVE_TO_STEP,
   payload: {stepId}
+});
+
+export const validatePolicy = (data, meta = {}): ActionWithPayload<any> => ({
+  type: ActionTypes.VALIDATE_POLICY.START,
+  payload: {data, meta}
+});
+
+export const validatePolicySuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.VALIDATE_POLICY.SUCCESS,
+  payload: { response, meta }
+});
+
+export const validatePolicyFailure = (error, meta): ActionFailure => ({
+  type: ActionTypes.VALIDATE_POLICY.FAILURE,
+  payload: { error, meta }
 });

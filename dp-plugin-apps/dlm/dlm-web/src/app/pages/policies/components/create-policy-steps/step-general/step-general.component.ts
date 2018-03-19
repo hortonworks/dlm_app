@@ -71,7 +71,7 @@ export class StepGeneralComponent implements OnInit, OnDestroy, StepComponent {
 
   ngOnInit() {
     this.form = this.initForm();
-    const formSubscription = this.form.valueChanges.map(_ => this.isFormValid()).distinctUntilChanged()
+    const formSubscription = this.form.valueChanges.map(_ => this.isFormValid())
       .subscribe(isFormValid => this.onFormValidityChange.emit(isFormValid));
     this.subscriptions.push(formSubscription);
   }

@@ -11,7 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import {Policy, PolicyPayload, Report} from 'models/policy.model';
+import {Policy, PolicyPayload} from 'models/policy.model';
 import { toSearchParams } from 'utils/http-util';
 import { JobService } from 'services/job.service';
 import { POLICY_DISPLAY_STATUS, POLICY_STATUS, POLICY_UI_STATUS } from 'constants/status.constant';
@@ -101,6 +101,12 @@ export class PolicyService {
 
   resumePolicy(payload: Policy): Observable<any> {
     return this.httpClient.put(`${this.getManagePolicyUrl(payload)}/resume`, {});
+  }
+
+  validatePolicy(data): Observable<any> {
+    const url = `clusters/${data.idForUrl}/policy/test`;
+    delete data.idForUrl;
+    return this.httpClient.post(url, data);
   }
 
 }
