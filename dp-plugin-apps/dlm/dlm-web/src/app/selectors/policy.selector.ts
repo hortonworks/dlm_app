@@ -47,6 +47,10 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
         .makeClusterId(cluster.dataCenter, cluster.name) === policy.sourceCluster) || {}
     };
     p.clusterResourceForRequests = p.targetClusterResource.id ? p.targetClusterResource : p.sourceClusterResource;
+    const customProperties = p.customProperties || {};
+    if (p.executionType === POLICY_EXECUTION_TYPES.HIVE && 'cloudCred' in customProperties) {
+      p.clusterResourceForRequests = p.sourceClusterResource;
+    }
     return p;
   });
 });
@@ -61,6 +65,10 @@ export const getAllPoliciesWithCloud = createSelector(getAllPoliciesWithClusters
       targetType: 'targetCluster' in policy ? SOURCE_TYPES.CLUSTER : SOURCE_TYPES.S3
     };
     p.clusterResourceForRequests = p.targetClusterResource.id ? p.targetClusterResource : p.sourceClusterResource;
+    const customProperties = p.customProperties || {};
+    if (p.executionType === POLICY_EXECUTION_TYPES.HIVE && 'cloudCred' in customProperties) {
+      p.clusterResourceForRequests = p.sourceClusterResource;
+    }
     return p;
   });
 });

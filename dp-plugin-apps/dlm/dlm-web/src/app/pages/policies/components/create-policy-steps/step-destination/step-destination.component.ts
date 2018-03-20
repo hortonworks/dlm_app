@@ -255,7 +255,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   }
 
   get shouldShowDestination(): boolean {
-    return this.isClusterSelected && this.isHdfsPolicy || this.isHiveOnPremReplication;
+    return this.isClusterType && this.isClusterSelected;
   }
 
   get isSourceEncrypted(): boolean {
@@ -405,8 +405,10 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
               }});
             }
           }
+          this.skipValidation(false);
         } else {
           this.disableFields(this.s3Fields);
+          this.skipValidation();
         }
         return;
       }
@@ -510,12 +512,16 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   validate() {
     const form = this.form;
     this.validationInProgress = true;
+    let sourceDataset = this.source.type === SOURCE_TYPES.S3 ? this.source.s3endpoint : this.source.directories;
+    if (this.isHivePolicy) {
+      sourceDataset = this.source.databases;
+    }
     const requestData: any = {
       type: this.general.type,
       cloudCred: this.source.cloudAccount || form.get('destination.cloudAccount').value,
-      sourceDataset: this.source.type === SOURCE_TYPES.S3 ? this.source.s3endpoint : this.source.directories,
       targetDataset: form.get('destination.type').value === SOURCE_TYPES.S3 ?
-        form.get('destination.s3endpoint').value : form.get('destination.path').value
+        form.get('destination.s3endpoint').value : form.get('destination.path').value,
+      sourceDataset
     };
     const sourceCluster = this.clusters.find(c => c.id === this.source.cluster);
     let sourceClusterId = '';
@@ -530,6 +536,9 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       targetClusterId = PolicyService.makeClusterId(targetCluster.dataCenter, targetCluster.name);
       requestData.idForUrl = targetCluster.id;
       requestData.targetCluster = targetClusterId;
+    }
+    if (this.isHivePolicy) {
+      requestData.idForUrl = sourceCluster.id;
     }
     this.store.dispatch(validatePolicy(omitEmpty(requestData), {}));
   }
