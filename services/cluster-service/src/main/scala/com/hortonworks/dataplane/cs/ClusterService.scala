@@ -66,9 +66,9 @@ object ClusterService extends App {
       override def onServiceRegistration(dpService: DpService) = {
         logger.info(s"Registered service $dpService")
         // Service registered now, override the db service endpoint
-        val config = configuration.getConfig("dp.services.db")
         val map = new util.HashMap[String, String]()
-        map.put("dp.services.db.service.uri", config.getString("service.path"))
+        map.put("dp.services.db.service.uri", configuration.getString("dp.services.db.service.path"))
+        map.put("dp.services.proxy.service.uri", configuration.getString("dp.services.proxy.service.path"))
         val gateway = new Gateway(configuration, map, Optional.of(this))
         gateway.initialize()
 
