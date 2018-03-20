@@ -129,8 +129,8 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
   }
 
 
-  override def getDatasetProfiledAssetCount(clusterId: String, datasetName: String, profilerInstanceName: String)(implicit token:Option[HJwtToken]): Future[JsObject] = {
-    ws.url(s"$url/cluster/$clusterId/dpprofiler/datasetasset/$datasetName/assetcount?profilerInstanceName=$profilerInstanceName")
+  override def getDatasetProfiledAssetCount(clusterId: String, datasetName: String, profilerInstanceName: String, startTime: Long, endTime: Long)(implicit token:Option[HJwtToken]): Future[JsObject] = {
+    ws.url(s"$url/cluster/$clusterId/dpprofiler/datasetasset/$datasetName/assetcount?profilerInstanceName=$profilerInstanceName&startTime=$startTime&endTime=$endTime")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()

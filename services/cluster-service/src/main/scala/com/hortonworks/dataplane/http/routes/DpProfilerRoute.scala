@@ -112,8 +112,10 @@ class DpProfilerRoute @Inject()(
   val datasetProfiledAssetCount =
     path("cluster" / LongNumber / "dpprofiler" / "datasetasset" / Segment / "assetcount") { (clusterId,datasetname) =>
       get {
-        parameters('profilerInstanceName.as[String]) { profilerInstanceName =>
-          onComplete(getDatasetProfiledAssetsCount(clusterId, profilerInstanceName, datasetname)) {
+        parameters("profilerInstanceName".as[String],
+          "startTime".as[Long],
+          "endTime".as[Long]) { (profilerInstanceName, startTime, endTime) =>
+          onComplete(getDatasetProfiledAssetsCount(clusterId, profilerInstanceName, datasetname, startTime,endTime)) {
             case Success(res) => res.status match {
               case 200 => complete(success(res.json))
               case 404 => complete(StatusCodes.NotFound, notFound)
@@ -416,13 +418,13 @@ class DpProfilerRoute @Inject()(
       }
     }
 
-  private def getDatasetProfiledAssetsCount(clusterId: Long, profilerInstanceName: String, datasetName: String): Future[WSResponse] = {
+  private def getDatasetProfiledAssetsCount(clusterId: Long, profilerInstanceName: String, datasetName: String, startTime: Long, endTime: Long ): Future[WSResponse] = {
 
     for {
       config <- getConfigOrThrowException(clusterId)
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset/assetcount/$datasetName?profilerinstancename=$profilerInstanceName")
+      urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset/assetcount/$datasetName?profilerinstancename=$profilerInstanceName&startTime=$startTime&endTime=$endTime")
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .get()

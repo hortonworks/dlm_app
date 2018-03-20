@@ -515,14 +515,14 @@ class DataSets @Inject()(
       }
   }
 
-  def getDatasetProfiledAssetCount(clusterId: String, datasetName: String, profilerInstanceName: String) = AuthenticatedAction.async { request =>
+  def getDatasetProfiledAssetCount(clusterId: String, datasetName: String, profilerInstanceName: String, startTime: Long, endTime: Long) = AuthenticatedAction.async { request =>
 
     implicit val token: Option[HJwtToken] = request.token
 
     (for {
 
       cId <- doGetClusterIdFromDpClusterId(clusterId)
-      dsAssetCount <- dpProfilerService.getDatasetProfiledAssetCount(cId, datasetName, profilerInstanceName)
+      dsAssetCount <- dpProfilerService.getDatasetProfiledAssetCount(cId, datasetName, profilerInstanceName, startTime, endTime)
 
     }  yield {
 
