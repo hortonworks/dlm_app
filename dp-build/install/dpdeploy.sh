@@ -533,6 +533,21 @@ migrate_configurations()
     echo "Migrated config properties."
 }
 
+get_bind_address_from_consul_container() {
+    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
+    if [ -z ${CONSUL_ID} ]; then
+        return 0
+    fi
+    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
+    for word in $CONSUL_ARGS; do
+        if [[ $word == -bind* ]]
+        then
+            BIND_ADDR=${word##*=}
+        fi
+    done
+    CONSUL_HOST=${BIND_ADDR};
+}
+
 upgrade() {
 
     if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
@@ -551,6 +566,7 @@ upgrade() {
     fi
 
     load_images
+    get_bind_address_from_consul_container
 
     source "$DP_PATH"/config.clear.sh
     get_master_password
