@@ -64,7 +64,7 @@ export class TimeRangeButtonGroupComponent implements OnChanges {
     switch (button.displayName) {
       case 'D':
         this.fromDate = moment().subtract(1, 'days').endOf('day').local().format(TIME_RANGE_FORMAT);
-        this.toDate = moment().startOf('day').local().format(TIME_RANGE_FORMAT);
+        this.toDate = moment().subtract(1,'days').endOf('day').local().format(TIME_RANGE_FORMAT);
         break;
       case 'W':
         this.fromDate = moment().subtract(8, 'days').startOf('day').local().format(TIME_RANGE_FORMAT);
@@ -81,6 +81,10 @@ export class TimeRangeButtonGroupComponent implements OnChanges {
 
     }
 
+    this.fireChange();
+  }
+
+  fireChange() {
     if (this.fromDate.length > 0 && this.toDate.length > 0) {
       this.change.emit([this.fromDate, this.toDate]);
     }

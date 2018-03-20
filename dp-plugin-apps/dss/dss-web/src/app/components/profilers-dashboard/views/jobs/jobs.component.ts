@@ -12,7 +12,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LakeService} from '../../../../services/lake.service';
 import {ProfilerService} from '../../../../services/profiler.service';
-import {JobsCountModel, ProfilerModel, ProfilerInfoWithJobsCount, JobInfoModel} from '../../models/profilerModels';
+import {JobsCountModel, ProfilerInfoWithJobsCount, JobInfoModel} from '../../../../models/profiler-models';
 
 
 export class JobStatusFilterState {

@@ -36,5 +36,5 @@
 }
 
 :host ::ng-deep .nv-multiBarWithLegend .tick line {
-  stroke: transparent;
+  stroke-dasharray: 1,1;
 }

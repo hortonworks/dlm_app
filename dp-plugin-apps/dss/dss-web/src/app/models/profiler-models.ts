@@ -11,7 +11,7 @@
 
 
 export class JobsCountModel {
-	SUCCESS?:number;
+  SUCCESS?:number;
 	RUNNING?:number;
 	STARTED?:number;
 	FAILED?:number;

@@ -240,3 +240,16 @@ a:hover {
   font-size: 13px;
   font-weight: 400;
 }
+
+.nvd3 .nv-axis line {
+  fill: none;
+  shape-rendering: crispEdges;
+  stroke: rgba(0, 0, 0, .2);
+  stroke-width: 1px;
+  stroke-dasharray: 2px;
+}
+
+.nvd3.nv-multiBarHorizontalChart .domain {
+  stroke-width: 1px;
+  stroke-dasharray: 2px;
+}
