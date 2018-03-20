@@ -147,6 +147,8 @@ object Webservice {
 
     def datasetAssetMapping(clusterId: String, assetIds: Seq[String], datasetName: String)(implicit token:Option[HJwtToken]) : Future[JsObject]
 
+    def getDatasetProfiledAssetCount(clusterId: String, datasetName: String, profilerInstanceName: String,startTime: Long, endTime: Long)(implicit token:Option[HJwtToken]) : Future[JsObject]
+
     def getProfilersStatusWithJobSummary (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject]
 
     def getProfilersStatusWithAssetsCount (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject]
