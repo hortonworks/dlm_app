@@ -533,21 +533,6 @@ migrate_configurations()
     echo "Migrated config properties."
 }
 
-get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
-    if [ -z ${CONSUL_ID} ]; then
-        return 0
-    fi
-    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
-    for word in $CONSUL_ARGS; do
-        if [[ $word == -bind* ]]
-        then
-            BIND_ADDR=${word##*=}
-        fi
-    done
-    CONSUL_HOST=${BIND_ADDR};
-}
-
 upgrade() {
 
     if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
@@ -560,13 +545,12 @@ upgrade() {
         exit -1
     fi
 
-    read -p "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):" CONTINUE_MIGRATE
+    read -p "This will update database schema which can not be reverted. All backups need to be made manually. Please confirm to proceed (yes/no):" CONTINUE_MIGRATE
     if [ "$CONTINUE_MIGRATE" != "yes" ]; then
         exit -1
     fi
 
     load_images
-    get_bind_address_from_consul_container
 
     source "$DP_PATH"/config.clear.sh
     get_master_password
@@ -589,13 +573,17 @@ upgrade() {
     echo "Destroying Knox"
     docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
+    echo "Destroying consul"
+    destroy_consul
+
     # migrate schema to new version
     migrate_schema
 
     # upgrade certs if required
     read_certs_config
 
-    # init all but db and consul
+    # init all but db
+    init_consul
     init_knox
     init_app
 
