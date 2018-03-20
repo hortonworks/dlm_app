@@ -171,13 +171,11 @@ object AppModule extends AbstractModule {
                             actorSystem: ActorSystem,
                             actorMaterializer: ActorMaterializer,
                             clusterData: ClusterDataApi,
-                            dpClusterService: DpClusterService,
                             sslContextManager: SslContextManager,
                             config: Config): HdpRoute = {
     new HdpRoute(actorSystem,
       actorMaterializer,
       clusterData,
-      dpClusterService: DpClusterService,
       sslContextManager: SslContextManager,
       config)
   }
