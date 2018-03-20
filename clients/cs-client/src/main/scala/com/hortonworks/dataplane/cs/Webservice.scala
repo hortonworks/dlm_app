@@ -77,17 +77,17 @@ object Webservice {
 
   trait AtlasService extends CsClientService {
 
-    def listQueryAttributes(clusterId: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, Seq[AtlasAttribute]]]
+    def listQueryAttributes(clusterId: String)(implicit token:Option[HJwtToken]): Future[Seq[AtlasAttribute]]
 
-    def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]]
+    def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[AtlasEntities]
 
-    def getAssetDetails(clusterId: String, atlasGuid: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]]
+    def getAssetDetails(clusterId: String, atlasGuid: String)(implicit token:Option[HJwtToken]): Future[JsObject]
 
-    def getAssetsDetails(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]]
+    def getAssetsDetails(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[AtlasEntities]
 
-    def getTypeDefs(clusterId: String, defType: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+    def getTypeDefs(clusterId: String, defType: String)(implicit token:Option[HJwtToken]) : Future[JsObject]
 
-    def getLineage(clusterId: String, atlasGuid: String, depth: Option[String])(implicit token:Option[HJwtToken]): Future[Either[Errors,JsObject]]
+    def getLineage(clusterId: String, atlasGuid: String, depth: Option[String])(implicit token:Option[HJwtToken]): Future[JsObject]
   }
 
 

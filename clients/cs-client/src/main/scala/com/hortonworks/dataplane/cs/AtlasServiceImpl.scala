@@ -12,10 +12,10 @@
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken, WrappedErrorException}
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.typesafe.config.Config
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,57 +26,21 @@ class AtlasServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  private def mapToAttributes(res: WSResponse) = {
-    res.status match {
-      case 200 =>
-        extractEntity[Seq[AtlasAttribute]](res, r =>
-            (r.json \ "results" \ "data").validate[Seq[AtlasAttribute]].get)
-      case _ => mapErrors(res)
-    }
+  private def httpHandler(res: WSResponse): JsValue = {
+    case 200 => res.json
+    case _ => throw WrappedErrorException(Error(500, "Something went wrong", "cluster.http.generic"))
   }
 
-  private def mapToResults(res: WSResponse) = {
-    res.status match {
-      case 200 => extractEntity[AtlasEntities](res, r => (r.json \ "results" \ "data").validate[AtlasEntities].get)
-      case _ => mapErrors(res)
-    }
-  }
-
-  private def mapToAtlasEntities(res: WSResponse) = {
-    res.status match {
-      case 200 => extractEntity[AtlasEntities](res, r => {
-        val entities = (r.json \ "results" \ "data" \ "entities").validate[Seq[AssetProperties]].get.map(_.getEntity())
-        AtlasEntities(Some(entities.toList))
-      })
-      case _ => mapErrors(res)
-    }
-  }
-
-  private def mapToProperties(res: WSResponse) = {
-    res.status match {
-      case 200 => extractEntity[Seq[AssetProperties]](res, r =>
-        (r.json \ "results" \ "data" \ "entities").validate[Seq[AssetProperties]].get
-      )
-      case _ => mapErrors(res)
-    }
-  }
-
-  private def mapResultsGeneric(res: WSResponse) : Either[Errors,JsObject]= {
-    res.status match {
-      case 200 =>  Right((res.json \ "results" \ "data").as[JsObject])
-      case _ => mapErrors(res)
-    }
-  }
-
-  override def listQueryAttributes(clusterId: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, Seq[AtlasAttribute]]] = {
+  override def listQueryAttributes(clusterId: String)(implicit token:Option[HJwtToken]): Future[Seq[AtlasAttribute]] = {
     ws.url(s"$url/cluster/$clusterId/atlas/hive/attributes")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToAttributes)
+      .map(httpHandler)
+      .map(json => (json \ "results" \ "data").validate[Seq[AtlasAttribute]].get)
   }
 
-  override def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]] = {
+  override def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[AtlasEntities] = {
     ws.url(s"$url/cluster/$clusterId/atlas/hive/search")
       .withToken(token)
       .withHeaders(
@@ -84,35 +48,42 @@ class AtlasServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
         "Accept" -> "application/json"
       )
       .post(Json.toJson(filters))
-      .map(mapToResults)
+      .map(httpHandler)
+      .map(json => (json \ "results" \ "data").validate[AtlasEntities].get)
   }
 
-  override def getAssetDetails(clusterId: String, atlasGuid: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+  override def getAssetDetails(clusterId: String, atlasGuid: String)(implicit token:Option[HJwtToken]): Future[JsObject] = {
     ws.url(s"$url/cluster/$clusterId/atlas/guid/$atlasGuid")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapResultsGeneric)
+      .map(httpHandler)
+      .map(json => (json \ "results" \ "data").as[JsObject])
   }
 
-  def getAssetsDetails(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]] = {
+  def getAssetsDetails(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[AtlasEntities] = {
     ws.url(s"$url/cluster/$clusterId/atlas/guid")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .withQueryString(guids.map(guid => ("query", guid)): _*)
       .get()
-      .map(mapToAtlasEntities)
+      .map(httpHandler)
+      .map { json =>
+        val entities = (json \ "results" \ "data" \ "entities").validate[Seq[AssetProperties]].get.map(_.getEntity())
+        AtlasEntities(Option(entities.toList))
+      }
   }
 
-  override def getTypeDefs(clusterId: String, defType:String) (implicit token:Option[HJwtToken]): Future[Either[Errors,JsObject]] = {
+  override def getTypeDefs(clusterId: String, defType:String) (implicit token:Option[HJwtToken]): Future[JsObject] = {
     ws.url(s"$url/cluster/$clusterId/atlas/typedefs/type/$defType")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapResultsGeneric)
+      .map(httpHandler)
+      .map(json => (json \ "results" \ "data").as[JsObject])
   }
 
-  override def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]) (implicit token:Option[HJwtToken]): Future[Either[Errors,JsObject]] = {
+  override def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]) (implicit token:Option[HJwtToken]): Future[JsObject] = {
     var lineageUrl = s"$url/cluster/$clusterId/atlas/$atlasGuid/lineage"
     if(depth.isDefined){
       lineageUrl = lineageUrl + s"?depth=${depth.get}"
@@ -121,7 +92,8 @@ class AtlasServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapResultsGeneric)
+      .map(httpHandler)
+      .map(json => (json \ "results" \ "data").as[JsObject])
   }
 
 
