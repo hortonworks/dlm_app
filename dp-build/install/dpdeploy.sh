@@ -550,6 +550,8 @@ upgrade() {
         exit -1
     fi
 
+    load_images
+
     source "$DP_PATH"/config.clear.sh
     get_master_password
 
