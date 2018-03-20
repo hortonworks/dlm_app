@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {Chart} from 'nvd3';
 
 import {ActivatedRoute, Router} from '@angular/router';
@@ -17,10 +17,7 @@ import {ProfilerService} from 'app/services/profiler.service';
 import {DataLakeDashboard} from '../../models/data-lake-dashboard';
 import {chartColors, ContextTypeConst, MetricTypeConst, ProfilerName} from '../../shared/utils/constants';
 import {DssAppEvents} from '../../services/dss-app-events';
-import {
-  MetricContextDefinition, ProfilerMetric,
-  ProfilerMetricDefinition, ProfilerMetricRequest
-} from "app/models/profiler-metric-request";
+import {ProfilerMetric, ProfilerMetricDefinition, ProfilerMetricRequest} from "app/models/profiler-metric-request";
 import {
   AssetsAndCount, Metric,
   ProfilerMetricResponse,
@@ -31,6 +28,10 @@ import * as moment from 'moment';
 import {ProfilerInfoWithJobsCount, ProfilerInfoWithAssetsCount} from '../../models/profiler-models';
 import {Observable} from 'rxjs/Observable';
 import {StringUtils} from '../../shared/utils/stringUtils';
+import {
+  TIME_RANGE_FORMAT,
+  TimeRangeButtonGroupComponent
+} from '../../shared/time-range-button-group/time-range-button-group.component';
 
 declare let d3: any;
 declare let nv: any;
@@ -47,9 +48,9 @@ export class DataLakeDashboardComponent implements OnInit {
   @ViewChild('profiledNonProfiled') profiledNonProfiled: ElementRef;
   @ViewChild('sensitiveData') sensitiveData: ElementRef;
   @ViewChild('profilerJobs') profilerJobs: ElementRef;
-  @ViewChild('secureData') secureData: ElementRef;
   @ViewChild('topAssetCollections') topAssetCollections: ElementRef;
   @ViewChild('topAssets') topAssets : ElementRef;
+  @ViewChildren(TimeRangeButtonGroupComponent) timeRangeButtons;
 
   LABEL_LENGTH  = 13;
 
@@ -71,6 +72,7 @@ export class DataLakeDashboardComponent implements OnInit {
         this.redirectToRoot();
       } else {
         this.getDataLakeDashboardData(this.clusterId);
+        this.fireTimeRangeButtonChange();
       }
     });
   }
@@ -83,6 +85,9 @@ export class DataLakeDashboardComponent implements OnInit {
     const metricsRequests = this.createProfilerMetricRequest([
       new ProfilerMetric(MetricTypeConst.SensitivityDistributionMetric, new ProfilerMetricDefinition())
     ]);
+
+    this.profiledNonProfiled.nativeElement.classList.add('loader');
+    this.sensitiveData.nativeElement.classList.add('loader');
 
     Observable.forkJoin([
       this.profileService.assetCollectionStats(metricsRequests),
@@ -102,13 +107,14 @@ export class DataLakeDashboardComponent implements OnInit {
 
   private createProfiledNonProfiledChart(profilerAssetCount: ProfilerInfoWithAssetsCount[], profilerMetricResponse: ProfilerMetricResponse) {
     this.profiledNonProfiled.nativeElement.classList.remove('loader');
+    DomUtils.removeAllChildNodes(this.profiledNonProfiled.nativeElement);
 
     const data = [];
     const sensitiveJobsCount = profilerAssetCount.filter(p => p.profilerInfo.name === ProfilerName.SENSITIVEINFO)[0];
     const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.SensitivityDistributionMetric)[0];
+    const sensitivityDistributionData = metrics.definition as SensitivityDistributionResponse;
 
-    if (sensitiveJobsCount && metrics) {
-      const sensitivityDistributionData = metrics.definition as SensitivityDistributionResponse;
+    if (sensitiveJobsCount && sensitivityDistributionData && sensitivityDistributionData.totalAssets) {
       const nonProfiledAssetCount = sensitivityDistributionData.totalAssets - sensitiveJobsCount.assetsCount;
       data.push({'key': `Non Profiled Assets - ${nonProfiledAssetCount}`, 'y': nonProfiledAssetCount});
       data.push({'key': `Profiled Assets - ${sensitiveJobsCount.assetsCount}`, 'y': sensitiveJobsCount.assetsCount});
@@ -144,6 +150,7 @@ export class DataLakeDashboardComponent implements OnInit {
 
   private createSensitiveDataChart(profilerMetricResponse: ProfilerMetricResponse) {
     this.sensitiveData.nativeElement.classList.remove('loader');
+    DomUtils.removeAllChildNodes(this.sensitiveData.nativeElement);
 
     let data = [];
     const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.SensitivityDistributionMetric)[0];
@@ -219,7 +226,10 @@ export class DataLakeDashboardComponent implements OnInit {
     const metrics = profilerMetricResponse.metrics.filter((metric: Metric) => metric.metricType === MetricTypeConst.AssetCounts)[0];
     if (metrics.status) {
       const data = metrics.definition as AssetsAndCount;
-      const assetsAndCount = data.assetsAndCount as AssetCountsResultForADay[];
+      let assetsAndCount = data.assetsAndCount as AssetCountsResultForADay[];
+      assetsAndCount = assetsAndCount.sort((a, b) => {
+        return (moment(a.date, TIME_RANGE_FORMAT).valueOf() - moment(b.date, TIME_RANGE_FORMAT).valueOf())
+      });
       assetsAndCount.forEach(ac => {
         assetCounts.push({'x': ac.date , 'y': ac.totalAssets});
         newAssetCount.push({'x': ac.date , 'y': ac.newAssets});
@@ -235,11 +245,11 @@ export class DataLakeDashboardComponent implements OnInit {
       const chart = nv.models.multiBarChart()
       .stacked(true)
       .showControls(false)
-      .showYAxis(false)
       .color([chartColors.GREEN, chartColors.RED])
       .groupSpacing(.4)
-      .height(320)
-      .reduceXTicks(false);
+      .margin({bottom: 75});
+
+      chart.yAxis.tickFormat(d3.format('f'));
 
       const svg = d3.select(this.totalAssets.nativeElement).datum(data);
       svg.transition().duration(0).call(chart);
@@ -252,7 +262,7 @@ export class DataLakeDashboardComponent implements OnInit {
   }
 
   private getProfilerJobs(startDate: number, endDate: number) {
-    this.totalAssets.nativeElement.classList.add('loader');
+    this.profilerJobs.nativeElement.classList.add('loader');
 
     this.profileService.getStatusWithJobCounts(this.clusterId, startDate, endDate).subscribe(profilerInfoWithJobsCount => {
       this.createProfilerJobsChart(profilerInfoWithJobsCount)
@@ -261,23 +271,23 @@ export class DataLakeDashboardComponent implements OnInit {
 
   private createProfilerJobsChart(profilerInfoWithJobsCount: ProfilerInfoWithJobsCount[]) {
     this.profilerJobs.nativeElement.classList.remove('loader');
-    DomUtils.removeAllChildNodes(this.totalAssets.nativeElement);
-
-    let success = 0, running = 0, started = 0, failed = 0, unknown = 0;
-    profilerInfoWithJobsCount.forEach(p => {
-      success += p.jobsCount.SUCCESS ? p.jobsCount.SUCCESS : 0;
-      running += p.jobsCount.RUNNING ? p.jobsCount.RUNNING : 0;
-      started += p.jobsCount.STARTED ? p.jobsCount.STARTED : 0;
-      failed  += p.jobsCount.FAILED  ? p.jobsCount.FAILED  : 0;
-      unknown += p.jobsCount.UNKNOWN ? p.jobsCount.UNKNOWN : 0;
-    });
+    DomUtils.removeAllChildNodes(this.profilerJobs.nativeElement);
 
     const data = [];
-    data.push({'key' : 'SUCCESS', 'y':  success});
-    data.push({'key' : 'RUNNING', 'y':  running});
-    data.push({'key' : 'STARTED', 'y':  started});
-    data.push({'key' : 'FAILED' , 'y':  failed});
-    data.push({'key' : 'UNKNOWN', 'y':  unknown});
+    const sensitiveJobsCount = profilerInfoWithJobsCount.filter(p => p.profilerInfo.name === ProfilerName.SENSITIVEINFO)[0];
+    if (sensitiveJobsCount) {
+      let success = sensitiveJobsCount.jobsCount.SUCCESS ? sensitiveJobsCount.jobsCount.SUCCESS : 0,
+      running = sensitiveJobsCount.jobsCount.RUNNING ? sensitiveJobsCount.jobsCount.RUNNING : 0,
+      started = sensitiveJobsCount.jobsCount.STARTED ? sensitiveJobsCount.jobsCount.STARTED : 0,
+      failed  = sensitiveJobsCount.jobsCount.FAILED  ? sensitiveJobsCount.jobsCount.FAILED  : 0,
+      unknown = sensitiveJobsCount.jobsCount.UNKNOWN ? sensitiveJobsCount.jobsCount.UNKNOWN : 0;
+
+      data.push({'key' : `Success - ${success}`, 'y':  success});
+      data.push({'key' : `Running - ${running}`, 'y':  running});
+      data.push({'key' : `Started - ${started}`, 'y':  started});
+      data.push({'key' : `Failed - ${failed}`  , 'y':  failed});
+      data.push({'key' : `Unknown - ${unknown}`, 'y':  unknown});
+    }
 
     nv.addGraph(() => {
       let chart = nv.models.pieChart()
@@ -290,7 +300,6 @@ export class DataLakeDashboardComponent implements OnInit {
       .donut(true)
       .height(320)
       .color([chartColors.GREEN, chartColors.BLUE, chartColors.YELLOW, chartColors.RED, chartColors.GREY])
-      .valueFormat((val) => `${val}%`)
       .labelType('percent');
 
       chart.pie.labelsOutside(true).donut(true);
@@ -360,7 +369,7 @@ export class DataLakeDashboardComponent implements OnInit {
         this.renderLockIcon(this.topAssetCollections);
       });
 
-      chart.yAxis.tickFormat(d3.format('f'))
+      chart.yAxis.tickFormat(d3.format('f'));
       chart.yAxis.axisLabel('Number of accesses');
 
       d3.select(this.topAssetCollections.nativeElement)
@@ -485,6 +494,12 @@ export class DataLakeDashboardComponent implements OnInit {
 
     if (type === MetricTypeConst.ProfilerJobs) {
       this.getProfilerJobs(moment($event[0], "YYYYMMDD").valueOf(), moment($event[1], "YYYYMMDD").valueOf());
+    }
+  }
+
+  private fireTimeRangeButtonChange() {
+    if (this.timeRangeButtons && this.timeRangeButtons.length > 0) {
+      this.timeRangeButtons.forEach(b => b.fireChange());
     }
   }
 }

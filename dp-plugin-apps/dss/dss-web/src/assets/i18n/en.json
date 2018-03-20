@@ -227,10 +227,10 @@
       },
       "data-lake-dashboard": {
         "no-of-total-assets" : "# of Total Assets",
-        "profiled-vs-non-profiled" : "Profiled Vs Non Profiled",
-        "sensitive-data" : "Sensitive Data",
-        "profiler-jobs" : "Profiler Jobs",
-        "secure-data" : "Secure Data",
+        "profiled-vs-non-profiled" : "Assets Sensitivity in Datalake",
+        "sensitive-data" : "Profiled ",
+        "profiler-jobs" : "Sensitivity Profiler Execution Status",
+        "secure-data" : "Datalake Asset Sensitivity Profiling Summary",
         "top-10-asset-collections" : "Top 10 Asset Collections by Access",
         "top-10-assets" : "Top 10 Assets by Access"
       }

@@ -12,5 +12,5 @@
   <ul class="time-range-button-group">
     <li *ngFor="let button of displayValues" [ngClass]="{'active' : button.isActive}" (click)="selectTimeRange(button)">{{button.displayName}}</li>
   </ul>
-  <div class="range-format"> {{fromDate + ' to ' + toDate}}</div>
+  <div class="range-format"> {{fromDate + (fromDate !== toDate ? ' to ' + toDate : '')}}</div>
 </div>

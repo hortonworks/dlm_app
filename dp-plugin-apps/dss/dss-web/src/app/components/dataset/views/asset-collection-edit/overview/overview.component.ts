@@ -147,16 +147,13 @@ export class OverviewComponent implements OnChanges {
       })
       .showValues(false)
       .duration(350)
-      .showControls(true)
       .stacked(false)
       .showControls(false)
       .showLegend(false)
       .showYAxis(true)
-      .groupSpacing(0.4)
+      .groupSpacing(0.2)
       .margin({left: 85})
       .noData((distributionByTagData.length > 0 && distributionByTagData[0].values.length === 0) ? this.NO_DATA : this.UNABLE_TO_FETCH_DATA);
-
-      chart.yAxis.tickFormat(d3.format('f'));
 
       d3.select(this.distributionByTag.nativeElement)
       .datum(distributionByTagData)
@@ -194,7 +191,7 @@ export class OverviewComponent implements OnChanges {
         return d.y
       })
       .donut(true)
-      .color([chartColors.GREEN, chartColors.BLUE])
+      .color([chartColors.BLUE, chartColors.RED])
       .valueFormat((val) => `${val}%`)
       .labelType('percent')
       .noData(this.UNABLE_TO_FETCH_DATA);
@@ -248,15 +245,12 @@ export class OverviewComponent implements OnChanges {
       .y((d) => {
         return d.value;
       })
-      .showValues(false)
-      .duration(350)
       .showControls(true)
       .stacked(false)
       .showControls(false)
       .showLegend(false)
-      .showYAxis(true)
-      .groupSpacing(0.4)
       .margin({left: 85})
+      .groupSpacing(0.2 + ((10 - topUsersData.length) * 0.07))
       .noData((topUsersData.length > 0 && topUsersData[0].values.length === 0) ? this.NO_DATA : this.UNABLE_TO_FETCH_DATA);
 
       chart.yAxis.tickFormat(d3.format('f'));
@@ -307,10 +301,11 @@ export class OverviewComponent implements OnChanges {
       })
       .donut(true)
       .title('')
-      .color([chartColors.GREEN, chartColors.BLUE])
+      .color([chartColors.BLUE, chartColors.RED])
       .valueFormat((val) => `${val}%`)
       .labelType('percent')
-      .noData(this.UNABLE_TO_FETCH_DATA);
+      .noData(this.UNABLE_TO_FETCH_DATA)
+      .margin({bottom: 50});
 
       chart.pie.labelsOutside(true).donut(true);
       chart.tooltip.valueFormatter((v, i, d) => {
