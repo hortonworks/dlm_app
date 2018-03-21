@@ -11,25 +11,26 @@
 
 package com.hortonworks.dataplane.http.routes
 
-import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, WrappedErrorException}
+import com.hortonworks.dataplane.commons.domain.Entities.{Errors, HJwtToken, WrappedErrorException}
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.{ClusterDataApi, CredentialInterface}
-import com.hortonworks.dataplane.cs.atlas.{AtlasInterface, AtlasService, DefaultAtlasInterface}
+import com.hortonworks.dataplane.cs.atlas.AtlasService
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 @Singleton
-class AtlasRoute @Inject()(private val config: Config, private val atlasApiData: ClusterDataApi, private val credentialInterface: CredentialInterface, atlas: AtlasService)
+class AtlasRoute @Inject()(config: Config, atlas: AtlasService, clusterDataApi: ClusterDataApi, credentialInterface: CredentialInterface)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Atlas._
@@ -42,11 +43,15 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
       extractRequest { request =>
         get {
           implicit val token = extractToken(request)
-          val attributes = atlas.getEntityTypes(clusterId, "hive_table")
-          onComplete(attributes) {
+          onComplete(
+            for {
+              urls <- clusterDataApi.getAtlasUrl(clusterId.toLong)
+              cred <- credentialInterface.getCredential(CSConstants.ATLAS_CREDENTIAL_KEY)
+              res <- atlas.getEntityTypes(urls, clusterId, cred.user.getOrElse("admin"), cred.pass.getOrElse("admin"), "hive_table")
+            } yield res
+          ) {
             case Success(att) => complete(success(att))
-            case Failure(th) =>
-              complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
+            case Failure(th) => complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
           }
         }
       }
@@ -58,8 +63,20 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
         post {
           entity(as[AtlasSearchQuery]) { query =>
             implicit val token = extractToken(request)
-            val eventualValue = atlas.query(clusterId, query)
-            handleResponse(eventualValue)
+            onComplete(
+              for {
+                urls <- clusterDataApi.getAtlasUrl(clusterId.toLong)
+                cred <- credentialInterface.getCredential(CSConstants.ATLAS_CREDENTIAL_KEY)
+                res <- atlas.query(urls, clusterId, cred.user.getOrElse("admin"), cred.pass.getOrElse("admin"), query)
+              } yield res
+            ) {
+              case Success(entities) => complete(success(entities))
+              case Failure(th) =>
+                th match {
+                  case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
+                  case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
+                }
+            }
           }
         }
       }
@@ -71,8 +88,13 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
       extractRequest { request =>
         get {
           implicit val token = extractToken(request)
-          val eventualValue = atlas.getEntity(clusterId, guid)
-          handleResponse(eventualValue)
+          handleResponse(
+            for {
+              urls <- clusterDataApi.getAtlasUrl(clusterId.toLong)
+              cred <- credentialInterface.getCredential(CSConstants.ATLAS_CREDENTIAL_KEY)
+              res <- atlas.getEntity(urls, clusterId, cred.user.getOrElse("admin"), cred.pass.getOrElse("admin"), guid)
+            } yield res
+          )
         }
       }
   }
@@ -83,8 +105,13 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
         parameters('query.*) { guids =>
           get {
             implicit val token = extractToken(request)
-            val eventualValue = atlas.getEntities(clusterId, guids.toList)
-            handleResponse(eventualValue)
+            handleResponse(
+              for {
+                urls <- clusterDataApi.getAtlasUrl(clusterId.toLong)
+                cred <- credentialInterface.getCredential(CSConstants.ATLAS_CREDENTIAL_KEY)
+                res <- atlas.getEntities(urls, clusterId, cred.user.getOrElse("admin"), cred.pass.getOrElse("admin"), guids.toList)
+              } yield res
+            )
           }
         }
       }
@@ -99,8 +126,20 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
             parameters("depth".?) { depth =>
               get {
                 implicit val token = extractToken(request)
-                val eventualValue = atlas.getLineage(clusterId, guid, depth)
-                handleResponse(eventualValue)
+                onComplete(
+                  for {
+                    urls <- clusterDataApi.getAtlasUrl(clusterId.toLong)
+                    cred <- credentialInterface.getCredential(CSConstants.ATLAS_CREDENTIAL_KEY)
+                    res <- atlas.getLineage(urls, clusterId, cred.user.getOrElse("admin"), cred.pass.getOrElse("admin"), guid, depth)
+                  } yield res
+                ) {
+                  case Success(entities) => complete(success(entities))
+                  case Failure(th) =>
+                    th match {
+                      case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
+                      case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
+                    }
+                }
               }
             }
           }
@@ -113,10 +152,15 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
         extractRequest { request =>
           get {
             implicit val token = extractToken(request)
-            val typeDefs = atlas.getTypes(clusterId, typeDef)
-            onComplete(typeDefs) {
+            onComplete(
+              for {
+                urls <- clusterDataApi.getAtlasUrl(clusterId.toLong)
+                cred <- credentialInterface.getCredential(CSConstants.ATLAS_CREDENTIAL_KEY)
+                res <- atlas.getTypes(urls, clusterId, cred.user.getOrElse("admin"), cred.pass.getOrElse("admin"), typeDef)
+              } yield res
+            ) {
               case Success(typeDefs) => complete(success(typeDefs))
-              case Failure(th) =>complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
+              case Failure(th) => complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
             }
           }
         }
@@ -132,7 +176,7 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
       case Success(entities) => complete(success(entities))
       case Failure(th) =>
         th match {
-          case ex: WrappedErrorException => complete(ex.error.status, Json.toJson(ex.error))
+          case ex: WrappedErrorException => complete(ex.error.status -> Json.toJson(Errors(Seq(ex.error))))
           case _ => complete(StatusCodes.InternalServerError, errors(500, "cluster.atlas.generic", "A generic error occured while communicating with Atlas.", th))
         }
     }

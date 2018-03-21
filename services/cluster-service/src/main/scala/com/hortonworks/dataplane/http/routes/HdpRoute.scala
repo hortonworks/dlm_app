@@ -24,17 +24,15 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.google.common.cache.{CacheBuilder, CacheLoader}
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, WrappedErrorException}
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.cs.ClusterDataApi
 import com.hortonworks.dataplane.cs.tls.SslContextManager
-import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 /**
   * This route enables other services to talk to other HDP http services
@@ -137,15 +135,17 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
           for {
             url <- serviceRoutes.get(cluster)
 
+            dpCluster <- clusterData.getDataplaneCluster(cluster.toLong)
+
             targetUrl <- Future.successful {
-              if (shouldUseKnox(jwtToken, url) && serviceEnabled(service))
+              if (shouldUseKnox(jwtToken, url, dpCluster.behindGateway) && serviceEnabled(service))
                 url.get
               else
                 new URL(request.getHeader(Constants.SERVICE_ENDPOINT).get.value)
             }
 
             parsedHeader <- {
-              if (shouldUseKnox(jwtToken, url)) {
+              if (shouldUseKnox(jwtToken, url, dpCluster.behindGateway)) {
                 //construct a token header
                 val accessToken =
                   clusterData.getTokenForCluster(cluster.toLong, jwtToken)
@@ -164,13 +164,11 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
               }
             }
 
-            dpCluster <- clusterData.getDataplaneCluster(cluster.toLong)
-
             h <- {
 
               // The filter is needed to clean the dummy auth header added
               // when there was a token and a target knox URL, then remove existing auth urls
-              val cleanedHeaders = if (shouldUseKnox(jwtToken, url)) {
+              val cleanedHeaders = if (shouldUseKnox(jwtToken, url, dpCluster.behindGateway)) {
                 request.headers.filterNot(
                   hi =>
                     hi.lowercaseName() == "authorization" || hi.isInstanceOf[Cookie]
@@ -180,7 +178,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                   hi.isInstanceOf[Cookie]
                     || hi.lowercaseName() == Constants.DPTOKEN.toLowerCase)
 
-              val finalPath = if (shouldUseKnox(jwtToken, url) && serviceEnabled(service)) s"${targetUrl.getPath}/$service/$targetPath" else s"${targetUrl.getPath}/$targetPath"
+              val finalPath = if (shouldUseKnox(jwtToken, url, dpCluster.behindGateway) && serviceEnabled(service)) s"${targetUrl.getPath}/$service/$targetPath" else s"${targetUrl.getPath}/$targetPath"
               val target = HttpRequest(
                 method = request.method,
                 entity = request.entity,
@@ -198,7 +196,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
 
 
               val flow = {
-                if ((shouldUseKnox(jwtToken, url) && serviceEnabled(service)) || targetUrl.getProtocol == "https") {
+                if ((shouldUseKnox(jwtToken, url, dpCluster.behindGateway) && serviceEnabled(service)) || targetUrl.getProtocol == "https") {
                   // reload context by cluster type
                   val httpsConnectionContext = sslContextManager.getHttpsConnectionContext(dpCluster.allowUntrusted)
 
@@ -226,8 +224,8 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
     enabledServices.contains(service.toLowerCase)
   }
 
-  private def shouldUseKnox(jwtToken: Option[HJwtToken], url: Option[URL]) = {
-    url.isDefined && jwtToken.isDefined
+  private def shouldUseKnox(jwtToken: Option[HJwtToken], url: Option[URL], behindGateway: Boolean) = {
+    url.isDefined && jwtToken.isDefined && behindGateway
   }
 }
 

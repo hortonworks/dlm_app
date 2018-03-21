@@ -49,8 +49,7 @@ object Entities {
                    details: Option[Seq[Error]] = None,
                    innererror: Option[InnerError] = None)
 
-  case class WrappedErrorException(error: Error)
-      extends Exception(error.message)
+  case class WrappedErrorException(error: Error) extends Exception(error.message)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)

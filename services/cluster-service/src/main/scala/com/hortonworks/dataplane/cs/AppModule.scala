@@ -15,6 +15,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
+import com.hortonworks.dataplane.cs.atlas.{AtlasApiSupplier, AtlasService}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.db.Webservice.{CertificateService, ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
@@ -120,11 +121,16 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideAtlasRoute(
-      config: Config,
-      atlasApiData: ClusterDataApi,
-      credentialInterface: CredentialInterface): AtlasRoute = {
-    AtlasRoute(config, atlasApiData, credentialInterface)
+  def provideAtlasService(ws: WSClient, config: Config): AtlasService = {
+
+    implicit val knoxProxyWsClient: KnoxProxyWsClient = KnoxProxyWsClient(ws, config)
+    new AtlasService(config)
+  }
+
+  @Provides
+  @Singleton
+  def provideAtlasRoute(config: Config, atlasService: AtlasService, clusterDataApi: ClusterDataApi, credentialInterface: CredentialInterface): AtlasRoute = {
+    new AtlasRoute(config, atlasService, clusterDataApi, credentialInterface)
   }
 
   @Provides

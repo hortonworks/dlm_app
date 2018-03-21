@@ -22,8 +22,7 @@ trait BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def success(data: JsValueWrapper) =
-    Json.obj("results" -> Json.obj("data" -> data))
+  def success(data: JsValueWrapper) = Json.obj("results" -> Json.obj("data" -> data))
 
   def errors(status: Int = 500,
              code: String = "cluster.generic",

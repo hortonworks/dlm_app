@@ -158,8 +158,15 @@ class ClusterDataApi @Inject()(
     } yield token
   }
 
-  def getAtlasUrl(clusterId:Long) = {
-     val atlasUrl = clusterAtlasSupplierCache.get(clusterId).get()
+  def getAtlasUrl(clusterId:Long): Future[Set[String]] = {
+     val atlasUrl =
+       clusterAtlasSupplierCache
+         .get(clusterId)
+         .get()
+         .map(
+           _.map(_.toString)
+         )
+
     // Make sure We evict on failure
     atlasUrl.onFailure {
       case th:Throwable =>
@@ -304,9 +311,7 @@ sealed class URLSupplierCacheLoader(
   override def load(key: Long): Supplier[Future[Set[URL]]] = {
     log.info(
       s"Loading a URL supplier into cache, URL's for cluster-id:$key")
-      new AtlasURLSupplier(key,
-                           clusterComponentService,
-                           clusterHostsService)
+      new AtlasURLSupplier(key, clusterComponentService, clusterHostsService)
 
   }
 }
