@@ -76,10 +76,7 @@ object Atlas {
     */
   case class AtlasSearchQuery(atlasFilters: Seq[AtlasFilter],
                               limit: Option[Int] = None,
-                              offset: Option[Int] = None) {
-    def isPaged =
-      limit.isDefined && offset.isDefined && offset.get >= 0 && limit.get > 0
-  }
+                              offset: Option[Int] = None)
 
   implicit val atlasAttributeReads = Json.reads[AtlasAttribute]
   implicit val atlasAttributeWrites = Json.writes[AtlasAttribute]
