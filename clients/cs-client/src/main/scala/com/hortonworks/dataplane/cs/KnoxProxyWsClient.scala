@@ -46,13 +46,14 @@ case class KnoxProxyWsRequest(private val request: WSRequest, private val fallba
 case class KnoxProxyWsClient(wrappedClient: WSClient, config: Config) {
   private def proxyUrl =
     Option(System.getProperty("dp.services.proxy.service.uri"))
-      .getOrElse(config.getString("dp.services.proxy.service.uri"))
+      .getOrElse(config.getString("dp.services.hdp.proxy.service.uri"))
 
   def url(urlString: String, clusterId: Long, serviceName: String): KnoxProxyWsRequest = {
     val url = new URL(urlString)
     val fallbackEndpoint = s"${url.getProtocol}://${url.getAuthority}"
     val fallbackPath = url.getPath
     val req = wrappedClient.url(s"$proxyUrl/cluster/$clusterId/service/${serviceName.toLowerCase}$fallbackPath")
+
     KnoxProxyWsRequest(req, fallbackEndpoint)
   }
 }

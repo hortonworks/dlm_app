@@ -18,6 +18,7 @@ import com.hortonworks.dataplane.commons.domain.Constants.ATLAS
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, HJwtToken, WrappedErrorException}
 import com.hortonworks.dataplane.cs.KnoxProxyWsClient
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSAuthScheme, WSResponse}
 
@@ -62,7 +63,7 @@ class AtlasService @Inject()(val config: Config)(implicit ws: KnoxProxyWsClient)
     firstOf(
       urls,
       (url: String) =>
-        ws.url(s"$url/api/atlas/v2/search/dsl}", clusterId.toLong, ATLAS)
+        ws.url(s"$url/api/atlas/v2/search/dsl", clusterId.toLong, ATLAS)
         .withToken(token)
         .withAuth(username, password, WSAuthScheme.BASIC)
         .withHeaders(
@@ -76,15 +77,15 @@ class AtlasService @Inject()(val config: Config)(implicit ws: KnoxProxyWsClient)
     .map { json =>
       //AtlasSearchResult: {entities: [AtlasEntityHeader]}
 
-      (json \ "entities").validateOpt[Seq[JsValue]]
+      (json \ "entities").asOpt[Seq[JsValue]]
         .map { _.collect {
               case cEntity: JsValue if (filterDeletedEntities && (cEntity \ "status").as[String] != "DELETED") => Entity(
-                typeName = (cEntity \ "TypeName").asOpt[String],
+                typeName = (cEntity \ "typeName").asOpt[String],
                 attributes = buildKV(cEntity),
-                guid = (cEntity \ "Guid").asOpt[String],
-                status = (cEntity \ "Status").asOpt[String],
-                displayText = (cEntity \ "DisplayText").asOpt[String],
-                tags = (cEntity \ "ClassificationNames").asOpt[Seq[String]],
+                guid = (cEntity \ "guid").asOpt[String],
+                status = (cEntity \ "status").asOpt[String],
+                displayText = (cEntity \ "displayText").asOpt[String],
+                tags = (cEntity \ "classificationNames").asOpt[Seq[String]],
                 datasetId = None,
                 datasetName = None)
             }
@@ -118,7 +119,7 @@ class AtlasService @Inject()(val config: Config)(implicit ws: KnoxProxyWsClient)
           .withToken(token)
           .withAuth(username, password, WSAuthScheme.BASIC)
           .withHeaders("Accept" -> "application/json")
-          .withQueryString(guids.map(guid => ("query", guid)): _*)
+          .withQueryString(guids.map(guid => ("guid", guid)): _*)
           .get()
     )
     .map(httpHandler)
@@ -161,7 +162,7 @@ class AtlasService @Inject()(val config: Config)(implicit ws: KnoxProxyWsClient)
       val sAttributes =
         attributes
           .filter(cAttribute => includedTypes.contains((cAttribute \ "typeName").as[String]))
-          .map(cAttribute => Json.obj("name" -> (cAttribute \ "name").as[String], "typeName" -> (cAttribute \ "typeName").as[String]))
+          .map(cAttribute => Json.obj("name" -> (cAttribute \ "name").as[String], "dataType" -> (cAttribute \ "typeName").as[String]))
 
       sAttributes.toList ++ defaultAttributes
       //Seq[AtlasAttribute(name: String, dataType: String)]: Seq[{name, typeName}]

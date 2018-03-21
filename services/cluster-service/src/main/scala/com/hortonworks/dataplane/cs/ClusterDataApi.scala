@@ -166,6 +166,7 @@ class ClusterDataApi @Inject()(
          .map(
            _.map(_.toString)
          )
+    log.info(s"Discovered URLs: $atlasUrl")
 
     // Make sure We evict on failure
     atlasUrl.onFailure {
