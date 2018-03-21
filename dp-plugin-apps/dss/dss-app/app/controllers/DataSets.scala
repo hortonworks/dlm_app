@@ -515,6 +515,23 @@ class DataSets @Inject()(
       }
   }
 
+  def getDatasetProfiledAssetCount(clusterId: String, datasetName: String, profilerInstanceName: String, startTime: Long, endTime: Long) = AuthenticatedAction.async { request =>
+
+    implicit val token: Option[HJwtToken] = request.token
+
+    (for {
+
+      cId <- doGetClusterIdFromDpClusterId(clusterId)
+      dsAssetCount <- dpProfilerService.getDatasetProfiledAssetCount(cId, datasetName, profilerInstanceName, startTime, endTime)
+
+    }  yield {
+
+      Ok(Json.toJson(dsAssetCount))
+
+    })
+      .recover(apiErrorWithLog(e => Logger.error(s"Datasets-Controller: getDatasetProfiledAssetCount with clusterId $clusterId, datasetName $datasetName and profilerInstanceName $profilerInstanceName on profiler_agent failed with message ${e.getMessage}", e)))
+  }
+
   private def extractAndFilterEntities(atlasEntities: AtlasEntities, exceptions: Seq[String] = Seq()) :Seq[Entity] = {
     atlasEntities.entities.getOrElse(Seq[Entity]()).filter(_.guid.nonEmpty).filter(ent => exceptions.find(_ == ent.guid.getOrElse(None)).isEmpty)
   }

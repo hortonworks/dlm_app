@@ -1,0 +1,42 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import "../../../styles/variables";
+
+.time-range-button-group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  vertical-align: top;
+  font-weight: 400;
+  font-size: 14px;
+
+  li {
+    display:inline;
+    padding: 4px 8px;
+    border-radius: 2px;
+    min-width: 24px;
+    text-align: center;
+    cursor: pointer;
+
+    &.active {
+      background: #444f62;
+      color: #fff;
+    }
+  }
+}
+
+.range-format {
+  font-size: 8px;
+  margin-top: 5px;
+  text-align: center;
+}
+
+

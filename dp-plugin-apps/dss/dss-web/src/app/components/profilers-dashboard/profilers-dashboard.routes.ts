@@ -9,7 +9,7 @@
  *
  */
 import {Routes} from "@angular/router";
-import {ProfilersDashboardComponent} from './profilers-dashboard.component';
+import {ProfilersDashboardComponent} from './views/profilers-dashboard.component';
 
 export const routes: Routes = [
   { path: 'dss/profilers', children: [

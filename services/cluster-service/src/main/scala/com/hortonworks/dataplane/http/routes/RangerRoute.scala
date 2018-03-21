@@ -136,6 +136,7 @@ class RangerRoute @Inject()(
       case "hive" =>
         requestRangerForResourcePolicies(request,
                                          clusterId,
+                                         serviceType,
                                          dbName.get,
                                          tableName.get,
                                          offset,
@@ -458,6 +459,7 @@ class RangerRoute @Inject()(
   private def requestRangerForResourcePolicies(
       request: HttpRequest,
       clusterId: Long,
+      serviceType: String,
       dbName: String,
       tableName: String,
       offset: Long,
@@ -470,12 +472,15 @@ class RangerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       credential <- credentialInterface.getCredential(CSConstants.RANGER_CREDENTIAL_KEY)
       dpc <- clusterDataApi.getDataplaneCluster(clusterId)
-      wsRequest <- createPolicyRequest(sslContextManager.getWSClient(dpc.allowUntrusted),
+      ws <- Future.successful(sslContextManager.getWSClient(dpc.allowUntrusted))
+      serviceIds <- getRangerServicesForType(ws, baseUrls.head, credential, serviceType, executor, token)
+      wsRequest <- createPolicyRequest(ws,
                                        dbName,
                                        tableName,
                                        offset,
                                        pageSize,
                                        baseUrls,
+                                       serviceIds.head,
                                        credential,
                                        executor)
       response <- executor.execute(KnoxApiRequest(wsRequest, { r =>
@@ -490,12 +495,13 @@ class RangerRoute @Inject()(
                                   offset: Long,
                                   pageSize: Long,
                                   baseUrls: Seq[String],
+                                  serviceId:Long,
                                   credential: Credentials,
                                   executor: KnoxApiExecutor) = {
     Future.successful {
       val request = ws
         .url(
-          s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=$offset&pageSize=$pageSize&resource:database=$dbName&resource:table=$tableName")
+          s"${baseUrls.head}/service/plugins/policies/service/${serviceId}?startIndex=$offset&pageSize=$pageSize&resource:database=$dbName&resource:table=$tableName")
         .withHeaders(defaultHeaders)
       setAuth(credential, executor, request)
     }

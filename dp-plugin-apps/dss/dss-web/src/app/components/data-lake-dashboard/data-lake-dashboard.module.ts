@@ -16,12 +16,14 @@ import {RouterModule} from '@angular/router';
 import { DataLakeDashboardComponent } from './data-lake-dashboard.component';
 import {routes} from './data-lake-dashboard.routes';
 import {ProfilerService} from '../../services/profiler.service';
+import {TimeRangeButtonGroupModule} from '../../shared/time-range-button-group/time-range-button-group.module';
 
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule,
+    TimeRangeButtonGroupModule,
     RouterModule.forChild(routes)
   ],
   declarations: [DataLakeDashboardComponent],

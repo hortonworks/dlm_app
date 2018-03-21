@@ -15,7 +15,7 @@ $details-content-height: $details-height - 35*2;
     white-space: normal;
     padding: 0;
     height: $details-height - 50px;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   .policy-details {

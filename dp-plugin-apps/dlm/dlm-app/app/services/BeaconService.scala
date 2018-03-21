@@ -121,7 +121,7 @@ class BeaconService @Inject()(
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPairedClustersOption.filter(_.isLeft).map(_.left.get)
-          if (failedResponses.lengthCompare(beaconClusters.length) == 0) {
+          if (beaconClusters.nonEmpty && failedResponses.lengthCompare(beaconClusters.length) == 0) {
             p.success(Left(DlmApiErrors(failedResponses)))
           } else {
             p.success(Right(PairedClustersResponse(failedResponses, setOfPairedClusters)))
@@ -506,7 +506,7 @@ class BeaconService @Inject()(
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPoliciesOption.filter(_.isLeft).map(_.left.get)
-          if (failedResponses.lengthCompare(beaconClusters.length) == 0) {
+          if (beaconClusters.nonEmpty && failedResponses.lengthCompare(beaconClusters.length) == 0) {
             p.success(Left(DlmApiErrors(failedResponses)))
           } else {
             p.success(Right(PoliciesDetailsResponse(failedResponses, policiesDetails)))
@@ -858,7 +858,7 @@ class BeaconService @Inject()(
             val allEvents: Seq[BeaconEventResponse] = eventListFromAllClusters.filter(_.isRight).flatMap(_.right.get).
               filter(x => x.syncEvent.isEmpty || (x.syncEvent.isDefined && !x.syncEvent.get))
             val failedResponses: Seq[BeaconApiErrors] = eventListFromAllClusters.filter(_.isLeft).map(_.left.get)
-            if (failedResponses.length == clusterIdWithBeaconUrl.length) {
+            if (clusterIdWithBeaconUrl.nonEmpty && failedResponses.lengthCompare(clusterIdWithBeaconUrl.length) == 0) {
               p.success(Left(DlmApiErrors(failedResponses)))
             } else {
 
@@ -904,7 +904,7 @@ class BeaconService @Inject()(
         } yield {
           val allBeaconAdminStatus: Seq[BeaconAdminStatusDetails] = allBeaconAdminStatusFuture.filter(_.isRight).map(x => x.right.get)
           val failedResponses: Seq[BeaconApiErrors] = allBeaconAdminStatusFuture.filter(_.isLeft).map(_.left.get)
-          if (failedResponses.lengthCompare(beaconClusters.length) == 0) {
+          if (beaconClusters.nonEmpty && failedResponses.lengthCompare(beaconClusters.length) == 0) {
             p.success(Left(DlmApiErrors(failedResponses)))
           } else {
             p.success(Right(AdminStatusResponse(failedResponses, allBeaconAdminStatus)))
@@ -1163,7 +1163,7 @@ class BeaconService @Inject()(
           cloudCredListFromAllClusters => {
             val allCloudCreds: Seq[CloudCredsBeaconResponse] = cloudCredListFromAllClusters.filter(_.isRight).map(_.right.get)
             val failedResponses: Seq[BeaconApiErrors] = cloudCredListFromAllClusters.filter(_.isLeft).map(_.left.get)
-            if (failedResponses.lengthCompare(clustersWithCloudSupport.length) == 0) {
+            if (clustersWithCloudSupport.nonEmpty && failedResponses.lengthCompare(clustersWithCloudSupport.length) == 0) {
               p.success(Left(DlmApiErrors(failedResponses ++ adminStatusResponse.unreachableBeacon)))
             } else {
               p.success(Right(CloudCredsDetailResponse(failedResponses, allCloudCreds)))
@@ -1218,7 +1218,7 @@ class BeaconService @Inject()(
 
                 val failedResponses: Seq[BeaconApiErrors] = cloudCredListFromAllClusters.filter(x => x.cloudCred.isLeft || x.policies.isLeft)
                   .map(x => if (x.cloudCred.isLeft) x.cloudCred.left.get else x.policies.left.get)
-                if (failedResponses.lengthCompare(clustersWithCloudSupport.length) == 0) {
+                if (clustersWithCloudSupport.nonEmpty && failedResponses.lengthCompare(clustersWithCloudSupport.length) == 0) {
                   p.success(Left(DlmApiErrors(failedResponses ++ adminStatusResponse.unreachableBeacon)))
                 } else {
                   val allCloudCredentials: Seq[CloudCredWithPolicies] = allCloudCreds.foldLeft(List(): List[CloudCredWithPolicies]) {

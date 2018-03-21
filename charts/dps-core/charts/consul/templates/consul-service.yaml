@@ -1,0 +1,28 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.app.name }}-{{ .Release.Name }}-service
+  #namespace: {{ .Values.global.namespace }}
+  labels:
+    app: {{ .Values.app.name }}
+    version: {{ .Chart.Version }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    app: consul
+    release: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: {{.Values.port.ui}}
+    - name: rpc
+      port: {{.Values.port.rpc}}
+    - name: serflan
+      port: {{.Values.port.serfPlan}}
+    - name: serfwan
+      port: {{.Values.port.serfWan}}
+    - name: server
+      port: {{.Values.port.server}}
+    - name: consuldns
+      port: {{.Values.port.dns}}

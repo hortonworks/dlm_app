@@ -82,19 +82,3 @@ button.date-range {
 :host ::ng-deep .nvd3.nv-pie .nv-pie-title {
   fill: #455A64;
 }
-
-:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .tick line{
-  opacity: 0;
-}
-
-:host ::ng-deep .nvd3.nv-multiBarHorizontalChart nv-zeroLine {
-  stroke-width: 2;
-}
-
-:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .nv-y text{
-  display:none;
-}
-
-:host ::ng-deep .nvd3.nv-multiBarHorizontalChart .domain {
-  display:none;
-}
