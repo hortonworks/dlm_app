@@ -51,7 +51,6 @@ import scala.util.{Failure, Success}
 class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                          private val actorMaterializer: ActorMaterializer,
                          private val clusterData: ClusterDataApi,
-                         private val dpClusterService: DpClusterService,
                          private val sslContextManager: SslContextManager,
                          private val config: Config)
     extends BaseRoute {
@@ -165,10 +164,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
               }
             }
 
-            dpCluster <- dpClusterService.retrieve(cluster).map {
-              case Left(errors) => throw WrappedErrorException(errors.errors.head)
-              case Right(dpCluster) => dpCluster
-            }
+            dpCluster <- clusterData.getDataplaneCluster(cluster.toLong)
 
             h <- {
 
