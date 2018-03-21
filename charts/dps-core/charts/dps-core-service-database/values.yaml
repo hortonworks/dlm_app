@@ -5,13 +5,41 @@
 replicaCount: 1
 
 image:
-  repository: hortonworks/dp-db-service
-  tag: latest
-  pullPolicy: IfNotPresent
+  repository: index.docker.io/hortonworks/dp-db-service
+  tag: 1.1.0.0-198
+  pullPolicy: Always
+
+imageCredentials:
+  registry: index.docker.io
+  username: sachinhg
+  password: p@ssw0rd
 
 service:
   type: ClusterIP
   port: 9000
+
+postgres:
+  image:
+    name: postgres
+    # This seems to be the Docker source repo: https://github.com/yobasystems/alpine-postgres
+    version: 9.6.3-alpine
+  dataDir: /postgres/data
+  mountDir: /postgres
+  uri: jdbc:postgresql://localhost:5432/
+  port: 5432
+  database: dataplane
+  user: dp-admin
+
+consul:
+  name: consul
+
+database:
+  name: dataplane
+  username: dataplane
+  password: dataplane
+
+ingress:
+  enabled: false
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

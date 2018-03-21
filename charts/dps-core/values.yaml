@@ -89,3 +89,4 @@ dps-core-service-database:
   database:
     username: {{ .Values.database.username }}
     password: {{ .Values.database.password }} 
+    name: {{ .Values.database.name }} 
