@@ -91,7 +91,7 @@ class AmbariService @Inject()(
               allClusterStatus.filter(_.isRight).map(_.right.get)
             val failedAmbariApis =
               allClusterStatus.filter(_.isLeft).map(_.left.get)
-            if (failedAmbariApis.lengthCompare(allClusterStatus.length) == 0) {
+            if (allClusterStatus.nonEmpty && failedAmbariApis.lengthCompare(allClusterStatus.length) == 0) {
               p.success(Left(failedAmbariApis))
             } else {
               p.success(Right(clusterStatuses))
