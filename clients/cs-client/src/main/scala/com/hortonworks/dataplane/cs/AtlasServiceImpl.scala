@@ -11,7 +11,6 @@
 
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Constants.ATLAS
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken, WrappedErrorException}
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
@@ -22,7 +21,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AtlasServiceImpl(val config: Config)(implicit ws: KnoxProxyWsClient)
+class AtlasServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
     extends AtlasService {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
@@ -33,7 +32,7 @@ class AtlasServiceImpl(val config: Config)(implicit ws: KnoxProxyWsClient)
   }
 
   override def listQueryAttributes(clusterId: String)(implicit token:Option[HJwtToken]): Future[Seq[AtlasAttribute]] = {
-    ws.url(s"$url/cluster/$clusterId/atlas/hive/attributes", clusterId.toLong, ATLAS)
+    ws.url(s"$url/cluster/$clusterId/atlas/hive/attributes")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -42,7 +41,7 @@ class AtlasServiceImpl(val config: Config)(implicit ws: KnoxProxyWsClient)
   }
 
   override def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[AtlasEntities] = {
-    ws.url(s"$url/cluster/$clusterId/atlas/hive/search", clusterId.toLong, ATLAS)
+    ws.url(s"$url/cluster/$clusterId/atlas/hive/search")
       .withToken(token)
       .withHeaders(
         "Content-Type" -> "application/json",
@@ -54,7 +53,7 @@ class AtlasServiceImpl(val config: Config)(implicit ws: KnoxProxyWsClient)
   }
 
   override def getAssetDetails(clusterId: String, atlasGuid: String)(implicit token:Option[HJwtToken]): Future[JsObject] = {
-    ws.url(s"$url/cluster/$clusterId/atlas/guid/$atlasGuid", clusterId.toLong, ATLAS)
+    ws.url(s"$url/cluster/$clusterId/atlas/guid/$atlasGuid")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -63,7 +62,7 @@ class AtlasServiceImpl(val config: Config)(implicit ws: KnoxProxyWsClient)
   }
 
   def getAssetsDetails(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[AtlasEntities] = {
-    ws.url(s"$url/cluster/$clusterId/atlas/guid", clusterId.toLong, ATLAS)
+    ws.url(s"$url/cluster/$clusterId/atlas/guid")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .withQueryString(guids.map(guid => ("query", guid)): _*)
@@ -76,7 +75,7 @@ class AtlasServiceImpl(val config: Config)(implicit ws: KnoxProxyWsClient)
   }
 
   override def getTypeDefs(clusterId: String, defType:String) (implicit token:Option[HJwtToken]): Future[JsObject] = {
-    ws.url(s"$url/cluster/$clusterId/atlas/typedefs/type/$defType", clusterId.toLong, ATLAS)
+    ws.url(s"$url/cluster/$clusterId/atlas/typedefs/type/$defType")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
@@ -89,12 +88,13 @@ class AtlasServiceImpl(val config: Config)(implicit ws: KnoxProxyWsClient)
     if(depth.isDefined){
       lineageUrl = lineageUrl + s"?depth=${depth.get}"
     }
-    ws.url(lineageUrl, clusterId.toLong, ATLAS)
+    ws.url(lineageUrl)
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(httpHandler)
       .map(json => (json \ "results" \ "data").as[JsObject])
   }
+
 
 }
