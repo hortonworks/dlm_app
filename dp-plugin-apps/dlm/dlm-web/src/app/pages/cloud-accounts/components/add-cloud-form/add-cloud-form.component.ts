@@ -331,6 +331,7 @@ export class AddCloudFormComponent implements OnInit, OnChanges {
     this.asyncActions.dispatch(updateCloudStore(requestPayload))
       .subscribe(progressState => {
         this.cloudAccountService.notifyOnCRUD(progressState, CRUD_ACTIONS.UPDATE);
+        this.store.dispatch(loadAccounts(ACCOUNTS_REQUEST));
         if (progressState.status === 200) {
           this.cloudAccountService.closeAddAccountModal();
         }
