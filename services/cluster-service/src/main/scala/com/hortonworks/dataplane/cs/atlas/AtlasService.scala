@@ -27,6 +27,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success, Try}
 
 class AtlasService @Inject()(val config: Config)(implicit ws: KnoxProxyWsClient) {
+  val logger = Logger(classOf[AtlasService])
 
   private def httpHandler(res: WSResponse): JsValue = {
     res.status match {
