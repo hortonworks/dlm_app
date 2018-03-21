@@ -46,7 +46,7 @@ class AtlasService(val config: Config)(implicit ws: KnoxProxyWsClient) {
   private val defaultLimit = Try(config.getInt("atlas.query.records.default.limit")).getOrElse(10000)
   private val defaultOffset = Try(config.getInt("atlas.query.records.default.offset")).getOrElse(0)
 
-  def query(clusterId: String, query: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[AtlasEntities] = {
+  def query(clusterId: String, query: AtlasSearchQuery)(implicit token: Option[HJwtToken]): Future[AtlasEntities] = {
     val q = s"$hiveBaseQuery ${Filters.query(query, lowerCaseQueries)}"
 
     val buildKV: JsValue => Option[Map[String, String]] = (cEntity: JsValue) => {
@@ -89,7 +89,7 @@ class AtlasService(val config: Config)(implicit ws: KnoxProxyWsClient) {
 
   }
 
-  def getEntity(clusterId: String, guid: String)(implicit token:Option[HJwtToken]): Future[JsValue] = {
+  def getEntity(clusterId: String, guid: String)(implicit token: Option[HJwtToken]): Future[JsValue] = {
     ws.url(s"$url/clusters/$clusterId/services/$ATLAS/v2/entity/guid/$guid", clusterId.toLong, ATLAS)
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
@@ -98,7 +98,7 @@ class AtlasService(val config: Config)(implicit ws: KnoxProxyWsClient) {
       //AtlasEntityWithExtInfo > {entity: {AtlasEntity}}
   }
 
-  def getEntities(clusterId: String, guids: Seq[String])(implicit token:Option[HJwtToken]): Future[JsValue] = {
+  def getEntities(clusterId: String, guids: Seq[String])(implicit token: Option[HJwtToken]): Future[JsValue] = {
     ws.url(s"$url/clusters/$clusterId/services/$ATLAS/v2/entity/bulk", clusterId.toLong, ATLAS)
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
@@ -108,7 +108,7 @@ class AtlasService(val config: Config)(implicit ws: KnoxProxyWsClient) {
       //AtlasEntitiesWithExtInfo > {entities: [{AtlasEntity}]}
   }
 
-  def getTypes(clusterId: String, defType: String) (implicit token:Option[HJwtToken]): Future[JsValue] = {
+  def getTypes(clusterId: String, defType: String) (implicit token: Option[HJwtToken]): Future[JsValue] = {
     ws.url(s"$url/clusters/$clusterId/services/$ATLAS/v2/types/typedefs", clusterId.toLong, ATLAS)
       .withToken(token)
       .withQueryString("type" -> defType)
@@ -118,7 +118,7 @@ class AtlasService(val config: Config)(implicit ws: KnoxProxyWsClient) {
       //AtlasTypesDef: {enumDefs: [], structDefs: {}, classificationDefs: [], entityDefs: []}
   }
 
-  def getEntityTypes(clusterId: String, name: String)(implicit token:Option[HJwtToken]): Future[Seq[JsValue]] = {
+  def getEntityTypes(clusterId: String, name: String)(implicit token: Option[HJwtToken]): Future[Seq[JsValue]] = {
     val typeOfDef = "entitydef"
     ws.url(s"$url/clusters/$clusterId/services/$ATLAS/v2/types/$typeOfDef/name/$name", clusterId.toLong, ATLAS)
       .withToken(token)
@@ -141,7 +141,7 @@ class AtlasService(val config: Config)(implicit ws: KnoxProxyWsClient) {
       }
   }
 
-  def getLineage(clusterId: String, guid: String, depth: Option[String]) (implicit token:Option[HJwtToken]): Future[JsValue] = {
+  def getLineage(clusterId: String, guid: String, depth: Option[String])(implicit token: Option[HJwtToken]): Future[JsValue] = {
     ws.url(s"$url/clusters/$clusterId/services/$ATLAS/v2/lineage/$guid", clusterId.toLong, ATLAS)
       .withToken(token)
       .withQueryString("depth" -> depth.getOrElse(3).toString, "direction" -> "BOTH")
