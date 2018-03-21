@@ -99,6 +99,43 @@
                     </div>
                   </div>
                   <!-- SOURCE S3 ENDPOINT END -->
+
+                  <!-- CLOUD ENCRYPTION -->
+                  <div class="row">
+                    <div class="col-xs-4" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === SOURCE_TYPES.S3">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.encryption_type' | translate"
+                        [errorClass]="'col-xs-12'"
+                        [fieldClass]="'col-xs-12'">
+                        <dlm-select-field
+                          qe-attr="policy-source-cloud-encryption"
+                          formField
+                          formControlName="cloudEncryption"
+                          [options]="cloudEncryptionOptions">
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                  <!-- CLOUD ENCRYPTION END -->
+
+                  <!-- CLOUD ENCRYPTION KEY -->
+                  <div class="row">
+                    <div class="col-xs-4" *ngIf="shouldShowEncryptionKey">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.encryption_key_id' | translate"
+                        [errorClass]="'col-xs-12'"
+                        [fieldClass]="'col-xs-12'"
+                        [required]="true">
+                        <input
+                          type="text"
+                          class="form-control"
+                          qe-attr="source-encryption-key-id"
+                          formField
+                          formControlName="cloudEncryptionKey"/>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                  <!-- CLOUD ENCRYPTION KEY END -->
                 </div>
               </div>
 

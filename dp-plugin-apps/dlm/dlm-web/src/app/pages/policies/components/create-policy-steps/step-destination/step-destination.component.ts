@@ -21,7 +21,10 @@ import { SourceValue, StepGeneralValue } from 'models/create-policy-form.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
-import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS, TDE_KEY_TYPE, TDE_KEY_LABEL } from 'constants/policy.constant';
+import {
+  POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS,
+  TDE_KEY_TYPE, TDE_KEY_LABEL, AWS_ENCRYPTION, AWS_ENCRYPTION_LABELS
+} from 'constants/policy.constant';
 import { getSteps } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
@@ -33,7 +36,7 @@ import { multiLevelResolve, omitEmpty, isEmpty, omit } from 'utils/object-utils'
 import { getPolicyValidationProgress } from 'selectors/create-policy.selector';
 import { PROGRESS_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
-import { contains } from 'utils/array-util';
+import { contains, without } from 'utils/array-util';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
 import { AsyncActionsService } from 'services/async-actions.service';
@@ -41,6 +44,7 @@ import { RadioItem } from 'common/radio-button/radio-button';
 import { loadDatabases } from 'actions/hivelist.action';
 import { filterClustersByTDE } from 'utils/cluster-util';
 import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
+import { SelectOption } from 'components/forms/select-field';
 
 export function validationStatusValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
@@ -100,7 +104,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
    *
    * @type {string[]}
    */
-  s3Fields = ['cloudAccount', 's3endpoint'];
+  s3Fields = ['cloudAccount', 's3endpoint', 'cloudEncryption', 'cloudEncryptionKey'];
 
   get formIsFilled() {
     const form = this.form;
@@ -244,22 +248,39 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
   }
 
   get shouldShowTDEKey(): boolean {
-    if (this.isSourceEncrypted && this.isClusterSelected) {
+    if (this.isSourceEncrypted && this.isClusterType) {
       return this.isHdfsPolicy || this.isHiveOnPremReplication;
     }
     return false;
   }
 
   get shouldShowS3Endpoint(): boolean {
-    return this.form.get('destination.cloudAccount').value;
+    return this.isCloudReplication && this.form.get('destination.cloudAccount').value;
   }
 
   get shouldShowDestination(): boolean {
     return this.isClusterType && this.isClusterSelected;
   }
 
+  get shouldShowEncryptionKey(): boolean {
+    return this.isCloudReplication && this.form.get('destination.cloudEncryption').value === AWS_ENCRYPTION.SSE_KMS;
+  }
+
   get isSourceEncrypted(): boolean {
-    return this.source.datasetEncrypted;
+    return this.source.datasetEncrypted || this.source.type === SOURCE_TYPES.S3 && this.source.cloudEncryption !== null;
+  }
+
+  get cloudEncryptionOptions(): SelectOption[] {
+    const sourceType = SOURCE_TYPES.S3;
+    const makeOption = (value, label): SelectOption => ({label, value});
+    const none: SelectOption = {value: null, label: 'None'};
+    const optionsMap: {[sourceType: string]: SelectOption[]} = {
+      [SOURCE_TYPES.S3]: [
+        makeOption(AWS_ENCRYPTION.SSE_S3, AWS_ENCRYPTION_LABELS[AWS_ENCRYPTION.SSE_S3]),
+        makeOption(AWS_ENCRYPTION.SSE_KMS, AWS_ENCRYPTION_LABELS[AWS_ENCRYPTION.SSE_KMS])
+      ]
+    };
+    return [].concat.apply(this.isSourceEncrypted ? [] : [none], !this.isCloudReplication ? [] : optionsMap[sourceType] || []);
   }
 
   constructor(
@@ -282,6 +303,8 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
         s3endpoint: ['', Validators.required],
         path: ['', Validators.required],
         tdeKey: [TDE_KEY_TYPE.DIFFERENT_KEY],
+        cloudEncryption: [null],
+        cloudEncryptionKey: [null, Validators.required],
         skipValidation: [false],
         validationStatus: [false],
         validationPerformed: [false]
@@ -350,7 +373,7 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
         const noErrors = Observable.of(null);
         this.cdRef.detectChanges();
         this.setPending(form.get('destination.path'));
-        if (!this.isSourceEncrypted || !cluster || contains([this.source.type, type], SOURCE_TYPES.S3)) {
+        if (!this.isSourceEncrypted || !cluster || type === SOURCE_TYPES.S3) {
           return noErrors;
         }
         if (this.general.type === POLICY_TYPES.HDFS) {
@@ -414,13 +437,39 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       }
       if (this.isCloudReplication) {
         this.disableFields(['path']);
-        this.enableFields(this.s3Fields);
+        this.enableFields(without(this.s3Fields, 'cloudEncryptionKey'));
       } else {
         this.enableFields(['path']);
         this.disableFields(this.s3Fields);
       }
     });
     this.subscriptions.push(updateHiveFieldsAccess);
+  }
+
+  private subscribeToCloudEncryption(form: FormGroup): void {
+    const cloudEncryptionChanges$: Observable<AWS_ENCRYPTION> = form.get('destination.cloudEncryption').valueChanges.distinctUntilChanged();
+    const updateEncryptionKeyAccess = cloudEncryptionChanges$.subscribe(value => {
+      if (value === AWS_ENCRYPTION.SSE_KMS) {
+        form.get('destination.cloudEncryptionKey').enable();
+      } else {
+        form.get('destination.cloudEncryptionKey').disable();
+      }
+    });
+    this.subscriptions.push(updateEncryptionKeyAccess);
+  }
+
+  private subscribeToCloudAccount(form: FormGroup): void {
+    const cloudAccountChange$ = form.get('destination.cloudAccount').valueChanges.distinctUntilChanged();
+    const presetCloudEncryption = cloudAccountChange$.subscribe(value => {
+      if (value && this.isSourceEncrypted && !form.get('destination.cloudEncryption').value) {
+        form.patchValue({
+          destination: {
+            cloudEncryption: AWS_ENCRYPTION.SSE_S3
+          }
+        });
+      }
+    });
+    this.subscriptions.push(presetCloudEncryption);
   }
 
   ngOnInit() {
@@ -471,8 +520,10 @@ export class StepDestinationComponent implements OnInit, OnDestroy, StepComponen
       }
     }));
     this.subscribeToDestinationType();
-    this.subscribeToDestinationPath(this.form);
     this.subscribeToCluster(this.form);
+    this.subscribeToCloudAccount(this.form);
+    this.subscribeToCloudEncryption(this.form);
+    this.subscribeToDestinationPath(this.form);
   }
 
   policyFieldsUpdated(currentFormValue): boolean {
