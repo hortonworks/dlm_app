@@ -1,0 +1,9 @@
+apiVersion: v1
+name: consul
+version: 0.8.5
+description: Consul
+keywords:
+  - consul
+maintainers:
+  - name: Hortonworks
+deprecated: false

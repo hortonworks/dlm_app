@@ -21,25 +21,28 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: docker.io/hortonworks/dp-db-service:1.1.0.0-195
+          #image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always #{{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
+            - name: CONSUL_HOST
+              value: consul-vigilant-shark-7886df5f67-29fdx.dc1 #{{ .Values.consul.name}}-{{ .Release.Name }}-service.default.svc.cluster.local
             - name: DATABASE_URI
               value: jdbc:postgresql://postgresql.{{ .Release.Namespace }}.svc.cluster.local:5432/{{ .Values.database.name }}
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-database-secret
-                  key: database.username
+                  name: dp-database-secret-{{ .Release.Name }} #{{ .Release.Name }}-database-secret
+                  key:  POSTGRES_USER
             - name: DATABASE_PASS
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-database-secret
-                  key: database.password
+                  name: dp-database-secret-{{ .Release.Name }} #{{ .Release.Name }}-database-secret
+                  key:  POSTGRES_PASSWORD
           livenessProbe:
             httpGet:
               path: /health

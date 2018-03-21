@@ -23,6 +23,7 @@ import { abortJob, rerunJob } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { LogService } from 'services/log.service';
 import { JOB_STATUS } from 'constants/status.constant';
+import { SOURCE_TYPES } from 'constants/policy.constant';
 import { PolicyService } from 'services/policy.service';
 import { confirmNextAction } from 'actions/confirmation.action';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
@@ -42,9 +43,12 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   private selectedForActionRow: Policy;
   JOB_STATUS = JOB_STATUS;
 
+  @Input() jobs = [];
+  @Input() footerOptions;
   @Input() jobsCount = 0;
 
-  @ViewChild('clusterNameCellRef') clusterNameCellRef: TemplateRef<any>;
+  @ViewChild('sourceNameCellRef') sourceNameCellRef: TemplateRef<any>;
+  @ViewChild('targetNameCellRef') targetNameCellRef: TemplateRef<any>;
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
   @ViewChild('policyNameCellTemplate') policyNameCellTemplate: TemplateRef<any>;
@@ -67,12 +71,18 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     return this.t.instant(`page.overview.table.column.${columnName}`);
   }
 
-  private getClusterName(policyClusterName: string) {
-    return PolicyService.getClusterName(policyClusterName);
+  getSourceName(policy: Policy) {
+    if (policy.sourceType === SOURCE_TYPES.CLUSTER) {
+      return policy.sourceClusterResource.name;
+    }
+    return policy.cloudCredentialResource.name;
   }
 
-  private getDatacenterName(policyClusterName: string) {
-    return PolicyService.getDatacenterName(policyClusterName);
+  getTargetName(policy: Policy) {
+    if (policy.targetType === SOURCE_TYPES.CLUSTER) {
+      return policy.targetClusterResource.name;
+    }
+    return policy.cloudCredentialResource.name;
   }
 
   private generateNotification() {
@@ -113,9 +123,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
           return job1.status > job2.status ? 1 : -1;
         }
       },
-      {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
+      {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.sourceNameCellRef},
       {name: '', cellTemplate: this.destinationIconCellRef, cellClass: 'arrow-cell', maxWidth: 20, minWidth: 20},
-      {prop: 'targetCluster', name: this.translateColumn('destination_cluster'), cellTemplate: this.clusterNameCellRef},
+      {prop: 'targetCluster', name: this.translateColumn('destination_cluster'), cellTemplate: this.targetNameCellRef},
       {prop: 'service', name: this.t.instant('common.service'),
         cellTemplate: this.serviceNameCellRef, cellClass: 'service-cell'},
       {

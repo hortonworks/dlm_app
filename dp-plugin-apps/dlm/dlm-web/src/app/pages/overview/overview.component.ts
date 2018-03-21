@@ -21,7 +21,7 @@ import { loadEvents } from 'actions/event.action';
 import { ProgressState } from 'models/progress-state.model';
 import { JOB_STATUS } from 'constants/status.constant';
 import {
-  getPolicyClusterJobFailedLastTen, getUnhealthyPolicies, getAllPoliciesWithClusters, getCountPoliciesForSourceClusters
+  getPolicyClusterJobFailedLastTen, getUnhealthyPolicies, getAllPoliciesWithCloud, getCountPoliciesForSourceClusters
 } from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
@@ -44,12 +44,14 @@ import { EntityType, LOG_EVENT_TYPE_MAP } from 'constants/log.constant';
 import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { getCountPairsForClusters } from 'selectors/pairing.selector';
 import { loadPairings } from 'actions/pairing.action';
+import { loadBeaconCloudCreds } from 'actions/beacon-cloud-cred.action';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { TranslateService } from '@ngx-translate/core';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
-const POLICIES_REQUEST = 'POLICIES_REQUEST';
-const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
+const POLICIES_REQUEST = '[OVERVIEW_PAGE] POLICIES_REQUEST';
+const CLUSTERS_REQUEST = '[OVERVIEW_PAGE] CLUSTERS_REQUEST';
+const CLOUD_CREDENTIALS_REQUEST = '[OVERVIEW_PAGE] CLOUD_CREDENTIALS_REQUEST';
 
 @Component({
   selector: 'dlm-overview',
@@ -106,7 +108,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
               private router: Router,
               private t: TranslateService) {
     this.events$ = store.select(getDisplayedEvents);
-    this.policies$ = store.select(getAllPoliciesWithClusters);
+    this.policies$ = store.select(getAllPoliciesWithCloud);
     this.clusters$ = store.select(getAllClusters);
     this.pairsCount$ = store.select(getCountPairsForClusters);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST));
@@ -281,7 +283,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
       // todo: this is workaround to get all events for recent issues.
       // for recent issues we don't need events with severity INFO, but Beacon API doesn't support filtering
       // so we need to load "all" events initially
-      loadEvents({numResults: 1000})
+      loadEvents({numResults: 1000}),
+      loadBeaconCloudCreds({requestId: CLOUD_CREDENTIALS_REQUEST})
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
       .take(1)

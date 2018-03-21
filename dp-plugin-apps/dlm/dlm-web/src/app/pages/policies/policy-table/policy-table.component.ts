@@ -470,10 +470,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     if (contentType === PolicyContent.Files) {
       if (policy.sourceType === SOURCE_TYPES.CLUSTER) {
         const cluster = this.clusterByDatacenterId(policy.sourceCluster);
+        this.sourceCluster = cluster.id;
         if (policy.type === POLICY_TYPES.HIVE) {
           this.store.dispatch(loadDatabases(cluster.id, {requestId: DATABASE_REQUEST}));
         } else {
-          this.sourceCluster = cluster.id;
           this.hdfsRootPath = policy.sourceDataset;
         }
       } else {

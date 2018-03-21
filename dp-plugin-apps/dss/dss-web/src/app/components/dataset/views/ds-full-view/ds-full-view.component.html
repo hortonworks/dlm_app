@@ -12,11 +12,6 @@
 <router-outlet name="sidebar"></router-outlet>
 <div *ngIf="!dsModel">Loading ... </div>
 <div *ngIf="dsModel" class="dsFullView borderBox flex-grid" [class.showSummary]="showSummary">
-
-
-
-
-
   <div class="flex-main">
     <div class="hwx-white-bg" style="padding: 15px;">
       <div class="flex-grid">
@@ -70,7 +65,7 @@
         <li data-tab="Assets" [class.active]="selectedTab == tabEnum.ASSETS" (click)="selectedTab = tabEnum.ASSETS">Assets</li>
       </ul>
     </div>
-    <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW" [clusterId]="dsModel.clusterId"> </dss-overview>
+    <dss-overview *ngIf="selectedTab===tabEnum.OVERVIEW" [dsModel]="dsModel"> </dss-overview>
     <div *ngIf="selectedTab == tabEnum.ASSETS">
       <div *ngIf="dsModel.counts.hiveCount">
         <ds-assets-list-style1 [dsModel]="dsModel"

@@ -68,6 +68,7 @@ DELETE        /api/dataset/:datasetId/assets                         controllers
 POST          /api/dataset/:datasetId/begin-edit                     controllers.DataSets.beginDatasetEdit(datasetId: Long)
 POST          /api/dataset/:datasetId/save-edit                      controllers.DataSets.saveDatasetEdit(datasetId: Long)
 POST          /api/dataset/:datasetId/cancel-edit                    controllers.DataSets.revertDatasetEdit(datasetId: Long)
+GET           /api/dataset/:clusterId/:datasetName/assetcount        controllers.DataSets.getDatasetProfiledAssetCount(clusterId: String, datasetName: String, profilerInstanceName: String, startTime: Long, endTime: Long)
 
 # DpProfiler
 # ===========================================
@@ -77,6 +78,11 @@ GET           /api/dpProfiler/scheduleStatus                          controller
 GET           /api/dpProfiler/auditResults                            controllers.DpProfilerAttributes.getAuditResults(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
 GET           /api/dpProfiler/auditActions                            controllers.DpProfilerAttributes.getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
 POST          /api/dpProfiler/metrics                                 controllers.DpProfilerAttributes.getMetrics(userName: String ?="")
+
+
+GET           /api/dpProfiler/:clusterId/status-with-jobs-count       controllers.DpProfilerAttributes.getProfilersStatusWithJobSummary(clusterId: String)
+GET           /api/dpProfiler/:clusterId/status-with-assets-count     controllers.DpProfilerAttributes.getProfilersStatusWithAssetsCount(clusterId: String)
+GET           /api/dpProfiler/:clusterId/jobs                         controllers.DpProfilerAttributes.getProfilersJobs(clusterId: String)
 
 
 # Ranger

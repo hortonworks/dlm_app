@@ -73,7 +73,7 @@ object ResponseEntities {
 
   case class BeaconHdfsFileResponse(status: String, message: String, requestId: String, totalResults: Long, fileList: Seq[HdfsFile])
 
-  case class HiveDbName(database: String, isEncrypted: Option[Boolean], encryptionKeyName: Option[String], snapshottable: Option[String])
+  case class HiveDbName(database: String, isEncrypted: Option[Boolean], encryptionKeyName: Option[String], snapshottable: Option[Boolean])
   
   case class BeaconHiveDbResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbName])
 
