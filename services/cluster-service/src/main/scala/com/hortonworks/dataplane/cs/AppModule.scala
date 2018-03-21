@@ -15,7 +15,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
-import com.hortonworks.dataplane.cs.atlas.{AtlasApiSupplier, AtlasService}
+import com.hortonworks.dataplane.cs.atlas.AtlasService
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.db.Webservice.{CertificateService, ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
