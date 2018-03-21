@@ -127,12 +127,10 @@ import { PolicyTableComponent } from './pages/policies/policy-table/policy-table
 import { FlowStatusComponent } from './pages/policies/policy-table/flow-status/flow-status.component';
 import { PolicyInfoComponent } from './pages/policies/policy-table/policy-info/policy-info.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
-import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
 import { PolicyServiceFilterComponent } from './pages/policies/components/policy-service-filter/policy-service-filter.component';
 
 import { PolicyDetailsComponent } from './pages/policies/policy-details/policy-details.component';
 import { PrevJobsComponent } from './pages/policies/components/prev-jobs/prev-jobs.component';
-import { SelectCloudDestinationComponent } from './pages/policies/components/select-cloud-destination/select-cloud-destination.component';
 
 import { PairingCardComponent } from './pages/pairings/components/pairing-card/pairing-card.component';
 import { PairingCardListComponent } from './pages/pairings/components/pairing-card-list/pairing-card-list.component';
@@ -144,8 +142,6 @@ import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-d
 
 import { TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
-
-import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 import { TabsComponent } from './common/tabs/tabs.component';
 
@@ -246,8 +242,6 @@ import { SummaryTreeComponent } from './pages/policies/components/summary-tree/s
     FlowStatusComponent,
     PolicyInfoComponent,
     CreatePolicyComponent,
-    PolicyFormComponent,
-    ReviewPolicyComponent,
     PolicyDetailsComponent,
     PolicyServiceFilterComponent,
     PrevJobsComponent,

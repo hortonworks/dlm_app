@@ -1,0 +1,38 @@
+app: 
+  name: consul
+
+image:
+  name: consul
+  version: 1.0.6
+
+dataDir: /consul/data
+mountDir: /consul/data
+
+replicaCount: 1
+
+global:
+  namespace: "default"
+port:
+  ui: "8500"
+  rpc: "8400"
+  serfPlan: "8301"
+  alt: "53"
+  udp: "53"
+  https: "8443"
+  http: "8080"
+  serfWan: "8302"
+  dns: "8600"
+  server: "8300"
+
+## Persist data to a persitent volume
+persistence:
+  enabled: true
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  size: 2Gi

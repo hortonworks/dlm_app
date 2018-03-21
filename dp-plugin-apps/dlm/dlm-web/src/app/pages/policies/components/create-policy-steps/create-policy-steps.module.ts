@@ -16,7 +16,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TranslateModule} from '@ngx-translate/core';
 import {CommonComponentsModule} from 'components/common-components.module';
 import {CommonModule} from '@angular/common';
-import {SelectCloudDestinationComponent} from '../select-cloud-destination/select-cloud-destination.component';
 import {BytesSizePipe} from 'pipes/bytes-size.pipe';
 import {PipesModule} from 'pipes/pipes.module';
 import {DateFormatPipe, MomentModule} from 'angular2-moment';
@@ -47,7 +46,6 @@ import {StepAdvancedComponent} from './step-advanced/step-advanced.component';
     StepSourceComponent,
     StepDestinationComponent,
     StepScheduleComponent,
-    SelectCloudDestinationComponent,
     StepAdvancedComponent
   ],
   exports: [

@@ -169,13 +169,11 @@ object AppModule extends AbstractModule {
   def provideHdpProxyRoute(actorSystem: ActorSystem,
                             actorMaterializer: ActorMaterializer,
                             clusterData: ClusterDataApi,
-                            dpClusterService: DpClusterService,
                             sslContextManager: SslContextManager,
                             config: Config): HdpRoute = {
     new HdpRoute(actorSystem,
       actorMaterializer,
       clusterData,
-      dpClusterService: DpClusterService,
       sslContextManager: SslContextManager,
       config)
   }
@@ -278,10 +276,14 @@ object AppModule extends AbstractModule {
         dpProfilerRoute.jobDelete ~
         dpProfilerRoute.startAndScheduleJob ~
         dpProfilerRoute.datasetAssetMapping ~
+        dpProfilerRoute.datasetProfiledAssetCount ~
         dpProfilerRoute.scheduleInfo ~
         dpProfilerRoute.auditResults ~
         dpProfilerRoute.auditActions ~
         dpProfilerRoute.profilerMetrics ~
+        dpProfilerRoute.getProfilersStatusWithJobSummary ~
+        dpProfilerRoute.getProfilersStatusWithAssetsCount ~
+        dpProfilerRoute.getProfilersJobsStatus ~
         atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~

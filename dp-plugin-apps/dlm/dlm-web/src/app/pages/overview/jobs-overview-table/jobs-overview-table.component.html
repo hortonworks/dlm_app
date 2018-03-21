@@ -23,8 +23,12 @@
 
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
 
-<ng-template #clusterNameCellRef let-name="value">
-  <span [tooltip]="getDatacenterName(name)">{{getClusterName(name)}}</span>
+<ng-template #sourceNameCellRef let-cluster="value" let-policy="row" let-index="rowIndex">
+  <span [tooltip]="policy.sourceClusterResource?.dataCenter">{{getSourceName(policy)}}</span>
+</ng-template>
+
+<ng-template #targetNameCellRef let-cluster="value" let-policy="row" let-index="rowIndex">
+  <span [tooltip]="policy.targetClusterResource?.dataCenter">{{getTargetName(policy)}}</span>
 </ng-template>
 
 <ng-template #statusCellTemplate let-policy="row">

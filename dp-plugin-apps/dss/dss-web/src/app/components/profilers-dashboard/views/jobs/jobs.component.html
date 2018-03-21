@@ -1,0 +1,114 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="flex-grid">
+	<div class="flex-side flex-side-left" style="min-width: 200px;">
+		<div class="section-white">
+			<div class="section-title">
+				<span class="hwx-subtitle">Filter</span>
+			</div>
+			<div class="section-content">
+				<div class="section-title flex-grid">
+					<span class="primary-space"><i class="fa fa-angle-right hwx-subtitle"></i> Clusters</span>
+				</div>
+				<table class="mdl-data-table">
+					<tbody>
+					<tr *ngFor="let lake of clusters" (click)="clusterFilterChanged(lake.clusterId);">
+						<td><i class="fa" [ngClass]="clstrFilState && clstrFilState[lake.clusterId]?'fa-check-square-o hwx-external':'fa-square-o'"></i> {{lake.name}}, {{lake.dcName}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="section-white">
+			<div class="section-content">
+				<div class="section-title flex-grid">
+					<span class="primary-space"><i class="fa fa-angle-right hwx-subtitle"></i> Job Status</span>
+				</div>
+				<table  class="mdl-data-table">
+					<tbody>
+					<tr *ngFor="let key of jSFState | keys" (click)="jsfChanged(key);">
+						<td><i class="fa" [ngClass]="jSFState[key]?'fa-check-square-o hwx-external':'fa-square-o'"></i> {{statusDisplayMap[key]}}</td>
+						<td class="numeric-column">{{jobsCountModel[key]}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="section-white">
+			<div class="section-content">
+				<div class="section-title flex-grid">
+					<span class="primary-space"><i class="fa fa-angle-right hwx-subtitle"></i> Profilers</span>
+				</div>
+				<table  class="mdl-data-table">
+					<tbody>
+					<tr *ngFor="let pInfo of profilersList" (click)="profFilChanged(pInfo.profilerInfo.name);">
+						<td><i class="fa" [ngClass]="profState[pInfo.profilerInfo.name]?'fa-check-square-o hwx-external':'fa-square-o'"></i> {{pInfo.profilerInfo.displayName}}</td>
+						<td class="numeric-column">{{pInfo.jobsCount.SUCCESS}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="flex-main">
+		<div class="section-white">
+			<div class="section-title flex-grid v-line-primary" style="border-bottom: 1px solid #ccc;">
+				<div class="flex-primary">
+					<span class="primary-space">
+						<div class="tags">
+							<ng-container *ngFor="let lake of clusters">
+								<span *ngIf="clstrFilState && clstrFilState[lake.clusterId]" class="tag">{{lake.name}}, {{lake.dcName}}</span>
+							</ng-container>	
+							<ng-container *ngFor="let key of jSFState | keys">
+								<span *ngIf="jSFState[key]" class="tag">{{statusDisplayMap[key]}} <i class="fa fa-times" (click)="jsfChanged(key);"></i></span>
+							</ng-container>	
+							<ng-container *ngFor="let pInfo of profilersList">
+								<span *ngIf="profState[pInfo.profilerInfo.name]" class="tag">{{pInfo.profilerInfo.displayName}} <i class="fa fa-times" (click)="profFilChanged(pInfo.profilerInfo.name);"></i></span>
+							</ng-container>	
+						</div>
+					</span>
+				</div>
+				<div class="flex-utility">
+                    <ul class="flex-grid duration-control" (click)="timeTabChanged();">
+                        <li [class.active]="timeTabs.D == timeSelect" (click)="timeSelect = timeTabs.D;">D</li>
+                        <li [class.active]="timeTabs.W == timeSelect" (click)="timeSelect = timeTabs.W;">W</li>
+                        <li [class.active]="timeTabs.M == timeSelect" (click)="timeSelect = timeTabs.M;">M</li>
+                    </ul>
+                </div>
+			</div>
+			<div class="section-content">
+				<table id="Jobs"  class="mdl-data-table">
+					<thead>
+					<tr>
+						<th class="sortable-column" (click)="sordBy('id')"    [ngClass]="sortInfo.col==='id'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Jobs ID</span></th>
+						<th class="sortable-column" (click)="sordBy('status')"   [ngClass]="sortInfo.col==='status'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Status</span></th>
+						<th class="sortable-column" (click)="sordBy('start')"    [ngClass]="sortInfo.col==='start'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Start Time</span></th>
+						<th class="sortable-column" (click)="sordBy('id')"  [ngClass]="sortInfo.col==='cluster'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Cluster</span></th>
+						<th class="sortable-column" (click)="sordBy('queue')"    [ngClass]="sortInfo.col==='queue'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Queue</span></th>
+						<th class="sortable-column" (click)="sordBy('profilers')" [ngClass]="sortInfo.col==='profilers'?(sortInfo.order==='desc'?'sort-down':'sort-up'):''" ><span>Profilers</span></th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr *ngFor="let job of jobs">
+						<td>{{job.id}}</td>
+						<td><i class="fa fa-circle" [ngClass]="job.status=='FAILED'?'hwx-error':job.status=='RUNNING'?'hwx-external':'hwx-ok'"></i> {{job.status}}</td>
+						<td>{{getDisplayDate(job.start)}}</td>
+						<td>{{currentClusterName}}</td>
+						<td>{{job.queue}}</td>
+						<td>{{job.profiler}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

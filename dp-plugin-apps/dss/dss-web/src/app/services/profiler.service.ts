@@ -16,6 +16,7 @@ import {DataLakeDashboard} from '../models/data-lake-dashboard';
 import {ProfilerMetricRequest} from '../models/profiler-metric-request';
 import {ProfilerMetricResponse} from '../models/profiler-metric-response';
 import {HttpUtil} from '../shared/utils/httpUtil';
+import {ProfilerInfoWithJobsCount, JobInfoModel, ProfilerInfoWithAssetsCount} from '../models/profiler-models';
 
 @Injectable()
 export class ProfilerService {
@@ -25,7 +26,7 @@ export class ProfilerService {
   assetCollectionStats(profilerMetricRequest: ProfilerMetricRequest): Observable<ProfilerMetricResponse> {
     const url = '/api/dpProfiler/metrics';
     return this.http.post(url, profilerMetricRequest, new RequestOptions(HttpUtil.getHeaders()))
-                .map(HttpUtil.extractData);
+    .map(HttpUtil.extractData);
 
     // return Observable.create(observer => {
     //   observer.next(ProfilerMetricResponse.getData());
@@ -39,5 +40,35 @@ export class ProfilerService {
       observer.next(DataLakeDashboard.getData());
       observer.complete();
     });
+  }
+
+  getStatusWithJobCounts(clusterId:number, startTime:number, endTime:number) : Observable<Array<ProfilerInfoWithJobsCount>> {
+    const uri = `/api/dpProfiler/${clusterId}/status-with-jobs-count?startTime=${startTime}&endTime=${endTime}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(res=>res.data)
+      .catch(HttpUtil.handleError);
+  }
+
+  getStatusWithAssetsCounts(clusterId:number, startTime:number, endTime:number) : Observable<Array<ProfilerInfoWithAssetsCount>> {
+    const uri = `/api/dpProfiler/${clusterId}/status-with-assets-count?startTime=${startTime}&endTime=${endTime}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(res=>res.data)
+      .catch(HttpUtil.handleError);
+  }
+
+
+  jobsList(clusterId:number, offset:number, limit:number, sortBy:string, sorOrder:string, startTime:number, endTime:number, profilerIds:Array<number>, statusArray:Array<String>) : Observable<Array<JobInfoModel>> {
+    let uri = `/api/dpProfiler/${clusterId}/jobs?offset=${offset}&limit=${limit}&sortBy=${sortBy}&sortDir=${sorOrder}&startTime=${startTime}&endTime=${endTime}`;
+    profilerIds.forEach(id => uri += `&profilerIds=${id}`);
+    statusArray.forEach(status => uri += `&status=${status}`);
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(res=>res.data)
+      .catch(HttpUtil.handleError);
   }
 }

@@ -14,9 +14,9 @@ import {TranslateModule} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
 import {TabsModule} from '../../shared/tabs/tabs.module'
 
-import { ProfilersDashboardComponent } from './profilers-dashboard.component';
-import {ProfilerJobsComponent} from './jobs/jobs.component';
-import {ProfilerConfigsComponent} from './configurations/configs.component';
+import { ProfilersDashboardComponent } from './views/profilers-dashboard.component';
+import {ProfilerJobsComponent} from './views/jobs/jobs.component';
+import {ProfilerConfigsComponent} from './views/configurations/configs.component';
 import {routes} from './profilers-dashboard.routes';
 import {SharedModule} from '../../shared/shared.module';
 

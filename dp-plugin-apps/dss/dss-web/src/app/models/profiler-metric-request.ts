@@ -15,21 +15,21 @@ export type MetricType = 'ProfilerMetric' | 'TopKUsersPerAssetMetric' | 'AssetDi
 export type ContextType = 'COLLECTION';
 
 export class MetricContextDefinition {
-  constructor(private collectionId: number){}
+  constructor(private collectionId: string){}
 }
 
 export class ProfilerMetricDefinition {
-  constructor(private lookBackDays?: number, private k?: number) {}
+  constructor(private k?: number, private startDate?: string, private endDate?: string) {}
 }
 
 export class ProfilerMetricContext {
   contextType: ContextType;
-  definition: MetricContextDefinition = new MetricContextDefinition(-1);
+  definition: MetricContextDefinition = new MetricContextDefinition('');
 }
 
 export class ProfilerMetric {
   metricType: MetricType;
-  definition: ProfilerMetricDefinition = new ProfilerMetricDefinition(-1, -1);
+  definition: ProfilerMetricDefinition = new ProfilerMetricDefinition(-1, '', '');
 
   constructor(metricType: MetricType, definition: ProfilerMetricDefinition) {
     this.metricType = metricType;

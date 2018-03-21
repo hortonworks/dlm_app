@@ -12,7 +12,7 @@ import { Cluster } from 'models/cluster.model';
 
 export const filterClustersByTDE = (clusters, beaconStatuses) => {
   const beaconStatusMap = toMapByField(beaconStatuses, 'clusterId');
-  return clusters.filter(c => !!beaconStatusMap.get(c.id).beaconAdminStatus.replication_TDE);
+  return clusters.filter(c => (!!beaconStatusMap.get(c.id) && !!beaconStatusMap.get(c.id).beaconAdminStatus.replication_TDE));
 };
 
 export const getUnderlyingHiveFS = (cluster: Cluster) => {

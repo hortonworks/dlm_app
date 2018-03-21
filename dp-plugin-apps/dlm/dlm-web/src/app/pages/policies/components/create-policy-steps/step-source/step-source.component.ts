@@ -191,8 +191,8 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
       if ('type' in this.general) {
         const selectedServiceType = this.general['type'];
         const sourceControls = this.form.get('source');
-        const enable = POLICY_TYPES.HDFS ? this.hdfsFields : this.hiveFields;
-        const disable = POLICY_TYPES.HDFS ? this.hiveFields : this.hdfsFields;
+        const enable = selectedServiceType === POLICY_TYPES.HDFS ? this.hdfsFields : this.hiveFields;
+        const disable = selectedServiceType === POLICY_TYPES.HDFS ? this.hiveFields : this.hdfsFields;
         enable.forEach(f => this.getControlSafe(f, sourceControls).enable());
         disable.forEach(f => this.getControlSafe(f, sourceControls).disable());
       }
