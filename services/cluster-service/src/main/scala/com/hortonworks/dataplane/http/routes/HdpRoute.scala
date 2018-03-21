@@ -142,8 +142,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
               if (shouldUseKnox(jwtToken, url) && serviceEnabled(service))
                 url.get
               else
-                new URL(
-                  request.getHeader(Constants.SERVICE_ENDPOINT).get.value)
+                new URL(request.getHeader(Constants.SERVICE_ENDPOINT).get.value)
             }
 
             parsedHeader <- {
