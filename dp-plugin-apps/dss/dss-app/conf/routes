@@ -79,10 +79,11 @@ GET           /api/dpProfiler/auditResults                            controller
 GET           /api/dpProfiler/auditActions                            controllers.DpProfilerAttributes.getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
 POST          /api/dpProfiler/metrics                                 controllers.DpProfilerAttributes.getMetrics(userName: String ?="")
 
-
 GET           /api/dpProfiler/:clusterId/status-with-jobs-count       controllers.DpProfilerAttributes.getProfilersStatusWithJobSummary(clusterId: String)
 GET           /api/dpProfiler/:clusterId/status-with-assets-count     controllers.DpProfilerAttributes.getProfilersStatusWithAssetsCount(clusterId: String)
 GET           /api/dpProfiler/:clusterId/jobs                         controllers.DpProfilerAttributes.getProfilersJobs(clusterId: String)
+PUT           /api/dpProfiler/:clusterId/profilerinstances/state      controllers.DpProfilerAttributes.putProfilerState(clusterId: String)
+GET           /api/dpProfiler/:clusterId/histories                    controllers.DpProfilerAttributes.getProfilerHistories(clusterId: String)
 
 
 # Ranger

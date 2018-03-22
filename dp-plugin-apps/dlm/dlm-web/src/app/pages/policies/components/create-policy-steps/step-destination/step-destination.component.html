@@ -148,6 +148,44 @@
             </div>
             <!-- DESTINATION S3 ENDPOINT END -->
 
+            <!-- CLOUD ENCRYPTION -->
+            <div class="row">
+              <div class="col-xs-4" *ngIf="isCloudReplication && form.get('destination.cloudAccount').value">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.encryption_type' | translate"
+                  [errorClass]="'col-xs-12'"
+                  [fieldClass]="'col-xs-12'"
+                  [required]="isSourceEncrypted">
+                  <dlm-select-field
+                    qe-attr="destination-source-cloud-encryption"
+                    formField
+                    formControlName="cloudEncryption"
+                    [options]="cloudEncryptionOptions">
+                  </dlm-select-field>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- CLOUD ENCRYPTION END -->
+
+            <!-- CLOUD ENCRYPTION KEY -->
+            <div class="row">
+              <div class="col-xs-4" *ngIf="shouldShowEncryptionKey">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.encryption_key_id' | translate"
+                  [errorClass]="'col-xs-12'"
+                  [fieldClass]="'col-xs-12'"
+                  [required]="true">
+                  <input
+                    type="text"
+                    class="form-control"
+                    qe-attr="destination-encryption-key-id"
+                    formField
+                    formControlName="cloudEncryptionKey"/>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- CLOUD ENCRYPTION KEY END -->
+
             <!-- SKIP VALIDATION CHECKBOX AND VALIDATE BUTTON -->
             <div class="row" *ngIf="isCloudUsedForPolicy && formIsFilled">
               <div class="col-xs-12">

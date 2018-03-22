@@ -156,3 +156,13 @@ export enum TDE_KEY_LABEL {
   SAME_KEY = 'common.tde.options.same',
   DIFFERENT_KEY = 'common.tde.options.different'
 }
+
+export enum AWS_ENCRYPTION {
+  SSE_S3 = 'AWS_SSES3',
+  SSE_KMS = 'AWS_SSEKMS'
+}
+
+export const AWS_ENCRYPTION_LABELS = {
+  [AWS_ENCRYPTION.SSE_S3]: 'SSE-S3',
+  [AWS_ENCRYPTION.SSE_KMS]: 'SSE-KMS'
+};

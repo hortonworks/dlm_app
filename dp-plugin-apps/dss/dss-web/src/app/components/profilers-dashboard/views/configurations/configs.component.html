@@ -16,7 +16,7 @@
 									<span class="primary-space hwx-subtitle">Clusters</span>
 								</div>
 								<div class="section-content">
-									<table class="mdl-data-table selectable" id="ClusterList" onclick="onShowProfilerConfiguration(event)">
+									<table class="mdl-data-table selectable" id="ClusterList">
 										<tbody>
 										<tr *ngFor="let lake of clusters" [class.active]="lake === selectedLake" (click)="selectLake(lake);">
 											<td>{{lake.name}}, {{lake.dcName}}</td>
@@ -33,7 +33,7 @@
 									<span class="primary-space hwx-subtitle">Profiler Configuration</span>
 								</div>
 								<div class="section-content">
-									<table id="ProfilerConfiguration" class="mdl-data-table">
+									<table id="ProfilerConfiguration" class="mdl-data-table selectable">
 										<thead>
 										<tr>
 											<th class="sortable-column"><span>Name</span></th>
@@ -43,12 +43,12 @@
 										</tr>
 										</thead>
 										<tbody>
-										<tr *ngFor="let profiler of profilers">
+										<tr *ngFor="let profiler of profilers" [class.active]="profiler === selectedProfiler" (click)="changeProfiler(profiler)" >
 											<td>{{profiler.profilerInfo.displayName}}</td>
 											<td>{{profiler.profilerInfo.version}}</td>
 											<td>{{profiler.assetsCount}}</td>
 											<td class="numeric-column">
-                                                <span class="toggle-active" (click)="toggleActive(profiler)">
+                                                <span class="toggle-active" (click)="toggleActive(profiler.profilerInfo)">
                                                     <span>{{(profiler.profilerInfo.active)?'Active':'Inactive'}}</span>
                                                     <i class="fa" [ngClass]="(profiler.profilerInfo.active)?'fa-toggle-on':'fa-toggle-off'"></i>
                                                 </span>
@@ -58,10 +58,10 @@
 									</table>
 								</div>
 							</div>
-							<div class="hwx-white-bg" style="margin-top: 10px; padding: 15px;">
-								<div class="hwx-subtitle">Sensitive</div>
+							<div *ngIf="profilerHistoryData && profilerHistoryData.length" class="hwx-white-bg" style="margin-top: 10px; padding: 15px;">
+								<div class="hwx-subtitle">{{selectedProfiler.profilerInfo.displayName }}</div>
 								<div class="flex-grid status-graph" style="text-align: center;">
-									<div *ngFor="let data of senstivityProfilerData;">
+									<div *ngFor="let data of profilerHistoryData;">
 										<div class="grap" [ngClass]="(data.status==='allPass')?'hwx-success':((data.status==='failed')?'hwx-error':'hwx-warning')">
 											<i class="fa fa-circle"></i>
 										</div>

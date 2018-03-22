@@ -224,6 +224,18 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val putProfilerState =
+    path("cluster" / LongNumber / "dp-profiler" / "profilerinstances" / "state" ) { (clusterId: Long) =>
+      extractRequest { request =>
+        put {
+          val queryString = request.uri.queryString()
+          onComplete(putOnProfiler(clusterId, "/profilerinstances/state", queryString.getOrElse(""))) {
+            case res => mapResponse(res)
+          }
+        }
+      }
+    }
+
   val getProfilersStatusWithJobSummary =
     path("cluster" / LongNumber / "dp-profiler" / "status" / "jobs-summary") { clusterId =>
       extractRequest { request =>
@@ -260,6 +272,18 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val getProfilersHistories =
+    path("cluster" / LongNumber / "dp-profiler" / "histories") { clusterId =>
+      extractRequest { request =>
+        get {
+          val queryString = request.uri.queryString()
+          onComplete(getFromProfiler(clusterId, "/assetjobhistories/assetcounts", queryString.getOrElse(""))) {
+            case res => mapResponse(res)
+          }
+        }
+      }
+    }
+
   private def mapResponse(resposneTry: Try[WSResponse]) = {
     resposneTry match {
       case Success(res) => res.status match {
@@ -282,10 +306,25 @@ class DpProfilerRoute @Inject()(
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}${uriPath}?$queryString")
-      ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .get()
+    } yield {
+      response
+    }
+  }
+
+  private def putOnProfiler(clusterId: Long, uriPath:String, queryString: String): Future[WSResponse] = {
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}${uriPath}?$queryString")
+      ws <- getWSClient(clusterId)
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json")
+        .put(Json.obj())
     } yield {
       response
     }
@@ -307,7 +346,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/assetmetrics")
       tmp <- Future.successful(println(urlToHit))
-      ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(postData)
@@ -333,7 +372,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/assetmetrics")
       tmp <- Future.successful(println(urlToHit))
-      ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(postData)
@@ -352,7 +391,7 @@ class DpProfilerRoute @Inject()(
               case JsSuccess(metricRequest, _) =>
                 userNameOpt.map(userName => {
                   onComplete(for {
-                    ws <- clusterDataApi.getDataplaneCluster(metricRequest.clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+                    ws <- getWSClient(metricRequest.clusterId)
                     config <- retrieveProfilerConfig(metricRequest.clusterId).flatMap(MetricRetriever.retrieveMetrics(ws, _, metricRequest, userName))
                   } yield config) {
                     case Success(results) =>
@@ -385,7 +424,7 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$jobName")
-        ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+        ws <- getWSClient(clusterId)
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .delete()
@@ -401,7 +440,7 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$taskName")
-        ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+        ws <- getWSClient(clusterId)
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .get()
@@ -417,7 +456,7 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/jobs/assetjob?assetId=$dbName.$tableName&profilerName=hivecolumn")
-        ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+        ws <- getWSClient(clusterId)
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .get()
@@ -433,7 +472,7 @@ class DpProfilerRoute @Inject()(
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset/assetcount/$datasetName?profilerinstancename=$profilerInstanceName&startTime=$startTime&endTime=$endTime")
-      ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .get()
@@ -464,7 +503,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/schedules")
       tmp <- Future.successful(println(urlToHit))
-      ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(Json.obj("name" -> jobName, "cronExpr" -> s"0 ${(2+(Instant.now.getEpochSecond/60)%60)%60} * * * ?", "jobTask"->postData))
@@ -485,7 +524,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset")
       echo <- Future.successful(println(s"url to hit for dataset-asset mapping $urlToHit"))
-      ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .post(postData)
@@ -515,7 +554,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/jobs")
       tmp <- Future.successful(println(urlToHit))
-      ws <- clusterDataApi.getDataplaneCluster(clusterId).map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(postData)
@@ -568,5 +607,9 @@ class DpProfilerRoute @Inject()(
         }
       }
   }
+
+  private def getWSClient(clusterId: Long): Future[WSClient] =
+    clusterDataApi.getDataplaneCluster(clusterId)
+      .map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
 
 }

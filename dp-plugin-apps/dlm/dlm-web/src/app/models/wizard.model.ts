@@ -7,12 +7,25 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export interface Step {
+import {
+  StepGeneralValue, StepSourceValue, StepDestinationValue,
+  StepScheduleValue, StepAdvancedValue
+} from 'models/create-policy-form.model';
+
+export interface Step<T = any> {
   label: string;
   id: string;
   index: number;
   state: 'active' | 'disabled' | 'completed';
-  value: any;
+  value: T;
   nextStepId: string;
   previousStepId: string;
+}
+
+export interface CreatePolicyFormState {
+  general: Step<StepGeneralValue>;
+  source: Step<StepSourceValue>;
+  destination: Step<StepDestinationValue>;
+  schedule: Step<StepScheduleValue>;
+  advanced: Step<StepAdvancedValue>;
 }

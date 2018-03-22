@@ -10,7 +10,7 @@
 import { RequestStatus } from './request-status.model';
 import { Cluster } from './cluster.model';
 import { Job } from './job.model';
-import { POLICY_MODES } from 'constants/policy.constant';
+import { POLICY_MODES, AWS_ENCRYPTION } from 'constants/policy.constant';
 import { CloudCredential } from 'models/beacon-cloud-cred.model';
 
 // @todo: consider moving non-required attrs like lastTenJobs, lastJobResource, accessMode
@@ -80,6 +80,8 @@ export interface PolicyDefinition {
   distcpMapBandwidth?: number;
   cloudCred?: string;
   'tde.sameKey'?: boolean;
+  'cloud.encryptionAlgorithm'?: AWS_ENCRYPTION;
+  'cloud.encryptionKey'?: string;
 }
 
 export interface PolicyPayload {
