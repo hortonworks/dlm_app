@@ -21,6 +21,7 @@ import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService, Error, WrappedErrorException}
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.cs.{ClusterDataApi, CredentialInterface, Credentials, StorageInterface}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, DpClusterService, ClusterService => CS}
 import com.hortonworks.dataplane.http.BaseRoute
@@ -45,7 +46,7 @@ class RangerRoute @Inject()(
     private val cs: CS,
     private val clusterDataApi: ClusterDataApi,
     private val config: Config,
-    private val ws: WSClient
+    private val sslContextManager: SslContextManager
 ) extends BaseRoute {
 
   val logger = Logger(classOf[RangerRoute])
@@ -171,7 +172,9 @@ class RangerRoute @Inject()(
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       credential <- credentialInterface.getCredential(CSConstants.RANGER_CREDENTIAL_KEY)
-      services <- getRangerServicesForType(baseUrls.head,
+      dpc <- clusterDataApi.getDataplaneCluster(clusterId)
+      services <- getRangerServicesForType(sslContextManager.getWSClient(dpc.allowUntrusted),
+                                           baseUrls.head,
                                            credential,
                                            serviceType,
                                            executor,
@@ -180,7 +183,8 @@ class RangerRoute @Inject()(
         .sequence(
           services.map(
             cServiceId =>
-              getRangerPoliciesByServiceIdAndQueries(baseUrls.head,
+              getRangerPoliciesByServiceIdAndQueries(sslContextManager.getWSClient(dpc.allowUntrusted),
+                                                     baseUrls.head,
                                                      credential,
                                                      cServiceId,
                                                      queries,
@@ -215,6 +219,7 @@ class RangerRoute @Inject()(
   }
 
   private def getRangerServicesForType(
+      ws: WSClient,
       uri: String,
       credentials: Credentials,
       serviceType: String,
@@ -222,7 +227,7 @@ class RangerRoute @Inject()(
       token: Option[String]): Future[Seq[Long]] = {
 
     val req =
-      getServiceTypeRequest(uri, credentials, serviceType, knoxApiExecutor)
+      getServiceTypeRequest(ws, uri, credentials, serviceType, knoxApiExecutor)
     knoxApiExecutor
       .execute(KnoxApiRequest(req, { r =>
         r.get()
@@ -234,7 +239,8 @@ class RangerRoute @Inject()(
       }
   }
 
-  private def getServiceTypeRequest(uri: String,
+  private def getServiceTypeRequest(ws: WSClient,
+                                    uri: String,
                                     credentials: Credentials,
                                     serviceType: String,
                                     executor: KnoxApiExecutor) = {
@@ -245,6 +251,7 @@ class RangerRoute @Inject()(
   }
 
   private def getRangerPoliciesByServiceIdAndQuery(
+      ws: WSClient,
       uri: String,
       credentials: Credentials,
       serviceId: Long,
@@ -253,7 +260,7 @@ class RangerRoute @Inject()(
       token: Option[String]): Future[Seq[JsObject]] = {
 
     val req =
-      getPolicyRequest(uri, credentials, serviceId, query, knoxApiExecutor)
+      getPolicyRequest(ws, uri, credentials, serviceId, query, knoxApiExecutor)
 
     knoxApiExecutor
       .execute(KnoxApiRequest(req, { r =>
@@ -264,7 +271,8 @@ class RangerRoute @Inject()(
       }
   }
 
-  private def getPolicyRequest(uri: String,
+  private def getPolicyRequest(ws: WSClient,
+                               uri: String,
                                credentials: Credentials,
                                serviceId: Long,
                                query: String,
@@ -276,6 +284,7 @@ class RangerRoute @Inject()(
   }
 
   private def getRangerPoliciesByServiceIdAndQueries(
+      ws: WSClient,
       uri: String,
       credentials: Credentials,
       serviceId: Long,
@@ -285,7 +294,8 @@ class RangerRoute @Inject()(
     val futures = queries
       .map(
         cQuery =>
-          getRangerPoliciesByServiceIdAndQuery(uri,
+          getRangerPoliciesByServiceIdAndQuery(ws,
+                                               uri,
                                                credentials,
                                                serviceId,
                                                cQuery,
@@ -303,6 +313,8 @@ class RangerRoute @Inject()(
       dpc <- Future.successful(dpce.right.get)
       executor <- Future.successful {
         val knoxConfig = KnoxConfig(tokenTopologyName, dpc.knoxUrl)
+        val ws = sslContextManager.getWSClient(dpc.allowUntrusted)
+
         if (useToken(request, dpc)) {
           KnoxApiExecutor(knoxConfig, ws)
         } else
@@ -332,16 +344,17 @@ class RangerRoute @Inject()(
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       credential <- credentialInterface.getCredential(CSConstants.RANGER_CREDENTIAL_KEY)
-      urlToHit1 <- Future.successful(
-        s"${baseUrls.head}/service/plugins/definitions?pageSource=Audit")
-      wsRequest <- getDefinitionsRequest(credential, urlToHit1, executor)
+      urlToHit1 <- Future.successful(s"${baseUrls.head}/service/plugins/definitions?pageSource=Audit")
+      dpc <- clusterDataApi.getDataplaneCluster(clusterId)
+      wsRequest <- getDefinitionsRequest(sslContextManager.getWSClient(dpc.allowUntrusted), credential, urlToHit1, executor)
       tokenAsString <- getTokenAsOptionalString(request)
       response1 <- executor.execute(KnoxApiRequest(wsRequest, { r =>
         r.get()
       }, tokenAsString))
 
       repoType <- Future.successful(getRepoTypeFromRangerServiceDef(response1))
-      wsRequest2 <- getDefinitionsRequest(credential,
+      wsRequest2 <- getDefinitionsRequest(sslContextManager.getWSClient(dpc.allowUntrusted),
+                                          credential,
                                           getUrl(dbName,
                                                  tableName,
                                                  offset,
@@ -360,6 +373,7 @@ class RangerRoute @Inject()(
   }
 
   private def getDefinitionsRequest(
+      ws: WSClient,
       credential: Credentials,
       url: String,
       executor: KnoxApiExecutor): Future[WSRequest] = {
@@ -457,8 +471,11 @@ class RangerRoute @Inject()(
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       credential <- credentialInterface.getCredential(CSConstants.RANGER_CREDENTIAL_KEY)
-      serviceIds <- getRangerServicesForType(baseUrls.head, credential, serviceType, executor, token)
-      wsRequest <- createPolicyRequest(dbName,
+      dpc <- clusterDataApi.getDataplaneCluster(clusterId)
+      ws <- Future.successful(sslContextManager.getWSClient(dpc.allowUntrusted))
+      serviceIds <- getRangerServicesForType(ws, baseUrls.head, credential, serviceType, executor, token)
+      wsRequest <- createPolicyRequest(ws,
+                                       dbName,
                                        tableName,
                                        offset,
                                        pageSize,
@@ -472,7 +489,8 @@ class RangerRoute @Inject()(
     } yield response.json
   }
 
-  private def createPolicyRequest(dbName: String,
+  private def createPolicyRequest(ws: WSClient,
+                                  dbName: String,
                                   tableName: String,
                                   offset: Long,
                                   pageSize: Long,

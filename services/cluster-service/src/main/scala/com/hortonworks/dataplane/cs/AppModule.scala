@@ -156,8 +156,7 @@ object AppModule extends AbstractModule {
                          dpClusterService: DpClusterService,
                          wSClient: WSClient,
                          sslContextManager: SslContextManager): AmbariRoute = {
-    new AmbariRoute(wSClient,
-                    storageInterface,
+    new AmbariRoute(storageInterface,
                     clusterService,
                     credentialInterface,
                     dpClusterService,
@@ -167,8 +166,7 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideHdpProxyRoute(
-                            actorSystem: ActorSystem,
+  def provideHdpProxyRoute(actorSystem: ActorSystem,
                             actorMaterializer: ActorMaterializer,
                             clusterData: ClusterDataApi,
                             sslContextManager: SslContextManager,
@@ -182,9 +180,8 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideConfigurationRoute(wsClient: WSClient, config: Config, sslContextManager: SslContextManager): ConfigurationRoute = {
+  def provideConfigurationRoute(config: Config, sslContextManager: SslContextManager): ConfigurationRoute = {
     new ConfigurationRoute(
-      wsClient,
       config,
       sslContextManager
     )
@@ -225,13 +222,13 @@ object AppModule extends AbstractModule {
                             clusterHostsService: ClusterHostsService,
                             clusterDataApi: ClusterDataApi,
                             config: Config,
-                            wSClient: WSClient): DpProfilerRoute = {
+                            sslContextManager: SslContextManager): DpProfilerRoute = {
     new DpProfilerRoute(clusterComponentService,
                         clusterHostsService,
                         storageInterface,
                         clusterDataApi,
                         config,
-                        wSClient)
+                        sslContextManager)
   }
 
   @Provides
@@ -244,7 +241,7 @@ object AppModule extends AbstractModule {
                          clusterService: ClusterService,
                          clusterDataApi: ClusterDataApi,
                          config: Config,
-                         wSClient: WSClient): RangerRoute = {
+                         sslContextManager: SslContextManager): RangerRoute = {
     new RangerRoute(clusterComponentService,
                     clusterHostsService,
                     storageInterface,
@@ -253,7 +250,7 @@ object AppModule extends AbstractModule {
                     clusterService,
                     clusterDataApi,
                     config,
-                    wSClient)
+                    sslContextManager)
   }
 
   @Provides

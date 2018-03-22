@@ -24,7 +24,7 @@ import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Try}
 
-class ConfigurationRoute @Inject()(val ws: WSClient, val config: Config, val sslContextManager: SslContextManager) extends BaseRoute {
+class ConfigurationRoute @Inject()(val config: Config, val sslContextManager: SslContextManager) extends BaseRoute {
 
   val reloadCertificates =
     path("configuration" / "actions" / "reloadCertificates") {

@@ -41,10 +41,9 @@ sealed trait AmbariDataplaneClusterInterface {
 }
 
 class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
-                                          val ws: WSClient,
+                                          val ws: WSClient, // inject strict or loose instance instead of adding entire provider
                                           val config: Config,
-                                          private val credentials: Credentials,
-                                          private val sslContextManager: SslContextManager)
+                                          private val credentials: Credentials)
     extends AmbariDataplaneClusterInterface {
 
   val logger = Logger(classOf[AmbariDataplaneClusterInterfaceImpl])
@@ -94,8 +93,6 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
   }
 
   def getAmbariResponse(requestUrl: String, allowUntrusted: Boolean)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse] = {
-    val ws = sslContextManager.getWSClient(dataplaneCluster.allowUntrusted)
-
     val request = ws.url(requestUrl)
     val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
     val delegatedCall:ApiCall = {req => req.get()}
@@ -159,6 +156,6 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 object AmbariDataplaneClusterInterfaceImpl {
   def apply(dataplaneCluster: DataplaneCluster,
             ws: WSClient,
-            config: Config, credentials: Credentials, sslContextManager: SslContextManager): AmbariDataplaneClusterInterfaceImpl =
-    new AmbariDataplaneClusterInterfaceImpl(dataplaneCluster, ws, config,credentials, sslContextManager)
+            config: Config, credentials: Credentials): AmbariDataplaneClusterInterfaceImpl =
+    new AmbariDataplaneClusterInterfaceImpl(dataplaneCluster, ws, config,credentials)
 }

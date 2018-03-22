@@ -35,6 +35,7 @@ import com.hortonworks.dataplane.commons.domain.profiler.models.Requests.Profile
 import com.hortonworks.dataplane.commons.domain.profiler.parsers.RequestParser._
 import com.hortonworks.dataplane.commons.domain.profiler.parsers.ResponseParser._
 import com.hortonworks.dataplane.cs.profiler.{GlobalProfilerConfigs, MetricRetriever}
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -45,7 +46,7 @@ class DpProfilerRoute @Inject()(
                              private val storageInterface: StorageInterface,
                              private val clusterDataApi: ClusterDataApi,
                              private val config:Config,
-                             private val ws: WSClient
+                             private val sslContextManager: SslContextManager
                            ) extends BaseRoute {
 
   val startJob =
@@ -305,6 +306,7 @@ class DpProfilerRoute @Inject()(
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}${uriPath}?$queryString")
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .get()
@@ -319,6 +321,7 @@ class DpProfilerRoute @Inject()(
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}${uriPath}?$queryString")
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .put(Json.obj())
@@ -343,6 +346,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/assetmetrics")
       tmp <- Future.successful(println(urlToHit))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(postData)
@@ -368,6 +372,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/assetmetrics")
       tmp <- Future.successful(println(urlToHit))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(postData)
@@ -385,9 +390,10 @@ class DpProfilerRoute @Inject()(
             request.validate[ProfilerMetricRequest] match {
               case JsSuccess(metricRequest, _) =>
                 userNameOpt.map(userName => {
-                  onComplete(
-                    retrieveProfilerConfig(metricRequest.clusterId).flatMap(MetricRetriever.retrieveMetrics(ws, _, metricRequest, userName))
-                  ) {
+                  onComplete(for {
+                    ws <- getWSClient(metricRequest.clusterId)
+                    config <- retrieveProfilerConfig(metricRequest.clusterId).flatMap(MetricRetriever.retrieveMetrics(ws, _, metricRequest, userName))
+                  } yield config) {
                     case Success(results) =>
                       complete(success(Json.toJson(results).as[JsObject]))
                     case Failure(error) =>
@@ -418,6 +424,7 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$jobName")
+        ws <- getWSClient(clusterId)
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .delete()
@@ -433,6 +440,7 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$taskName")
+        ws <- getWSClient(clusterId)
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .get()
@@ -448,6 +456,7 @@ class DpProfilerRoute @Inject()(
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
         urlToHit <- Future.successful(s"${baseUrls.head}/jobs/assetjob?assetId=$dbName.$tableName&profilerName=hivecolumn")
+        ws <- getWSClient(clusterId)
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .get()
@@ -463,6 +472,7 @@ class DpProfilerRoute @Inject()(
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset/assetcount/$datasetName?profilerinstancename=$profilerInstanceName&startTime=$startTime&endTime=$endTime")
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .get()
@@ -493,6 +503,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/schedules")
       tmp <- Future.successful(println(urlToHit))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(Json.obj("name" -> jobName, "cronExpr" -> s"0 ${(2+(Instant.now.getEpochSecond/60)%60)%60} * * * ?", "jobTask"->postData))
@@ -513,6 +524,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/datasetasset")
       echo <- Future.successful(println(s"url to hit for dataset-asset mapping $urlToHit"))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .post(postData)
@@ -542,6 +554,7 @@ class DpProfilerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}/jobs")
       tmp <- Future.successful(println(urlToHit))
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .post(postData)
@@ -594,5 +607,9 @@ class DpProfilerRoute @Inject()(
         }
       }
   }
+
+  private def getWSClient(clusterId: Long): Future[WSClient] =
+    clusterDataApi.getDataplaneCluster(clusterId)
+      .map(dpc => sslContextManager.getWSClient(dpc.allowUntrusted))
 
 }

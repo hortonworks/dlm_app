@@ -35,7 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-class AmbariRoute @Inject()(val ws: WSClient,
+class AmbariRoute @Inject()(
                             val storageInterface: StorageInterface,
                             val clusterService: ClusterService,
                             val credentialInterface: CredentialInterface,
@@ -106,10 +106,9 @@ class AmbariRoute @Inject()(val ws: WSClient,
       creds <- credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
-                                            ws,
+                                            sslContextManager.getWSClient(dataplaneCluster.allowUntrusted),
                                             config,
-                                            creds,
-                                            sslContextManager))
+                                            creds))
       clusters <- dli.discoverClusters()
       details <- getDetails(dataplaneCluster,clusters, dli)
     } yield details
@@ -240,6 +239,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
         Some(HJwtToken(tokenInfoHeader.get().value()))
       else None
 
+    val ws = sslContextManager.getWSClient(dataplaneCluster.allowUntrusted)
+
     // Decide on the executor
     val executor =
       if (knoxEnabledAndTokenPresent(dataplaneCluster, token)) {
@@ -340,10 +341,9 @@ class AmbariRoute @Inject()(val ws: WSClient,
       creds <- credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dpcwServices.dataplaneCluster,
-          ws,
+          sslContextManager.getWSClient(dataplaneCluster.allowUntrusted),
           config,
-          creds,
-          sslContextManager))
+          creds))
       hdpVersion <- dli.getHdpVersion
       services <- dli.getServices(dataplaneCluster.name)
       availableDpServices <- Future.successful(services.intersect(dpServices))

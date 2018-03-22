@@ -38,9 +38,9 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
     with ActorLogging {
 
   val clusterMap = collection.mutable.Map[Long, ActorRef]()
+
   val dpClusterInterface =
-    AmbariDataplaneClusterInterfaceImpl(dpCluster, wSClient, config, credentials,
-      sslContextManager)
+    AmbariDataplaneClusterInterfaceImpl(dpCluster, sslContextManager.getWSClient(dpCluster.allowUntrusted), config, credentials)
 
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
     .getOrElse("/api/v1/clusters")

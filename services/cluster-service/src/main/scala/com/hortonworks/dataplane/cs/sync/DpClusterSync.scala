@@ -68,10 +68,9 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
       creds <- credentialInterface.getCredential(CSConstants.AMBARI_CREDENTIAL_KEY)
       interface <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
-          wSClient,
+          sslContextManager.getWSClient(dataplaneCluster.allowUntrusted),
           config,
-          creds,
-          sslContextManager))
+          creds))
       clusterNames <- interface.discoverClusters
       clusterDetails <- interface.getClusterDetails(clusterNames.head)
     } yield (clusterNames.head, clusterDetails)
