@@ -321,6 +321,7 @@ class DpProfilerRoute @Inject()(
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       urlToHit <- Future.successful(s"${baseUrls.head}${uriPath}?$queryString")
+      ws <- getWSClient(clusterId)
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .put(Json.obj())
