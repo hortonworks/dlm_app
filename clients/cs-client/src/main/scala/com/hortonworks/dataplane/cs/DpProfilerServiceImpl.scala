@@ -161,4 +161,22 @@ class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) e
       .map(mapToResultsGeneric)
   }
 
+  override def putProfilerState (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/profilerinstances/state?$queryString")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .put(Json.obj())
+      .map(mapToResultsGeneric)
+  }
+
+  override def getProfilersHistories (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/histories?$queryString")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResultsGeneric)
+  }
+
+
+
 }

@@ -20,7 +20,7 @@ import { CloudContainer } from 'models/cloud-container.model';
 import { CloudAccount } from 'models/cloud-account.model';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { Cluster } from 'models/cluster.model';
-import { Step } from 'models/wizard.model';
+import { Step, CreatePolicyFormState } from 'models/wizard.model';
 import { getAllSteps, getEntities } from 'selectors/create-policy.selector';
 import { getStepById } from 'utils/policy-util';
 import { WIZARD_STEP_ID, WIZARD_STATE, SOURCE_TYPES, POLICY_TYPES, TDE_KEY_TYPE } from 'constants/policy.constant';
@@ -43,6 +43,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { getUnderlyingHiveFS } from 'utils/cluster-util';
 import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
 import { AsyncActionsService } from 'services/async-actions.service';
+import { SourceValue, DestinationValue, StepAdvancedValue } from 'models/create-policy-form.model';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -161,7 +162,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
   }
 
   submitPolicy() {
-    const formsData = this._stepsMap;
+    const formsData: CreatePolicyFormState = this._stepsMap;
     const {
       general: {value: general},
       source: {value: {source}},
@@ -170,7 +171,7 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
     } = formsData;
 
     // This will guarantee that the advanced settings information is always the latest
-    const {advanced} = this.viewChildStepIdMap[this.activeStepId].getFormValue();
+    const {advanced}: StepAdvancedValue = this.viewChildStepIdMap[this.activeStepId].getFormValue();
 
     const policyData = {
       policyDefinition: <PolicyDefinition>{
@@ -238,6 +239,19 @@ export class CreatePolicyWizardComponent implements OnInit, AfterViewInit, OnDes
 
     if (advanced.max_bandwidth) {
       policyData.policyDefinition.distcpMapBandwidth = Number(advanced.max_bandwidth);
+    }
+
+    let cloudEncryptionTarget: SourceValue|DestinationValue = null;
+    if (source.type === SOURCE_TYPES.S3 && !!source.cloudEncryption) {
+      cloudEncryptionTarget = source;
+    } else if (destination.type === SOURCE_TYPES.S3 && !!destination.cloudEncryption) {
+      cloudEncryptionTarget = destination;
+    } else if (source.type === destination.type && isHiveCloud && !!destination.cloudEncryption) {
+      cloudEncryptionTarget = destination;
+    }
+    if (cloudEncryptionTarget) {
+      policyData.policyDefinition['cloud.encryptionAlgorithm'] = cloudEncryptionTarget.cloudEncryption;
+      policyData.policyDefinition['cloud.encryptionKey'] = cloudEncryptionTarget.cloudEncryptionKey;
     }
 
     policyData.policyDefinition = <PolicyDefinition>omitEmpty(policyData.policyDefinition);

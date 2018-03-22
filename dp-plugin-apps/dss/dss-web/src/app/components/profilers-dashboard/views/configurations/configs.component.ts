@@ -13,38 +13,13 @@ import {Component, OnInit} from '@angular/core';
 import {ProfilerService} from '../../../../services/profiler.service';
 import {LakeService} from '../../../../services/lake.service';
 import { Lake } from '../../../../models/lake';
-import {ProfilerInfoWithAssetsCount} from '../../../../models/profiler-models';
+import {ProfilerModel, ProfilerInfoWithAssetsCount} from '../../../../models/profiler-models';
 
-// export class JobsCountModel {
-// 	Completed:number;
-// 	Running:number;
-// 	Failed:number;
-// }
-
-// export class ProfilerModel {
-// 	id:number;
-// 	name:string;
-// 	version:string;
-// 	isActive:boolean;
-// 	assetsCount:number;
-// 	counts:JobsCountModel;
-// }
-
-const profilersObjList = [
-	{"id":1, "name":"Sensitivity", "version":"1.1", "isActive":false, "assetsCount":30, "counts":{Completed:5,Running:2,Failed:0}},
-	{"id":2, "name":"Hive Column", "version":"1.1", "isActive":true, "assetsCount":40, "counts":{Completed:8,Running:7,Failed:3}},
-	{"id":3, "name":"Hive Meta", "version":"1.1", "isActive":true, "assetsCount":50, "counts":{Completed:10,Running:8,Failed:4}},
-	{"id":4, "name":"Audit", "version":"1.1", "isActive":true, "assetsCount":35, "counts":{Completed:7,Running:3,Failed:3}}
-]
-
-const senstivityProfilerData = [
-	{"status":"allPass", "assetsProfiled":"100%"},
-	{"status":"allPass", "assetsProfiled":"80%"},
-	{"status":"somePass", "assetsProfiled":"90%"},
-	{"status":"allPass", "assetsProfiled":"100%"},
-	{"status":"failed", "assetsProfiled":"0%"},
-	{"status":"allPass", "assetsProfiled":"100%"}
-]
+import {chartColors, ContextTypeConst, MetricTypeConst} from '../../../../shared/utils/constants';
+import {
+  MetricContextDefinition, ProfilerMetric,
+  ProfilerMetricDefinition, ProfilerMetricRequest
+} from "app/models/profiler-metric-request";
 
 @Component({
   selector: 'profilers-configs-dashboard',
@@ -57,7 +32,12 @@ export class ProfilerConfigsComponent implements OnInit {
   clusters = [];
   selectedLake:Lake = null;
   profilers:Array<ProfilerInfoWithAssetsCount> = [];
+  selectedProfiler:ProfilerInfoWithAssetsCount = null;
   senstivityProfilerData = [];
+
+  profilerHistoryData = [];
+  historiesResp = null;
+  assetMatricResp = null;
 
   constructor( private lakeService: LakeService
              , private profilerService:ProfilerService
@@ -65,6 +45,7 @@ export class ProfilerConfigsComponent implements OnInit {
 
   ngOnInit() {
   	this.lakeService.listWithClusterId().subscribe(lakes => {
+      lakes = lakes.sort((a, b) => a.name.localeCompare(b.name));
   	  this.clusters = lakes;
   	  this.selectLake(lakes[0]);
 	  }); 
@@ -73,40 +54,111 @@ export class ProfilerConfigsComponent implements OnInit {
   selectLake(lake) {
   	this.selectedLake =lake;
   	this.profilers = [];
-  	//TODO send request to fetch list from server
-  	this.relodeProfilerStatus();
-
-  	this.senstivityProfilerData = [];
-  	//TODO send request to fetch list from server
-  	setTimeout(()=>{
-  		this.addDisplayDateToSenstivityProfilerData(senstivityProfilerData);
-  		this.senstivityProfilerData =senstivityProfilerData;
-  	}, 500);
+    this.selectedProfiler = null;
+    this.reloadAssetMatric();
+    this.relodeProfilersStatus();
   }
 
-  relodeProfilerStatus () {
+  relodeProfilersStatus () {
     this.profilers = [];
+
     var d = new Date();
     const endTime = d.getTime();
     d.setHours(0,0,0,0);
     const startTime = d.getTime();
 
-    this.profilerService.getStatusWithAssetsCounts(this.selectedLake.clusterId, startTime, endTime)
+    this.profilerService
+      .getStatusWithAssetsCounts(this.selectedLake.clusterId, startTime, endTime)
       .subscribe(infoAndCounts => {
         this.profilers = infoAndCounts
+        this.selectedProfiler = infoAndCounts[0];
+        this.loadProfilerHistories();
       });
   }
 
-  toggleActive(profiler) {
-  	profiler.isActive = !profiler.isActive;
-  	//TODO send request to toggle at server as well
+  loadProfilerHistories () {
+    this.historiesResp = null;
+    this.profilerHistoryData = null;
+
+    var d = new Date();
+    const endTime = d.getTime();
+    d.setHours(-24*6,0,0,0);
+    const startTime = d.getTime();
+
+    this.profilerService
+      .getProfilerHistories(this.selectedLake.clusterId, this.selectedProfiler.profilerInfo.name, startTime, endTime)
+      .subscribe(histories => {
+        this.historiesResp = histories;
+        this.prepareProfilerHistoryData();
+      })
   }
 
-  addDisplayDateToSenstivityProfilerData (senstivityProfilerData) {
-  	let d=new Date(); d.setDate(d.getDate()-7);
-  	senstivityProfilerData.forEach(data=>{
-  		data.displayDate=(new Date(d.setDate(d.getDate()+1))).toString().substr(4,6);
-  	});
+  prepareProfilerHistoryData () {
+    if(!this.assetMatricResp || !this.historiesResp) return;
+    this.profilerHistoryData = [];
+    for(var i=6; i > 0; i--) {
+      let d = new Date(), dStr = this.formatDate(d.setDate(d.getDate()-i));
+      let data = this.historiesResp.find(obj => obj.day === dStr)
+      let mData = this.assetMatricResp.find(obj => obj.date === dStr)
+      let status = (!data || !data.assetsCount.SUCCESS)?"failed":(data.assetsCount.FAILED)?"somePass":"allPass";
+      let percent = (!data || !mData)? "-": (Math.floor(100 * data.assetsCount.SUCCESS / mData.totalAssets) + "%");
+      let displayDate=(new Date(d.setDate(d.getDate()))).toString().substr(4,6);
+
+      this.profilerHistoryData.push({"day":dStr, "status":status, "assetsProfiled":percent, "displayDate":displayDate});
+    }
+    console.log(this.profilerHistoryData);
   }
+
+  toggleActive(profiler: ProfilerModel) {
+  	profiler.active = !profiler.active;
+    this.profilerService
+      .putProfilerState(this.selectedLake.clusterId, profiler.name, profiler.active)
+      .subscribe(resp => profiler.active = resp.state);
+  }
+  changeProfiler(profiler: ProfilerInfoWithAssetsCount) {
+    this.selectedProfiler = profiler;
+    this.loadProfilerHistories();
+  }
+
+  private createProfilerMetricRequest(metrics: ProfilerMetric[]) {
+    const profilerMetricRequest = new ProfilerMetricRequest();
+    profilerMetricRequest.clusterId = this.selectedLake.clusterId;
+
+    profilerMetricRequest.context.contextType = ContextTypeConst.CLUSTER;
+
+    profilerMetricRequest.metrics = metrics;
+    return profilerMetricRequest;
+  }
+
+  private reloadAssetMatric() {
+
+    var d = new Date();
+    const endTime = d.getTime();
+    d.setHours(-24*6,0,0,0);
+    const startTime = d.getTime();
+
+    const metricsRequests = this.createProfilerMetricRequest([
+      new ProfilerMetric(MetricTypeConst.AssetCounts, new ProfilerMetricDefinition(undefined, this.formatDate(startTime), this.formatDate(endTime)))
+    ]);
+
+    this.assetMatricResp = null;
+    this.profilerService.assetCollectionStats(metricsRequests).subscribe(data => {
+      this.assetMatricResp = data.metrics[0].definition['assetsAndCount'];
+      this.prepareProfilerHistoryData();
+    });
+  }
+
+  private formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+  }
+
   
 }

@@ -634,6 +634,8 @@
           "destination_type": "Type",
           "source_type": "Type",
           "cloud_account": "Account",
+          "encryption_type": "Encryption Type",
+          "encryption_key_id": "Key ID",
           "s3": {
             "account": "Cloud Credential",
             "endpoint": "Path"

@@ -64,7 +64,7 @@ export class ProfilerJobsComponent  implements OnInit {
 
   ngOnInit() {
   	this.lakeService.listWithClusterId().subscribe(lakes => {
-  		//lakes = lakes.sort((a, b) => a.name.localeCompare(b.name));
+  		lakes = lakes.sort((a, b) => a.name.localeCompare(b.name));
   		lakes.forEach((lake, i)=>this.clstrFilState[lake.clusterId]=(!i)?true:false);
   		this.clusters = lakes;
       this.currentClusterId = lakes[0].clusterId;
