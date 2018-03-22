@@ -15,12 +15,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.{Inject, Singleton}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
-import com.google.common.base.Supplier
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.hortonworks.dataplane.commons.service.api.Poll
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
-import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,14 +39,14 @@ private[cs] sealed case class DpClusterAdded(id: Long)
 class ClusterSync @Inject()(val actorSystem: ActorSystem,
                             val config: Config,
                             val clusterInterface: StorageInterface,
-                            val wSClient: WSClient) {
+                            val sslContextManager: SslContextManager) {
 
   import scala.concurrent.duration._
   // Not really used for thread safety
   val initialized:AtomicBoolean = new AtomicBoolean(false)
   lazy val actorSupplier: ActorRef = {
     actorSystem.actorOf(
-      Props(classOf[Synchronizer], clusterInterface, wSClient, config),
+      Props(classOf[Synchronizer], clusterInterface, sslContextManager, config),
       "ambari_Synchronizer")
   }
 
@@ -91,7 +90,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 private sealed class Synchronizer(val storageInterface: StorageInterface,
                                   val credentialInterface: CredentialInterface,
-                                  val wSClient: WSClient,
+                                  val sslContextManager: SslContextManager,
                                   val config: Config)
     extends Actor
     with ActorLogging {
@@ -137,7 +136,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
                                 credentials,
                                 config,
                                 storageInterface,
-                                wSClient,
+                                sslContextManager.getWSClient(dpc.allowUntrusted),
                                 dbActor),
                           s"Datalake_${dpc.id.get}"))
       }

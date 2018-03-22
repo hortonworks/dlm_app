@@ -15,7 +15,6 @@ import akka.actor.Status.Failure
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, ClusterService => ClusterData}
 import com.hortonworks.dataplane.commons.service.api.Poll
-import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
 
@@ -37,17 +36,16 @@ private[cs] sealed case class HostInfoSaved(cluster: Cluster)
 
 class ClusterActor(cluster: Cluster,
                    dpCluster: DataplaneCluster,
-                   implicit val wSClient: WSClient,
+                   wsClient: WSClient,
                    storageInterface: StorageInterface,
                    credentials: Credentials,
                    val dbActor: ActorRef,
-                   config: Config,
-                   sslContextManager: SslContextManager)
+                   config: Config)
     extends Actor
     with ActorLogging {
 
   val ambariInterface =
-    new AmbariClusterInterface(cluster, dpCluster, credentials, config, sslContextManager)
+    new AmbariClusterInterface(cluster, credentials, config, wsClient)
   val clusterSaveState =
     collection.mutable.Map("NAMENODE" -> false, "HOST_INFO" -> false)
 

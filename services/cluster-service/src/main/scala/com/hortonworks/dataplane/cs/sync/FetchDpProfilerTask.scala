@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class FetchDpProfilerTask(cl: ClusterData, c: Config, w: WSClient, si: StorageInterface, credentialInterface: CredentialInterface, cs: ActorRef, sslContextManager: SslContextManager) extends ClusterSyncTask(cl, c, w, si, credentialInterface, cs, sslContextManager) {
+class FetchDpProfilerTask(cl: ClusterData, c: Config, w: WSClient, si: StorageInterface, credentialInterface: CredentialInterface, cs: ActorRef) extends ClusterSyncTask(cl, c, w, si, credentialInterface, cs) {
 
   override val taskType: TaskType = TaskType.DpProfiler
 

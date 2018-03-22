@@ -46,7 +46,7 @@ private[sync] case class ClusterData(dataplaneCluster: DataplaneCluster,
 
 sealed trait SyncTaskBase extends Actor with ActorLogging {
   val taskType: TaskType
-  val wSClient: WSClient
+  val wsClient: WSClient
   val config: Config
   val clusterData: ClusterData
   val storageInterface: StorageInterface
@@ -63,12 +63,11 @@ abstract class ClusterSyncTask(cl: ClusterData,
                                w: WSClient,
                                si: StorageInterface,
                                credentialInterface: CredentialInterface,
-                               cs:ActorRef,
-                               sslContextManager: SslContextManager)
+                               cs:ActorRef)
     extends SyncTaskBase {
 
   final override val config: Config = c
-  final override val wSClient: WSClient = w
+  final override val wsClient: WSClient = w
   final override val storageInterface: StorageInterface = si
   final override val clusterData: ClusterData = cl
   final override val clusterSynchronizer:ActorRef = cs
@@ -77,14 +76,13 @@ abstract class ClusterSyncTask(cl: ClusterData,
   private val knoxConfig = KnoxConfig(
     Try(c.getString("dp.services.knox.token.topology")).getOrElse("token"),
     cl.dataplaneCluster.knoxUrl)
-  private implicit val ws: WSClient = w
   final protected def knoxEnabled =
     cl.dataplaneCluster.knoxEnabled.isDefined && cl.dataplaneCluster.knoxEnabled.get && cl.dataplaneCluster.knoxUrl.isDefined
   final protected val executor =
     if (knoxEnabled) KnoxApiExecutor.withTokenCaching(knoxConfig, w)
     else KnoxApiExecutor.withTokenDisabled(knoxConfig, w)
   final protected val ambariInterface: AmbariInterfaceV2 =
-    new AmbariClusterInterfaceV2(cl.cluster,cl.dataplaneCluster, c, credentialInterface, executor, sslContextManager)
+    new AmbariClusterInterfaceV2(cl.cluster, cl.dataplaneCluster, c, credentialInterface, executor, wsClient)
 
   import akka.pattern.pipe
   override final def receive: Receive = {
@@ -121,25 +119,25 @@ abstract class ClusterSyncTask(cl: ClusterData,
 }
 
 class ClusterSynchronizer(private val config: Config,
-                          private val clusterData: ClusterData,private val wSClient: WSClient,
+                          private val clusterData: ClusterData,
+                          private val wSClient: WSClient,
                           private val storageInterface: StorageInterface,
                           private val credentialInterface: CredentialInterface,
-                          callback:PartialFunction[TaskStatus,Unit],
-                          private val sslContextManager: SslContextManager) extends Actor with ActorLogging{
+                          callback: PartialFunction[TaskStatus,Unit]) extends Actor with ActorLogging{
 
 
 
   val workers = {
     val map = collection.mutable.Map[TaskType,ActorRef]()
-    map.put(TaskType.NameNode,context.actorOf(Props(classOf[FetchNameNodeTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.HostInfo,context.actorOf(Props(classOf[FetchHostInfoTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.Atlas,context.actorOf(Props(classOf[FetchAtlasTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.Knox,context.actorOf(Props(classOf[FetchKnoxTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.Beacon,context.actorOf(Props(classOf[FetchBeaconTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.Hdfs,context.actorOf(Props(classOf[FetchHdfsTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.Hive,context.actorOf(Props(classOf[FetchHiveTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.Ranger,context.actorOf(Props(classOf[FetchRangerTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
-    map.put(TaskType.DpProfiler,context.actorOf(Props(classOf[FetchDpProfilerTask],clusterData,config,wSClient,storageInterface, credentialInterface, self, sslContextManager)))
+    map.put(TaskType.NameNode,context.actorOf(Props(classOf[FetchNameNodeTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.HostInfo,context.actorOf(Props(classOf[FetchHostInfoTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.Atlas,context.actorOf(Props(classOf[FetchAtlasTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.Knox,context.actorOf(Props(classOf[FetchKnoxTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.Beacon,context.actorOf(Props(classOf[FetchBeaconTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.Hdfs,context.actorOf(Props(classOf[FetchHdfsTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.Hive,context.actorOf(Props(classOf[FetchHiveTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.Ranger,context.actorOf(Props(classOf[FetchRangerTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
+    map.put(TaskType.DpProfiler,context.actorOf(Props(classOf[FetchDpProfilerTask],clusterData,config,wSClient,storageInterface, credentialInterface, self)))
     map.toMap
   }
 

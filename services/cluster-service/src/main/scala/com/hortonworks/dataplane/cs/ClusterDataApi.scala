@@ -15,15 +15,15 @@ import java.net.URL
 import java.util.concurrent.{Executors, TimeUnit}
 
 import akka.actor.ActorSystem
-import akka.actor.Status.Success
 import akka.stream.ActorMaterializer
-import com.google.common.base.{Supplier, Suppliers}
+import com.google.common.base.{Supplier}
 import com.google.common.cache.{Cache, CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
 import com.hortonworks.dataplane.CSConstants
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Error, HJwtToken, WrappedErrorException, ClusterService => CS}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
+import com.hortonworks.dataplane.cs.tls.SslContextManager
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, DpClusterService}
 import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
@@ -31,7 +31,6 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.joda.time.DateTime
 import play.api.libs.json.{JsArray, JsObject, JsValue}
-import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -45,7 +44,7 @@ class ClusterDataApi @Inject()(
     private val clusterHostsService: ClusterHostsService,
     private val dpClusterService: DpClusterService,
     private val clusterService: ClusterService,
-    private val wSClient: WSClient,
+    private val sslContextManager: SslContextManager,
     private val config: Config) {
 
   //Create a new Execution context for use in our proxy
@@ -125,7 +124,7 @@ class ClusterDataApi @Inject()(
           KnoxConfig(Try(config.getString("dp.services.knox.token.topology"))
             .getOrElse("token"),
             dpc.knoxUrl),
-          wSClient)
+         sslContextManager.getWSClient(dpc.allowUntrusted))
 
         executor.getKnoxApiToken(s"${Constants.HJWT}=$t")
       })

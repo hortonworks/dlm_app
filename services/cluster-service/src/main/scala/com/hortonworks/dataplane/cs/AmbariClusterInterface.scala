@@ -13,9 +13,7 @@ package com.hortonworks.dataplane.cs
 
 import java.net.{MalformedURLException, URL}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster}
-import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
-import com.hortonworks.dataplane.cs.tls.SslContextManager
+import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
@@ -27,15 +25,12 @@ import scala.util.Try
 
 class AmbariClusterInterface(
     private val cluster: Cluster,
-    private val dpCluster: DataplaneCluster,
     private val credentials: Credentials,
     private val appConfig: Config,
-    private val sslContextManager: SslContextManager)(implicit wsImplicit: WSClient)
+    private val ws: WSClient)
     extends AmbariInterface {
 
   val logger = Logger(classOf[AmbariClusterInterface])
-
-  val ws = sslContextManager.getWSClient(dpCluster.allowUntrusted)
 
   override def ambariConnectionCheck: Future[AmbariConnection] = {
     // use the cluster definition to get Ambari

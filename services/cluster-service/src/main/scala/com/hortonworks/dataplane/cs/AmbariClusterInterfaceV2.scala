@@ -29,8 +29,8 @@ class AmbariClusterInterfaceV2(
     private val dataplaneCluster: DataplaneCluster,
     private val appConfig: Config,
     private val credentialInterface: CredentialInterface,
-    knoxApiExecutor: KnoxApiExecutor,
-    private val sslContextManager: SslContextManager)(implicit ws: WSClient)
+    private val knoxApiExecutor: KnoxApiExecutor,
+    private val ws: WSClient)
     extends AmbariInterfaceV2 {
 
   val logger = Logger(classOf[AmbariClusterInterfaceV2])
@@ -175,7 +175,6 @@ class AmbariClusterInterfaceV2(
   private def getWrappedRequest(
       url: String,
       hJwtToken: Option[HJwtToken]): Future[WSRequest] = {
-    val ws = sslContextManager.getWSClient(dataplaneCluster.allowUntrusted)
 
     val baseReq = ws.url(url)
     if (hJwtToken.isDefined && dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined)

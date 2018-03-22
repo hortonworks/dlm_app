@@ -25,7 +25,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class FetchKnoxTask(cl: ClusterData, c: Config, w: WSClient, si: StorageInterface,
-                    credentialInterface: CredentialInterface, cs: ActorRef, sslContextManager: SslContextManager) extends ClusterSyncTask(cl,c,w,si, credentialInterface, cs, sslContextManager) {
+                    credentialInterface: CredentialInterface, cs: ActorRef) extends ClusterSyncTask(cl,c,w,si, credentialInterface, cs) {
 
   override val taskType: TaskType = TaskType.Knox
 
