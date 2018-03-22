@@ -40,10 +40,18 @@
 }
 .panel-body {
   padding: 0px 0px 15px 15px;
-  border: 1px solid $iron;
   background: $white;
   min-height: 518px;
+  position: relative;
+
+  .title {
+    font-size: 16px;
+    color: $mine-shaft;
+    position: absolute;
+    top: 15px;
+  }
 }
+
 .load-right-to-left,
 .load-right-to-left-slider {
   -webkit-animation: keyframe-dialog-rtl 0.2s linear;

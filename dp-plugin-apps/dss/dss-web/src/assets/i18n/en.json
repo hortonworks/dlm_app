@@ -233,6 +233,30 @@
         "secure-data" : "Datalake Asset Sensitivity Profiling Summary",
         "top-10-asset-collections" : "Top 10 Asset Collections by Access",
         "top-10-assets" : "Top 10 Assets by Access"
+      },
+      "asset-view-overview": {
+        "no-of-rows": "# of Rows",
+        "no-of-columns": "# of Columns",
+        "sensitive-column": "Sensitive Columns",
+        "no-of-partition": "# of Partitions",
+        "top-10-users": "Top 10 Users",
+        "new-partitions-added": "New partitions added",
+        "times-table-accessed": "Times table accessed",
+        "times-wrote": "Times wrote",
+        "allowed-unauthorised-access": "Allowed Vs Unauthorised Access",
+        "select-vs-update": "Select Vs Update"
+      },
+      "asset-view-aside": {
+        "table-properties": "Table Properties",
+        "owner": "Owner",
+        "qualified-name":"Qualified Name",
+        "table-type":"Table Type",
+        "datalake":"Datalake",
+        "database":"Database",
+        "created-on":"Created On",
+        "last-modified":"Last Modified",
+        "system-tags": "System Tags",
+        "profilers": "Profilers"
       }
     },
     "comments": {

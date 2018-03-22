@@ -1,0 +1,96 @@
+<div class="charts-cards-container summary">
+
+  <div class="charts-card">
+    <div class="icon-section">
+      <i class="fa fa-bars"></i>
+    </div>
+    <div class="text-section">
+      <div class="value"> {{assetDetails.entity.attributes.parameters.numRows}} </div>
+      <div class="title">{{"pages.dataset.asset-view-overview.no-of-rows" | translate}} </div>
+    </div>
+  </div>
+
+  <div class="charts-card">
+    <div class="icon-section">
+      <i class="fa fa-bars fa-rotate-90"></i>
+    </div>
+    <div class="text-section">
+      <div class="value"> {{assetDetails.entity.attributes.columns.length}}  </div>
+      <div class="title">{{"pages.dataset.asset-view-overview.no-of-columns" | translate}} </div>
+    </div>
+  </div>
+
+  <div class="charts-card">
+    <div class="icon-section">
+      <i class="fa fa-briefcase"></i>
+    </div>
+    <div class="text-section">
+      <div class="value"> --  </div>
+      <div class="title">{{"pages.dataset.asset-view-overview.sensitive-column" | translate}} </div>
+    </div>
+  </div>
+
+  <div class="charts-card">
+    <div class="icon-section">
+      <i class="fa fa-adjust"></i>
+    </div>
+    <div class="text-section">
+      <div class="value"> --  </div>
+      <div class="title">{{"pages.dataset.asset-view-overview.no-of-partition" | translate}} </div>
+    </div>
+  </div>
+
+</div>
+
+<dp-lineage [clusterId]="clusterId" [guid]="guid"> </dp-lineage>
+
+
+<div class="charts-cards-container top-users">
+  <div class="charts-card chart">
+    <div class="title"> {{"pages.dataset.asset-view-overview.top-10-users" | translate}}  </div>
+    <svg #topUsers></svg>
+  </div>
+
+  <div class="summary">
+    <div class="charts-card">
+      <div class="icon-section">
+        <i class="fa fa-adjust"></i>
+      </div>
+      <div class="text-section">
+        <div class="value"> 10 </div>
+        <div class="title">{{"pages.dataset.asset-view-overview.new-partitions-added" | translate}} </div>
+      </div>
+    </div>
+
+    <div class="charts-card">
+      <div class="icon-section">
+        <i class="fa fa-key"></i>
+      </div>
+      <div class="text-section">
+        <div class="value"> 11  </div>
+        <div class="title">{{"pages.dataset.asset-view-overview.times-table-accessed" | translate}} </div>
+      </div>
+    </div>
+
+    <div class="charts-card">
+      <div class="icon-section">
+        <i class="fa fa-edit"></i>
+      </div>
+      <div class="text-section">
+        <div class="value"> 12  </div>
+        <div class="title">{{"pages.dataset.asset-view-overview.times-wrote" | translate}} </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="charts-cards-container comparision-charts">
+  <div class="charts-card bar">
+    <div class="title"> {{"pages.dataset.asset-view-overview.allowed-unauthorised-access" | translate}}  </div>
+    <svg #authUnauthorisedAccess></svg>
+  </div>
+  <div class="charts-card pie">
+    <div class="title"> {{"pages.dataset.asset-view-overview.select-vs-update" | translate}}  </div>
+    <svg #selectAndUpdate></svg>
+  </div>
+</div>

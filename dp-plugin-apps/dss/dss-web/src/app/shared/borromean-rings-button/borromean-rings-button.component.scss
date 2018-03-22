@@ -1,0 +1,32 @@
+@import '../../../styles/variables';
+
+.fa-stack {
+  border-radius: 12px;
+  background: $gallery;
+}
+
+.one {
+  position: absolute;
+  top: 5px;
+  left: 4px;
+}
+
+.two {
+  position: absolute;
+  top: 6px;
+  left: 9px;
+}
+
+.three {
+  position: absolute;
+  top: 10px;
+  left: 5px;
+}
+
+.fa-circle {
+  position: absolute;
+  left: 11px;
+  font-size: 0.6em;
+  top: 3px;
+  color: $burnt-sienna;
+}

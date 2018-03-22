@@ -125,7 +125,7 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
     this.barChartLoading = true;
     this.barChartLoading503 = false;
     this.noBarData = false;
-    let results={"allowed":[], "denied":[]}
+    let results={"allowed":[], "denied":[]};
     this.bar_data.forEach(obj=>obj.values=results[obj.id]);
     this.assetService.getProfilerAuditResults(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (
       res=> {

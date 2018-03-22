@@ -9,42 +9,8 @@
   ~  */
   -->
 
-<dp-tabs [tabEnum]="detailsTabs" [tabType]="tabType.BUTTON" (selected)="selectedDetailsTabs=$event"> </dp-tabs>
 <div class="details-wrapper">
-  <section *ngIf="selectedDetailsTabs === detailsTabs.PROPERTIES">
-    <table style="width: 100%" dp-config-table class="mdl-data-table mdl-js-data-table">
-      <thead>
-        <tr>
-          <th class="mdl-data-table__cell--non-numeric">KEY</th>
-          <th class="mdl-data-table__cell--non-numeric">VALUE</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr *ngFor="let property of assetProperties">
-            <td class="mdl-data-table__cell--non-numeric">{{property.key}}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{property.value}}</td>
-          </tr>
-      </tbody>
-    </table>
-  </section>
-  <section *ngIf="selectedDetailsTabs === detailsTabs.TAGS">
-    <table *ngIf="assetTags.length" style="width: 100%" class="mdl-data-table mdl-js-data-table">
-      <thead>
-        <tr>
-          <th class="mdl-data-table__cell--non-numeric">Name</th>
-          <th class="mdl-data-table__cell--non-numeric">Attributes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let tag of assetTags">
-          <td class="mdl-data-table__cell--non-numeric">{{tag.name}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{tag.attributes}}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div *ngIf="!assetTags.length">No tags available for asset</div>
-  </section>
-  <section *ngIf="selectedDetailsTabs === detailsTabs.SCHEMA">
+  <section>
     <table style="width: 100%" class="mdl-data-table mdl-js-data-table" >
       <thead>
         <tr>
@@ -83,6 +49,6 @@
       </tbody>
     </table>
     <br/><br/>
-    <div class="starText">* Approximate values as being computed using HLL algorithm.</div> 
+    <div class="starText">* Approximate values as being computed using HLL algorithm.</div>
   </section>
 </div>

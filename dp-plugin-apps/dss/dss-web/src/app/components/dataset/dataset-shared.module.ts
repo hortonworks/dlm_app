@@ -69,6 +69,10 @@ import {AssetCollectionEditComponent} from './views/asset-collection-edit/asset-
 import {OverviewComponent} from './views/asset-collection-edit/overview/overview.component';
 import {ProfilerService} from "app/services/profiler.service";
 import {TimeRangeButtonGroupModule} from '../../shared/time-range-button-group/time-range-button-group.module';
+import {BorromeanRingsButtonComponent} from '../../shared/borromean-rings-button/borromean-rings-button.component';
+import {BorromeanRingsButtonModule} from '../../shared/borromean-rings-button/borromean-rings-button.module';
+import {AssetViewOverviewComponent} from './views/asset-view/asset-view-overview/asset-view-overview.component';
+import {AssetViewAsideSummaryComponent} from './views/asset-view/asset-view-aside-summary/asset-view-aside-summary.component';
 
 @NgModule({
   declarations: [
@@ -102,7 +106,9 @@ import {TimeRangeButtonGroupModule} from '../../shared/time-range-button-group/t
     AssetTagPolicyViewComponent,
     AssetResourcePolicyViewComponent,
     AssetCollectionEditComponent,
-    OverviewComponent
+    OverviewComponent,
+    AssetViewOverviewComponent,
+    AssetViewAsideSummaryComponent
   ],
   entryComponents: [QueryFilter],
   imports: [
@@ -119,7 +125,8 @@ import {TimeRangeButtonGroupModule} from '../../shared/time-range-button-group/t
     RouterModule,
     MyDateRangePickerModule,
     CommentsModule,
-    TimeRangeButtonGroupModule
+    TimeRangeButtonGroupModule,
+    BorromeanRingsButtonModule
   ],
   exports: [
     NavTagPanel,

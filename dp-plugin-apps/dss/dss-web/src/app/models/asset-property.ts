@@ -14,13 +14,63 @@ export class AssetProperty {
   }
 }
 
+export class AssetEntityParameters {
+  totalSize:             string;
+  rawDataSize:           string;
+  EXTERNAL:              string;
+  numRows:               string;
+  numFiles:              string;
+  transient_lastDdlTime: string;
+  department:            string;
+}
+
+export class AssetEntityColumn {
+  guid:     string;
+  typeName: string;
+}
+
+export class AssetEntityClassification {
+  typeName: string;
+  attributes: any;
+}
+
+export class AssetEntityAttributes {
+  owner:            string;
+  temporary:        boolean;
+  lastAccessTime:   number;
+  aliases:          null;
+  qualifiedName     = '';
+  columns:          AssetEntityColumn[] = [];
+  description:      null;
+  viewExpandedText: null;
+  sd:               AssetEntityColumn = new AssetEntityColumn();
+  tableType:        string;
+  createTime:       number;
+  name:             string;
+  comment:          null;
+  partitionKeys:    null;
+  profileData:      null;
+  parameters:       AssetEntityParameters = new AssetEntityParameters();
+  db:               AssetEntityColumn = new AssetEntityColumn();
+  retention:        number;
+  viewOriginalText: null;
+}
+
+export class AssetEntity {
+  id:              string;
+  typeName:        string;
+  attributes:      AssetEntityAttributes = new AssetEntityAttributes();
+  guid:            string;
+  status:          string;
+  createdBy:       string;
+  updatedBy:       string;
+  createTime:      number;
+  updateTime:      number;
+  version:         number;
+  classifications: AssetEntityClassification[] = [];
+}
+
 export class AssetDetails {
   referredEntities: any;
-  entity: {
-    attributes: any;
-    classifications: any[]
-    id: string;
-    typeName: string;
-    status: string;
-  };
+  entity: AssetEntity = new AssetEntity();
 }

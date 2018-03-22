@@ -253,3 +253,26 @@ a:hover {
   stroke-width: 1px;
   stroke-dasharray: 2px;
 }
+
+// Asset Tags
+
+.asset-tags {
+  display: flex;
+  flex-wrap: wrap;
+
+  .tag {
+    padding: 2px 3px;
+    border-radius: 2px;
+    margin: 0px 5px 5px 0px;
+  }
+
+  .color-b {
+    color: #fff;
+    background: #a089b7;
+  }
+
+  .system {
+    color: #fff;
+    background: #e17361;
+  }
+}

@@ -11,62 +11,28 @@
 
 @import "../../../../../styles/variables";
 
-.lastRunTime{
-  font-size:10px;
-  margin:7px 0 0 8px;
-}
-
-.dp-view-pane {
-  //height: 100%;
-
-  & .mdl-typography--headline {
-    text-transform: uppercase;
-  }
-}
-
-.box {
+.asset-view {
   display: flex;
-  flex-flow: column;
-  height: 100%;
-  & .row.header {
+  justify-content: space-between;
+  margin: 15px 30px;
+
+
+  .asset-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .asset-view-summary {
+    background: $white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
     flex: 0 1 auto;
-  }
-  & .row.content {
-    flex: 1 1 auto;
-  }
-  & .row.footer {
-    flex: 0 1 40px;
-  }
-}
 
-.summary-pane-3 ul {
-  background: $white;
-
-  & li {
-    padding: 10px 20px;
-    line-height: 1;
-
-    & > div {
-      padding: 0;
-
-      &.title {
-        font-size: 12px;
-        margin-bottom: 5px;
-      }
-      &.value {
-        font-size: 16px;
-      }
-
+    .title {
+      display: flex;
+      flex-direction: column;
     }
   }
-}
-
-.sticker {
-  position:absolute;
-  top:20px;
-  right:3px;
-  background-color:#CFD3D7;
-  font-size:12px;
-  border-radius:3px;
-  padding:5px;
 }

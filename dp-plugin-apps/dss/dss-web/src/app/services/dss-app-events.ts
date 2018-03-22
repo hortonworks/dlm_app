@@ -22,12 +22,18 @@ export class DssAppEvents {
   dataSetCollaborationPaneCollapsed$: Observable<boolean>;
   private dataSetCollaborationPaneCollapsed: Subject<boolean>;
 
+  assetCollaborationPaneCollapsed$: Observable<boolean>;
+  private assetCollaborationPaneCollapsed: Subject<boolean>;
+
   constructor() {
     this.sideNavCollapsed = new Subject<boolean>();
     this.sideNavCollapsed$ = this.sideNavCollapsed.asObservable();
 
     this.dataSetCollaborationPaneCollapsed = new Subject<boolean>();
     this.dataSetCollaborationPaneCollapsed$ = this.dataSetCollaborationPaneCollapsed.asObservable();
+
+    this.assetCollaborationPaneCollapsed = new Subject<boolean>();
+    this.assetCollaborationPaneCollapsed$ = this.assetCollaborationPaneCollapsed.asObservable();
   }
 
   setSideNavCollapsed(newValue: boolean) {
@@ -36,5 +42,9 @@ export class DssAppEvents {
 
   setDataSetCollaborationPaneCollapsed(newValue: boolean) {
     this.dataSetCollaborationPaneCollapsed.next(newValue);
+  }
+
+  setAssetCollaborationPaneCollapsed(newValue: boolean) {
+    this.assetCollaborationPaneCollapsed.next(newValue);
   }
 }

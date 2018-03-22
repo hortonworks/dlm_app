@@ -14,12 +14,13 @@ import {ActivatedRoute, RouterModule, Routes} from '@angular/router';
 
 import {AssetService} from '../../../../services/asset.service';
 import {TabStyleType} from '../../../../shared/tabs/tabs.component';
-import {NodeDetailsComponent} from './node-details/node-details.component'
+import {NodeDetailsComponent} from './node-details/node-details.component';
 import {AssetDetails, AssetProperty} from '../../../../models/asset-property';
+import {DssAppEvents} from '../../../../services/dss-app-events';
 
 
 export enum TopLevelTabs {
-  DETAILS, LINEAGE, POLICY, AUDIT//, REPLICATION
+  OVERVIEW, SCHEMA, POLICY, AUDIT
 }
 
 enum ProfilerStatus {
@@ -35,24 +36,26 @@ enum ProfilerStatus {
 export class AssetViewComponent implements OnInit {
   tabType = TabStyleType;
   topLevelTabs = TopLevelTabs;
+  selectedTopLevelTabs = TopLevelTabs.OVERVIEW;
+  showSummary = true;
 
-  selectedTopLevelTabs = TopLevelTabs.DETAILS;
-
-  assetDetails: AssetDetails;
+  assetDetails = new AssetDetails();
 
   clusterId: string;
   guid: string;
   tableName: string;
   databaseName: string;
   summary: AssetProperty[] = [];
-  jobId:number = null;
+  jobId: number = null;
   PS = ProfilerStatus;
-  profilerStatus:ProfilerStatus = this.PS.UNKNOWN;
-  lastRunTime:string = "";
-  nextRunTime:number = 0;
-  nextRunDisplay:string = "";
+  profilerStatus: ProfilerStatus = this.PS.UNKNOWN;
+  lastRunTime = '';
+  nextRunTime = 0;
+  nextRunDisplay = '';
 
-  constructor(private route: ActivatedRoute, private assetService: AssetService) {
+  constructor(private route: ActivatedRoute,
+              private assetService: AssetService,
+              private dssAppEvents: DssAppEvents) {
   }
 
   ngOnInit() {
@@ -67,66 +70,76 @@ export class AssetViewComponent implements OnInit {
       this.getProfilingJobStatus();
     });
     this.assetService.getDetailsFromDb(this.guid).subscribe(details => {
-      this.assetService.getScheduleInfo(details.clusterId, details.datasetId).subscribe(res=>{
-        this.nextRunTime = Math.max(0,parseInt(res['nextFireTime']) - Date.now());
+      this.assetService.getScheduleInfo(details.clusterId, details.datasetId).subscribe(res => {
+        this.nextRunTime = Math.max(0, parseInt(res['nextFireTime'], 10) - Date.now());
         this.setNextRunDisplay();
       },
       err =>
-          ((err.status === 404) && (console.log("404 from getScheduleInfo")))
-        ||((err.status === 405) && (console.log("405 from getScheduleInfo")))
+          ((err.status === 404) && (console.log('404 from getScheduleInfo')))
+        || ((err.status === 405) && (console.log('405 from getScheduleInfo')))
       );
     });
   }
 
   setNextRunDisplay () {
-        if(this.profilerStatus === this.PS.RUNNING) {
-          this.nextRunDisplay = "Profiling in progress ...";
+        if (this.profilerStatus === this.PS.RUNNING) {
+          this.nextRunDisplay = 'Profiling in progress ...';
           return;
         }
-        var nrtMin = Math.ceil(this.nextRunTime/60000); //in minutes;
-        var nrtHour = (nrtMin > 60)?Math.floor(nrtMin/60):0;
-        this.nextRunDisplay = "Next Profiler Schedule in : " + ((nrtHour)?(nrtHour + ((nrtHour==1)?" hour":" hours")):(nrtMin + ((nrtMin==1)?" minute":" minutes")));
+        const nrtMin = Math.ceil(this.nextRunTime / 60000); // in minutes;
+        const nrtHour = (nrtMin > 60) ? Math.floor(nrtMin / 60) : 0;
+        this.nextRunDisplay = 'Next Profiler Schedule in : ' + ((nrtHour) ? (nrtHour + ((nrtHour === 1) ?
+                                ' hour' : ' hours')) : (nrtMin + ((nrtMin === 1) ? ' minute' : ' minutes')));
   }
 
   get showProfilerStatus() {
-    return (this.profilerStatus != this.PS.NOSUPPORT && this.profilerStatus != this.PS.UNKNOWN);
+    return (this.profilerStatus !== this.PS.NOSUPPORT && this.profilerStatus !== this.PS.UNKNOWN);
   }
 
   get showLastRunTime () {
-    return (this.lastRunTime && this.showProfilerStatus && this.profilerStatus != this.PS.RUNNING);
+    return (this.lastRunTime && this.showProfilerStatus && this.profilerStatus !== this.PS.RUNNING);
   }
 
   getProfilingJobStatus () {
-    this.assetService.getProfilingStatus(this.clusterId, this.databaseName, this.tableName).subscribe(res=>{
+    this.assetService.getProfilingStatus(this.clusterId, this.databaseName, this.tableName).subscribe(res => {
       this.lastRunTime = (new Date(res.time)).toLocaleString();
-      switch(res.status) {
-          case "SUCCESS" : if(this.profilerStatus === this.PS.RUNNING) location.reload();
-                           this.profilerStatus = this.PS.SUCCESS; break;
-          case "FAILED"  : this.profilerStatus = this.PS.FAILED;  break;
-          case "STARTED" : this.profilerStatus = this.PS.RUNNING;
-                           this.setNextRunDisplay();
-                           setTimeout(()=>this.getProfilingJobStatus(), 5000);
-                           break;
-      }
+          switch (res.status) {
+            case 'SUCCESS' :
+              if (this.profilerStatus === this.PS.RUNNING) {
+                location.reload();
+              }
+              this.profilerStatus = this.PS.SUCCESS;
+              break;
+            case 'FAILED'  :
+              this.profilerStatus = this.PS.FAILED;
+              break;
+            case 'STARTED' :
+              this.profilerStatus = this.PS.RUNNING;
+              this.setNextRunDisplay();
+              setTimeout(() => this.getProfilingJobStatus(), 5000);
+              break;
+          }
     },
     err =>
         ((err.status === 404) && (this.profilerStatus = this.PS.NOTSTARTED))
-      ||((err.status === 405) && (this.profilerStatus = this.PS.NOSUPPORT))
+      || ((err.status === 405) && (this.profilerStatus = this.PS.NOSUPPORT))
     );
   }
 
   startProfiler() {
-    if (this.profilerStatus == this.PS.RUNNING) return;
+    if (this.profilerStatus === this.PS.RUNNING) {
+      return;
+    }
     this.profilerStatus = this.PS.RUNNING;
     this.assetService.startProfiling(this.clusterId, this.databaseName, this.tableName).subscribe(
-      res=>(this.jobId = res.id) && this.getProfilingJobStatus(),
+      res => (this.jobId = res.id) && this.getProfilingJobStatus(),
       err => (err.status === 405) && (this.profilerStatus = this.PS.NOSUPPORT)
     );
   }
 
   private extractSummary(entity) {
-    let summary: AssetProperty[] = [];
-    let qualifiedName = entity.attributes.qualifiedName;
+    const summary: AssetProperty[] = [];
+    const qualifiedName = entity.attributes.qualifiedName;
     this.tableName = qualifiedName.slice(qualifiedName.indexOf('.') + 1, qualifiedName.indexOf('@'));
     this.databaseName = qualifiedName.slice(0, qualifiedName.indexOf('.'));
     summary.push(new AssetProperty('Datalake', qualifiedName.slice(qualifiedName.indexOf('@') + 1, qualifiedName.length)));
@@ -140,5 +153,9 @@ export class AssetViewComponent implements OnInit {
     return summary;
   }
 
+  toggleSummary() {
+    this.showSummary = !this.showSummary;
+    setTimeout(() => this.dssAppEvents.setAssetCollaborationPaneCollapsed(this.showSummary), 300);
+  }
 }
 

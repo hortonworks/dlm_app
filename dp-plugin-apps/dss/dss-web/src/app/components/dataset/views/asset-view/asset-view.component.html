@@ -9,54 +9,43 @@
   ~  */
   -->
 
-<div class="dp-view-pane">
-    <div class="mdl-grid mdl-grid--no-spacing">
-        <div class="mdl-cell--10-col">
-            <div class="mdl-typography--headline hwx-title">{{this.tableName}}</div>
-            <span class="mdl-chip hive-table-chip">
-                <span class="mdl-chip__text">HIVE</span>
-            </span>
-        </div>
-        <div class="mdl-cell--2-col">
-            <!--
-            <dp-dropdown class="pull-right" [list]="['abc', 'def']"></dp-dropdown>
-             -->
-            <!--
-            <button *ngIf="showProfilerStatus" (click)="startProfiler()" class="mdl-button btn-hwx-default">
-              <span *ngIf="profilerStatus == PS.RUNNING">Profiler Running <i class="fa fa-spinner fa-spin"></i></span>
-              <span *ngIf="profilerStatus != PS.RUNNING">Restart Profiling</span>
-            </button>
-            <div *ngIf="showLastRunTime" class="lastRunTime" >Last ran at : {{lastRunTime}}</div>
-             -->
-        </div>
+<div class="asset-view">
+  <div class="asset-view-wrapper">
+    <div class="asset-view-summary">
+    <div class="title">
+      <span class="hwx-title"> {{this.tableName}} </span>
+      <span class="mdl-chip hive-table-chip">
+        <span class="mdl-chip__text">HIVE</span>
+      </span>
     </div>
-    <div class="spacer-34"> </div>
-    <div class="summary-pane-3">
-      <ul>
-          <li *ngFor="let property of summary">
-            <div class="title">{{property.key}}</div>
-            <div class="value">{{property.value}}</div>
-          </li>
-      </ul>
-    </div>
-    <div class="spacer-15"> </div>
+    <app-borromean-rings-button (onClick)="toggleSummary()"> </app-borromean-rings-button>
+  </div>
+
     <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
-    <div class="spacer-15"> </div>
-    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS" style="position:relative;">
+
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.OVERVIEW">
+      <dss-asset-view-overview [clusterId]="clusterId" [guid]="guid" [assetDetails]="assetDetails"> </dss-asset-view-overview>
+    </section>
+
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.SCHEMA" style="position:relative;">
       <div class="sticker" *ngIf="nextRunDisplay">{{nextRunDisplay}}</div>
       <dp-asset-details-view [assetDetails]="assetDetails" [clusterId]="clusterId" [guid]="guid"> </dp-asset-details-view>
     </section>
-    <section *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE">
-     <dp-lineage [clusterId]="clusterId" [guid]="guid"> </dp-lineage>
-    </section>
+
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.AUDIT">
-     <asset-audit-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-audit-view>
+      <asset-audit-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-audit-view>
     </section>
+
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.POLICY">
-     <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.resourceBasedPolicies' | translate}}</div>
-     <dp-asset-resource-policy-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </dp-asset-resource-policy-view>
-     <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.tagBasedPolicies' | translate}}</div>
-     <dp-asset-tag-policy-view [clusterId]="clusterId" [guid]="guid"> </dp-asset-tag-policy-view>
+      <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.resourceBasedPolicies' | translate}}</div>
+      <dp-asset-resource-policy-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </dp-asset-resource-policy-view>
+      <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.tagBasedPolicies' | translate}}</div>
+      <dp-asset-tag-policy-view [clusterId]="clusterId" [guid]="guid"> </dp-asset-tag-policy-view>
     </section>
+  </div>
+
+  <div class="dp-sidle-in-summary" [ngClass]="{'show': showSummary}">
+    <dss-asset-view-aside-summary [assetDetails]="assetDetails"> </dss-asset-view-aside-summary>
+  </div>
 
 </div>

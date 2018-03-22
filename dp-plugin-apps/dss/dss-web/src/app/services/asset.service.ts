@@ -25,14 +25,14 @@ export class AssetService {
   constructor(private http: Http) {
   }
 
-  checkMockAuditVisualStatus(){
+  checkMockAuditVisualStatus() {
     return this.http
       .get(`${this.uri}/auditMockStatus`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
 
-  getDetailsFromDb (guid: string) : Observable<AssetModel> {
+  getDetailsFromDb (guid: string): Observable<AssetModel> {
     const uri = `${this.uri}/byguid/${guid}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
@@ -40,7 +40,7 @@ export class AssetService {
       .catch(HttpUtil.handleError);
   }
 
-  getDetails(clusterId:string, assetId: string) : Observable<AssetDetails>{
+  getDetails(clusterId: string, assetId: string): Observable<AssetDetails> {
     const uri = `${this.uri}/details/${clusterId}/${assetId}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
@@ -48,63 +48,73 @@ export class AssetService {
       .catch(HttpUtil.handleError);
   }
 
-  startProfiling(clusterId:string, dbName:string, tableName:string) : Observable<any>{
+  startProfiling(clusterId: string, dbName: string, tableName: string): Observable<any> {
     const uri = `api/dpProfiler/startJob?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
       .post(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {
-        if(err.status == 404 || err.status == 405) return Observable.throw(err);
-        return HttpUtil.handleError(err)
+        if (err.status === 404 || err.status === 405) {
+          return Observable.throw(err);
+        }
+        return HttpUtil.handleError(err);
       });
 
   }
 
-  getProfilingStatus(clusterId:string, dbName:string, tableName:string) : Observable<any>{
+  getProfilingStatus(clusterId: string, dbName: string, tableName: string): Observable<any> {
     const uri = `api/dpProfiler/jobStatus?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {
-        if(err.status == 404 || err.status == 405) return Observable.throw(err);
-        return HttpUtil.handleError(err)
+        if (err.status === 404 || err.status === 405) {
+          return Observable.throw(err);
+        }
+        return HttpUtil.handleError(err);
       });
   }
 
-  getScheduleInfo(clusterId:number, datasetId:number) : Observable<any> {
+  getScheduleInfo(clusterId: number, datasetId: number): Observable<any> {
     const uri = `api/dpProfiler/scheduleStatus?clusterId=${clusterId}&dataSetId=${datasetId}`
         return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {
-        if(err.status == 404 || err.status == 405) return Observable.throw(err);
-        return HttpUtil.handleError(err)
+        if(err.status === 404 || err.status === 405) {
+          return Observable.throw(err);
+        }
+        return HttpUtil.handleError(err);
       });
   }
 
-  getProfilerAuditResults(clusterId:string, dbName:string, tableName:string, userName:string, dateModel:any) : Observable<any>{
-    const endDate = `${dateModel.endDate.year}-${dateModel.endDate.month}-${dateModel.endDate.day}`
-    const startDate = `${dateModel.beginDate.year}-${dateModel.beginDate.month}-${dateModel.beginDate.day}`
-    const uri = `api/dpProfiler/auditResults?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
+  getProfilerAuditResults(clusterId: string, dbName: string, tableName: string, userName: string, dateModel: any): Observable<any> {
+    const endDate = `${dateModel.endDate.year}-${dateModel.endDate.month}-${dateModel.endDate.day}`;
+    const startDate = `${dateModel.beginDate.year}-${dateModel.beginDate.month}-${dateModel.beginDate.day}`;
+    const uri = `api/dpProfiler/auditResults?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName ? ('&userName=' + userName) : ''}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {
-        if(err.status == 404 || err.status == 405 || err.status == 503 || err.status == 500) return Observable.throw(err);
-        return HttpUtil.handleError(err)
+        if (err.status === 404 || err.status === 405 || err.status === 503 || err.status === 500) {
+          return Observable.throw(err);
+        }
+        return HttpUtil.handleError(err);
       });
   }
 
-  getProfilerAuditActions(clusterId:string, dbName:string, tableName:string, userName:string, dateModel:any) : Observable<any>{
+  getProfilerAuditActions(clusterId: string, dbName: string, tableName: string, userName: string, dateModel: any): Observable<any> {
     const endDate = `${dateModel.endDate.year}-${dateModel.endDate.month}-${dateModel.endDate.day}`
     const startDate = `${dateModel.beginDate.year}-${dateModel.beginDate.month}-${dateModel.beginDate.day}`
-    const uri = `api/dpProfiler/auditActions?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
+    const uri = `api/dpProfiler/auditActions?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName ? ('&userName=' + userName) : ''}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {
-        if(err.status == 404 || err.status == 405 || err.status == 503 || err.status == 500) return Observable.throw(err);
-        return HttpUtil.handleError(err)
+        if (err.status === 404 || err.status === 405 || err.status === 503 || err.status === 500) {
+          return Observable.throw(err);
+        }
+        return HttpUtil.handleError(err);
       });
   }
 

@@ -137,3 +137,23 @@ $dialog-4x-width: 1380px;
   @extend  .load-right-to-left;
   @extend .dp-slider-pane-editable;
 }
+
+
+/* slide in summary pane */
+.dp-sidle-in-summary {
+  display: none;
+  min-width: 0px;
+  flex-direction: column;
+  margin-left: 0px;
+  -webkit-transition: min-width .8s ease;
+  -moz-transition: min-width .8s ease;
+  -o-transition: min-width .8s ease;
+  transition: min-width .8s ease;
+  -webkit-font-smoothing: antialiased;
+
+  &.show {
+    min-width: 280px;
+    margin-left: 10px;
+    display: block;
+  }
+}

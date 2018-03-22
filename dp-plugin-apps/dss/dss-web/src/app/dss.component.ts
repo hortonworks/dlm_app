@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
-import {ActivatedRoute} from '@angular/router';
 
 declare var require;
 
@@ -11,7 +10,7 @@ declare var require;
 })
 export class AppComponent {
 
-  constructor(private translateService: TranslateService){
+  constructor(private translateService: TranslateService) {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');

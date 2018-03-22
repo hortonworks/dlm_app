@@ -1,0 +1,93 @@
+@import "../../../../../../styles/variables";
+@import "../../../../../../styles/charts";
+
+.summary {
+  margin-bottom: 10px;
+
+  .charts-card {
+    display: flex;
+    flex-direction: row;
+
+    .icon-section {
+      margin-right: 15px;
+      font-size: 24px;
+      display: block;
+      line-height: 7px;
+    }
+
+    .text-section {
+      display: flex;
+      flex-direction: column;
+
+      .value {
+        font-weight: 400;
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+
+      .title {
+        color: $dusty-gray;
+        font-size: 10px;
+      }
+    }
+  }
+}
+
+dp-lineage {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.top-users {
+  margin-bottom: 10px;
+  .chart {
+    min-height: 360px;
+  }
+
+  .summary {
+    flex-basis: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 0px;
+
+    .charts-card {
+      height: 100px;
+      max-height: 100px;
+      padding: 10px 20px;
+      align-items: center;
+      margin: 0px;
+
+      .value {
+        font-size: 20px;
+      }
+
+      .title {
+        font-size: 12px;
+      }
+
+    }
+  }
+}
+
+.comparision-charts {
+  margin-bottom: 10px;
+  .bar {
+    height: 370px;
+    margin: 0px;
+    flex-grow: 100;
+  }
+
+  .pie {
+    flex-grow: 1;
+  }
+}
+
+.top-queries {
+  background: $white;
+  padding: 15px;
+}
+
+.mdl-data-table {
+  white-space: normal;
+}

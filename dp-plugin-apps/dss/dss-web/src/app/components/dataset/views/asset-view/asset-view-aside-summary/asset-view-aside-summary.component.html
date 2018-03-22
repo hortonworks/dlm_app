@@ -1,0 +1,85 @@
+<div class="container">
+  <img src="{{assetPrefix}}/assets/images/hive_table.png">
+  <div class="table-counts">
+    <div class="cards-summary">
+      <i class="fa fa-bars"></i>
+      <div class="value"> {{assetDetails.entity.attributes.parameters.numRows}} </div>
+      <div class="title">{{"pages.dataset.asset-view-overview.no-of-rows" | translate}} </div>
+    </div>
+    <div class="cards-summary">
+      <i class="fa fa-bars fa-rotate-90"></i>
+      <div class="value"> {{assetDetails.entity.attributes.columns.length}}  </div>
+      <div class="title">{{"pages.dataset.asset-view-overview.no-of-columns" | translate}} </div>
+    </div>
+  </div>
+
+  <div class="collapsible-pane">
+    <div class="collapsible-title" (click)="showProperties = !showProperties">
+      <i class="fa fa-angle-right" [ngClass]="{'fa-rotate-90': showProperties}"></i>
+      <span> {{"pages.dataset.asset-view-aside.table-properties" | translate}} </span>
+    </div>
+    <div class="properties" *ngIf="showProperties">
+      <div class="card-summary">
+        <div class="title"> {{"pages.dataset.asset-view-aside.owner" | translate}}</div>
+        <div class="value">{{assetDetails.entity.attributes.owner}}</div>
+      </div>
+      <div class="card-summary">
+        <div class="title"> {{"pages.dataset.asset-view-aside.qualified-name" | translate}}</div>
+        <div class="value">{{assetDetails.entity.attributes.qualifiedName}}</div>
+      </div>
+      <div class="card-summary">
+        <div class="title"> {{"pages.dataset.asset-view-aside.table-type" | translate}}</div>
+        <div class="value">{{assetDetails.entity.attributes.tableType}}</div>
+      </div>
+      <!--<div class="card-summary">-->
+        <!--<div class="title"> {{"pages.dataset.asset-view-aside.datalake" | translate}}</div>-->
+        <!--<div class="value"> USCluster001</div>-->
+      <!--</div>-->
+      <div class="card-summary">
+        <div class="title"> {{"pages.dataset.asset-view-aside.database" | translate}}</div>
+        <div class="value">{{assetDetails.entity.attributes.qualifiedName.split('.')[0]}}</div>
+      </div>
+      <div class="card-summary">
+        <div class="title"> {{"pages.dataset.asset-view-aside.created-on" | translate}}</div>
+        <div class="value">{{assetDetails.entity.createTime | date:'dd MMM yyyy'}}</div>
+      </div>
+      <div class="card-summary">
+        <div class="title"> {{"pages.dataset.asset-view-aside.last-modified" | translate}}</div>
+        <div class="value">{{assetDetails.entity.updateTime | date:'dd MMM yyyy'}}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="collapsible-pane">
+    <div class="collapsible-title" (click)="showTags = !showTags">
+      <i class="fa fa-angle-right" [ngClass]="{'fa-rotate-90': showTags}"></i>
+      <span> {{"pages.dataset.asset-view-aside.system-tags" | translate}} </span>
+    </div>
+    <div class="tags-wrapper" *ngIf="showTags">
+      <div class="asset-tags">
+        <span *ngFor="let tag of assetTags" class="tag system"> {{ tag.name }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="collapsible-pane">
+    <div class="collapsible-title" (click)="showProfilers = !showProfilers">
+      <i class="fa fa-angle-right" [ngClass]="{'fa-rotate-90': showProfilers}"></i>
+      <span> {{"pages.dataset.asset-view-aside.profilers" | translate}} </span>
+    </div>
+    <div class="profilers" *ngIf="showProfilers">
+      <div class="profilers-container">
+        <div class="profilers-card">
+          <div>
+            <div class="profilers-text"> Sensitive </div>
+            <div class="profilers-text"> Active </div>
+          </div>
+          <div class="text-right">
+            <div class="profilers-text"> Last Run </div>
+            <div class="profilers-text"> 12 min ago </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

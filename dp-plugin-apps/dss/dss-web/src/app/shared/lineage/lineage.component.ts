@@ -17,13 +17,15 @@ import {
   SimpleChanges,
   AfterViewInit,
   ElementRef,
-  HostListener
+  HostListener,
+  OnInit,
 } from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TypeDefs} from '../../models/type-defs';
 import {Observable} from 'rxjs/Rx';
 import {Lineage} from '../../models/lineage';
 import {AtlasService} from '../../services/atlas.service';
+import {DssAppEvents} from '../../services/dss-app-events';
 
 declare var d3: any;
 declare var dagreD3: any;
@@ -44,17 +46,18 @@ export class LineageComponent implements OnChanges, AfterViewInit {
   g: any;
   svg: any;
   zoom: any;
+  tooltip: any;
+  activeTip = false;
+  showLoader = false;
+  activeNode = false;
   typeMap: any = {};
   fromToObj: any = {};
-  showLoader = false;
+  showLineage = true;
   layoutRendered = false;
-  @ViewChild('graph') graph: ElementRef;
   asyncFetchCounter: number = 0;
   lineage: Lineage = new Lineage();
-  activeNode = false;
-  activeTip = false;
-  tooltip: any;
-  showLineage = true;
+
+  @ViewChild('graph') graph: ElementRef;
 
   readonly entityStateReadOnly = {
     'ACTIVE': false,
@@ -63,7 +66,18 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     'STATUS_DELETED': true
   };
 
-  constructor(private elementRef: ElementRef, private atlasService: AtlasService, private router: Router, private route: ActivatedRoute) {
+  constructor(private router: Router,
+              private elementRef: ElementRef,
+              private route: ActivatedRoute,
+              private atlasService: AtlasService,
+              private dssAppEvents: DssAppEvents) {}
+
+  reDraw(): void {
+    const svgEle = this.graph.nativeElement;
+    while (svgEle.hasChildNodes()) {
+      svgEle.removeChild(svgEle.lastChild);
+    }
+    this.initialize();
   }
 
   createGraph() {
