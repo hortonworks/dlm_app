@@ -70,7 +70,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
   private lazy val pathRegex =
     """(\/cluster\/)(\d+)(\/service\/)(\w+)\/(.*)""".r
 
-  private val enabledServices = config.getStringList("dp.services.hdp.proxy.services")
+  private val enabledServices = config.getStringList("dp.services.hdp_proxy.services")
 
   def valid(request: HttpRequest): Boolean = {
     pathRegex.pattern.matcher(request.uri.path.toString()).matches()

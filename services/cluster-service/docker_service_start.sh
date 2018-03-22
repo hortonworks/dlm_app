@@ -7,7 +7,7 @@ fi
 /usr/dp-cluster-service/bin/cluster-service \
     -Ddp.services.db.service.uri=http://dp-db-service:9000 \
     -Dconsul.host=${CONSUL_HOST} \
-    -Ddp.services.hdp.proxy.consul.host=${CONSUL_HOST} \
+    -Ddp.services.hdp_proxy.consul.host=${CONSUL_HOST} \
     -Ddp.keystore.path=${KEYSTORE_PATH} \
     -Ddp.keystore.password=${KEYSTORE_PASSWORD} \
     -Ddp.service.ambari.single.node.cluster=${SINGLE_NODE_CLUSTER} \

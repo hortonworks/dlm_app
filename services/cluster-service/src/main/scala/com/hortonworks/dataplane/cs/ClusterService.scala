@@ -40,7 +40,7 @@ object ClusterService extends App {
   proxy.init.onComplete { _ =>
     logger.info("Proxy server started, Setting up service registry")
     // load the proxy configuration
-    val proxyConfig = configuration.getConfig("dp.services.hdp.proxy")
+    val proxyConfig = configuration.getConfig("dp.services.hdp_proxy")
 
     val registrar = new ApplicationRegistrar(
       proxyConfig,
@@ -68,7 +68,7 @@ object ClusterService extends App {
         // Service registered now, override the db service endpoint
         val map = new util.HashMap[String, String]()
         map.put("dp.services.db.service.uri", configuration.getString("dp.services.db.service.path"))
-        map.put("dp.services.proxy.service.uri", configuration.getString("dp.services.hdp.proxy.service.path"))
+        map.put("dp.services.hdp_proxy.service.uri", configuration.getString("dp.services.hdp_proxy.service.path"))
         val gateway = new Gateway(configuration, map, Optional.of(this))
         gateway.initialize()
 

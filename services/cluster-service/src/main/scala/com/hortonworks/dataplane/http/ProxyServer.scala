@@ -29,8 +29,8 @@ class ProxyServer @Inject()(private val actorSystem: ActorSystem,
                             private val routes:Route ) {
 
   private implicit val dispatcher = actorSystem.dispatcher
-  private val port = Try(config.getInt("dp.services.hdp.proxy.port")).getOrElse(9010)
-  private val host = Try(config.getString("dp.services.hdp.proxy.host")).getOrElse("0.0.0.0")
+  private val port = Try(config.getInt("dp.services.hdp_proxy.port")).getOrElse(9010)
+  private val host = Try(config.getString("dp.services.hdp_proxy.host")).getOrElse("0.0.0.0")
 
   def init = {
     implicit val system = actorSystem
