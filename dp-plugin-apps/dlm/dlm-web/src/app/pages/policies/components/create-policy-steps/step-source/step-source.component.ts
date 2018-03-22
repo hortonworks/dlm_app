@@ -19,7 +19,14 @@ import { CloudAccount } from 'models/cloud-account.model';
 import { Cluster } from 'models/cluster.model';
 import { StepComponent } from 'pages/policies/components/create-policy-wizard/step-component.type';
 import { FormGroup, Validators, FormBuilder, AbstractControl } from '@angular/forms';
-import { POLICY_TYPES, WIZARD_STEP_ID, SOURCE_TYPES, SOURCE_TYPES_LABELS} from 'constants/policy.constant';
+import {
+  POLICY_TYPES,
+  WIZARD_STEP_ID,
+  SOURCE_TYPES,
+  SOURCE_TYPES_LABELS,
+  AWS_ENCRYPTION,
+  AWS_ENCRYPTION_LABELS
+} from 'constants/policy.constant';
 import { getStep } from 'selectors/create-policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs/Subscription';
@@ -44,10 +51,11 @@ import { HiveService } from 'services/hive.service';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { filterClustersByTDE } from 'utils/cluster-util';
 import { SERVICES } from 'constants/cluster.constant';
-import { uniqBy, contains } from 'utils/array-util';
+import { uniqBy, contains, without } from 'utils/array-util';
 import { loadBeaconConfigStatus } from 'actions/beacon.action';
 import { StepGeneralValue } from 'models/create-policy-form.model';
 import { UnderlyingFsForHive } from 'models/beacon-config-status.model';
+import { SelectOption } from 'components/forms/select-field';
 
 const DATABASE_REQUEST = '[StepSourceComponent] DATABASE_REQUEST';
 
@@ -101,9 +109,9 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
    *
    * @type {string[]}
    */
-  s3Fields = ['cloudAccount', 's3endpoint'];
+  s3Fields = ['cloudAccount', 's3endpoint', 'cloudEncryption', 'cloudEncryptionKey'];
 
-  get sourceType() {
+  get sourceType(): SOURCE_TYPES {
     return this.form.value.source.type;
   }
 
@@ -154,6 +162,23 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
     return this.isHivePolicy() ? [cluster] : [s3, cluster];
   }
 
+  get cloudEncryptionOptions(): SelectOption[] {
+    const sourceType = this.form.get('source.type').value;
+    const makeOption = (value, label): SelectOption => ({label, value});
+    const none: SelectOption = {value: null, label: 'None'};
+    const optionsMap: {[sourceType: string]: SelectOption[]} = {
+      [SOURCE_TYPES.S3]: [
+        makeOption(AWS_ENCRYPTION.SSE_S3, AWS_ENCRYPTION_LABELS[AWS_ENCRYPTION.SSE_S3]),
+        makeOption(AWS_ENCRYPTION.SSE_KMS, AWS_ENCRYPTION_LABELS[AWS_ENCRYPTION.SSE_KMS])
+      ]
+    };
+    return [].concat.apply([none], sourceType === SOURCE_TYPES.CLUSTER ? [] : optionsMap[sourceType] || []);
+  }
+
+  get shouldShowEncryptionKey(): boolean {
+    return this.sourceType === SOURCE_TYPES.S3 && this.form.get('source.cloudEncryption').value === AWS_ENCRYPTION.SSE_KMS;
+  }
+
   constructor(
     private store: Store<State>,
     private formBuilder: FormBuilder,
@@ -173,7 +198,9 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
         s3endpoint: ['', Validators.required],
         databases: ['', Validators.required],
         directories: ['', Validators.required],
-        datasetEncrypted: [false]
+        datasetEncrypted: [false],
+        cloudEncryption: [null],
+        cloudEncryptionKey: [null, Validators.required]
       })
     });
   }
@@ -203,6 +230,7 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
     this.subscribeToSourceCluster();
     this.setupDatabaseChanges(this.form);
     this.setupSourceEncryptionUpdate(this.form);
+    this.subscribeToCloudEncryption(this.form);
     this.subscriptions.push(formSubscription);
   }
 
@@ -275,8 +303,8 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
       this.store.dispatch(wizardResetStep(WIZARD_STEP_ID.DESTINATION));
       let toEnable = [], toDisable = [];
       if (type === this.SOURCE_TYPES.S3) {
-        toEnable = this.s3Fields;
-        toDisable = this.clusterFields.concat(this.hdfsFields, this.hiveFields);
+        toEnable = without(this.s3Fields, 'cloudEncryptionKey');
+        toDisable = this.clusterFields.concat(this.hdfsFields, this.hiveFields, ['cloudEncryptionKey']);
       }
       if (type === this.SOURCE_TYPES.CLUSTER) {
         toEnable = this.clusterFields.concat(this.general.type === POLICY_TYPES.HDFS ? this.hdfsFields : this.hiveFields);
@@ -371,6 +399,18 @@ export class StepSourceComponent implements OnInit, AfterViewInit, OnDestroy, St
       form.patchValue({source: {datasetEncrypted: isEncrypted}});
     });
     this.subscriptions.push(updateEncryptionValue);
+  }
+
+  private subscribeToCloudEncryption(form: FormGroup): void {
+    const cloudEncryptionChanges$: Observable<AWS_ENCRYPTION> = form.get('source.cloudEncryption').valueChanges.distinctUntilChanged();
+    const updateEncryptionKeyAccess = cloudEncryptionChanges$.subscribe(value => {
+      if (value === AWS_ENCRYPTION.SSE_KMS) {
+        form.get('source.cloudEncryptionKey').enable();
+      } else {
+        form.get('source.cloudEncryptionKey').disable();
+      }
+    });
+    this.subscriptions.push(updateEncryptionKeyAccess);
   }
 
   private hasPair(cluster: Cluster, pairings: Pairing[]): boolean {

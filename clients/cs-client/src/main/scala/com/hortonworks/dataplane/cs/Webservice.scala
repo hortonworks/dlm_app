@@ -155,6 +155,10 @@ object Webservice {
 
     def getProfilersJobs (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject]
 
+    def putProfilerState (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject]
+
+    def getProfilersHistories (clusterId: String, queryString: String) (implicit token:Option[HJwtToken]) : Future[JsObject]
+
   }
 
 

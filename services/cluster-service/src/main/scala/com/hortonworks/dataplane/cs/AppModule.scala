@@ -287,6 +287,8 @@ object AppModule extends AbstractModule {
         dpProfilerRoute.getProfilersStatusWithJobSummary ~
         dpProfilerRoute.getProfilersStatusWithAssetsCount ~
         dpProfilerRoute.getProfilersJobsStatus ~
+        dpProfilerRoute.putProfilerState ~
+        dpProfilerRoute.getProfilersHistories ~
         atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~
