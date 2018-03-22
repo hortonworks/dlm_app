@@ -210,4 +210,32 @@ class DpProfilerAttributes @Inject()(
     }
   }
 
+  def putProfilerState(clusterId: String) = {
+    AuthenticatedAction.async { req =>
+      val queryString = req.rawQueryString
+      Logger.info(s"Received putProfilerState for clusterId - $clusterId with query params - $queryString")
+      implicit val token = req.token
+      dpProfilerService
+        .putProfilerState(clusterId, queryString)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
+  def getProfilerHistories(clusterId: String) = {
+    AuthenticatedAction.async { req =>
+      val queryString = req.rawQueryString
+      Logger.info(s"Received getProfilerHistories for clusterId - $clusterId with query params - $queryString")
+      implicit val token = req.token
+      dpProfilerService
+        .getProfilersHistories(clusterId, queryString)
+        .map(jsObj => Ok(Json.toJson(jsObj)))
+        .recoverWith({
+          case e: Exception => Future.successful(InternalServerError(Json.toJson(e.getMessage)))
+        })
+    }
+  }
+
 }

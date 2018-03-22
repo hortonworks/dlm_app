@@ -71,4 +71,23 @@ export class ProfilerService {
       .map(res=>res.data)
       .catch(HttpUtil.handleError);
   }
+
+  putProfilerState(clusterId:number, name:string, state:boolean) : Observable<any> {
+    const uri = `/api/dpProfiler/${clusterId}/profilerinstances/state?name=${name}&active=${state}`;
+    return this.http
+      .put(uri, {}, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(res=>res.data)
+      .catch(HttpUtil.handleError);
+  }
+
+  getProfilerHistories(clusterId:number, name:string, startTime:number, endTime:number) : Observable<any> {
+    const uri = `/api/dpProfiler/${clusterId}/histories?profilerName=${name}&startTime=${startTime}&endTime=${endTime}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(res=>res.data)
+      .catch(HttpUtil.handleError);
+  }
+
 }

@@ -223,6 +223,18 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val putProfilerState =
+    path("cluster" / LongNumber / "dp-profiler" / "profilerinstances" / "state" ) { (clusterId: Long) =>
+      extractRequest { request =>
+        put {
+          val queryString = request.uri.queryString()
+          onComplete(putOnProfiler(clusterId, "/profilerinstances/state", queryString.getOrElse(""))) {
+            case res => mapResponse(res)
+          }
+        }
+      }
+    }
+
   val getProfilersStatusWithJobSummary =
     path("cluster" / LongNumber / "dp-profiler" / "status" / "jobs-summary") { clusterId =>
       extractRequest { request =>
@@ -259,6 +271,18 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val getProfilersHistories =
+    path("cluster" / LongNumber / "dp-profiler" / "histories") { clusterId =>
+      extractRequest { request =>
+        get {
+          val queryString = request.uri.queryString()
+          onComplete(getFromProfiler(clusterId, "/assetjobhistories/assetcounts", queryString.getOrElse(""))) {
+            case res => mapResponse(res)
+          }
+        }
+      }
+    }
+
   private def mapResponse(resposneTry: Try[WSResponse]) = {
     resposneTry match {
       case Success(res) => res.status match {
@@ -284,6 +308,20 @@ class DpProfilerRoute @Inject()(
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json")
         .get()
+    } yield {
+      response
+    }
+  }
+
+  private def putOnProfiler(clusterId: Long, uriPath:String, queryString: String): Future[WSResponse] = {
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}${uriPath}?$queryString")
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json")
+        .put(Json.obj())
     } yield {
       response
     }
