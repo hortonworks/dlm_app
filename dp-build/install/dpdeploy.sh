@@ -513,11 +513,11 @@ migrate_configurations()
                 ;;
                 RENAME)
                     echo "Renaming config $key to $value"
-                    $(sed -i.tmp "s|$key|$value|g" "$config_file")
+                    $(sed -i.tmp "s|^$key=|$value|g" "$config_file")
                 ;;
                 REMOVE)
                     echo "Removing config $key (No longer supported)"
-                    line_number=$(grep -n "$key"  "$config_file" | head -n 1 | cut -d: -f1)
+                    line_number=$(grep -n "^$key="  "$config_file" | head -n 1 | cut -d: -f1)
                     $(sed -i.tmp ""${line_number}"d" "$config_file")
                 ;;
                 *)
