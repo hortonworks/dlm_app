@@ -1,0 +1,302 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="form-container">
+  <form class="basic-form policy-form" [formGroup]="form">
+    <div class="container-fluid">
+      <div class="row">
+        <fieldset formGroupName="destination">
+          <div class="col-xs-12 form-section">
+            <!-- DESTINATION TYPE -->
+            <div class="row">
+              <div class="col-xs-6">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.destination_type' | translate"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]=""
+                  [required]="true">
+                  <dlm-select-field
+                    qe-attr="policy-destination-type"
+                    formField
+                    formControlName="type"
+                    [options]="destinationTypes"
+                    [value]="destinationType">
+                  </dlm-select-field>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- DESTINATION TYPE END -->
+
+            <!-- DESTINATION CLUSTER -->
+            <div class="row">
+              <div class="col-xs-6" *ngIf="isClusterType">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.destinationCluster.self' | translate"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]=""
+                  [required]="true">
+                  <dlm-select-field
+                    qe-attr="policy-destination-cluster"
+                    formField
+                    formControlName="cluster"
+                    [options]="destinationClusters"
+                    [value]="destinationCluster">
+                    <ng-template selectFieldDropdown let-showMenu="showMenu" let-options="options" let-dropdownActionEmitter="dropdownActionEmitter">
+                      <ul class="select-field-option-list select-field-options-wrapper list-unstyled" *ngIf="showMenu">
+                        <li class="select-field-option-item" *ngFor="let option of options"
+                            [ngClass]="{'disabled text-muted': isOptionDisabled(option)}"
+                            [tooltip]="getTooltip(option)"
+                            container="body"
+                            (click)="dropdownClickHandler(option, dropdownActionEmitter)">
+                          <div [attr.qe-attr]="option.value">
+                            {{option.label.display}}
+                          </div>
+                        </li>
+                      </ul>
+                    </ng-template>
+                    <ng-template selectFieldValue let-value="value" let-label="label">
+                      <div>
+                        {{label.display || value || ('common.none' | translate)}}
+                      </div>
+                    </ng-template>
+                  </dlm-select-field>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- DESTINATION CLUSTER END -->
+
+            <!-- DESTINATION PATH -->
+            <div class="row">
+              <div class="col-xs-6" [hidden]="!shouldShowDestination">
+                <dlm-form-field
+                  [label]="destinationPathLabel"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]="'col-xs-12'"
+                  [required]="true">
+                  <div class="has-feedback">
+                    <input
+                      qe-attr="policy-destination-path"
+                      formField
+                      class="form-control"
+                      [readonly]="destinationPathDisabled"
+                      formControlName="path">
+                    <span class="form-control-feedback fa fa-spin fa-spinner" *ngIf="form.get('destination.path').pending | debounce:1000"></span>
+                  </div>
+                  <dlm-field-error *ngIf="form.get('destination.path').hasError('encryption')">
+                    {{'page.policies.form.fields.destinationCluster.errors.encryption' | translate}}
+                  </dlm-field-error>
+                  <dlm-field-error *ngIf="isHivePolicy && form.get('destination.path').hasError('invalidName')">
+                    {{'page.policies.form.fields.destinationCluster.errors.invalid_db_name' | translate}}
+                  </dlm-field-error>
+                  <dlm-field-error *ngIf="isHivePolicy && isSourceEncrypted && isHiveCloudNotEncrypted" [isWarning]="true" [isError]="false">
+                    {{'page.policies.form.fields.destinationCluster.warnings.db_encryption' | translate}}
+                  </dlm-field-error>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- DESTINATION PATH END -->
+
+            <!-- DESTINATION TDE KEY -->
+            <div class="row" *ngIf="shouldShowTDEKey">
+              <div class="col-xs-6">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.destinationCluster.tdeKey' | translate"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]="'col-xs-12'">
+                  <dlm-radio-button qe-attr="policy-destination-tde-type"
+                    formField
+                    [items]="tdeOptions"
+                    formControlName="tdeKey">
+                  </dlm-radio-button>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- DESTINATION TDE KEY END -->
+
+            <!-- DESTINATION S3 PATH FOR HIVE -->
+            <div class="row" *ngIf="shouldShowS3Endpoint && shouldPrepopulateHivePath">
+              <div class="col-xs-6">
+                <div class="dlm-field-label">
+                  <label>{{'page.policies.form.fields.s3.endpoint' | translate}}</label>
+                  <p class="s3endpoint-readonly">
+                        <span [tooltip]="form.value.destination.s3endpoint" qe-attr="destinationS3endpoint">
+                          {{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}:// {{form.value.destination.s3endpoint}}
+                        </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- DESTINATION S3 PATH FOR HIVE END -->
+
+            <!-- DESTINATION CLOUD ACCOUNT -->
+            <div class="row">
+              <div class="col-xs-6" *ngIf="isCloudReplication">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.s3.account' | translate"
+                  [required]="true"
+                  [fieldClass]="'col-xs-12'"
+                  [errorClass]="">
+                  <dlm-select-field
+                    qe-attr="destination-cloud-account"
+                    formField
+                    formControlName="cloudAccount"
+                    [options]="destinationCloudAccounts"
+                    [value]="destinationCloudAccount">
+                  </dlm-select-field>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- DESTINATION CLOUD ACCOUNT END -->
+
+            <div class="row" *ngIf="shouldShowTDEWarning">
+              <div class="col-xs-6">
+                <div class="alert alert-warning alert-small flex-center">
+                  <div class="pull-left">
+                    <i class="fa fa-exclamation-triangle text-warning"></i>
+                  </div>
+                  <div class="pull-left mlm">
+                    <div>{{'page.policies.form.fields.destinationCluster.tde_warning.title' | translate}}</div>
+                    <small>{{'page.policies.form.fields.destinationCluster.tde_warning.body' | translate}}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- DESTINATION S3 ENDPOINT -->
+            <div class="row" *ngIf="shouldShowS3Endpoint && !shouldPrepopulateHivePath">
+              <div class="col-xs-6">
+                <dlm-form-field
+                  [label]="'page.policies.form.fields.s3.endpoint' | translate"
+                  [errorClass]="'col-xs-12'"
+                  [fieldClass]="'col-xs-12'"
+                  [required]="true">
+                  <div class="input-group">
+                    <div class="input-group-addon">{{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}://</div>
+                    <input
+                      type="text"
+                      class="form-control s3endpoint"
+                      qe-attr="destinationS3endpoint"
+                      formField
+                      formControlName="s3endpoint"/>
+                  </div>
+                </dlm-form-field>
+              </div>
+            </div>
+            <!-- DESTINATION S3 ENDPOINT END -->
+
+            <!-- CLOUD ENCRYPTION -->
+            <div class="row">
+              <div class="col-xs-6" *ngIf="isCloudReplication && form.get('destination.cloudAccount').value">
+                <dlm-form-field
+                  *ngIf="!(isHivePolicy && isCloudReplication); else rawInput"
+                  [label]="'page.policies.form.fields.encryption_type' | translate"
+                  [errorClass]="'col-xs-12'"
+                  [fieldClass]="'col-xs-12'"
+                  [required]="isSourceEncrypted">
+                  <dlm-select-field
+                    qe-attr="destination-source-cloud-encryption"
+                    formField
+                    formControlName="cloudEncryption"
+                    [options]="cloudEncryptionOptions">
+                  </dlm-select-field>
+                </dlm-form-field>
+                <ng-template #rawInput>
+                  <dlm-form-field
+                    [label]="'page.policies.form.fields.encryption_type' | translate"
+                    [fieldClass]="'col-xs-12'">
+                    <input
+                      readonly
+                      type="text"
+                      class="form-control readonly-input"
+                      qe-attr="destination-source-cloud-encryption"
+                      formField
+                      formControlName="cloudEncryption"/>
+                  </dlm-form-field>
+                </ng-template>
+              </div>
+            </div>
+            <!-- CLOUD ENCRYPTION END -->
+
+            <!-- CLOUD ENCRYPTION KEY -->
+            <div class="row">
+              <div class="col-xs-6" *ngIf="shouldShowEncryptionKey && form.get('destination.cloudAccount').value">
+                <dlm-form-field
+                  *ngIf="!(isHivePolicy && isCloudReplication); else rawEncryptionKeyInput"
+                  [label]="'page.policies.form.fields.encryption_key_id' | translate"
+                  [errorClass]="'col-xs-12'"
+                  [fieldClass]="'col-xs-12'"
+                  [required]="true">
+                  <input
+                    type="text"
+                    class="form-control"
+                    qe-attr="destination-encryption-key-id"
+                    formField
+                    formControlName="cloudEncryptionKey"/>
+                </dlm-form-field>
+                <ng-template #rawEncryptionKeyInput>
+                  <dlm-form-field
+                    *ngIf="form.get('destination.cloudEncryptionKey').value"
+                    [label]="'page.policies.form.fields.encryption_key_id' | translate"
+                    [fieldClass]="'col-xs-12'">
+                    <input
+                      readonly
+                      type="text"
+                      class="form-control readonly-input"
+                      qe-attr="destination-encryption-key-id"
+                      formField
+                      formControlName="cloudEncryptionKey"/>
+                  </dlm-form-field>
+                </ng-template>
+              </div>
+            </div>
+            <!-- CLOUD ENCRYPTION KEY END -->
+
+            <!-- SKIP VALIDATION CHECKBOX AND VALIDATE BUTTON -->
+            <div class="row" *ngIf="formIsFilled && (isCloudType || !isDestination10)">
+              <div class="col-xs-12">
+                <dlm-checkbox [disabled]="validationInProgress" formControlName="skipValidation">
+                  {{'page.policies.form.fields.destinationCluster.skipValidation' | translate}}
+                </dlm-checkbox>
+                <button
+                  [disabled]="form.get('destination.skipValidation').value || validationInProgress"
+                  type="button"
+                  class="btn btn-success"
+                  qe-attr="validate-policy"
+                  (click)="validate()">
+                  &nbsp;{{"page.policies.form.validateBtn" | translate}} <i *ngIf="validationInProgress" class="fa fa-fw fa-spinner fa-spin"></i>
+                  <i class="glyphicon glyphicon-ok" *ngIf="form.get('destination.validationStatus').value && !validationInProgress"></i>
+                </button>
+                <div *ngIf="form.get('destination.validationPerformed').value && !form.get('destination.skipValidation').value && !validationInProgress">
+                  <div *ngIf="!form.get('destination.validationStatus').value">
+                    <dlm-field-error>{{validationMessage}}</dlm-field-error>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- SKIP VALIDATION CHECKBOX AND VALIDATE BUTTON END -->
+
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </form>
+</div>

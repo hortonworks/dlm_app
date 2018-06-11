@@ -1,0 +1,98 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<dlm-table
+  [rowDetailHeight]="550"
+  [rowDetailTemplate]="rowDetailRef"
+  [theme]="tableTheme"
+  [columns]="columns"
+  [columnMode]="columnMode"
+  [footerOptions]="tableFooterOptions"
+  [rows]="clusters">
+</dlm-table>
+
+<ng-template #statusCell let-status="value" let-cluster="row" let-index="rowIndex">
+  <span>
+    <dlm-cluster-status-icon [cluster]="cluster" [attr.qe-attr]="'cluster-status-icon-' + index" ></dlm-cluster-status-icon>
+    <span [innerHtml]="status" [attr.qe-attr]="'cluster-status-' + index" ></span>
+  </span>
+</ng-template>
+
+<ng-template #slashIconCell>
+  <span class="slash">&#47;</span>
+</ng-template>
+
+<ng-template #nameCell let-name="value" let-cluster="row" let-index="rowIndex">
+  <span class="cluster-name" [attr.qe-attr]="'cluster-name-' + index">{{name}}</span>
+</ng-template>
+
+<ng-template #dcCell let-name="value" let-cluster="row" let-index="rowIndex">
+  <span class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + index" >{{name}}</span>
+</ng-template>
+
+<ng-template let-stats="value" let-cluster="row" #usageCell let-expanded="expanded" let-index="rowIndex">
+  <div class="cell-content"
+       [ngClass]="setStatsClass(cluster)"
+       [attr.qe-attr]="'cluster-details-' + index" (click)="toggleClusterDetails(cluster)">
+    <span [innerHTML]="getCapacityUsed(stats)"></span> / <span [innerHTML]="getCapacityTotal(stats)"></span>
+    <i *ngIf="!isHDFSDisabled(cluster)" [ngClass]="{fa: true, 'fa-chevron-down': !expanded, 'fa-chevron-up': expanded}"></i>
+  </div>
+</ng-template>
+
+<ng-template let-value="value" let-column="column" let-row="row" let-index="rowIndex" #plainCell>
+  <span *ngIf="value || value === 0; else emptyValue" class="cell-content" [attr.qe-attr]="column['qeAttrName'] + '-' + index">{{value}}</span>
+  <ng-template #emptyValue>
+    <span [attr.qe-attr]="column['qeAttrName'] + '-' + index">
+      <i class="fa fa-minus"></i>
+    </span>
+  </ng-template>
+</ng-template>
+
+<ng-template let-location="value" let-cluster="row" let-index="rowIndex" #locationCell>
+  <span [attr.qe-attr]="'cluster-location-' + index" >{{location.city}}, {{location.country}}</span>
+</ng-template>
+
+<ng-template let-cluster="row" let-index="rowIndex" #addActionsCell>
+  <dlm-cluster-actions
+    [attr.qe-attr]="'cluster-actions-' + index"
+    [rowId]="cluster.id"
+    [cluster]="cluster"
+    [clusterActions]="clusterActions"
+    [clustersLength]="clusters.length"
+    [availableActions]="availableActions"
+    (handler)="handleSelectedAction($event)">
+  </dlm-cluster-actions>
+</ng-template>
+
+<ng-template let-cluster="row" let-index="rowIndex" ngx-datatable-row-detail-template #rowDetailRef>
+  <div class="row">
+    <div class="col col-xs-12">
+      <dlm-hdfs-browser
+        [attr.qe-attr]="'cluster-actions-hdfs-browser' + index"
+        [rootPath]="hdfsRootPath"
+        [cluster]="cluster"
+        [page]="getFileBrowserPageForRow(cluster.id)"
+        (changePage)="handleFileBrowserPageChange($event, cluster.id)"
+        (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
+    </div>
+  </div>
+</ng-template>

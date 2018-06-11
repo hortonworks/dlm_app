@@ -1,0 +1,166 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="form-container">
+  <form class="basic-form add-cloud-form" [formGroup]="addCloudForm">
+    <div class="container-fluid">
+      <div class="row">
+        <div *ngIf="errorMessage" qe-attr="add-form-error" class="alert alert-danger" role="alert">
+          {{errorMessage}}
+        </div>
+        <div class="form-section col-xs-12">
+          <dlm-form-field
+            [label]="'page.cloud_stores.content.accounts.add.provider' | translate"
+            [fieldClass]="fieldClass"
+            [errorClass]="fieldClass">
+            <dlm-select-field [class.hidden]="isEditMode" qe-attr="add-cloud-store-cloud-provider-type" formField
+                              formControlName="cloudProviderType" [options]="cloudProviderOptions" [value]="cloudProviderType">
+            </dlm-select-field>
+            <div *ngIf="isEditMode" qe-attr="add-cloud-store-cloud-provider-type-read-only" class="add-cloud-store-read-only">
+              {{CLOUD_PROVIDER_LABELS[account?.accountDetails?.provider]}}</div>
+          </dlm-form-field>
+          <dlm-form-field
+            [label]="'page.cloud_stores.content.accounts.add.name.label' | translate"
+            [inlineError]="true"
+            [fieldClass]="fieldClass"
+            [errorClass]="fieldClass"
+            [required]="!isEditMode">
+            <input type="text" class="form-control" [class.hidden]="isEditMode" [placeholder]="'page.cloud_stores.content.accounts.add.name.placeholder' | translate"
+                   qe-attr="add-cloud-store-credential-name" formField formControlName="credentialName" maxlength="32"/>
+            <dlm-field-error *ngIf="addCloudForm.get('credentialName').hasError('uniqValidator')">
+              {{'forms.validation_errors.credValidator' | translate}}
+            </dlm-field-error>
+            <div *ngIf="isEditMode" qe-attr="add-cloud-store-credential-name-read-only" class="add-cloud-store-read-only">
+              {{account?.id}}</div>
+          </dlm-form-field>
+          <dlm-form-field
+            [label]="'page.cloud_stores.content.accounts.add.auth_type.label' | translate"
+            [fieldClass]="fieldClass"
+            [errorClass]="fieldClass"
+            [inlineError]="true">
+            <dlm-select-field qe-attr="add-cloud-store-credential-type" [disabled]="authTypeDisabled" formField formControlName="authType"
+                              [options]="authenticationTypeOptions" [value]="authType">
+            </dlm-select-field>
+          </dlm-form-field>
+          <dlm-form-field *ngIf="isS3AccessKeyAuthType"
+            [label]="'page.cloud_stores.content.accounts.add.access_key.label' | translate"
+            [inlineError]="true"
+            [fieldClass]="fieldClass"
+            [errorClass]="fieldClass"
+            [required]="true">
+            <input type="text" class="form-control" [placeholder]="'page.cloud_stores.content.accounts.add.access_key.placeholder' | translate"
+                   [attr.disabled]="isInputDisabled()" qe-attr="cloud-store-access-key" formField formControlName="accessKey" />
+            <span *ngIf="isValidationSuccess" class="glyphicon glyphicon-ok text-success status-icon form-control-feedback"></span>
+            <span *ngIf="addCloudForm.get('accessKey').hasError('wrongCredentials')" class="glyphicon glyphicon-remove status-icon form-control-feedback"></span>
+            <dlm-field-error *ngIf="addCloudForm.get('accessKey').hasError('wrongCredentials')">
+              {{'forms.validation_errors.invalid_credentials' | translate}}
+            </dlm-field-error>
+          </dlm-form-field>
+          <dlm-form-field *ngIf="isS3AccessKeyAuthType"
+            [label]="'page.cloud_stores.content.accounts.add.secret_key.label' | translate"
+            [fieldClass]="fieldClass"
+            [errorClass]="fieldClass"
+            [inlineError]="true"
+            [required]="true">
+            <div class="row">
+              <div class="col-md-9">
+                <input
+                  class="form-control"
+                  [type]="secretKeyInputType"
+                  [placeholder]="'page.cloud_stores.content.accounts.add.secret_key.placeholder' | translate"
+                  [attr.disabled]="isInputDisabled()"
+                  qe-attr="cloud-store-secret-key"
+                  formField
+                  formControlName="secretKey"/>
+                <span *ngIf="isValidationSuccess"
+                      class="glyphicon glyphicon-ok text-success status-icon form-control-feedback"></span>
+                <span *ngIf="addCloudForm.get('secretKey').hasError('wrongCredentials')"
+                      class="glyphicon glyphicon-remove status-icon form-control-feedback"></span>
+              </div>
+              <div class="col-md-3">
+                <button class="btn btn-default pull-right" type="button" (click)="toggleSecretKeyInputType()"><i class="fa fa-eye"></i></button>
+              </div>
+            </div>
+            <dlm-field-error *ngIf="addCloudForm.get('secretKey').hasError('wrongCredentials')">
+              {{'forms.validation_errors.invalid_credentials' | translate}}
+            </dlm-field-error>
+          </dlm-form-field>
+          <div *ngIf="isValidationSuccess">
+            <dlm-form-field
+              [fieldClass]="fieldClass"
+              [errorClass]="fieldClass"
+              [label]="'page.cloud_stores.content.accounts.iam_username' | translate">
+              <input type="hidden" qe-attr="add_cloud_username_input" formField formControlName="userName" />
+              <span qe-attr="add_cloud_username">{{addCloudForm.get('userName').value}}</span>
+            </dlm-form-field>
+            <dlm-form-field
+              [fieldClass]="fieldClass"
+              [errorClass]="fieldClass"
+              [label]="'page.cloud_stores.content.accounts.aws_account_id' | translate">
+              <input type="hidden" qe-attr="add_cloud_account_id_input" formField formControlName="accountId" />
+              <span qe-attr="add_cloud_account_id">{{addCloudForm.get('accountId').value}}</span>
+            </dlm-form-field>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-footer col-xs-12">
+          <div class="footer-controls pull-right">
+            <button qe-attr="cancel-add-cloud-form" type="button"
+                    class="btn btn-default"
+                    (click)="cancelButtonHandler()">
+              {{'common.cancel' | translate}}
+            </button>
+            <button *ngIf="!(isValidationSuccess || isIamRoleAuthType)"
+                    qe-attr="validate-cloud-connection-btn"
+                    type="button"
+                    [disabled]="isValidationInProgress || !canValidate"
+                    class="btn btn-success"
+                    (click)="validateButtonHandler(addCloudForm)">
+              <span *ngIf="!isValidationInProgress; else validating;">
+                {{'page.cloud_stores.content.accounts.add.validate' | translate}}
+              </span>
+            </button>
+            <button *ngIf="isValidationSuccess || isIamRoleAuthType"
+                    qe-attr="save-cloud-btn"
+                    type="submit"
+                    [disabled]="isSaveButtonDisabled"
+                    class="btn btn-success"
+                    (click)="saveButtonHandler()">
+              <span *ngIf="!isSaveInProgress; else saving;">
+                {{(isEditMode ? 'common.update' : 'common.save') | translate}}
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<ng-template #validating>
+  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>{{'page.cloud_stores.content.accounts.add.validating' | translate}}
+</ng-template>
+<ng-template #saving>
+  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+  {{(isEditMode ? 'common.updating' : 'common.saving') | translate}}
+</ng-template>

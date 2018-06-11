@@ -1,0 +1,76 @@
+/*!
+ * HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+ *
+ * (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+ *
+ * This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+ * of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+ * authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+ * an authorized and properly licensed third party, you do not have any rights to this code.
+ *
+ * If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+ * WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+ * RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+ * OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+ * TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+ * DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+ * OR LOSS OR CORRUPTION OF DATA.
+ */
+
+//Colors
+$primary-color: #3FAE2A;
+$success-color: #1EB475;
+$warning-color: #E98A40;
+$hdfs-hexagon-color: #662d91;
+$hive-hexagon-color: #00697c;
+$alert-color: #EF6162;
+$link-color: #1491C1;
+$black-color: #333;
+$grey-color: #666;
+$light-grey: #CFD3D7;
+$lighter-grey: #EEE;
+$secondary-font-color: #676767;
+$white-color: #FFF;
+$number-color: #CCC;
+$background-color: #53646A;
+$graph-color: #E5E7E6;
+$default-table-border: #DDD;
+$table-row-hover: #E7F6FC;
+$table-row-hover-border: #A7DFF2;
+$table-row-active: #EEE;
+$table-header: #999;
+$modal-backdrop: #808080;
+$navigation-header-bg: #313d54;
+$navigation-header-hover: #304e73;
+//Fonts
+$roboto-font: 'Roboto', sans-serif;
+//Sizes
+$modal-padding: 20px;
+$row-padding: 15px; // padding size used by bootstrap for .row
+$text-large-size: 16px;
+
+$body-background: #ececec;
+
+$header-height: 55px;
+$oxford-blue: #333F54;
+$logo-background: $oxford-blue;
+$side-nav-width: 200px;
+$side-nav-minimised-width: 50px;
+$eastern-blue : #2192bf;
+$tuna: #323544;
+$pickled-bluewood: #303D54;
+$forest-green-1: #3FAE2A;
+$logo-icon: #1491C1;
+$popup-font: #6e6f72;
+$fruit-salad: #4AAB52;
+$submarine: #B8BEC4;
+$bright-gray: #404351;
+$min-container-width: 1366px;
+
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}

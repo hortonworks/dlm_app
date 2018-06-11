@@ -1,0 +1,111 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="wizard">
+  <div class="wizard-body row">
+    <div class="wizard-nav col-xs-12">
+      <tabset [vertical]="true" type="pills">
+        <tab *ngFor="let step of wizardSteps$ | async; trackBy: trackByFn"
+             (select)="handleSelectTab($event, step)"
+             [active]="activeStepId === step.id"
+             [disabled]="step.state === 'disabled'"
+             [customClass]="step.state">
+          <ng-template tabHeading>
+            <i class="step-marker">
+              <span class="step-index">{{step.index}}</span>
+            </i>
+            <p class="step-name" [attr.qe-attr]="'wizard-step-' + step.id">{{step?.label}}</p>
+          </ng-template>
+          <div [ngSwitch]="step?.id">
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.GENERAL">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label" [showSummary]="false">
+                <div wizard-content-body>
+                  <dlm-step-general #general (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-general>
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SOURCE">
+              <dlm-wizard-content [stepIndex]="step?.index" [stepLabel]="step?.label">
+                <div wizard-content-body>
+                  <dlm-step-source #source [accounts]="accounts" [clusters]="clusters" [pairings]="pairings" [sourceClusterId]="sourceClusterId"
+                                   (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-source>
+                </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.SOURCE"></dlm-wizard-summary-content>
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.DESTINATION">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  <dlm-step-destination
+                    #destination
+                    [accounts]="accounts"
+                    [clusters]="clusters"
+                    [pairings]="pairings"
+                    (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-destination>
+                </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.DESTINATION" [clusters]="clusters"></dlm-wizard-summary-content>
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.SCHEDULE">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  <dlm-step-schedule
+                    #schedule
+                    (onFormValidityChange)="handleFormValidityChange($event)">
+                  </dlm-step-schedule>
+                </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.SCHEDULE" [clusters]="clusters"></dlm-wizard-summary-content>
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+            <ng-template [ngSwitchCase]="WIZARD_STEP_ID.ADVANCED">
+              <dlm-wizard-content [stepIndex]="step.index" [stepLabel]="step.label">
+                <div wizard-content-body>
+                  <dlm-step-advanced
+                    #advanced
+                    [clusters]="clusters"
+                    (onFormValidityChange)="handleFormValidityChange($event)"></dlm-step-advanced>
+                </div>
+                <div wizard-content-summary>
+                  <dlm-wizard-summary-content [stepId]="WIZARD_STEP_ID.ADVANCED" [clusters]="clusters"></dlm-wizard-summary-content>
+                </div>
+              </dlm-wizard-content>
+            </ng-template>
+          </div>
+        </tab>
+      </tabset>
+    </div>
+    <div class="wizard-footer col-xs-12">
+      <button class="btn btn-default" (click)="handleCancelClick($event)" [disabled]="policyRequestInProgress">Cancel</button>
+      <button class="btn btn-success pull-right" (click)="handleNextButtonClick($event)" [disabled]="!isFormValid || policyRequestInProgress">
+        <i *ngIf="policyRequestInProgress" class="fa fa-spin fa-spinner"></i>
+        {{getNextButtonText}} →
+      </button>
+      <button class="btn btn-default pull-right" (click)="handleBackButtonClick($event)" [disabled]="isBackButtonDisabled">Back</button>
+    </div>
+  </div>
+</div>

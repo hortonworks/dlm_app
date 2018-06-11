@@ -1,0 +1,13 @@
+.rat-excludes
+.idea/**
+**/*.json
+.angular-cli.json
+.editorconfig
+dist/**
+target/**
+vendor/**
+node/**
+node_modules/**
+src/assets/**
+npm-debug.log
+yarn.lock

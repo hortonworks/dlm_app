@@ -1,0 +1,236 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<dlm-progress-container [progressState]="overallProgress$ | async">
+  <dlm-beacon-validity></dlm-beacon-validity>
+  <div class="page-section">
+    <dlm-resource-summary
+      (onSelectPanelCell)="handleOnSelectPanelCell($event)"
+      [clusters]="clustersSummary$ | async"
+      [policies]="policiesSummary$ | async"
+      [jobs]="jobsSummary$ | async">
+    </dlm-resource-summary>
+  </div>
+  <div>
+    <div class="row">
+      <div class="col-xs-4">
+        <div class="row">
+          <div class="col-xs-12">
+            <h4>
+              {{'page.overview.issues.recent' | translate}}
+            </h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <dlm-issues-list
+              [events]="events$ | async">
+            </dlm-issues-list>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-8">
+        <div class="row">
+          <div class="col-xs-12">
+            <h4>
+              {{'common.clusters' | translate}}
+            </h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-12">
+            <dp-map [sizeSettings]="mapSizeSettings" [mapData]="clustersMapData$ | async" (clickMarker)="handleClickMarker($event)" *ngIf="!(overallProgress$ | async)?.isInProgress && (clustersMapData$ | async).length">
+              <dlm-map-legend class="overview-map-legend" *ngIf="clusterLegend$ | async">
+                <dlm-cluster-legend [cluster]="clusterLegend$ | async" (onClose)="handleLegendClose($event)"></dlm-cluster-legend>
+              </dlm-map-legend>
+            </dp-map>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-section">
+    <div class="row">
+      <div class="col-xs-7">
+        <div class="flex-center" #jobs_overview_table>
+          <span class="h4">
+            {{'page.overview.issues.updates' | translate}}
+            <dlm-help-link [iconHint]="'page.overview.hints.issues_and_updates'"></dlm-help-link>
+          </span>
+          <div *ngIf="jobStatusFilter$ | async" class="job-status-filter inline-block">
+            <span class="label label-default filter-tag" [ngClass]="{'progress': isInProgressFilterApplied(), 'failed': isFailedFilterApplied()}">
+              <span class="text-bold text-uppercase">{{'common.jobs' | translate}}:&nbsp;</span>
+              <span>{{formatStatusFilter(jobStatusFilter$ | async)}} </span>
+              <a href="javascript:void(0);" (click)="removeJobStatusFilter()">
+                <i class="fa fa-close"></i>
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-5">
+        <div class="pull-right">
+          <button qe-attr="add-pairing" class="btn btn-xs btn-secondary btn-padding" type="button" [disabled]="!(resourceAvailability$ | async).canAddPairing" routerLink="/pairings/create">
+            <span class="text-uppercase">{{'common.add_pair' | translate}}</span>
+          </button>
+          <button qe-attr="add-policy" class="btn btn-xs btn-secondary" type="button" [disabled]="!(resourceAvailability$ | async).canAddPolicy" routerLink="/policies/create">
+            <span class="text-uppercase">{{'common.add_policy' | translate}}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div *ngIf="shouldShowTable$ | async">
+          <div *ngIf="(tableData$ | async).length === 0; else jobs_table" id="no_issues_warning" class="well well-lg">{{'page.overview.issues.no_issues' | translate}}</div>
+          <ng-template #jobs_table>
+            <dlm-jobs-overview-table
+              [jobs]="tableData$ | async"
+              [jobsCount]="(tableResources$ | async).length"
+              (onShowPolicyLog)="handleOnShowPolicyLog($event)"
+              [footerOptions]="jobsTableFooterOptions">
+            </dlm-jobs-overview-table>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</dlm-progress-container>
+
+<dlm-modal-dialog
+  qe-attr="unhealthy-clusters-modal"
+  #unhealthyClusters
+  [title]="'page.overview.modals.unhealthy_cluster.title'"
+  [showDialog]="isUnhealthyClustersModalVisible"
+  [showCancel]="false"
+  (onClose)="hideSummaryModals()"
+>
+  <dlm-modal-dialog-body>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{{'page.overview.modals.unhealthy_cluster.columns.cluster_name' | translate}}</th>
+          <th>{{'page.overview.modals.unhealthy_cluster.columns.services' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cluster of (unhealthyClusters$ | async)">
+          <td>{{cluster.name}}</td>
+          <td>
+            <div *ngFor="let service of cluster.status">
+              <i class="fa fa-circle text-danger"></i>
+              <span>{{service.service_name}}</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </dlm-modal-dialog-body>
+</dlm-modal-dialog>
+
+<dlm-modal-dialog
+  #lowCapacity
+  qe-attr="low-capacity-modal"
+  [title]="'page.overview.modals.hdfs_capacity.title'"
+  [showDialog]="isWarningClustersModalVisible"
+  [showCancel]="false"
+  (onClose)="hideSummaryModals()"
+>
+  <dlm-modal-dialog-body>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{{'page.overview.modals.hdfs_capacity.columns.cluster_name' | translate}}</th>
+          <th>{{'page.overview.modals.hdfs_capacity.columns.total_capacity' | translate}}</th>
+          <th>{{'page.overview.modals.hdfs_capacity.columns.remaining_capacity' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cluster of (lowCapacityClusters$ | async)">
+          <td>{{cluster.name}}</td>
+          <td [innerHtml]="cluster.stats.CapacityTotal | bytesSize"></td>
+          <td>
+            <i class="fa fa-exclamation-triangle alert-warning"></i>
+            <span [innerHtml]="cluster.stats.CapacityRemaining | bytesSize"></span>
+            <span>&nbsp;( {{getPercentageRemaining(cluster)}} )</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </dlm-modal-dialog-body>
+</dlm-modal-dialog>
+
+<dlm-modal-dialog
+  #unhealthyPolicy
+  qe-attr="unhealthy-policy-modal"
+  [title]="'page.overview.modals.unhealthy_policy.title'"
+  [showDialog]="isUnhealthyPoliciesModalVisible"
+  [showCancel]="false"
+  (onClose)="hideSummaryModals()"
+>
+  <dlm-modal-dialog-body>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{{'page.overview.modals.unhealthy_policy.columns.policy' | translate}}</th>
+          <th>{{'page.overview.modals.unhealthy_policy.columns.source' | translate}}</th>
+          <th>{{'page.overview.modals.unhealthy_policy.columns.destination' | translate}}</th>
+          <th>{{'page.overview.modals.unhealthy_policy.columns.issues' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let policy of (unhealthyPolicies$ | async)">
+          <td>{{policy.name}}</td>
+          <td>
+            <i class="fa fa-circle"
+               [class.text-success]="policy.sourceClusterResource.healthStatus === CLUSTER_STATUS.HEALTHY"
+               [class.text-danger]="policy.sourceClusterResource.healthStatus === CLUSTER_STATUS.UNHEALTHY"></i>
+            {{policy.sourceCluster}}
+            {{policy.targetClusterResource.healthStatus}}
+          </td>
+          <td>
+            <i class="fa fa-circle"
+               [class.text-success]="policy.targetClusterResource.healthStatus === CLUSTER_STATUS.HEALTHY"
+               [class.text-danger]="policy.targetClusterResource.healthStatus === CLUSTER_STATUS.UNHEALTHY"></i>
+            {{policy.targetCluster}}
+          </td>
+          <td>
+            <div *ngIf="policy.sourceClusterResource?.status.length">
+              <div>Stopped services on <strong>{{policy.sourceCluster}}</strong></div>
+              <div *ngFor="let service of policy.sourceClusterResource.status">
+                <i class="fa fa-circle text-danger"></i>
+                {{service.service_name}}
+              </div>
+            </div>
+            <div *ngIf="policy.targetClusterResource?.status.length">
+              <div>Stopped services on <strong>{{policy.targetCluster}}</strong></div>
+              <div *ngFor="let service of policy.targetClusterResource.status">
+                <i class="fa fa-circle text-danger"></i>
+                {{service.service_name}}
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </dlm-modal-dialog-body>
+</dlm-modal-dialog>

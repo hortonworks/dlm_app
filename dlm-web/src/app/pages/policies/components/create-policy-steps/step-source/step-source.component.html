@@ -1,0 +1,281 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="form-container">
+  <form class="basic-form policy-form" [formGroup]="form">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="form-section col-xs-12">
+          <div class="form-group">
+            <!-- SOURCE -->
+            <fieldset formGroupName="source">
+              <div class="row">
+                <div class="col-xs-12">
+                  <!-- SOURCE TYPE -->
+                  <div class="row">
+                    <div class="col-xs-6">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.source_type' | translate"
+                        [fieldClass]="'col-xs-12'"
+                        [errorClass]=""
+                        [required]="true">
+                        <dlm-select-field
+                          qe-attr="policy-source-type"
+                          formField
+                          formControlName="type"
+                          [options]="sourceTypes"
+                          [value]="sourceType">
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                  <!-- SOURCE TYPE END -->
+
+                  <!-- SOURCE CLUSTER -->
+                  <div class="row">
+                    <div class="col-xs-6" *ngIf="form.get('source.type').value === SOURCE_TYPES.CLUSTER">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.sourceCluster.self' | translate"
+                        [fieldClass]="'col-xs-12'"
+                        [errorClass]=""
+                        [required]="true">
+                        <dlm-select-field
+                          qe-attr="policy-source-cluster"
+                          formField
+                          formControlName="cluster"
+                          [options]="sourceClusters"
+                          [value]="sourceCluster">
+                            <ng-template selectFieldDropdown let-showMenu="showMenu" let-options="options" let-dropdownActionEmitter="dropdownActionEmitter">
+                              <ul class="select-field-option-list select-field-options-wrapper list-unstyled" *ngIf="showMenu">
+                                <li class="select-field-option-item" *ngFor="let option of options"
+                                  [ngClass]="{'disabled text-muted': isOptionDisabled(option)}"
+                                  [tooltip]="getTooltip(option)"
+                                  container="body"
+                                  (click)="dropdownClickHandler(option, dropdownActionEmitter)">
+                                  <div [attr.qe-attr]="option.value">
+                                    {{option.label.display}}
+                                  </div>
+                                  </li>
+                              </ul>
+                            </ng-template>
+                            <ng-template selectFieldValue let-value="value" let-label="label">
+                              <div>
+                                {{label.display || value || ('common.none' | translate)}}
+                              </div>
+                            </ng-template>
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                  <!-- SOURCE CLUSTER END -->
+
+                  <!-- SOURCE CLOUD ACCOUNT -->
+                  <div class="row">
+                    <div class="col-xs-6"
+                        *ngIf="form.get('source.type').value === SOURCE_TYPES.S3">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.s3.account' | translate"
+                        [required]="true"
+                        [fieldClass]="'col-xs-12'"
+                        [errorClass]="">
+                        <dlm-select-field
+                          qe-attr="source-cloud-account"
+                          formField
+                          formControlName="cloudAccount"
+                          [options]="sourceCloudAccounts"
+                          [value]="sourceCloudAccount">
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                  <!-- SOURCE CLOUD ACCOUNT END -->
+
+                  <!-- SOURCE S3 ENDPOINT -->
+                  <div class="row">
+                    <div class="col-xs-6" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === SOURCE_TYPES.S3">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.s3.endpoint' | translate"
+                        [errorClass]="'col-xs-12'"
+                        [fieldClass]="'col-xs-12'"
+                        [required]="true">
+                        <div class="input-group">
+                          <div class="input-group-addon">{{SOURCE_TYPES_LABELS[SOURCE_TYPES.S3]}}://</div>
+                          <input
+                            type="text"
+                            class="form-control"
+                            qe-attr="source-S3-endpoint"
+                            formField
+                            [placeholder]="'page.policies.form.fields.s3.endpointPlaceholder' | translate"
+                            formControlName="s3endpoint"/>
+                        </div>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                  <!-- SOURCE S3 ENDPOINT END -->
+
+                  <!-- CLOUD ENCRYPTION -->
+                  <div class="row">
+                    <div class="col-xs-6" *ngIf="form.get('source.cloudAccount').value && form.get('source.type').value === SOURCE_TYPES.S3">
+                      <dlm-form-field
+                        [label]="'page.policies.form.fields.encryption_type' | translate"
+                        [errorClass]="'col-xs-12'"
+                        [fieldClass]="'col-xs-12'">
+                        <dlm-select-field
+                          qe-attr="policy-source-cloud-encryption"
+                          formField
+                          formControlName="cloudEncryption"
+                          [options]="cloudEncryptionOptions">
+                        </dlm-select-field>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                  <!-- CLOUD ENCRYPTION END -->
+                </div>
+              </div>
+
+              <div class="row" *ngIf="sourceCluster && !clusterSubmitted">
+                <div class="col-xs-12 text-center is-text-large">
+                  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+                </div>
+              </div>
+
+              <!-- HDFS FILE BROWSER -->
+              <div class="row" *ngIf="isHDFSPolicy() && sourceCluster && clusterSubmitted">
+                <div class="form-section col-xs-12">
+                  <div class="form-section-title">
+                    {{'page.policies.form.sections.directories' | translate}}
+                  </div>
+                  <fieldset>
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <dlm-form-field
+                          [fieldClass]="'col-xs-12'"
+                          [errorClass]="'col-xs-12'"
+                          [label]="'page.policies.form.fields.directories' | translate">
+                          <div class="row">
+                            <div class="col-xs-6">
+                              <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
+                            </div>
+                            <div class="col-xs-6 text-left path-help-hint">
+                              <i class="fa fa-lock fa-2x text-muted"
+                                *ngIf="isDatasetEncrypted()"
+                                [tooltip]="'page.policies.form.help.encrypted_path' | translate"></i>
+                              <i class="fa fa-files-o fa-2x text-muted"
+                                 *ngIf="isDatasetSnapshotable(); else enableSnapshot"
+                                 [tooltip]="'page.policies.form.help.snapshot_enabled_path' | translate"></i>
+                              <dlm-field-error *ngIf="isDatasetEncrypted() && isDatasetSnapshotable()" [isError]="false" [isWarning]="true">
+                                {{'page.policies.form.fields.enableSnapshot.warning.encrypted_snapshottable' | translate}}
+                              </dlm-field-error>
+                              <ng-template #enableSnapshot>
+                                <div *ngIf="showEnableSnapshot">
+                                  <dlm-checkbox
+                                    [disabled]="enableSnapshotDisabled"
+                                    [checked]="form.get('source.setSnapshottable').value"
+                                    (onSelect)="handleSnapshotable($event)">
+                                    {{"page.policies.form.fields.enableSnapshot.label" | translate}}
+                                  </dlm-checkbox>
+                                  <dlm-field-error *ngIf="!!snapshotBasedReplicationWarning" [isError]="false" [isWarning]="true">
+                                    {{snapshotBasedReplicationWarning}}
+                                  </dlm-field-error>
+                                  <dlm-help-link
+                                    id="enable_snapshot"
+                                    [linkTo]="'page.policies.form.help.snapshot_url' | translate"
+                                    [linkText]="'page.policies.form.fields.enableSnapshot.helpText'">
+                                  </dlm-help-link>
+                                </div>
+                              </ng-template>
+                            </div>
+                          </div>
+                          <dlm-field-error *ngIf="form.get('source.directories').hasError('isFile')">
+                            {{'forms.validation_errors.not_directory' | translate:directoryField}}
+                          </dlm-field-error>
+                          <dlm-field-error *ngIf="form.get('source.directories').hasError('notExist')">
+                            {{'forms.validation_errors.not_exist_directory' | translate:directoryField}}
+                          </dlm-field-error>
+                        </dlm-form-field>
+                        <div class="hdfs-browser-container" *ngIf="submittedClusters[sourceCluster]">
+                          <dlm-hdfs-browser
+                            [rootPath]="hdfsRootPath"
+                            [cluster]="sourceClusterResource"
+                            (selectFile)="handleHdfsPathChange($event)"
+                          ></dlm-hdfs-browser>
+                        </div>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+              <!-- HDFS FILE BROWSER END -->
+
+              <!-- HIVE DB VIEWER -->
+              <div class="row" *ngIf="isHivePolicy() && sourceCluster">
+                <div class="form-section col-xs-12">
+                  <div class="form-section-title">
+                    {{'page.policies.form.sections.database' | translate}}
+                  </div>
+                  <fieldset>
+                    <div class="form-group">
+                      <div class="row flex-center">
+                        <div class="col-xs-8">
+                  <span class="text-muted">
+                    <span>
+                      {{'page.policies.form.selected' | translate}}: {{form.value.source.databases}}
+                      <i class="fa fa-lock text-muted"
+                        *ngIf="isDatasetEncrypted()"
+                        [tooltip]="'page.policies.form.help.encrypted_db' | translate"></i>
+                      <i class="fa fa-files-o text-muted"
+                        *ngIf="isDatasetSnapshotable()"
+                        [tooltip]="'page.policies.form.help.snapshot_enabled_db' | translate"></i>
+                    </span>
+                  </span>
+                        </div>
+                        <div class="col-xs-4">
+                          <dlm-search-input
+                            qe-attr="policy-database-search-filter"
+                            (valueChange)="handleSearchChange($event)"
+                            [value]="databaseSearch$ | async">
+                          </dlm-search-input>
+                        </div>
+                      </div>
+                      <dlm-progress-container [progressState]="databaseRequest$ | async">
+                        <dlm-hive-browser
+                          formControlName="databases"
+                          [tablesLoadingMap]="databaseTablesLoadingMap"
+                          [databases]="sourceDatabases$ | async"
+                          [readonly]="false"
+                          (databaseTablesCollapsed)="onDatabaseTablesCollapsed($event)"
+                        ></dlm-hive-browser>
+                      </dlm-progress-container>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+              <!-- HIVE DB VIEWER END -->
+
+            </fieldset>
+            <!-- SOURCE END -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

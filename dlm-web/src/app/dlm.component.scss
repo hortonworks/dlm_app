@@ -1,0 +1,198 @@
+/*!
+ * HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+ *
+ * (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+ *
+ * This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+ * of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+ * authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+ * an authorized and properly licensed third party, you do not have any rights to this code.
+ *
+ * If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+ * WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+ * RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+ * OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+ * TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+ * DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+ * OR LOSS OR CORRUPTION OF DATA.
+ */
+
+@import './styles/ngx-table-theme.scss';
+@import './styles/forms.scss';
+@import './styles/variables.scss';
+@import './styles/utils.scss';
+@import './styles/bs.scss';
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700');
+
+html, body {
+  height: 100%;
+  min-width: $min-container-width;
+  background-color: $body-background;
+  font-family: 'Roboto', sans-serif;
+}
+
+.caret {
+  &.caret-up {
+    transform: rotate(180deg);
+  }
+}
+
+.navigation-bar-fit-height {
+  z-index: 1000 !important;
+}
+
+header {
+  background-color: #fff;
+  height: 60px;
+  &.row {
+    margin-right: 0;
+  }
+  .navbar-nav {
+    margin: 12px 0 0 0;
+    float: left;
+    color: #666;
+    line-height: 40px;
+    padding-right: 28px;
+    ol.breadcrumb {
+      padding-left: 30px;
+    }
+    .fa, .glyphicon {
+      font-size: 16px;
+    }
+  }
+  .navbar-right {
+    float: right;
+  }
+  .navbar-user {
+    margin-right: 2px;
+  }
+  .notifications-group.open {
+    color: $link-color;
+  }
+}
+
+#dlm_content {
+  // overwrites container-fluid defaults 15px
+  // required by design
+  padding: 0 30px;
+}
+
+#dlm_main_content {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.page-section {
+  margin-top: 15px;
+}
+
+.text-muted {
+  color: #999 !important;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.filter-tag {
+  margin: 3px;
+  font-size: 10px;
+  display: inline-block;
+  float: right;
+  height: 24px;
+  line-height: 24px;
+  padding: 0 7px;
+  font-weight: 400;
+  &.label {
+    color: #666;
+    a {
+      color: #666;
+    }
+    &.failed, &.progress {
+      color: $white-color;
+      a {
+        color: #F1F1F1;
+      }
+    }
+  }
+}
+
+.label-default {
+  background-color: #DDD;
+  &.failed {
+    background-color: $alert-color;
+  }
+  &.progress {
+    background-color: $link-color;
+  }
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+a:focus {
+  outline: none;
+}
+
+ng-select {
+  &, .ui-select-container, .ui-select-match {
+    line-height: normal;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.btn {
+  &.btn-xs {
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: normal;
+    border-radius: 3px;
+    height: auto;
+  }
+}
+
+.fa-stack-left {
+  &.fa-stack {
+    position: relative;
+
+    > i.fa:first-child {
+      position: absolute;
+      z-index: 1;
+      top: 11px;
+      font-size: 11px;
+      left: -3px;
+    }
+
+    > i.fa:nth-child(2) {
+      position: relative;
+    }
+
+    &.fa-lg {
+      > i.fa:first-child {
+        &.fa-lock {
+          left: 1px;
+          font-size: inherit;
+          top: 8px;
+        }
+      }
+
+      > i.fa:nth-child(2) {
+        left: 8px;
+      }
+    }
+  }
+}
+
+.zero-padding {
+  padding: 0;
+}
+
+.tooltip {
+  z-index: 2100;
+}

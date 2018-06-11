@@ -1,0 +1,236 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="form-container">
+  <form class="basic-form policy-form" [formGroup]="form">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="form-section col-xs-12">
+          <div class="form-section-title">
+            {{'page.policies.form.sections.job' | translate}}
+            <div class="clearfix"></div>
+          </div>
+          <fieldset formGroupName="job">
+            <div class="schedule-group">
+              <div class="row new-row">
+                <div class="col col-xs-12">
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <label>{{'page.policies.form.fields.start.self' | translate}}</label>
+                    </div>
+                  </div>
+                  <!-- START MODE -->
+                  <div class="row">
+                    <div class="col-xs-6">
+                      <dlm-radio-button
+                        qe-attr="policy-start-schedule"
+                        [items]="startOptions"
+                        formControlName="start"
+                        [selectedValue]="selectedStart"
+                        (change)="handleStartChange($event)">
+                      </dlm-radio-button>
+                    </div>
+                  </div>
+                  <!-- START MODE END -->
+
+                  <div class="row">
+                    <div class="col col-xs-12">
+                      <dlm-field-label [required]="true">
+                        {{'page.policies.form.fields.repeat' | translate}}
+                      </dlm-field-label>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <!-- REPEAT MODE -->
+                    <div class="col col-xs-2">
+                      <dlm-select-field
+                        qe-attr="policy-repeat-mode"
+                        formField
+                        formControlName="repeatMode"
+                        [options]="repeatOptions"
+                        [value]="repeatOption">
+                      </dlm-select-field>
+                    </div>
+                    <!-- REPEAT MODE END -->
+
+                    <!-- FREQUENCY -->
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-xs-2"
+                         [class.has-error]="form.get('job.frequency').touched && form.get('job.frequency').invalid">
+                      <input
+                        type="text"
+                        qe-attr="policy-frequency"
+                        class="form-control"
+                        placeholder="Freq"
+                        formField
+                        formControlName="frequency" />
+                    </div>
+                    <!-- FREQUENCY END -->
+
+                    <!-- REPEAT UNITS -->
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-xs-2">
+                      <dlm-select-field
+                        qe-attr="policy-unit"
+                        formField
+                        formControlName="unit"
+                        [options]="units"
+                        [value]="unit">
+                      </dlm-select-field>
+                    </div>
+                    <!-- REPEAT UNITS END -->
+
+                    <!-- DAYS OF THE WEEK -->
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY && unit === policyTimeUnits.WEEKS"
+                         class="col col-xs-6 zero-padding">
+                      <div class="row">
+                        <div class="col col-xs-1 text-center" style="margin-top: 10px">
+                          <span>&nbsp;on&nbsp;</span>
+                        </div>
+                        <div class="col col-xs-11">
+                          <dlm-radio-button
+                            qe-attr="policy-selected-days"
+                            [items]="dayOptions"
+                            formControlName="day"
+                            [selectedValue]="selectedDay"
+                            [type]="'buttons'"
+                            [disabled]="startOption === policyStart.START_NOW"
+                            (change)="handleDayChange($event)">
+                          </dlm-radio-button>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- DAYS OF THE WEEK END -->
+
+                  </div>
+                  <div class="row">
+                    <!-- FREQUENCY ERRORS -->
+                    <div class="col col-xs-5 col-xs-offset-2">
+                      <div *ngIf="form.get('job.frequency').touched">
+                        <dlm-field-error
+                          *ngIf="form.get('job.frequency').hasError('required')">
+                          {{'forms.validation_errors.required' | translate:freqRequired}}
+                        </dlm-field-error>
+                        <dlm-field-error
+                          *ngIf="form.get('job.frequency').hasError('freqValidator')">
+                          {{'forms.validation_errors.freqValidator' | translate:freqLimit}}
+                        </dlm-field-error>
+                        <dlm-field-error
+                          *ngIf="form.get('job.frequency').hasError('integerValidator')">
+                          {{'forms.validation_errors.integerValidator' | translate:freqLimit}}
+                        </dlm-field-error>
+                      </div>
+                      <dlm-field-error
+                        *ngIf="form.get('job.frequency').touched && form.get('job.frequency').hasError('freqValidator')">
+                        {{'forms.validation_errors.freqValidator' | translate:freqLimit}}
+                      </dlm-field-error>
+                    </div>
+                    <!-- FREQUENCY ERRORS END -->
+                  </div>
+                </div>
+              </div>
+              <div class="row new-row">
+                <div class="col-xs-3" formGroupName="startTime">
+                  <!-- START DATE -->
+                  <div class="date-time-group">
+                    <div class="date-control">
+                      <label>{{'page.policies.form.fields.start_date' | translate}}</label>
+                      <my-date-picker
+                        qe-attr="policy-start-date"
+                        selectionTxtFontSize="12"
+                        [selDate]="form.value.job.startTime.date"
+                        [placeholder]="'page.policies.form.fields.date_format' | translate"
+                        [options]="datePickerOptions"
+                        [disabled]="startOption === policyStart.START_NOW"
+                        (inputFieldChanged)="handleDateInputChange($event, 'startTime')"
+                        (dateChanged)="handleDateChange($event, 'startTime')">
+                      </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="form.get('job.startTime.date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:startTimeDateField}}
+                      </dlm-field-error>
+                      <dlm-field-error *ngIf="form.get('job.startTime.date').hasError('required')">
+                        {{'forms.validation_errors.required' | translate:startTimeDateField}}
+                      </dlm-field-error>
+                    </div>
+                  </div>
+                  <!-- START DATE END -->
+                </div>
+                <div class="col-xs-3" formGroupName="endTime">
+                  <!-- END DATE -->
+                  <div class="date-time-group">
+                    <div class="date-control">
+                      <label>{{'page.policies.form.fields.end_date' | translate}}</label>
+                      <my-date-picker
+                        qe-attr="policy-end-time"
+                        [selDate]="form.value.job.endTime.date"
+                        [placeholder]="'page.policies.form.fields.date_format' | translate"
+                        (dateChanged)="handleDateChange($event, 'endTime')"
+                        (inputFieldChanged)="handleDateInputChange($event, 'endTime')"
+                        [options]="datePickerOptions">
+                      </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="form.get('job.endTime.date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:endTimeDateField}}
+                      </dlm-field-error>
+                    </div>
+                  </div>
+                  <!-- END DATE END -->
+                </div>
+              </div>
+              <div class="row new-row">
+                <!-- START TIME -->
+                <div class="time-field" formGroupName="startTime">
+                  <label>{{'page.policies.form.fields.start_time' | translate}}</label>
+                  <timepicker
+                    qe-attr="policy-start-time"
+                    formField formControlName="time"
+                    [showMeridian]="false"
+                    [showSpinners]="false"
+                    [readonlyInput]="startOption === policyStart.START_NOW">
+                  </timepicker>
+                </div>
+                <div class="timezone-field">
+                  <label>
+                    {{'page.policies.form.fields.timezone' | translate}}
+                    <dlm-help-link [iconHint]="'page.policies.form.fields.timezone_hint' | translate" [placement]="'right'"></dlm-help-link>
+                  </label>
+                  <div class="value" [tooltip]="userTimezone" [placement]="'bottom'">
+                    {{userTimezone | truncate:40}}
+                  </div>
+                </div>
+                <!-- START TIME END -->
+              </div>
+              <div class="new-row">
+                <dlm-field-error *ngIf="form.get('job.startTime.time').hasError('lessThanCurrent')">
+                  {{'forms.validation_errors.time_less_than_current' | translate}}
+                </dlm-field-error>
+                <dlm-field-error *ngIf="form.get('job.startTime.time').hasError('greaterThanEndTime')">
+                  {{'forms.validation_errors.greaterThanEndTime' | translate}}
+                </dlm-field-error>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

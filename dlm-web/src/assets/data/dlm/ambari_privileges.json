@@ -1,0 +1,22 @@
+[
+  {
+    "clusterId": 1,
+    "isConfigReadAuthEnabled": true
+  },
+  {
+    "clusterId": 2,
+    "isConfigReadAuthEnabled": true
+  },
+  {
+    "clusterId": 3,
+    "isConfigReadAuthEnabled": true
+  },
+  {
+    "clusterId": 4,
+    "isConfigReadAuthEnabled": true
+  },
+  {
+    "clusterId": 5,
+    "isConfigReadAuthEnabled": false
+  }
+]

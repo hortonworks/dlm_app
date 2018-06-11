@@ -1,0 +1,95 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="row">
+  <div
+    [ngClass]="{'navigation-bar': true, 'navigation-bar-fit-height': 'fitHeight'}">
+    <div class="navigation-bar-container">
+      <ul class="side-nav-header nav nav-pills nav-stacked">
+        <li class="navigation-header">
+          <div #personaNavSrc class="row nav-header-container">
+            <div id="header_icon" class="col-xs-3">
+              <a *ngIf="header.iconHtml != ''" class="ambari-logo">
+                <span [innerHTML]="header.iconHtml"></span>
+                <span *ngIf="isCollapsed" class="toggle-small-icon fa fa-chevron-down"></span>
+              </a>
+            </div>
+            <div id="header_content" class="col-xs-9">
+              <div class="btn-group">
+                <div aria-haspopup="true" aria-expanded="false">
+                  <span class="ambari-header" style="font-size: 15px; padding: 0">{{header.label}}</span>
+                </div>
+                <div>
+                  <span class="toggle-icon-down fa fa-chevron-down"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <ul class="side-nav-menu nav nav-pills nav-stacked">
+        <li *ngFor="let item of menuItems"
+          [ngClass]="{'mainmenu-li': true, 'active': false, 'has-sub-menu': hasSubMenu(item)}"
+            routerLinkActive="active">
+
+          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu"
+             [attr.qe-attr]="item.qeAttr" [tooltip]="isCollapsed ? item.label : ''" [placement]="'right'">
+            <span [ngClass]="item.iconClasses"></span>
+            <span class="navigation-menu-item">{{item.label}}</span>
+          </a>
+
+          <ng-template #has_sub_menu>
+            <a href="#" data-toggle="collapse-sub-menu" [attr.qe-attr]="item.qeAttr">
+              <span [ngClass]="item.iconClasses"></span>
+              <span class="navigation-menu-item">{{item.label}}</span>
+              <span class="toggle-icon fa fa-chevron-down pull-right"></span>
+            </a>
+            <ul class="sub-menu nav nav-pills nav-stacked">
+              <li *ngFor="let subItem of item.subMenu"
+                  [ngClass]="{'submenu-li': true, 'active': false}"
+                  routerLinkActive="active">
+                <a [routerLink]="subItem.linkURL" [attr.qe-attr]="subItem.qeAttr">
+                  <span [ngClass]="subItem.iconClasses"></span>
+                  <span class="submenu-item">{{subItem.label}}</span>
+                </a>
+              </li>
+            </ul>
+          </ng-template>
+        </li>
+        <li class="mainmenu-li">
+          <a [href]="'help_url' | translate" qe-attr="go-to-help" target="_blank"
+             (click)="restoreActiveItems()" [tooltip]="isCollapsed ? ('sidenav.menuItem.help' | translate) : ''" [placement]="'right'">
+            <span class="navigation-icon fa fa-fw fa-question-circle"></span>
+            <span class="navigation-menu-item">{{'sidenav.menuItem.help' | translate}}</span>
+          </a>
+        </li>
+      </ul>
+      <ul class="side-nav-footer nav nav-pills nav-stacked">
+        <li class="navigation-footer">
+          <a href="#" data-toggle="collapse-side-nav" (click)="toggleNavbar()">
+            <span class="navigation-icon fa fa-angle-double-left"></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

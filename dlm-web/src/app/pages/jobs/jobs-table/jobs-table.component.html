@@ -1,0 +1,109 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="row filter-wrapper">
+  <div class="col-md-12">
+    <dlm-table-filter
+      [filterBy]="filterBy"
+      [initialFilters]="filters"
+      [restoreState]="true"
+      [initialInputValue]="jobsInput"
+      [ignoreInitialFiltersUpdate]="true"
+      (onFilter)="handleOnFilter($event)"
+      (onInput)="handleOnInput($event)"></dlm-table-filter>
+  </div>
+</div>
+<dlm-table
+  #jobsTable
+  [externalPaging]="true"
+  [externalSorting]="true"
+  [loadingIndicator]="loadingJobs"
+  [sorts]="sorts"
+  [reorderable]="false"
+  [footerOptions]="footerOptions"
+  [columns]="columns"
+  [rows]="jobs"
+  [count]="jobsOverallCount"
+  [offset]="jobsOffset"
+  [selectCheck]="selectCheck"
+  [selectionType]="selectionType"
+  (sortAction)="handleOnSort($event)"
+  (pageChange)="handlePageChange($event)"
+  selectionType="checkbox">
+</dlm-table>
+
+<dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
+
+<ng-template #statusCellTemplate let-row="row">
+  <dlm-job-status [job]="row"></dlm-job-status>
+</ng-template>
+
+<ng-template #statusVerbTemplate let-value="value">
+  <span *ngIf="value === JOB_STATUS.SKIPPED; else notIgnored" [tooltip]="'page.jobs.job_ignored' | translate">
+    {{value | jobStatusFmt}}
+  </span>
+
+  <ng-template #notIgnored>
+    {{value | jobStatusFmt}}
+  </ng-template>
+</ng-template>
+
+<ng-template #agoTemplate let-value="value">
+  <span *ngIf="policy.lastJobResource">
+    <span *ngIf="value; else" [tooltip]="value | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+      {{value | fmtTz | amTimeAgo}}
+    </span>
+    <ng-template #inProgress>
+      In Progress
+    </ng-template>
+  </span>
+</ng-template>
+
+<ng-template #runTimeTemplate let-value="value" let-row="row">
+  <i class="fa fa-exclamation-triangle text-warning" *ngIf="isJobRuntimeGreater(row)" [tooltip]="'page.policies.job_runtime_warn' | translate"></i>
+  <dlm-duration-column [isRunning]="isRunning(row)" [duration]="value"></dlm-duration-column>
+</ng-template>
+
+<ng-template #transferredFormattedTemplate let-value="value" let-job="row">
+  <dlm-transferred-column [trackingInfo]="value" [jobStatus]="job.status"></dlm-transferred-column>
+</ng-template>
+
+<ng-template #transferredObjectsTemplate let-job="row">
+  <dlm-transferred-objects
+    [executionType]="policy.executionType"
+    [filesCopied]="job?.trackingInfo?.progress?.filesCopied"
+    [completed]="job?.trackingInfo?.progress?.completed"
+    [total]="job?.trackingInfo?.progress?.total"
+    [units]="job?.trackingInfo?.progress?.unit"
+    [status]="job.status">
+  </dlm-transferred-objects>
+</ng-template>
+
+<ng-template #actionsCell let-row="row">
+  <dlm-policy-actions
+    qe-attr="job-actions"
+    [rowId]="row.id"
+    [policy]="row"
+    [policyActions]="rowActions"
+    (handler)="handleSelectedAction($event)">
+  </dlm-policy-actions>
+</ng-template>

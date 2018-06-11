@@ -1,0 +1,109 @@
+/*!
+ * HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+ *
+ * (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+ *
+ * This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+ * of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+ * authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+ * an authorized and properly licensed third party, you do not have any rights to this code.
+ *
+ * If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+ * WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+ * RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+ * OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+ * TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+ * DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+ * OR LOSS OR CORRUPTION OF DATA.
+ */
+
+@import '../../../../styles/variables';
+
+.dlm-cloud-accounts-list {
+  .cell-content {
+    font-size: 16px;
+  }
+
+  .cloud-credential-status {
+    font-size: 20px;
+  }
+
+  .status-header {
+    padding-left: 35px;
+  }
+
+  .datatable-body-cell {
+    &.add-actions-cell {
+      justify-content: flex-end !important;
+      .datatable-body-cell-label {
+        text-align: center;
+      }
+    }
+  }
+
+  .datatable-row-detail {
+    padding: 0;
+    background-color: #EEE;
+    overflow-y: visible !important;
+  }
+
+  .datatable-scroll {
+    width: 100% !important;
+  }
+
+  .text-center {
+    .datatable-body-cell-label {
+      width: 100%;
+    }
+  }
+
+  span.provider {
+    background-color: $link-color;
+    color: $white-color;
+    text-align: center;
+    font-size: 12px;
+    position: absolute;
+    top: 24px;
+    width: 60px;
+    left: -10px;
+    z-index: 2;
+  }
+
+  .card-danger {
+    .provider {
+      background-color: $alert-color;
+    }
+  }
+
+  .card-disabled {
+    .provider {
+      background-color: $grey-color;
+    }
+  }
+
+  .provider-wrapper {
+    .tooltip {
+      width: 164px;
+      margin-left: 32px;
+
+      .tooltip-arrow {
+        left: 50px !important;
+      }
+    }
+  }
+
+  span.left-arrow {
+    font-size: 15px;
+    color: #A0A0A0;
+    position: absolute;
+    top: 32px;
+    left: -12px;
+    z-index: 1;
+  }
+
+  .userDetails {
+    color: $grey-color;
+  }
+}

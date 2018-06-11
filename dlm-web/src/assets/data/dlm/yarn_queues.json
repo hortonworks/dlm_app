@@ -1,0 +1,26 @@
+{
+  "items": [
+      {
+          "name": "root",
+          "children": [
+              {
+                  "name": "default",
+                  "children": [],
+                  "path": "root.default"
+              },
+              {
+                  "name": "test-queue",
+                  "children": [
+                      {
+                          "name": "child-test-queue",
+                          "children": [],
+                          "path": "root.test-queue.child-test-queue"
+                      }
+                  ],
+                  "path": "root.test-queue"
+              }
+          ],
+          "path": "root"
+      }
+  ]
+}
