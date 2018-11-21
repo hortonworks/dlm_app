@@ -1,0 +1,28 @@
+{
+  "/dlm/api/": {
+    "target": {
+      "host": "localhost",
+      "port": "443",
+      "protocol": "https:"
+    },
+    "secure": false,
+    "changeOrigin": true,
+    "headers": {
+      "Cookie": ""
+    }
+  },
+
+  "/dlm/": {
+    "target": "https://localhost",
+    "secure": false
+  },
+
+  "/api/": {
+    "target": "https://localhost",
+    "secure": false,
+    "changeOrigin": true,
+    "headers": {
+      "Cookie": ""
+    }
+  }
+}

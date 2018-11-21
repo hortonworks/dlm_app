@@ -1,0 +1,146 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<dlm-table #table
+  [rowDetailHeight]="560"
+  [rowDetailTemplate]="rowDetailRef"
+  [theme]="tableTheme"
+  [columns]="columns"
+  [columnMode]="columnMode"
+  [rowsCount]="policiesCount"
+  [rows]="policies"
+  [footerOptions]="tableFooterOptions">
+</dlm-table>
+
+<dlm-icon-column></dlm-icon-column>
+<dlm-policy-info
+  [activeContent]="activeContentType"
+  (nameClick)="toggleRowDetail($event, policyContent.Files)"
+  (editPolicy)="handleEditPolicy($event, policyWizardSteps.SCHEDULE)"
+>
+</dlm-policy-info>
+
+<ng-template #durationCell let-seconds="value" let-policy="row" let-index="rowIndex">
+  <dlm-duration-column [duration]="seconds" [attr.qe-attr]="'policy-duration-' + index"></dlm-duration-column>
+</ng-template>
+
+<ng-template #verbStatusCellTemplate let-value="value" let-index="rowIndex" let-policy="row">
+  <span [attr.qe-attr]="'policy-status-' + index" class="policy-status">{{value | translate}}</span>
+  <dlm-policy-status-column
+    [attr.qe-attr]="'policy-status-additional-' + index"
+    [policy]="policy"
+    [showText]="false"
+    [status]="policy.uiStatus">
+  </dlm-policy-status-column>
+</ng-template>
+
+<ng-template #flowStatusCell let-policy="row">
+  <dlm-flow-status [policy]="policy"></dlm-flow-status>
+</ng-template>
+
+<ng-template #sourceCellTemplate let-value="value" let-policy="row" let-index="rowIndex">
+  <div class="padded overflow-hidden">
+    <div class="cluster-name" [attr.qe-attr]="'source-id-' + index">{{getSourceName(policy)}}</div>
+    <div class="datacenter-name" [attr.qe-attr]="'path-' + index" [tooltip]="value">
+      <i class="fa fa-lock" *ngIf="policy.customProperties && policy.customProperties['tde.enabled']"></i>
+      {{value}}
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #targetCellTemplate let-value="value" let-policy="row" let-index="rowIndex">
+  <div class="padded overflow-hidden">
+    <div class="cluster-name" [attr.qe-attr]="'target-id-' + index">{{getTargetName(policy)}}</div>
+    <div class="datacenter-name" [attr.qe-attr]="'path-' + index" [tooltip]="value">
+      <i class="fa fa-lock" *ngIf="policy.customProperties && policy.customProperties['tde.enabled']"></i>
+      {{value}}
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #iconCellTemplate>
+  <span class="fa fa-arrow-right" aria-hidden="true"></span>
+</ng-template>
+
+<ng-template #prevJobs let-row="row" let-index="rowIndex">
+  <span class="actionable" [attr.qe-attr]="'policy-jobs-' + index" (click)="toggleRowDetail(row, policyContent.Jobs)">
+    <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
+    <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isPrevJobsActive(row), 'fa-caret-down': !isPrevJobsActive(row.id)}">
+    </span>
+  </span>
+</ng-template>
+
+<ng-template #lastGoodCell let-time="value" let-policy="row" let-index="rowIndex">
+  <span *ngIf="time; else noData" [attr.qe-attr]="'policy-last-good-' + index"
+        [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+    {{time | fmtTz | amTimeAgo}}
+  </span>
+  <ng-template #noData>
+    <span [attr.qe-attr]="'policy-last-good-' + index">n/a</span>
+  </ng-template>
+</ng-template>
+
+<ng-template let-row="row" ngx-datatable-row-detail-template #rowDetailRef>
+  <div class="popup-arrow"></div>
+  <dlm-policy-details
+    [contentType]="activeContentType"
+    [policy]="row"
+    [jobs]="jobs"
+    [jobsOffset]="jobsOffset"
+    [jobsOverallCount]="jobsOverallCount"
+    [sourceCluster]="sourceCluster"
+    [beaconStatuses]="beaconStatuses"
+    [hdfsRootPath]="hdfsRootPath"
+    [policyDatabase]="policyDatabase$ | async"
+    [jobsSort]="getJobsSortForRow(row.id)"
+    [jobsPage]="getJobsPageForRow(row.id)"
+    [jobsFilters]="getJobsFiltersForRow(row.id)"
+    [jobsInput]="getJobsInputForRow(row.id)"
+    [loadingJobs]="loadingJobs"
+    [loadingDatabases]="databaseRequest$ | async"
+    [loadingTables]="tablesLoadingMap"
+    [fileBrowserPage]="getFilesPageForRow(row.id)"
+    [tablesSearchPattern]="tablesSearchPattern"
+    (onTablesFilter)="handleTablesFilterApplied($event)"
+    (onPageChangeFiles)="handleFilesPageChange($event, row.id)"
+    (onOpenDirectory)="handleOnOpenDirectory($event)"
+    (onSortJobs)="handleOnSortJobs($event, row.id)"
+    (onFilterJobs)="handleOnFilterJobs($event, row.id)"
+    (onInput)="handleOnInput($event, row.id)"
+    (onSelectActionJobs)="handleOnSelectActionJobs($event, row.id)"
+    (onPageChangeJobs)="handleJobsPageChange($event, row.id)"
+    (abortJobAction)="abortJobAction($event)"
+    (rerunJobAction)="rerunJobAction($event)"
+    (editField)="handleEditField($event, row)"
+    (editInlineField)="handleInlineEditField($event, row)"
+  ></dlm-policy-details>
+</ng-template>
+
+<ng-template #actionsCell let-row="row" let-index="rowIndex">
+  <dlm-policy-actions
+    [attr.qe-attr]="'policy-actions-' + index"
+    [rowId]="row.id"
+    [row]="row"
+    [actions]="rowActions"
+    (handler)="handleSelectedAction($event)">
+  </dlm-policy-actions>
+</ng-template>

@@ -1,0 +1,13 @@
+{
+  "unreachableBeacon": [
+    {
+      "beaconUrl": "http://jaimin-beacon-3.c.pramod-thangali.internal:25968"
+    },
+    {
+      "beaconUrl": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
+    },
+    {
+      "beaconUrl": "http://jaimin-beacon-6.c.pramod-thangali.internal:25968"
+    }
+  ]
+}

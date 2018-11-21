@@ -1,0 +1,13 @@
+{
+  "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@2",
+  "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001",
+  "name": "ambari-server-2",
+  "type": "FS",
+  "executionType": "FS",
+  "user": "beacon",
+  "status": "SUCCESS",
+  "startTime": "2017-07-28T17:26:00",
+  "endTime": "2017-07-28T17:26:17",
+  "trackingInfo": "{\"jobId\":\"job_1501194648859_0008\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":1521597,\"filesCopied\":28,\"timeTaken\":7900}",
+  "message": "SUCCESS"
+}

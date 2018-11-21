@@ -1,0 +1,107 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="row">
+  <div class="col-xs-2 summary">
+    <dlm-summary-tree [items]="summaryItems" [header]="summaryHeader">
+    </dlm-summary-tree>
+  </div>
+  <div class="col-xs-10">
+    <dlm-jobs-table
+      class="clearfix"
+      *ngIf="contentType===policyContent.Jobs"
+      [sorts]="jobsSort"
+      [filters]="jobsFilters"
+      [page]="jobsPage"
+      [footerOptions]="jobsTableFooterOptions"
+      [jobs]="jobs"
+      [jobsOffset]="jobsOffset"
+      [jobsInput]="jobsInput"
+      [jobsOverallCount]="jobsOverallCount"
+      [policy]="policy"
+      [loadingJobs]="loadingJobs"
+      (onSort)="handleOnSort($event)"
+      (onFilter)="handleOnFilter($event)"
+      (onInput)="handleOnInput($event)"
+      (onSelectAction)="handleOnSelectAction($event)"
+      (onPageChange)="handleOnPageChange($event)"
+      (abortJobAction)="handleAbortJobAction($event)"
+      (rerunJobAction)="handleRerunJobAction($event)"
+    >
+    </dlm-jobs-table>
+    <div *ngIf="contentType===policyContent.Files">
+      <div *ngIf="isSourceCluster; else messageTemplate">
+        <dlm-hdfs-browser *ngIf="fileBasedPolicy()"
+          [rootPath]="hdfsRootPath"
+          [cluster]="sourceCluster"
+          [page]="fileBrowserPage"
+          [restrictAboveRootPath]=true
+          (changePage)="handleOnFilePageChange($event)"
+          (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
+        <dlm-progress-container [progressState]="loadingDatabases" *ngIf="databaseBasedPolicy()">
+          <dlm-hive-browser
+            *ngIf="!loadingDatabases.isInProgress"
+            [tablesLoadingMap]="loadingTables"
+            [databases]="[policyDatabase]"
+            [searchPattern]="tablesSearchPattern"
+            (filterApplied)="handleFilterApplied($event)">
+          </dlm-hive-browser>
+        </dlm-progress-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #messageTemplate>
+  <div class="info-message">
+    <span>{{'page.policies.no_file_browser_info' | translate}}</span>
+  </div>
+</ng-template>
+
+<ng-template #editableHeaderTemplate let-item="item" let-index="rowIndex">
+  {{item.label}}
+  <ng-container *ngIf="canEdit">
+    <i *dlmFeature="features.policy_edit"
+      class="fa fa-edit text-primary actionable"
+      [attr.qe-attr]="'summary-tree-edit-' + item.id"
+      (click)="handleEdit(item)">
+    </i>
+  </ng-container>
+</ng-template>
+
+<ng-template #editableDetailsTemplate let-item="item" let-settings="context">
+  <dlm-inline-edit
+    [showWidget]="showEditWidget(item.id)"
+    [value]="settings?.value"
+    [type]="settings?.type"
+    [options]="settings?.options"
+    [qeAttr]="settings?.qeAttr"
+    (confirmValue)="handleConfirmValue(item, $event)"
+    (cancelValue)="handleCancel(item, $event)">
+    <small class="text-muted" *ngIf="!item.value; else value">
+      {{placeholder(item)}}
+    </small>
+    <ng-template #value>
+      {{item.value}}
+    </ng-template>
+  </dlm-inline-edit>
+</ng-template>

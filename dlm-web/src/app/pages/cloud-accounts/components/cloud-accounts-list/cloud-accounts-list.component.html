@@ -1,0 +1,132 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<dlm-table
+  [theme]="tableTheme"
+  [columns]="columns"
+  [columnMode]="columnMode"
+  [footerHeight]="footerHeight"
+  [showFooter]="showFooter"
+  [limit]="1000"
+  [rows]="accounts"
+  [rowDetailHeight]="rowDetailHeight"
+  [rowClass]="rowClass"
+  [rowDetailTemplate]="rowDetailRef">
+</dlm-table>
+
+<ng-template #statusCell let-account="row" let-index="rowIndex">
+  <i *ngIf="hasError(account)" class="fa fa-fw text-danger cloud-credential-status" [attr.qe-attr]="'cloud-credential-status-' + index"
+     [ngClass]="{'fa-exclamation-triangle': getErrorType(account)}"
+     [tooltip]="errorMessage(account)" container="body"></i>
+</ng-template>
+
+<ng-template #providerCell let-account="row" let-index="rowIndex">
+  <div class="provider-wrapper">
+    <span class="provider"
+      [attr.qe-attr]="'cloud-account-provider-' + index"
+      [tooltip]="errorMessage(account)" container="body" containerClass="account-provider-tooltip">
+      {{CLOUD_PROVIDER_LABELS[account.accountDetails.provider]}}</span>
+    <span class="left-arrow">&#9664;</span>
+  </div>
+</ng-template>
+
+<ng-template #policiesCell let-account="row" let-index="rowIndex">
+  <div [attr.qe-attr]="'cloud-account-policies' + index" class="is-text-large">
+    <span *ngIf="account.policies?.length; else noPolicies" class="actionable" (click)="toggleRowDetails(account)">
+      {{account.policies.length}}
+      <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-chevron-up': isAccountActive(account), 'fa-chevron-down': !isAccountActive(account)}">
+      </span>
+    </span>
+    <ng-template #noPolicies>
+      <span class="fa fa-minus"></span>
+    </ng-template>
+  </div>
+</ng-template>
+
+<ng-template #nameCell let-account="row" let-index="rowIndex">
+  <div class="userName is-text-large" [attr.qe-attr]="'cloud-account-id-' + index">
+    <span [tooltip]="errorMessage(account)" container="body">
+      {{account.id}}
+    </span>
+  </div>
+  <div class="userDetails">
+    <span
+      class="iamRole"
+      [attr.qe-attr]="'cloud-account-account-iamRole-' + index"
+      *ngIf="account.accountDetails.credentialType === AWS_INSTANCEPROFILE">
+      {{'page.cloud_stores.content.accounts.iam_role' | translate}}
+    </span>
+    <span
+      class="userName"
+      [attr.qe-attr]="'cloud-account-account-userName-' + index"
+      [tooltip]="('page.cloud_stores.content.accounts.iam_username' | translate)"
+      container="body"
+      *ngIf="account.accountDetails.userName">
+      {{account.accountDetails.userName}}
+    </span>
+    <span
+      class="accountName"
+      [attr.qe-attr]="'cloud-account-account-name-' + index"
+      [tooltip]="accountTypeMsg(account)"
+      container="body"
+      *ngIf="account.accountDetails.accountName">
+      <span *ngIf="account.accountDetails.userName">|</span> {{account.accountDetails.accountName}}
+    </span>
+  </div>
+  <div *ngIf="isExpiredAccount(account); else outOfSync">
+    <button type="button" class="btn btn-secondary btn-xs" [attr.qe-attr]="'cloud-account-update-button-' + index"
+            (click)="edit(account)">
+      {{'common.update' | translate | uppercase}}
+    </button>
+  </div>
+  <ng-template #outOfSync>
+    <div *ngIf="isOutOfSync(account)">
+      <button type="button" class="btn btn-secondary btn-xs" [attr.qe-attr]="'cloud-account-sync-button-' + index"
+              [disabled]="isSyncInProgress"
+              (click)="sync(account)">
+        <dlm-spinner *ngIf="isSyncInProgress" [size]="spinnerSize.Small"></dlm-spinner>
+        {{'common.sync' | translate | uppercase}}
+      </button>
+    </div>
+  </ng-template>
+</ng-template>
+
+<ng-template #actionsCell let-account="row" let-index="rowIndex">
+  <dlm-cloud-account-actions *ngIf="!isUnregistered(account); else deleteAccount"
+    [attr.qe-attr]="'cloud-account-actions-' + index"
+    [rowId]="account.id"
+    [cloudAccount]="account"
+    [cloudAccountActions]="cloudAccountActions"
+    (handler)="handleSelectedAction($event)">
+  </dlm-cloud-account-actions>
+  <ng-template #deleteAccount>
+    <i class="fa fa-trash fa-fw cloud-credential-status"
+      [tooltip]="(hasUnexpiredPolicies(account) ? 'page.cloud_stores.content.accounts.delete.expired_account_hint' : 'common.delete') | translate"
+      container="body"
+      [ngClass]="{'text-muted disabled': hasUnexpiredPolicies(account), 'text-primary actionable': !hasUnexpiredPolicies(account)}"
+      [attr.qe-attr]="'unregistered-account-delete-action-' + index" (click)="deleteUnregistered(account)"></i>
+  </ng-template>
+</ng-template>
+
+<ng-template let-account="row" ngx-datatable-row-detail-template #rowDetailRef>
+  <dlm-cloud-account-policies-table [policies]="account.policies"></dlm-cloud-account-policies-table>
+</ng-template>

@@ -1,0 +1,10 @@
+{
+  "policyId": "/c1/c1/c2/c2/ystest/0/1497564970816/000000008",
+  "name": "hdfs1policy",
+  "type": "FS",
+  "status": "RUNNING",
+  "frequency": 7200,
+  "endTime": "9999-12-31T00:00:00",
+  "sourceCluster": "c1",
+  "targetCluster": "c2"
+}

@@ -1,0 +1,22 @@
+{
+  "id": 2,
+  "name": "c2",
+  "dataCenter": "dc-Europe",
+  "description": "Cluster c2",
+  "ambariurl": "http://104.196.80.178:8080/api/v1/clusters/c2",
+  "stats": {
+    "CapacityTotal": 9129444352,
+    "CapacityUsed": 564879360,
+    "CapacityRemaining": 3856367616
+  },
+  "location": {
+    "id": 3431161,
+    "country": "AR",
+    "city": "Los Helechos",
+    "latitude": -27.557600021362305,
+    "longitude": -55.07683181762695
+  },
+  "stackMajorVersion": "HDP-2.6",
+  "stackVersion": "HDP-2.6.5.0",
+  "beaconURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
+}

@@ -1,0 +1,86 @@
+/*!
+ * HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+ *
+ * (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+ *
+ * This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+ * of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+ * authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+ * an authorized and properly licensed third party, you do not have any rights to this code.
+ *
+ * If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+ * WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+ * RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+ * OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+ * TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+ * DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+ * OR LOSS OR CORRUPTION OF DATA.
+ */
+
+$header-width: 320px;
+$filter-width: 210px;
+$add-button-width: 125px;
+$filter-margin: 10px;
+
+.page-header {
+  border-bottom-color: transparent;
+}
+
+.service-legend {
+  .hexagon {
+    line-height: 14px;
+  }
+  min-width: 75px;
+  .service-name {
+    line-height: 28px;
+    font-size: small;
+    padding-left: 5px;
+  }
+}
+
+.alert-wrapper {
+  padding: 20px;
+}
+
+.actions {
+  padding-top: 15px;
+}
+
+:host {
+  .filters-block {
+    display: flex;
+
+    .filter-item {
+      margin-right: $filter-margin;
+      &.filter-wrapper {
+        width: calc(100% - #{$add-button-width} - #{$filter-width} - #{$filter-margin} - #{$filter-margin})
+      }
+    }
+  }
+  .filter-buttons {
+    width: $filter-width;
+  }
+  .add-button {
+    width: $add-button-width;
+  }
+  .header {
+    float: left;
+    width: $header-width;
+    padding: 0 15px;
+  }
+  .filters {
+    float: left;
+    width: calc(100% - #{$header-width});
+    padding: 15px 15px 0 15px;
+  }
+  .table-wrapper {
+    margin-top: 10px;
+  }
+  /deep/ {
+    .fa.fa-edit {
+      padding-left: 5px;
+    }
+  }
+}

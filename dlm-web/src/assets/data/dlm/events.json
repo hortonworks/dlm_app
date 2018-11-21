@@ -1,0 +1,146 @@
+{
+  "status": "SUCCEEDED",
+  "message": "success",
+  "requestId": "1922453655@qtp-2021854618-15",
+  "totalCount": 10,
+  "events": [
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ystest/0/1497564970816/000000008",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/ystest/0/1497564970816/000000008@36",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 21:12:38.158",
+      "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/hd_policy/0/1497564970816/000000003",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/hd_policy/0/1497564970816/000000003@99",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-23 20:45:30.482",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/removed/0/1497564970816/000000003",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/removed/0/1497564970816/000000003@99",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-23 20:45:30.482",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/tdk/0/1497564970816/000000002",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/tdk/0/1497564970816/000000002@168",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:44:12.052",
+      "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000001",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000001@184",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:43:36.829",
+      "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ystest/0/1497564970816/000000008",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/ystest/0/1497564970816/000000008@35",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:43:04.67",
+      "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/asdf/0/1497564970816/000000004",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/asdf/0/1497564970816/000000004@50",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-23 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/tdk111/0/1497564970816/000000007",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/tdk111/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-23 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "yusaku-dlm-159-b-1.c.pramod-thangali.internal",
+      "event": "started",
+      "eventType": "system",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:42:15.206",
+      "message": "beacon started successfully"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/testhivepolicy/0/1497564970816/000000006",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/testhivepolicy/0/1497564970816/000000006@47",
+      "event": "ignored",
+      "eventType": "policyinstance",
+      "policyReplType": "HIVE",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:42:03.852",
+      "message": "policy instance ignored"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000001",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000001@183",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 12:16:48.306",
+      "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000007",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-24 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/tdk111/0/1497564970816/000000007",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/tdk111/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-25 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/testhivepolicy/0/1497564970816/000000007",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/testhivepolicy/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-26 20:42:18.454",
+      "message": "policy instance failed"
+    }
+  ]
+}

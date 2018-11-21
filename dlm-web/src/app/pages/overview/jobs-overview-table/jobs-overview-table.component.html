@@ -1,0 +1,127 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<dlm-table
+  #jobsTable
+  [footerOptions]="footerOptions"
+  [columns]="columns"
+  [rows]="jobs"
+  [rowsCount]="jobsCount"
+  (selectColumnAction)="handleSelectedAction($event)">
+</dlm-table>
+<div class="legend pull-right">
+  <dlm-job-status [job]="{status: 'SUCCESS'}">Success</dlm-job-status>
+  <dlm-job-status [job]="{status: 'RUNNING'}">In Progress</dlm-job-status>
+  <dlm-job-status [job]="{status: 'FAILED'}">Failed</dlm-job-status>
+</div>
+
+<dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
+
+<ng-template #sourceNameCellRef let-cluster="value" let-policy="row" let-index="rowIndex">
+  <span [tooltip]="policy.sourceClusterResource?.dataCenter">{{getSourceName(policy)}}</span>
+</ng-template>
+
+<ng-template #targetNameCellRef let-cluster="value" let-policy="row" let-index="rowIndex">
+  <span [tooltip]="policy.targetClusterResource?.dataCenter">{{getTargetName(policy)}}</span>
+</ng-template>
+
+<ng-template #statusCellTemplate let-policy="row">
+  <dlm-job-status
+    qe-attr="show-log"
+    class="actionable"
+    [job]="policy.lastJobResource"
+    [tooltip]="'page.notifications.view_log' | translate"
+    (click)="showPolicyLog(policy)">
+  </dlm-job-status>
+</ng-template>
+
+<ng-template #verbStatusCellTemplate let-job="value" let-policy="row">
+  <span class="actionable"
+        [tooltip]="job.status === JOB_STATUS.RUNNING ? '' : ('page.notifications.view_log' | translate)"
+        (click)="showPolicyLog(policy)">
+    {{job.status | jobStatusFmt}}
+    <i class="fa fa-file-text-o text-info" *ngIf="job.status !== JOB_STATUS.RUNNING"></i>
+  </span>
+</ng-template>
+
+<ng-template #policyNameCellTemplate let-row="row" let-name="value">
+  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name" [tooltip]="name">
+   {{name}}
+  </span>
+</ng-template>
+
+<ng-template #serviceNameCellTemplate let-name="value">
+  <div>
+    <span class="hexagon" [ngClass]="{'hexagon-warning': isHDFS(name), 'hexagon-success': !isHDFS(name)}">
+        <i class="fa" [ngClass]="{'fa-file-o': isHDFS(name), 'fa-database': !isHDFS(name)}"></i>
+    </span>
+    <span class="service-name">{{name}}</span>
+  </div>
+</ng-template>
+
+<ng-template #agoTemplate let-value="value" let-policy="row">
+  <span *ngIf="policy.lastJobResource">
+    <span *ngIf="value; else" [tooltip]="value | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+      {{value | fmtTz | amTimeAgo}}
+    </span>
+    <ng-template #inProgress>
+      {{'common.status.in_progress' | translate}}
+    </ng-template>
+  </span>
+</ng-template>
+
+<ng-template #prevJobs let-jobs="value" let-row="row">
+  <dlm-last-ten-jobs-column qe-attr="go-to-policies" class="actionable" (click)="goToPolicy(row)" [jobs]="jobs"></dlm-last-ten-jobs-column>
+</ng-template>
+
+<ng-template #nextRunTemplate let-row="row">
+  <span [tooltip]="row.nextRun | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+    {{row.nextRun | fmtTz | amDateFormat:'MMM DD, YYYY'}}
+  </span>
+</ng-template>
+
+<ng-template #runTimeTemplate let-value="value" let-policy="row">
+  <dlm-duration-column [isRunning]="isRunning(policy?.lastJobResource)" [duration]="value"></dlm-duration-column>
+</ng-template>
+
+<ng-template #transferredFormattedTemplate let-value="value" let-policy="row">
+  <div *ngIf="policy.lastJobResource.status === JOB_STATUS.RUNNING; else transferredTpl" class="text-muted">
+    {{'common.status.in_progress' | translate}}
+  </div>
+  <ng-template #transferredTpl>
+    <span [innerHtml]="value.bytesCopied | bytesSize" [tooltip]="getTransferredTooltip(value)"></span>
+  </ng-template>
+</ng-template>
+
+<ng-template #destinationIconCell>
+  <i class="fa fa-arrow-right"></i>
+</ng-template>
+
+<ng-template #actionsCell let-row="row">
+  <dlm-policy-actions
+    qe-attr="entity-actions"
+    [rowId]="row.id"
+    [row]="row"
+    [actions]="rowActions"
+    (handler)="handleSelectedAction($event)">
+  </dlm-policy-actions>
+</ng-template>

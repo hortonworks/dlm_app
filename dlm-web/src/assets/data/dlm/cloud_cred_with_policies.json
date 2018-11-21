@@ -1,0 +1,297 @@
+{
+  "unreachableBeacon": [
+    {
+      "code": 5,
+      "beaconUrl": "http://jaimin-beacon-7.c.pramod-thangali.internal:25968",
+      "error": {
+        "message": "error message 1 about unreachable beacon",
+        "status": "FAILED",
+        "requestId": "None"
+      }
+    },
+    {
+      "code": 5,
+      "beaconUrl": "http://jaimin-beacon-6.c.pramod-thangali.internal:25968",
+      "error": {
+        "message": "error message 2 about unreachable beacon",
+        "status": "FAILED",
+        "requestId": "None"
+      }
+    },
+    {
+      "code": 5,
+      "beaconUrl": "http://jaimin-beacon-1.c.pramod-thangali.internal:25968",
+      "error": {
+        "message": "error message 3 about unreachable beacon",
+        "status": "FAILED",
+        "requestId": "None"
+      }
+    }
+  ],
+  "allCloudCreds": [
+    {
+      "name": "dev-credentials",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy1",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "default$c1",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "SUCCESS",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "SUCCESS"
+            }
+          ],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        },
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "default$c1",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "SUCCESS",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "SUCCESS"
+            },
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "FAILED",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "FAILED"
+            }
+          ],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        },
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy3",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "default$c1",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [
+            {
+              "id":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@5",
+              "policyId":
+                "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+              "name": "s3Policy",
+              "type": "FS",
+              "executionType": "FS_HCFS",
+              "user": "beacon",
+              "status": "SUCCESS",
+              "startTime": "2018-02-24T01:27:42",
+              "endTime": "2018-02-24T01:28:10",
+              "trackingInfo":
+                "{\"jobId\":\"job_1519255052761_0011\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":0,\"dirCopied\":0,\"bytesCopied\":0,\"timeTaken\":14529,\"unit\":\"maptasks\"}}",
+              "message": "SUCCESS"
+            }
+          ],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "clusters": [
+        {
+          "clusterId": 1,
+          "isInSync": true
+        }
+      ]
+    },
+    {
+      "name": "wasb-dev-credentials",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/wasbPolicy/0/1519434462287/000000001",
+          "name": "wasbPolicy",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "RUNNING",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "wasb://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "dc-Europe$c2",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0",
+            "queueName": "default",
+            "distcpMapBandwidth": "100",
+            "distcpMaxMaps": "10"
+          },
+          "jobs": [{
+            "id": "/default/c1/default/c1/wasbPolicy/0/1519434462287/000000001@1",
+            "policyId": "/default/c1/default/c1/wasbPolicy/0/1519434462287/000000001",
+            "name": "wasbPolicy",
+            "type": "FS",
+            "executionType": "FS_HCFS",
+            "user": "beacon",
+            "status": "SUCCESS",
+            "startTime": "2018-02-24T01:07:43",
+            "endTime": "2018-02-24T01:08:18",
+            "trackingInfo": "{\"jobId\":\"job_1519255052761_0007\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":1,\"dirCopied\":0,\"bytesCopied\":32,\"timeTaken\":17508,\"unit\":\"maptasks\"}}",
+            "message": "SUCCESS"
+          }],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:08:18"
+            }
+          }
+        }
+      ],
+      "clusters": [
+        {
+          "clusterId": 1,
+          "isInSync": true
+        }
+      ]
+    },
+
+    {
+      "name": "out-of-sync",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "ENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "dc-Europe$c2",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "clusters": [
+        {
+          "clusterId": 2,
+          "isInSync": false
+        }
+      ],
+      "cloudCred": {
+        "id": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+      }
+    },
+    {
+      "name": "unregistered",
+      "policies": [
+        {
+          "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+          "name": "s3Policy2",
+          "type": "FS",
+          "executionType": "FS_HCFS",
+          "status": "SUSPENDED",
+          "sourceDataset": "/beacon-test",
+          "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+          "frequency": 300,
+          "endTime": "9999-12-31T00:00:00",
+          "sourceCluster": "dc-Europe$c2",
+          "customProperties": {
+            "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0"
+          },
+          "jobs": [],
+          "report": {
+            "lastSucceededInstance": {
+              "status": "SUCCESS",
+              "endTime": "2018-02-24T01:28:10"
+            }
+          }
+        }
+      ],
+      "cloudCred": {
+        "name": "unregistered",
+        "configs": {"version": "1"},
+        "creationTime": "2018-03-28T23:25:15",
+        "id": "8e9db93d-78cb-48b0-8112-1352a511bda0",
+        "lastModifiedTime": "2018-03-28T23:25:15",
+        "provider": "AWS"
+      }
+    }
+  ]
+}

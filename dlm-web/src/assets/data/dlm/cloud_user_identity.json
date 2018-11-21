@@ -1,0 +1,6 @@
+{
+  "provider":"AWS",
+  "credentialType":"AWS_ACCESSKEY",
+  "accountName":"974722628977",
+  "userName":"dlm-s3-account"
+}

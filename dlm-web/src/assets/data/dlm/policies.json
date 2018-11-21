@@ -1,0 +1,444 @@
+{
+  "unreachableBeacon": [],
+  "policies": [{
+    "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+    "name": "s3Policy",
+    "type": "FS",
+    "executionType": "FS_HCFS",
+    "status": "RUNNING",
+    "sourceDataset": "/beacon-test",
+    "targetDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+    "frequency": 300,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c2",
+    "customProperties": {
+      "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0",
+      "queueName": "default",
+      "distcpMapBandwidth": "100",
+      "distcpMaxMaps": "10"
+    },
+    "jobs": [{
+      "id": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@1",
+      "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+      "name": "s3Policy",
+      "type": "FS",
+      "executionType": "FS_HCFS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2018-02-24T01:07:43",
+      "endTime": "2018-02-24T01:08:18",
+      "trackingInfo": "{\"jobId\":\"job_1519255052761_0007\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":1,\"dirCopied\":0,\"bytesCopied\":32,\"timeTaken\":17508,\"unit\":\"maptasks\"}}",
+      "message": "SUCCESS"
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2018-02-24T01:08:18"
+      }
+    }
+  }, {
+    "policyId": "/default/c1/default/c1/wasbPolicy/0/1519434462287/000000001",
+    "name": "wasbPolicy",
+    "type": "FS",
+    "executionType": "FS_HCFS",
+    "status": "RUNNING",
+    "sourceDataset": "/beacon-test",
+    "targetDataset": "wasb://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+    "frequency": 300,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c2",
+    "customProperties": {
+      "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0",
+      "queueName": "default",
+      "distcpMapBandwidth": "100",
+      "distcpMaxMaps": "10"
+    },
+    "jobs": [{
+      "id": "/default/c1/default/c1/wasbPolicy/0/1519434462287/000000001@1",
+      "policyId": "/default/c1/default/c1/wasbPolicy/0/1519434462287/000000001",
+      "name": "wasbPolicy",
+      "type": "FS",
+      "executionType": "FS_HCFS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2018-02-24T01:07:43",
+      "endTime": "2018-02-24T01:08:18",
+      "trackingInfo": "{\"jobId\":\"job_1519255052761_0007\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":1,\"dirCopied\":0,\"bytesCopied\":32,\"timeTaken\":17508,\"unit\":\"maptasks\"}}",
+      "message": "SUCCESS"
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2018-02-24T01:08:18"
+      }
+    }
+  }, {
+    "policyId": "/default/c1/default/c1/S3-to-on-prem/0/1519434462287/000000001",
+    "name": "S3-to-on-prem",
+    "type": "FS",
+    "executionType": "FS_HCFS",
+    "status": "RUNNING",
+    "sourceDataset": "s3://jaimin-dlm-app/home/jaimin/beacon-replication/test1",
+    "targetDataset": "/beacon-test",
+    "frequency": 300,
+    "endTime": "9999-12-31T00:00:00",
+    "targetCluster": "dc-Europe$c2",
+    "customProperties": {
+      "cloudCred": "14e96676-c2e9-4aad-92d9-8eefcfe209f0",
+      "queueName": "default",
+      "distcpMapBandwidth": "100"
+    },
+    "jobs": [{
+      "id": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001@1",
+      "policyId": "/default/c1/default/c1/s3Policy/0/1519434462287/000000001",
+      "name": "s3Policy",
+      "type": "FS",
+      "executionType": "FS_HCFS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2018-02-24T01:07:43",
+      "endTime": "2018-02-24T01:08:18",
+      "trackingInfo": "{\"jobId\":\"job_1519255052761_0007\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"failed\":0,\"killed\":0,\"filesCopied\":1,\"dirCopied\":0,\"bytesCopied\":32,\"timeTaken\":17508,\"unit\":\"maptasks\"}}",
+      "message": "SUCCESS"
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2018-02-24T01:08:18"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c1/dc-Europe/c2/hive-cloud/0/1501199282746/000000001",
+    "name": "hive-cloud",
+    "description": "Hive cloud replication",
+    "type": "HIVE",
+    "executionType": "HIVE",
+    "status": "RUNNING",
+    "sourceDataset": "testdb",
+    "targetDataset": "testdb",
+    "frequency": 86400,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c2",
+    "targetCluster": "dc-Europe$c1",
+    "jobs": [],
+    "report": {},
+    "customProperties": {
+      "queueName": "child-test-queue",
+      "cloudCred": "171f6ded-3f4c-43db-858d-fd1b5ce10ea3"
+    }
+  }, {
+    "policyId": "/dc-Europe/c2/dc-Europe/c1/1234567890123456789012345678901234567890123456789012345678901234/0/1501516834949/000000010",
+    "name": "1234567890123456789012345678901234567890123456789012345678901234",
+    "type": "FS",
+    "executionType": "FS",
+    "status": "SUSPENDEDFORINTERVENTION",
+    "sourceDataset": "/",
+    "targetDataset": "/",
+    "frequency": 86400,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c2",
+    "targetCluster": "dc-Europe$c1",
+    "jobs": [{
+      "id": "/dc-Europe/c2/dc-Europe/c1/1234567890123456789012345678901234567890123456789012345678901234/0/1501516834949/000000010@1",
+      "policyId": "/dc-Europe/c2/dc-Europe/c1/1234567890123456789012345678901234567890123456789012345678901234/0/1501516834949/000000010",
+      "name": "1234567890123456789012345678901234567890123456789012345678901234",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "FAILED",
+      "startTime": "2017-07-31T16:53:52",
+      "endTime": "2017-07-31T17:11:25",
+      "trackingInfo": "{\"jobId\":\"job_1501190983539_0016\",\"jobType\":\"MAIN\",\"progress\": {\"total\":0,\"completed\":0,\"bytesCopied\":0,\"filesCopied\":0,\"timeTaken\":211}}",
+      "message": "java.io.IOException: DistCp failure: Job job_1501190983539_0016 has failed: Task failed task_1501190983539_0016_m_000000\nJob failed as tasks failed. failedMaps:1 failedReduces:0\n"
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T17:11:25"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c2/dc-Europe/c1/aaaaaaaaaaaaaaaaaaaaa/0/1501516834949/000000007",
+    "name": "aaaaaaaaaaaaaaaaaaaaa",
+    "type": "FS",
+    "executionType": "FS_SNAPSHOT",
+    "status": "FAILED",
+    "sourceDataset": "/",
+    "targetDataset": "/",
+    "frequency": 60,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c1",
+    "targetCluster": "dc-Europe$c2",
+    "customProperties": {
+      "enableSnapshotBasedReplication" : "true"
+    },
+    "jobs": [{
+      "id": "/dc-Europe/c2/dc-Europe/c1/aaaaaaaaaaaaaaaaaaaaa/0/1501516834949/000000007@1",
+      "policyId": "/dc-Europe/c2/dc-Europe/c1/aaaaaaaaaaaaaaaaaaaaa/0/1501516834949/000000007",
+      "name": "aaaaaaaaaaaaaaaaaaaaa",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "FAILED",
+      "startTime": "2017-07-31T16:07:39",
+      "endTime": "2017-07-31T16:15:13",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0010\",\"jobType\":\"MAIN\",\"progress\":{\"total\":3,\"completed\":1,\"killed\":1,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":1000,\"timeTaken\":7430,\"unit\":\"table\"}}",
+      "message": "java.io.IOException: DistCp failure: Job job_1501190983539_0011 has failed: Task failed task_1501190983539_0011_m_000000\nJob failed as tasks failed. failedMaps:1 failedReduces:0\n"
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T16:15:13"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c2/dc-Europe/c1/asd/0/1501516834949/000000008",
+    "name": "asd",
+    "type": "FS",
+    "executionType": "FS",
+    "status": "RUNNING",
+    "sourceDataset": "/app-logs",
+    "targetDataset": "/app-logs",
+    "frequency": 2147472000,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c2",
+    "targetCluster": "dc-Europe$c1",
+    "jobs": [{
+      "id": "/dc-Europe/c2/dc-Europe/c1/asd/0/1501516834949/000000008@1",
+      "policyId": "/dc-Europe/c2/dc-Europe/c1/asd/0/1501516834949/000000008",
+      "name": "asd",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2017-07-31T16:28:38",
+      "endTime": "2017-07-31T16:29:12",
+      "trackingInfo": "{\"jobId\":\"job_1501190983539_0012\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":3872393,\"filesCopied\":583,\"timeTaken\":22780}}",
+      "message": "SUCCESS"
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2017-07-31T16:29:12"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c1/dc-Europe/c2/321/0/1501370918147/000000002",
+    "name": "321",
+    "type": "FS",
+    "executionType": "FS_SNAPSHOT",
+    "status": "RUNNING",
+    "sourceDataset": "/ambari-server-log",
+    "targetDataset": "/ambari-server-log",
+    "frequency": 86400,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c1",
+    "targetCluster": "dc-Europe$c2",
+    "customProperties": {
+      "enableSnapshotBasedReplication" : "true"
+    },
+    "jobs": [{
+      "id": "/dc-Europe/c1/dc-Europe/c2/321/0/1501370918147/000000002@1",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/321/0/1501370918147/000000002",
+      "name": "321",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "FAILED",
+      "startTime": "2017-07-31T16:09:01",
+      "endTime": "2017-07-31T16:10:32",
+      "message": "org.apache.hadoop.security.AccessControlException: Permission denied: user=beacon, access=WRITE, inode=\"/ambari-server-log\":hdfs:hdfs:drwxr-xr-x\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:319)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:292)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:213)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:190)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1955)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1939)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1922)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:71)\n\tat org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:4150)\n\tat org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:1109)\n\tat org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:633)\n\tat org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)\n\tat org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:640)\n\tat org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2351)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2347)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1866)\n\tat org.apache.hadoop.ipc.Server$Handler.run(Server.java:2345)\n"
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T16:10:32"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001",
+    "name": "ambari-server-2",
+    "type": "FS",
+    "executionType": "FS",
+    "status": "RUNNING",
+    "sourceDataset": "/user/beacon/ambari-server-2",
+    "targetDataset": "/user/beacon/ambari-server-2",
+    "frequency": 1800,
+    "startTime": "2017-07-28T16:56:00",
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c1",
+    "targetCluster": "dc-Europe$c2",
+    "jobs": [{
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@156",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001",
+      "name": "ambari-server-2",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "SKIPPED",
+      "startTime": "2017-07-31T22:26:00",
+      "endTime": "2017-07-31T22:26:18",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0316\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7558}}",
+      "message": "SUCCESS"
+    }, {
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@155",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001",
+      "name": "ambari-server-2",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "RUNNING",
+      "startTime": "2017-07-31T21:56:00",
+      "endTime": "2017-07-31T21:56:17",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0314\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7800}}",
+      "message": "SUCCESS"
+    }, {
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@154",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001",
+      "name": "ambari-server-2",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2017-07-31T21:26:00",
+      "endTime": "2017-07-31T21:26:16",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0312\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7461}}",
+      "message": "SUCCESS"
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2017-07-31T21:26:16"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001",
+    "name": "ambari-server-log",
+    "type": "FS",
+    "executionType": "FS",
+    "status": "RUNNING",
+    "sourceDataset": "/user/beacon/ambari-server",
+    "targetDataset": "/user/beacon/ambari-server",
+    "frequency": 1800,
+    "startTime": "2017-07-27T22:48:00",
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c1",
+    "targetCluster": "dc-Europe$c2",
+    "jobs": [{
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001@192",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001",
+      "name": "ambari-server-log",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2017-07-31T22:18:00",
+      "endTime": "2017-07-31T22:18:18",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0315\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7364}}",
+      "message": "SUCCESS"
+    }, {
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001@191",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001",
+      "name": "ambari-server-log",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2017-07-31T21:48:00",
+      "endTime": "2017-07-31T21:48:19",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0313\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7510}}",
+      "message": "SUCCESS"
+    }, {
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001@190",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001",
+      "name": "ambari-server-log",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "SUCCESS",
+      "startTime": "2017-07-31T21:18:00",
+      "endTime": "2017-07-31T21:18:18",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0311\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7591}}",
+      "message": "SUCCESS"
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2017-07-31T22:18:18"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001",
+    "name": "ambari-server-log-2",
+    "type": "FS",
+    "executionType": "FS",
+    "status": "SUSPENDED",
+    "sourceDataset": "/ambari-server-log",
+    "targetDataset": "/ambari-server-log",
+    "frequency": 900,
+    "startTime": "2017-07-29T23:30:00",
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c1",
+    "targetCluster": "dc-Europe$c2",
+    "jobs": [{
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001@189",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001",
+      "name": "ambari-server-log-2",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "FAILED",
+      "startTime": "2017-07-31T22:30:00",
+      "endTime": "2017-07-31T22:31:30",
+      "message": "org.apache.hadoop.security.AccessControlException: Permission denied: user=beacon, access=WRITE, inode=\"/ambari-server-log\":hdfs:hdfs:drwxr-xr-x\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:319)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:292)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:213)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:190)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1955)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1939)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1922)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:71)\n\tat org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:4150)\n\tat org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:1109)\n\tat org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:633)\n\tat org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)\n\tat org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:640)\n\tat org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2351)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2347)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1866)\n\tat org.apache.hadoop.ipc.Server$Handler.run(Server.java:2345)\n"
+    }, {
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001@188",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001",
+      "name": "ambari-server-log-2",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "FAILED",
+      "startTime": "2017-07-31T22:15:00",
+      "endTime": "2017-07-31T22:16:30",
+      "message": "org.apache.hadoop.security.AccessControlException: Permission denied: user=beacon, access=WRITE, inode=\"/ambari-server-log\":hdfs:hdfs:drwxr-xr-x\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:319)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:292)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:213)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:190)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1955)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1939)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1922)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:71)\n\tat org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:4150)\n\tat org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:1109)\n\tat org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:633)\n\tat org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)\n\tat org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:640)\n\tat org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2351)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2347)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1866)\n\tat org.apache.hadoop.ipc.Server$Handler.run(Server.java:2345)\n"
+    }, {
+      "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001@187",
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001",
+      "name": "ambari-server-log-2",
+      "type": "FS",
+      "executionType": "FS",
+      "user": "beacon",
+      "status": "FAILED",
+      "startTime": "2017-07-31T22:00:00",
+      "endTime": "2017-07-31T22:01:30",
+      "message": "org.apache.hadoop.security.AccessControlException: Permission denied: user=beacon, access=WRITE, inode=\"/ambari-server-log\":hdfs:hdfs:drwxr-xr-x\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:319)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:292)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:213)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:190)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1955)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1939)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1922)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:71)\n\tat org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:4150)\n\tat org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:1109)\n\tat org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:633)\n\tat org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)\n\tat org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:640)\n\tat org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2351)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2347)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1866)\n\tat org.apache.hadoop.ipc.Server$Handler.run(Server.java:2345)\n"
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T22:31:30"
+      }
+    }
+  }, {
+    "policyId": "/dc-Europe/c1/dc-Europe/c2/tde-enabled/0/1501199282746/000000001",
+    "name": "tde-enabled",
+    "description": "TDE Enabled policy. Throw error on update",
+    "type": "HIVE",
+    "executionType": "HIVE",
+    "status": "RUNNING",
+    "sourceDataset": "testdb",
+    "targetDataset": "testdb",
+    "frequency": 86400,
+    "endTime": "9999-12-31T00:00:00",
+    "sourceCluster": "dc-Europe$c1",
+    "targetCluster": "dc-Europe$c2",
+    "jobs": [],
+    "report": {},
+    "customProperties": {
+      "tde.enabled": "true",
+      "queueName": "child-test-queue"
+    }
+  }]
+}
+

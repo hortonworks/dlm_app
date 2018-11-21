@@ -1,0 +1,69 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<h4 class="title">{{"common.policies" | translate}}</h4>
+
+<dlm-table
+  [showFooter]="false"
+  [theme]="tableTheme"
+  [columns]="columns"
+  [columnMode]="columnMode"
+  [rows]="policies"
+  [limit]="1000"
+  [scrollbarV]="true"
+  [footerOptions]="tableFooterOptions">
+</dlm-table>
+
+<ng-template #verbStatusCellTemplate let-value="value" let-index="rowIndex" let-policy="row">
+  <dlm-policy-status-column
+    class="inline-block"
+    [showText]="false"
+    [status]="policy.uiStatus">
+  </dlm-policy-status-column>
+  <span [attr.qe-attr]="'policy-status-' + index" class="policy-status">{{value | translate}}</span>
+</ng-template>
+
+<ng-template #policyNameCellTemplate let-row="row" let-name="value" let-index="rowIndex">
+  <span [attr.qe-attr]="'go-to-policies-' + index" (click)="goToPolicy(row)" class="actionable text-primary policy-name" [tooltip]="name" container="body">
+   {{name}}
+  </span>
+</ng-template>
+
+<ng-template #prevJobsCellTemplate let-policy="row" let-index="rowIndex">
+  <span [attr.qe-attr]="'policy-jobs-' + index">
+    <dlm-prev-jobs [policy]="policy"></dlm-prev-jobs>
+  </span>
+</ng-template>
+
+<ng-template #endTimeCellTemplate let-policy="row" let-index="rowIndex">
+  <span [attr.qe-attr]="'policy-end-time-' + index" *ngIf="policy?.endTime">{{policy?.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
+</ng-template>
+
+<ng-template #lastJobTimeCellTemplate let-time="value" let-policy="row" let-index="rowIndex">
+  <span *ngIf="time; else noData" [attr.qe-attr]="'policy-last-job-' + index"
+        [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+    {{time | fmtTz | amTimeAgo}}
+  </span>
+  <ng-template #noData>
+    <span [attr.qe-attr]="'policy-last-good-' + index">n/a</span>
+  </ng-template>
+</ng-template>

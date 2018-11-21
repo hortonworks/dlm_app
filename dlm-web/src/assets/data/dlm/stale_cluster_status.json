@@ -1,0 +1,24 @@
+{
+  "clusters": [
+    {
+      "id": 1,
+      "stale": false
+    },
+    {
+      "id": 2,
+      "stale": true
+    },
+    {
+      "id": 3,
+      "stale": true
+    },
+    {
+      "id": 4,
+      "stale": true
+    },
+    {
+      "id": 5,
+      "stale": true
+    }
+  ]
+}
