@@ -1,0 +1,14 @@
+{
+  "id": 1,
+  "username": "admin",
+  "avatar": null,
+  "roles": ["SUPERADMIN", "INFRAADMIN", "USER", "CURATOR"],
+  "services": ["dlm"],
+  "display": "Super Administrator",
+  "token": "eyJhbGciOiJSUzI1NiJ9.eyJleHAiOjE1MDIxNTY3MzAsInVzZXIiOiJ7XCJpZFwiOjEsXCJ1c2VybmFtZVwiOlwiYWRtaW5cIixcImF2YXRhclwiOm51bGwsXCJyb2xlc1wiOltcIlNVUEVSQURNSU5cIixcIklORlJBQURNSU5cIixcIlVTRVJcIixcIkNVUkFUT1JcIl0sXCJzZXJ2aWNlc1wiOltcImRsbVwiXSxcImRpc3BsYXlcIjpcIlN1cGVyIEFkbWluaXN0cmF0b3JcIixcInRva2VuXCI6bnVsbCxcInBhc3N3b3JkXCI6XCIkMmEkMTAkRzhoRTFZaWthd2dremJGeTNYUW1rLlhFYllWUmVmNjJEaU9jYXVibFdMY0M5YkUzb282VVdcIixcImFjdGl2ZVwiOnRydWV9In0.gzTVkJt40XRFMgqoDwq8FZlG1OKFLFHLiaaYw7BqvbA9qcG6JSV4NlTiSvrrKYyxcz2lX2zW4_onBvLyHPqLxVMwZwt1kqy9haUjqIIYPe_qEuEyyP1eta5Y3smyn_ZHm7XyeDRxFmR7txPZHxYLhp_G5K4-tkdfTOcn72lTqqduuIr77xiLN6qjMxWuk0hJcxwuo8Razomma5Cc356gHfaybirq_KQWbrrAaM3pXUCpU7dRZ1Rqy-a0vkQBoGSHxsSlgiOW2m9C9sYgmwfMCZ4lSBTRQ_yNwrI6s4rty6DX3wv5fcn1Fg0YHTSfuzpNbYrHuzVSRCtPZSCqg0k1eg",
+  "password": "$2a$10$G8hE1YikawgkzbFy3XQmk.XEbYVRef62DiOcaublWLcC9bE3oo6UW",
+  "active": true,
+  "dbManaged": true,
+  "groupManaged": false,
+  "updatedAt": 1530652309
+}

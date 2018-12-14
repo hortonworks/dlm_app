@@ -1,0 +1,75 @@
+{
+    "unreachableAmbari": [],
+    "configDetails": [
+        {
+            "clusterId": 2,
+            "underlyingFsForHive": "HDFS",
+            "configs": {
+                "hive.warehouse.subdir.inherit.perms": "true",
+                "hive.metastore.warehouse.dir": "/apps/hive/warehouse",
+                "hive.metastore.uris": "thrift://example.com:9083",
+                "hsEndpoint": "jdbc:hive2://example.com:2181,example2.com:2181,example.com:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2",
+                "hive.metastore.kerberos.principal": "hive/_HOST@EXAMPLE.COM"
+            }
+        },
+        {
+            "clusterId": 1,
+            "underlyingFsForHive": "S3",
+            "configs": {
+                "hive.warehouse.subdir.inherit.perms": "true",
+                "hive.metastore.warehouse.dir": "s3a://bucketname/objectpath",
+                "hive.metastore.uris": "thrift://example.com:9083",
+                "hsEndpoint": "jdbc:hive2://example.com:2181,example2.com:2181,example3.com:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2",
+                "hive.metastore.kerberos.principal": "hive/_HOST@EXAMPLE.COM",
+                "atlasEndpoint": "atlas://example.com"
+            }
+        },
+        {
+            "clusterId": 3,
+            "underlyingFsForHive": "HDFS",
+            "configs": {
+                "hive.warehouse.subdir.inherit.perms": "true",
+                "hive.metastore.warehouse.dir": "/apps/hive/warehouse",
+                "hive.metastore.uris": "thrift://example.com:9083",
+                "hsEndpoint": "jdbc:hive2://example.com:2181,example2.com:2181,example3.com:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2",
+                "hive.metastore.kerberos.principal": "hive/_HOST@EXAMPLE.COM",
+                "atlasEndpoint": "atlas://example.com"
+            }
+        },
+        {
+            "clusterId": 6,
+            "underlyingFsForHive": "HDFS",
+            "configs": {
+                "hive.warehouse.subdir.inherit.perms": "true",
+                "hive.metastore.warehouse.dir": "/apps/hive/warehouse",
+                "hive.metastore.uris": "thrift://example.com:9083",
+                "hsEndpoint": "jdbc:hive2://example.com:2181,example2.com:2181,example3.com:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2",
+                "hive.metastore.kerberos.principal": "hive/_HOST@EXAMPLE.COM"
+            }
+        },
+        {
+            "clusterId": 4,
+            "underlyingFsForHive": "HDFS",
+            "configs": {
+                "hive.warehouse.subdir.inherit.perms": "true",
+                "hive.metastore.warehouse.dir": "/apps/hive/warehouse",
+                "hive.metastore.uris": "thrift://example.com:9083",
+                "hsEndpoint": "jdbc:hive2://example.com:2181,example2.com:2181,example3.com:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2",
+                "hive.metastore.kerberos.principal": "hive/_HOST@EXAMPLE.COM",
+                "atlasEndpoint": "atlas://example.com"
+            }
+        },
+        {
+            "clusterId": 7,
+            "underlyingFsForHive": "GCS",
+            "configs": {
+                "hive.warehouse.subdir.inherit.perms": "true",
+                "hive.metastore.warehouse.dir": "gs://bucketname/objectpath",
+                "hive.metastore.uris": "thrift://example.com:9083",
+                "hsEndpoint": "jdbc:hive2://example.com:2181,example2.com:2181,example3.com:2181/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=hiveserver2",
+                "hive.metastore.kerberos.principal": "hive/_HOST@EXAMPLE.COM",
+                "atlasEndpoint": "atlas://example.com"
+            }
+        }
+    ]
+}

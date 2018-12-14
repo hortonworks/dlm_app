@@ -1,0 +1,119 @@
+{
+  "unreachableBeacon": [
+    {
+      "code": 5,
+      "beaconUrl": "http://jaimin-beacon-7.c.pramod-thangali.internal:25968",
+      "error": {
+        "message": "error message about unreachable beacon",
+        "status": "FAILED",
+        "requestId": "None"
+      }
+    },
+    {
+      "code": 5,
+      "beaconUrl": "http://jaimin-beacon-6.c.pramod-thangali.internal:25968",
+      "error": {
+        "message": "error message 2 about unreachable beacon",
+        "status": "FAILED",
+        "requestId": "None"
+      }
+    },
+    {
+      "code": 5,
+      "beaconUrl": "http://jaimin-beacon-1.c.pramod-thangali.internal:25968",
+      "error": {
+        "message": "error message 3 about unreachable beacon",
+        "status": "FAILED",
+        "requestId": "None"
+      }
+    }
+  ],
+  "response": [
+    {
+      "clusterId": 1,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.1.2.0-76",
+        "plugins": "ATLAS",
+        "security": "None",
+        "wireEncryption": false,
+        "replication_cloud_fs": true,
+        "replication_TDE": true,
+        "enableSnapshotBasedReplication": true,
+        "policy_edit": true,
+        "clusterUpdateSupported": true
+      }
+    },
+    {
+      "clusterId": 2,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.1.2.0-76",
+        "plugins": "RANGER,ATLAS",
+        "security": "None",
+        "wireEncryption": false,
+        "replication_cloud_fs": true,
+        "replication_TDE": true,
+        "policy_edit": true,
+        "clusterUpdateSupported": true
+      }
+    },
+    {
+      "clusterId": 3,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.1.1.0-76",
+        "plugins": "RANGER,ATLAS",
+        "security": "None",
+        "wireEncryption": false
+      }
+    },
+    {
+      "clusterId": 4,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.0.0.0-SNAPSHOT",
+        "plugins": "None",
+        "security": "None",
+        "wireEncryption": false
+      }
+    },
+    {
+      "clusterId": 5,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.0.0.0-76",
+        "plugins": "None",
+        "security": "None",
+        "wireEncryption": false
+      }
+    },
+    {
+      "clusterId": 6,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.1.2.0-76",
+        "plugins": "RANGER,ATLAS",
+        "security": "None",
+        "wireEncryption": false,
+        "replication_cloud_fs": true,
+        "replication_TDE": true,
+        "policy_edit": true,
+        "clusterUpdateSupported": true
+      }
+    },
+    {
+      "clusterId": 7,
+      "beaconAdminStatus": {
+        "status": "WARNING",
+        "version": "1.0.0.1.3.0.0-76",
+        "plugins": "RANGER,ATLAS",
+        "security": "None",
+        "wireEncryption": false,
+        "replication_cloud_fs": true,
+        "wasbReplicationSupported": true,
+        "gcsReplicationSupported": true
+      }
+    }
+  ]
+}

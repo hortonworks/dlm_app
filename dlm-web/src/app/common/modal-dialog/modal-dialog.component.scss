@@ -1,0 +1,84 @@
+/*!
+ * HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+ *
+ * (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+ *
+ * This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+ * of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+ * authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+ * an authorized and properly licensed third party, you do not have any rights to this code.
+ *
+ * If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+ * WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+ * RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+ * OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+ * TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+ * DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+ * OR LOSS OR CORRUPTION OF DATA.
+ */
+
+$full-page-margin: 0px;
+$modal-header-height: 70px;
+
+.modal {
+  // navbar has z-index 2079
+  z-index: 2080;
+}
+
+.modal-dialog {
+  margin-left: auto;
+  margin-right: auto;
+
+  &.small-modal {
+    width: 40%;
+  }
+  &.medium-modal {
+    width: 50%;
+  }
+  &.large-modal {
+    width: 70%;
+  }
+  &.fixed-400 {
+    width: 400px;
+  }
+  &.full-page {
+    width: calc(100vw - 2 * #{$full-page-margin});
+    height: calc(100vh - 2 * #{$full-page-margin});
+    margin: $full-page-margin;
+    .modal-body {
+      max-height: calc(100vh - 2 * #{$full-page-margin} - #{$modal-header-height});
+      padding: 0;
+    }
+  }
+}
+
+.modal-header {
+  height: $modal-header-height;
+  .close {
+    margin-top: 2px;
+    margin-right: 10px;
+    font-size: 30px;
+    opacity: 0.4;
+    &:focus {
+      outline: 0;
+    }
+  }
+  .modal-title {
+    .modal-sub-title {
+      padding-left: 5px;
+    }
+  }
+}
+
+.modal-body {
+  min-height: 70px;
+  font-size: 14px !important;
+  max-height: calc(100vh - 225px);
+  overflow-y: auto;
+}
+
+.modal-title {
+  color: #333 !important;
+}

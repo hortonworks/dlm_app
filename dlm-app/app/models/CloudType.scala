@@ -1,0 +1,108 @@
+/*
+ * HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+ *
+ * (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+ *
+ * This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+ * of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+ * authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+ * an authorized and properly licensed third party, you do not have any rights to this code.
+ *
+ * If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+ * WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+ * RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+ * OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+ * TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+ * DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+ * OR LOSS OR CORRUPTION OF DATA.
+ */
+
+package models
+
+import models.CloudAccountProvider.CloudAccountProvider
+import models.CloudCredentialType.CloudCredentialType
+import play.api.libs.json._
+
+/**
+  * Cloud types that are supported for cloud replication
+  */
+sealed trait CloudType {
+  def name: String
+}
+
+case object S3 extends CloudType { val name = "S3" }
+
+case object ADLS extends CloudType { val name = "ADLS" }
+
+case object WASB extends CloudType { val name = "WASB" }
+
+/**
+  * Cloud credential types that are supported for cloud replication
+  */
+object CloudCredentialType extends Enumeration {
+  type CloudCredentialType = Value
+
+  val WASB_ACCESSKEY = Value("WASB_ACCESSKEY")
+  val WASB_SAS_TOKEN = Value("WASB_SAS_TOKEN")
+  val AWS_ACCESSKEY = Value("AWS_ACCESSKEY")
+  val AWS_INSTANCEPROFILE = Value("AWS_INSTANCEPROFILE")
+  val ADLS_STS = Value("ADLS_STS")
+  val GCS_PRIVATEKEY = Value("GCS_PRIVATEKEY")
+
+  implicit val cloudCredentialTypeFormat = new Format[CloudCredentialType] {
+    def reads(json: JsValue) = JsSuccess(CloudCredentialType.withName(json.as[String]))
+    def writes(myEnum: CloudCredentialType) = JsString(myEnum.toString)
+  }
+}
+
+/**
+  * Hive underlying FS type
+  */
+object HiveFileSystemType extends Enumeration {
+  type HiveFileSystemType = Value
+
+  val HDFS = Value("HDFS")
+  val S3 = Value("S3")
+  val WASB = Value("WASB")
+  val GCS = Value("GCS")
+
+  implicit val hiveFileSystemTypeFormat = new Format[HiveFileSystemType] {
+    def reads(json: JsValue) = JsSuccess(HiveFileSystemType.withName(json.as[String]))
+    def writes(myEnum: HiveFileSystemType) = JsString(myEnum.toString)
+  }
+}
+
+/**
+  * List of supported cloud providers
+  */
+object CloudAccountProvider extends Enumeration {
+  type CloudAccountProvider = Value
+
+  val WASB = Value("WASB")
+  val AWS = Value("AWS")
+  val ADLS = Value("ADLS")
+  val GCS = Value("GCS")
+
+  implicit val cloudAccountProviderFormat = new Format[CloudAccountProvider] {
+    def reads(json: JsValue) = JsSuccess(CloudAccountProvider.withName(json.as[String]))
+    def writes(myEnum: CloudAccountProvider) = JsString(myEnum.toString)
+  }
+}
+
+object CloudAccountStatus extends Enumeration {
+  type CloudAccountStatus = Value
+
+  val ACTIVE = Value("ACTIVE")
+  val EXPIRED = Value("EXPIRED")
+
+  implicit val cloudAccountStatusFormat = new Format[CloudAccountStatus] {
+    def reads(json: JsValue) = JsSuccess(CloudAccountStatus.withName(json.as[String]))
+    def writes(myEnum: CloudAccountStatus) = JsString(myEnum.toString)
+  }
+}
+
+object CloudEncryptionType {
+  val encryptionMap = Map("AWS_SSES3" -> "AES256", "AWS_SSEKMS" -> "SSE-KMS")
+}

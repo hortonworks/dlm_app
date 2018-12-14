@@ -1,0 +1,145 @@
+/*!
+ * HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+ *
+ * (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+ *
+ * This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+ * of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+ * authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+ * an authorized and properly licensed third party, you do not have any rights to this code.
+ *
+ * If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+ * WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+ * RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+ * OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+ * TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+ * DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+ * OR LOSS OR CORRUPTION OF DATA.
+ */
+
+@import '../../../../styles/variables';
+
+$navigation-menu-width: 300px;
+
+.wizard {
+  .wizard-body {
+    .dlm-radio-group {
+      .dlm-radio-item {
+        float: left;
+        &:not(:first-child) {
+          padding-left: 15px;
+        }
+      }
+    }
+  }
+}
+
+.schedule-group {
+  .new-row {
+    padding-top: 20px;
+  }
+}
+
+.date-time-group {
+  .time-control {
+    display: flex;
+    justify-content: center;
+  }
+
+  .clock-icon {
+    font-size: 20px;
+    align-self: center;
+    margin-right: 15px;
+  }
+}
+
+.hdfs-browser-container {
+  padding: 15px;
+  background-color: #EEE;
+}
+
+.fa {
+  &.text-primary:hover {
+    cursor: pointer;
+  }
+}
+
+.policy-form {
+  label {
+    font-weight: normal;
+    &.btn-primary {
+      color: #FFF;
+    }
+  }
+  .form-section-title {
+    color: $link-color;
+  }
+  .form-footer {
+    border: 0;
+  }
+  .time-field, .timezone-field {
+    float: left;
+    width: 200px;
+    padding: 0 15px;
+  }
+  .timezone-field {
+    width: 300px;
+    .value {
+      padding-top: 7px;
+    }
+  }
+}
+
+#enable_snapshot {
+  .link-text {
+    padding: 0;
+  }
+}
+
+.tab-container {
+  ul.nav {
+    width: $navigation-menu-width;
+    float: left;
+    min-height: 550px;
+    padding-top: 25px;
+    background-color: #323544;
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
+  }
+  .tab-content {
+    margin-left: $navigation-menu-width;
+    height: calc(100vh - 120px);
+  }
+}
+
+.wizard {
+  .wizard-body {
+    height: calc(100vh - 76px);
+    .wizard-nav {
+      height: calc(100vh - 138px);
+      padding: 0;
+      margin: 0;
+      background-color: transparent;
+    }
+    .wizard-content {
+      padding-left: 25px;
+      padding-right: 25px;
+      float: none !important;
+      .panel {
+        height: calc(100vh - 250px);
+        overflow: visible;
+        .basic-form {
+          padding: 0;
+        }
+      }
+    }
+  }
+}
+
+.dlm-step-schedule {
+  .raw-value {
+    padding-top: 7px;
+  }
+}

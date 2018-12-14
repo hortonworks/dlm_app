@@ -1,0 +1,179 @@
+{
+  "unreachableBeacon": [],
+  "pairedClusters": [
+    {
+      "cluster1": {
+        "id": 1,
+        "description": "primary",
+        "name": "Primary Cluster",
+        "dataCenter": "dc-Europe",
+        "ambariWebUrl": "http://localhost:8080",
+        "stats": {
+          "CapacityTotal": 9129444352,
+          "CapacityUsed": 564879360,
+          "CapacityRemaining": 3856367616
+        },
+        "location": {
+          "city": "Pur Chaman",
+          "country": "AF"
+        }
+      },
+      "cluster2":{
+        "id": 2,
+        "description": "secondary",
+        "name": "Secondary Cluster",
+        "dataCenter": "default",
+        "ambariWebUrl": "http://localhost:8080",
+        "stats": {
+          "CapacityTotal": 9129444352,
+          "CapacityUsed": 564879360,
+          "CapacityRemaining": 3856367616
+        },
+        "location": {
+          "city": "Santa Clara",
+          "country": "US"
+        }
+      },
+      "status": "PAIRED"
+    },
+    {
+      "cluster1": {
+        "id": 2,
+        "name": "c2",
+        "dataCenter": "dc-Europe",
+        "description": "Cluster c2",
+        "ambariWebUrl": "http://104.196.80.178:8080",
+        "stats": {
+          "CapacityTotal": 9129444352,
+          "CapacityUsed": 8399088804,
+          "CapacityRemaining": 730355548
+        },
+        "location": {
+          "id": 3431161,
+          "country": "AR",
+          "city": "Los Helechos",
+          "latitude": -27.557600021362305,
+          "longitude": -55.07683181762695
+        }
+      },
+      "cluster2": {
+        "id": 7,
+        "name": "c7",
+        "dataCenter": "dc-IN",
+        "description": "Insufficient ambari privileges",
+        "ambariWebUrl": "http://104.196.85.208:8080",
+        "stats": {},
+        "location": {
+          "id": 703448,
+          "country": "IN",
+          "city": "Bangalore",
+          "latitude": 50.45465850830078,
+          "longitude": 30.523799896240234
+        }
+      },
+      "status": "PAIRED"
+    },
+    {
+      "cluster1":{
+        "id": 3,
+        "description": "development",
+        "name": "Development Cluster",
+        "dataCenter": "dc-India",
+        "ambariWebUrl": "http://localhost:8080",
+        "stats": {
+          "CapacityTotal": 9129444352,
+          "CapacityUsed": 564879360,
+          "CapacityRemaining": 3856367616
+        },
+        "location": {
+          "city": "Columbus",
+          "country": "US"
+        }
+      },
+      "cluster2":{
+        "id": 1,
+        "description": "primary",
+        "name": "Primary Cluster",
+        "dataCenter": "dc-Europe",
+        "ambariWebUrl": "http://localhost:8080",
+        "stats": {
+          "CapacityTotal": 9129444352,
+          "CapacityUsed": 564879360,
+          "CapacityRemaining": 3856367616
+        },
+        "location": {
+          "city": "Pur Chaman",
+          "country": "AF"
+        }
+      },
+      "status": "PAIRED"
+    },
+    {
+      "cluster1": {
+        "id": 4,
+        "name": "c4",
+        "dataCenter": "dc-UA",
+        "description": "Same Location as Cluster c3",
+        "ambariWebUrl": "http://localhost:8080",
+        "stats": {},
+        "location": {
+          "id": 703448,
+          "country": "UA",
+          "city": "Kiev",
+          "latitude": 50.45465850830078,
+          "longitude": 30.523799896240234
+        }
+      },
+      "cluster2": {
+        "id": 5,
+        "name": "c5",
+        "dataCenter": "dc-UA",
+        "description": "Insufficient ambari privileges",
+        "ambariWebUrl": "http://104.196.85.208:8080",
+        "stats": {},
+        "location": {
+          "id": 703448,
+          "country": "UA",
+          "city": "Kiev",
+          "latitude": 50.45465850830078,
+          "longitude": 30.523799896240234
+        }
+      },
+      "status": "PAIRED"
+    },
+    {
+      "cluster1": {
+        "id": 3,
+        "name": "Dev cluster",
+        "dataCenter": "dc-CA",
+        "description": "Same Location as Cluster c3",
+        "ambariWebUrl": "http://localhost:8080",
+        "stats": {},
+        "location": {
+          "id": 703448,
+          "country": "USA",
+          "city": "California",
+          "latitude": 50.45465850830078,
+          "longitude": 30.523799896240234
+        }
+      },
+      "cluster2": {
+        "id": 2,
+        "name": "Staging cluster",
+        "dataCenter": "dc-FL",
+        "description": "Insufficient ambari privileges",
+        "ambariWebUrl": "http://104.196.85.208:8080",
+        "stats": {},
+        "location": {
+          "id": 703448,
+          "country": "USA",
+          "city": "Miami",
+          "latitude": 50.45465850830078,
+          "longitude": 30.523799896240234
+        }
+      },
+      "status": "SUSPENDED",
+      "message": "This pairing is in \"SUSPENDED\" state due to asymmetry found in the configs of both the clusters. Resolve the issue by either going to the clusters page and syncing the configs or to Ambari"
+    }
+  ]
+}

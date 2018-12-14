@@ -1,0 +1,35 @@
+[
+  {
+    "skuName": "dlm",
+    "enabled": true,
+    "sku": {
+      "id": 1,
+      "name": "dlm",
+      "description": "Data Lifecycle Manager",
+      "status": 1,
+      "created": "2018-07-03T21:11:49.283276",
+      "updated": "2018-07-03T21:11:49.283276"
+    },
+    "enabledSku": {
+      "skuId": 1,
+      "enabledBy": 1,
+      "enabledOn": "2018-07-03T21:50:27.596",
+      "smartSenseId": "A-12345678-C-12341234",
+      "subscriptionId": "A-12345678-C-12341234",
+      "created": "2018-07-03T21:50:27.596",
+      "updated": "2018-07-03T21:50:27.596"
+    }
+  },
+  {
+    "skuName": "dss",
+    "enabled": false,
+    "sku": {
+      "id": 2,
+      "name": "dss",
+      "description": "Data Steward Studio",
+      "status": 1,
+      "created": "2018-07-03T21:11:49.283276",
+      "updated": "2018-07-03T21:11:49.283276"
+    }
+  }
+]

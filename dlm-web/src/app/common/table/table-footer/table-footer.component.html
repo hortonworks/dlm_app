@@ -1,0 +1,64 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="row row-nopad">
+  <div class="col-xs-3 col-md-2 col-lg-2">
+    <span *ngIf="options.showFilterSummary">
+      {{summary}}
+    </span>
+  </div>
+  <div class="col-xs-2 col-md-5 col-lg-5">
+    <ng-content></ng-content>
+  </div>
+  <div class="col-xs-3 col-md-2 col-lg-2">
+    <div class="pull-right" *ngIf="options.showPageSizeMenu">
+      {{"common.show" | translate}}:
+      <dlm-dropdown
+        qe-attr="change-page-size"
+        class="page-size-menu"
+        type="link"
+        [container]="dropdownContainer"
+        [isDropup]="options.pagerDropup"
+        [text]="pageSize"
+        [items]="pageSizeOptions"
+        [buttonClass]="'btn-default'"
+        [alignRight]="true"
+        [showChevron]="false"
+        (onSelectItem)="handleChangeLimit($event)"></dlm-dropdown>
+    </div>
+  </div>
+  <div class="col-xs-2 col-md-2 col-lg-2">
+    <div class="pull-right">
+      {{paging}}
+    </div>
+  </div>
+  <div class="col-xs-2 col-md-1 col-lg-1">
+    <div class="pull-right">
+      <button qe-attr="prev-page" class="btn btn-link" (click)="handleGoToPrev()" [disabled]="prevDisabled">
+        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+      </button>
+      <button qe-attr="next-page" class="btn btn-link" (click)="handleGoToNext()" [disabled]="nextDisabled">
+        <span class="fa fa-arrow-right" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="form-container">
+  <form class="basic-form policy-form" [formGroup]="form">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="form-section col-xs-12">
+          <fieldset>
+            <!-- POLICY NAME -->
+            <dlm-form-field
+              [label]="'page.policies.form.fields.policy_name.label' | translate"
+              [required]="true"
+              [maxLengthValue]="64">
+              <input
+                type="text"
+                class="form-control"
+                [placeholder]="'page.policies.form.fields.policy_name.placeholder' | translate"
+                qe-attr="policy-name"
+                formField
+                formControlName="name" />
+              <dlm-field-error *ngIf="form.get('name').hasError('nameValidator')">
+                {{'forms.validation_errors.namePattern' | translate}}
+              </dlm-field-error>
+            </dlm-form-field>
+            <!-- POLICY NAME END -->
+
+            <!-- POLICY DESCRIPTION -->
+            <dlm-form-field
+              [label]="'page.policies.form.fields.policy_description.label' | translate"
+              [maxLengthValue]="256">
+              <textarea
+                rows="4"
+                class="form-control"
+                [placeholder]="'page.policies.form.fields.policy_description.placeholder' | translate"
+                qe-attr="policy-description"
+                formField
+                formControlName="description">
+              </textarea>
+              <dlm-field-error *ngIf="form.get('description').hasError('singleLineValidator')">
+                {{'forms.validation_errors.singleLinePattern' | translate}}
+              </dlm-field-error>
+            </dlm-form-field>
+            <!-- POLICY DESCRIPTION END -->
+
+            <!-- POLICY TYPE -->
+            <div class="form-group">
+              <div class="row">
+                <label class="col-xs-6">
+                  {{'page.policies.form.fields.service' | translate}}
+                </label>
+              </div>
+              <div class="row">
+                <div class="col-xs-6">
+                  <dlm-radio-button
+                    qe-attr="policy-type"
+                    [type]="'service_icons'"
+                    [items]="storageTypes"
+                    formControlName="type">
+                  </dlm-radio-button>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" *ngIf="isHivePolicy()">
+              <div class="col-xs-6">
+                <p class="text-muted" [innerHtml]="'page.policies.form.warnings.hive_replication' | translate">
+                </p>
+              </div>
+            </div>
+            <!-- POLICY TYPE END -->
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

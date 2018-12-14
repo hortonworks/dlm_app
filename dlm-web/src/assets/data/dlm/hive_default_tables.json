@@ -1,0 +1,15 @@
+{
+  "status": "SUCCEEDED",
+  "message": "Success",
+  "requestId": "1267977349@qtp-1945836927-290",
+  "totalResults": 1,
+  "dbList": [
+    {
+      "database": "default",
+      "table": [
+        "school",
+        "allstar_full"
+      ]
+    }
+  ]
+}

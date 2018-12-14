@@ -1,0 +1,936 @@
+{
+  "common": {
+    "all": "All",
+    "and": "And",
+    "add": "Add",
+    "back": "Back",
+    "ok": "Ok",
+    "cancel": "Cancel",
+    "dlm": "DLM",
+    "dlm_engine": "DLM Engine",
+    "edit": "Edit",
+    "delete": "Delete",
+    "copy": "Copy",
+    "copied": "Copied",
+    "review": "Review",
+    "submit": "Submit",
+    "show": "Show",
+    "save": "Save",
+    "saving": "Saving",
+    "update": "Update",
+    "updating": "Updating",
+    "sync": "Sync",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "permissions": "Permissions",
+    "duration": "Duration",
+    "source": "Source",
+    "destination": "Destination",
+    "description": "Description",
+    "data": "Data",
+    "download": "Download",
+    "open": "Open",
+    "close": "Close",
+    "path": "Path",
+    "schedule": "Schedule",
+    "files": "Files",
+    "folders": "Folders",
+    "none": "None",
+    "policies": "Policies",
+    "pair": "Pair",
+    "add_pair": "Add Pair",
+    "add_policy": "Add Policy",
+    "pairing": "Pairing",
+    "pairs": "Pairs",
+    "policy": "Policy",
+    "name": "Name",
+    "no_results": "No results found",
+    "queue_name": "Queue Name",
+    "max_bandwidth": "Max. Bandwidth",
+    "max_maps": "Max. Maps",
+    "job": "Job",
+    "jobs": "Jobs",
+    "start_time": "Start Time",
+    "starting": "starting",
+    "starting_now": "starting now",
+    "until": "until",
+    "end_time": "End Time",
+    "clusters": "Clusters",
+    "cluster": "Cluster",
+    "service": "Service",
+    "hdfs": "HDFS",
+    "hive": "HIVE",
+    "for": "for",
+    "error": "Error",
+    "empty_log": "Log is empty",
+    "na": "NA",
+    "snapshot_enabled": "Snapshot Enabled",
+    "snapshot": "Snapshot",
+    "version": "Version",
+    "versions": "Versions",
+    "yes": "Yes",
+    "no": "No",
+    "not_applicable": "Not Applicable",
+    "last_job": "Last Job",
+    "errors": {
+      "no_log": "Oops! Could not retrieve a log message for this event.",
+      "unknown": "Something went wrong.",
+      "add_cloud": {
+        "unexpected": "Error: Unexpected response"
+      }
+    },
+    "time": {
+      "hourly": "Hourly",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "hours": "Hour(s)",
+      "minutes": "Minute(s)",
+      "days": "Day(s)",
+      "weeks": "Week(s)"
+    },
+    "frequency": {
+      "self": "Frequency",
+      "yearly": {
+        "plural": {
+          "short": "Every {{num}}y",
+          "detailed": "Every {{num}} years"
+        },
+        "singular": "Every year"
+      },
+      "monthly": {
+        "plural": {
+          "short": "Every {{num}}m",
+          "detailed": "Every {{num}} months"
+        },
+        "singular": "Every month"
+      },
+      "weekly": {
+        "plural": {
+          "short": "Every {{num}}w",
+          "detailed": "Every {{num}} weeks"
+        },
+        "singular": "Every week"
+      },
+      "daily": {
+        "plural": {
+          "short": "Every {{num}}d",
+          "detailed": "Every {{num}} days"
+        },
+        "singular": "Every day"
+      },
+      "hourly": {
+        "plural": {
+          "short": "Every {{num}}h",
+          "detailed": "Every {{num}} hours"
+        },
+        "singular": "Every hour"
+      },
+      "minutely": {
+        "plural": {
+          "short": "Every {{num}}m",
+          "detailed": "Every {{num}} minutes"
+        },
+        "singular": "Every minute"
+      },
+      "secondly": {
+        "plural": {
+          "short": "Every {{num}}s",
+          "detailed": "Every {{num}} seconds"
+        },
+        "singular": "Every second"
+      },
+      "every": "Every",
+      "never": "Never"
+    },
+    "table": {
+      "summary": "{{shown}} of {{count}} showing",
+      "paging": "{{start}} - {{end}} of {{count}}"
+    },
+    "status": {
+      "self": "Status",
+      "failed": "Failed",
+      "in_progress": "In Progress",
+      "active": "Active",
+      "suspended": "Suspended",
+      "ended": "Expired"
+    },
+    "warnings": {
+      "beacon_unavailable": "Data presented may not be complete due to DLM Engine api error on clusters {{clusters}} executed from dp-cluster-service container."
+    },
+    "modal": {
+      "confirmation": {
+        "title": "Confirm",
+        "body": "Are you sure?"
+      }
+    },
+    "action_notifications": {
+      "abort_job": {
+        "success": {
+          "title": "Abort Job Successful",
+          "body": "Job for policy {{policyName}} aborted successfully!"
+        },
+        "error": {
+          "title": "Abort Job Failed"
+        }
+      },
+      "rerun_job": {
+        "success": {
+          "title": "Re-run Job Successful",
+          "body": "Job for policy {{policyName}} re-ran successfully!"
+        },
+        "error": {
+          "title": "Re-run Job Failed"
+        }
+      },
+      "delete_policy": {
+        "success": {
+          "title": "Removing Policy Successful",
+          "body": "Policy {{policyName}} removed successfully!"
+        },
+        "error": {
+          "title": "Removing Policy Failed"
+        }
+      },
+      "suspend_policy": {
+        "success": {
+          "title": "Suspending Policy Successful",
+          "body": "Policy {{policyName}} suspended successfully!"
+        },
+        "error": {
+          "title": "Suspending Policy Failed"
+        }
+      },
+      "activate_policy": {
+        "success": {
+          "title": "Activating Policy Successful",
+          "body": "Policy {{policyName}} activated successfully!"
+        },
+        "error": {
+          "title": "Activating Policy Failed"
+        }
+      },
+      "view_log": {
+        "error": {
+          "title": "View Log Failed",
+          "body": "Cannot retrieve logs for selected entity.",
+          "policy_removed": "Policy {{policyName}} no longer exists."
+        }
+      },
+      "sync_cluster": {
+        "success": {
+          "title": "Updating Cluster configuration successful",
+          "body": "Cluster {{clusterName}} configurations updated successfully!"
+        },
+        "error": {
+          "title": "Updating cluster configuration failed",
+          "body": "Cannot update cluster configuration"
+        },
+        "warning": {
+          "title": "Updating cluster configuration completed with warnings"
+        }
+      }
+    },
+    "services": {
+      "ambari_server": "Ambari Server"
+    },
+    "units": {
+      "events": "Events",
+      "files": "Files",
+      "tables": "Tables"
+    },
+    "tde": {
+      "options": {
+        "same": "Same Key",
+        "different": "Different Key"
+      }
+    }
+  },
+  "docs": {
+    "policy_intervention": {
+      "text": "Intervention needed",
+      "link": "http://horton.works/dlm120_h0008a"
+    }
+  },
+  "topnav": {
+    "timezone": "Current Timezone",
+    "disaster_recovery": "Disaster Recovery",
+    "notifications": {
+      "empty_list": "No notifications to show"
+    }
+  },
+  "sidenav": {
+    "menuItem": {
+      "overview": "Overview",
+      "clusters": "Clusters",
+      "cloud_stores": "Cloud Credentials",
+      "policies": "Policies",
+      "pairings": "Pairings",
+      "jobs": "Jobs",
+      "help": "Help",
+      "header": "DATA LIFECYCLE MANAGER"
+    },
+    "version": {
+      "short": "V {{version}}",
+      "long": "DLM App Version {{version}}"
+    }
+  },
+  "user": {
+    "isReadOnly": "{{userName}} does not have permission to execute this action",
+    "isNotInfraAdmin": "{{userName}} does not have sufficient permission"
+  },
+  "data_stores": {
+    "clusters": "Clusters",
+    "cloud": {
+      "aws": "S3",
+      "wasb": "WASB",
+      "adls": "ADLS"
+    }
+  },
+  "jobs": {
+    "status": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "warnings": "Warnings",
+      "failed": "Failed"
+    },
+    "duration": {
+      "running": "Running"
+    }
+  },
+  "hive_database": {
+    "empty_selection": "No Database selected",
+    "empty_tables": "No Tables found",
+    "notifications": {
+      "error": {
+        "title": "Request for List Databases is failed"
+      }
+    }
+  },
+  "hdfs_filebrowser": {
+    "notifications": {
+      "error": {
+        "title": "Request for List Files is failed"
+      }
+    }
+  },
+  "notification_body": {
+    "click_details": "Check error details"
+  },
+  "forms": {
+    "validation_errors": {
+      "required": "\"{{fieldLabel}}\" is required",
+      "maxlength": "\"{{fieldLabel}}\" should be lower than {{maxLengthValue}} symbols",
+      "freqValidator": "\"{{fieldLabel}}\" is too big",
+      "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
+      "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
+      "greaterThanEndTime": "End time must be later than start time.",
+      "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
+      "not_exist_directory": "Specified path does not exist",
+      "credValidator": "Name must be unique",
+      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'.",
+      "singleLinePattern": "Field can't be multiline",
+      "invalid_date": "\"{{fieldLabel}}\" should be a valid date",
+      "invalid_credentials": "Wrong Credentials",
+      "jsonValidator": "File must be valid JSON with not empty fields \"{{fields}}\""
+    }
+  },
+  "page": {
+    "not_found": {
+      "message": "This page does not exist.",
+      "link_text": "Click here to return to home page.",
+      "breadcrumb": "Route Not Found"
+    },
+    "overview": {
+      "charts": {
+        "clusters": "Clusters",
+        "policies": "Policies",
+        "jobs": "Jobs"
+      },
+      "hints": {
+        "issues_and_updates": "Policy History shows the status of the last 10 jobs of the policy including the latest job."
+      },
+      "filter": {
+        "title": "Time Range",
+        "options": {
+          "day": "24 Hours",
+          "week": "1 Week",
+          "month": "1 Month"
+        }
+      },
+      "issues": {
+        "updates": "Issues & Updates",
+        "recent": "Recent Issues",
+        "no_issues": "No issues to report",
+        "list": {
+          "view_all": "View all",
+          "empty_list": "No issues or updates within the selected time period.",
+          "status": {
+            "in_progress": "is in progress",
+            "failed": "failed",
+            "warning": "completed with warnings",
+            "success": "completed"
+          }
+        }
+      },
+      "summary_panels": {
+        "title": {
+          "clusters": "Cluster Health",
+          "policies": "Policies",
+          "jobs": "Jobs"
+        },
+        "status": {
+          "unhealthy": "Unhealthy",
+          "healthy": "Healthy",
+          "in_progress": "In Progress",
+          "failed_last": "Failed Last",
+          "failed_last_10": "Failed in Last 10",
+          "active": "Active",
+          "suspended": "Suspended",
+          "warning": "Warning"
+        },
+        "hint": {
+          "clusters": {
+            "healthy": "Clusters ready for replication. All core services are running.",
+            "warning": "Clusters with remaining capacity of less than 10%.",
+            "unhealthy": "Clusters for which one or more core services are not running.  Policies set up on these clusters are likely to fail unless the services are brought back up before the next scheduled job."
+          },
+          "policies": {
+            "unhealthy": "Policies on unhealthy clusters.  These policies are likely to fail unless the clusters are brought back to the healthy state before the next scheduled job."
+          },
+          "jobs": {
+            "failed_last": "Policies for which the last job failed.",
+            "failed_last_ten": "Policies for which one or more jobs failed out of the last 10 jobs."
+          }
+        }
+      },
+      "world_map": {
+        "cluster_legend": {
+          "alerts": "Alerts",
+          "fix_alerts": "Fix Alerts",
+          "launch_ambari": "Launch Ambari",
+          "manage_ambari": "Manage Cluster"
+        }
+      },
+      "table": {
+        "column": {
+          "job_status": "Job Status",
+          "source_cluster": "Source",
+          "destination_cluster": "Destination",
+          "started": "Started",
+          "ended": "Ended",
+          "runtime": "Runtime",
+          "transferred": "Transferred",
+          "next_run": "Next Run",
+          "action": "Action",
+          "actions": "Actions",
+          "last_ten_jobs": "Policy History"
+        },
+        "actions": {
+          "abort_job": "Abort Job",
+          "rerun_job": "Re-run Job",
+          "delete_policy": "Delete Policy",
+          "suspend_policy": "Suspend Policy",
+          "activate_policy": "Activate Policy"
+        }
+      },
+      "modals": {
+        "unhealthy_cluster": {
+          "title": "Unhealthy Clusters",
+          "columns": {
+            "cluster_name": "Cluster Name",
+            "services": "Unhealthy Services"
+          }
+        },
+        "hdfs_capacity": {
+          "title": "HDFS Remaining Capacity",
+          "columns": {
+            "cluster_name": "Cluster",
+            "remaining_capacity": "Remaining Capacity",
+            "total_capacity": "Total Capacity"
+          }
+        },
+        "unhealthy_policy": {
+          "title": "Unhealthy Policy",
+          "columns": {
+            "policy": "Policy",
+            "source": "Source",
+            "destination": "Destination",
+            "issues": "Issues"
+          }
+        }
+      }
+    },
+    "clusters": {
+      "dropdown": {
+        "cluster": "Cluster",
+        "policy": "Policy"
+      },
+      "card": {
+        "usage": "Usage",
+        "nodes": "Nodes",
+        "volume": "Volume",
+        "location": "Location",
+        "create_pair_text": "Add Pair",
+        "create_policy_text": "Add Policy",
+        "launch_ambari": "Launch Ambari",
+        "sync": "Sync"
+      },
+      "hints": {
+        "header": "Clusters shown below are enabled for DLM"
+      },
+      "warning": {
+        "stale_configs": "Beacon cluster definition is out of sync from current cluster configuration as known by Ambari"
+      }
+    },
+    "cloud_stores": {
+      "header": "Cloud Credentials",
+      "unregistered_header": "Unregistered Credentials",
+      "unregistered_hint": "Cloud credentials not registered to DLM application but being used for replication policies",
+      "content": {
+        "no_accounts": "No Credentials",
+        "no_containers": "No Containers",
+        "table": {
+          "actions": "ACTIONS",
+          "user_details": "CREDENTIAL",
+          "policies": "POLICIES"
+        },
+        "accounts": {
+          "iam_role": "IAM ROLE",
+          "iam_username": "IAM USERNAME",
+          "accountEmail":  "GCS Account Email: {{accountEmail}}",
+          "aws_account_id": "AWS ACCOUNT ID",
+          "wasb_storage_account": "WASB STORAGE ACCOUNT",
+          "expired_account": "Cloud credential invalid. Update this credential to continue using it.",
+          "out_of_sync_account": "{{clusters}} clusters not updated with revised credential. Sync revised credential to all clusters",
+          "update": {
+            "title": "Update Cloud Credential",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential updated successfully"
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to update cloud credential."
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "All clusters might not have been updated due to DLM Engine service outage in one or more clusters"
+            }
+          },
+          "delete": {
+            "title": "Delete Cloud Credential",
+            "body": "Are you sure you want to delete cloud credential {{accountName}}?",
+            "expired_account_hint": "Delete all associated active and suspended policies to be able to delete the cloud credential",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential deleted successfully"
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to delete cloud credential."
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "All clusters might not have been updated due to DLM Engine service outage in one or more clusters"
+            }
+          },
+          "add": {
+            "title": "Add Cloud Credential",
+            "provider": "Cloud Storage Type",
+            "name" : {
+              "label" : "Name",
+              "placeholder": "Enter a unique name for the cloud credential"
+            },
+            "access_key": {
+              "label" : "Access Key",
+              "placeholder": "Enter S3 access key"
+            },
+            "secret_key" : {
+              "label" : "Secret Key",
+              "placeholder": "Enter S3 secret key"
+            },
+            "auth_type": {
+              "label": "Authentication Type",
+              "keys": "Access & Secret Key",
+              "role": "IAM Role"
+            },
+            "application_id": {
+              "label": "Application ID",
+              "placeholder": "Enter ADLS Application ID"
+            },
+            "application_key": {
+              "label": "Key",
+              "placeholder": "Enter ADLS Application Key"
+            },
+            "token_endpoint": {
+              "label": "Token Endpoint",
+              "placeholder": "Enter ADLS Token Endpoint"
+            },
+            "wasb_storage_account_name": {
+              "label": "Storage Account Name",
+              "placeholder": "Enter your WASB Storage Account Name"
+            },
+            "wasb_token": {
+              "label": "Access Key",
+              "placeholder": "Enter your WASB Storage Account Key"
+            },
+            "gcs_account_email": {
+              "label": "Account Email",
+              "placeholder": "Enter your Account Email"
+            },
+            "gcs_cred_file": {
+              "upload": "Upload File",
+              "label": "Service Account Private Key (json format)"
+            },
+            "gcs_token": {
+              "label": "Access Key Id",
+              "placeholder": "Enter your GCS Storage Account Key ID"
+            },
+            "gcs_secret": {
+              "label": "Secret Access Key",
+              "placeholder": "Enter your GCS Storage Secret Account Key"
+            },
+            "validate": "Validate",
+            "validating": "Validating",
+            "invalid_form": "Error: Cannot save cloud credential since form is in invalid state",
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud Credential added successfully!"
+            }
+          },
+          "sync": {
+            "success_notification": {
+              "title": "Success",
+              "body": "Cloud credential synced successfully!"
+            },
+            "warn_notification": {
+              "title": "Warning",
+              "body": "All clusters might not have been updated due to DLM Engine service outage in one or more clusters"
+            },
+            "error_notification": {
+              "title": "Failure",
+              "body": "Failed to sync cloud credential."
+            }
+          }
+        }
+      }
+    },
+    "policies": {
+      "header": "Replication Policies",
+      "header_note": "You must create a cluster pairing before you can create a replication policy.",
+      "header_create": "Create Replication Policy",
+      "header_edit": "Edit Replication Policy",
+      "header_review": "Review Replication Policy",
+      "create_button_text": "Add Policy",
+      "tags": "Tags",
+      "groups": "Groups",
+      "settings": "Policy Settings",
+      "data_summary": "Data Summary",
+      "help_url": "http://horton.works/dlm120_h0004a",
+      "help_text": "How Policies Work",
+      "job_runtime_warn": "Job runtime exceeds policy frequency",
+      "no_file_browser_info": "File listing is not available",
+      "no_jobs": "No jobs",
+      "no_policies": "Create your first replication policy.",
+      "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
+      "no_clusters": "You must first select at least two clusters to register with Data Lifecycle Manager. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
+      "no_description": "No Description",
+      "notifications": {
+        "update": {
+          "error": {
+            "title": "Update policy failed"
+          },
+          "success": {
+            "title": "Policy Updated Successfully",
+            "body": "Replication policy {{policyName}} updated successfully!"
+          }
+        }
+      },
+      "confirmDisableSnapshot": {
+        "body": "This operation will delete existing snapshots in directory {{sourcePath}}. Are you sure you want to go ahead with this operation?"
+      },
+      "perform_action": {
+        "confirmation": {
+          "title": "Confirm",
+          "body": "Are you sure?"
+        },
+        "rerun_job": {
+          "body": "Are you sure you want to rerun the instance of policy {{policyName}}?"
+        },
+        "abort_job": {
+          "body": "Are you sure you want to abort the instance of policy {{policyName}}?"
+        },
+        "suspend_policy": {
+          "body": "Are you sure you want to suspend the replication policy {{policyName}}?"
+        },
+        "activate_policy": {
+          "body": "Are you sure you want to activate the replication policy {{policyName}}?"
+        },
+        "delete_policy": {
+          "body": "Are you sure you want to delete the replication policy {{policyName}}?"
+        }
+      },
+      "flow_status": {
+        "source_abbrev": "S",
+        "read_write": "Read / Write",
+        "read_only": "Read Only",
+        "read_write_abbrev": "RW",
+        "read_only_abbrev": "RO",
+        "ranger_disabled_tooltip": "Ranger is not enabled on this cluster. Accidental writes might occur on the replicated data. Enable Ranger to prevent this issue"
+      },
+      "success": {
+        "title": "Policy Creation Successful",
+        "body": "Replication policy {{policyName}} created successfully!"
+      },
+      "jobs_table": {
+        "column": {
+          "status": "Status",
+          "startTime": "Started",
+          "endTime": "Ended",
+          "duration": "Runtime",
+          "transferredBytes": "Transferred Bytes",
+          "transferredFiles": "# of Objects",
+          "actions": "Actions"
+        }
+      },
+      "form": {
+        "selected": "Selected",
+        "validateBtn": "validate",
+        "sections": {
+          "general": "General",
+          "database": "Select Database",
+          "directories": "Select a Folder",
+          "job": "Run Job",
+          "advanced": "Advanced Properties"
+        },
+        "help": {
+          "snapshot_text": "Enable snapshot based replication",
+          "toggle_snapshot_text": "Snapshot based replication",
+          "snapshot_url": "http://horton.works/dlm120_h0006a",
+          "encrypted_path": "Selected path contains one or more folders that are encrypted",
+          "snapshot_enabled_path": "Snapshot Replication enabled on the selected folder",
+          "encrypted_db": "Selected database is encrypted",
+          "snapshot_enabled_db": "Snapshot Replication enabled for the selected database"
+        },
+        "warnings": {
+          "hive_replication": "<b>Note:</b> ACID tables, External tables, StorageHandler-based tables (such as Hbase), and column statistics are not currently replicated. See <a href=\"http://horton.works/dlm120_h0005a\" target=\"_blank\">policy guidelines</a> for details.",
+          "not_shown_dirs": "More directories might be available, to access enter the path"
+        },
+        "no_containers": "No containers",
+        "fields": {
+          "policy_name": {
+            "label": "Policy Name",
+            "placeholder": "Enter a unique name for the policy"
+          },
+          "policy_description": {
+            "label": "Description",
+            "placeholder": "Enter a description for the policy"
+          },
+          "sourceCluster": {
+            "self": "Source Cluster"
+          },
+          "enableSnapshot": {
+            "label": "Enable snapshot based replication",
+            "helpText": "Snapshot Guidelines",
+            "warning": {
+              "enabled": "Alert: Snapshot replication impact. Selecting snapshot based replication might have adverse impact on NameNode for general operations",
+              "not_super_user": "Alert: Insufficient permission for Snapshot replication. Please contact the HDFS admin for more information",
+              "snapshottable_ancestor": "Alert: Snapshot-based replication cannot be performed on this directory because a parent directory has snapshots enabled. You must replicate data from the highest-level directory that is snapshot-enabled.",
+              "encrypted_zone": "Alert: TDE enabled zone can't be used for snapshot based replication.",
+              "encrypted_snapshottable": "Alert: snapshot-based replication will not be performed"
+            }
+          },
+          "destinationCluster": {
+            "self": "Destination Cluster",
+            "default": "Select a Source Cluster first",
+            "directory": "Destination Path",
+            "database": "Destination Database",
+            "noPair": "No paired cluster available for the selected source cluster",
+            "tdeKey": "Source & Destination encrypted with",
+            "errors": {
+              "encryption": "Encrypted data cannot be replicated to an unencrypted path. Please enter an encrypted path to continue.",
+              "invalid_db_name": "Database name should contain only letters, digits and underscores '_'."
+            },
+            "warnings": {
+              "db_encryption": "Make sure the database is encrypted. Otherwise replication will fail."
+            },
+            "tde_warning": {
+              "title": "Alert: Same key impact",
+              "body": "Selecting same key option when different keys were used for encrypting source and destination will cause policy to fail."
+            },
+            "skipValidation": "Skip Validation",
+            "validationFailed": "Validation failed",
+            "wasbValidationFailed": "Validation failed. WASB storage account name for the credential \"{{name}}\" may be invalid.",
+            "validationCompleted": "Validation completed"
+          },
+          "advancedSettings": {
+            "skipAtlas": "Disable Atlas metadata replication"
+          },
+          "destination_type": "Type",
+          "source_type": "Type",
+          "cloud_account": "Account",
+          "encryption_type": "Encryption Type",
+          "encryption_key_id": "Key ID",
+          "s3": {
+            "account": "Cloud Credential",
+            "endpoint": "Path",
+            "endpointPlaceholder": "bucket_name/object_path"
+          },
+          "wasb": {
+            "container": "Container",
+            "container_placeholder": "Enter Container Name",
+            "blockPath": "Block Path",
+            "blockPath_placeholder": "Enter Block Path",
+            "endpointPlaceholder": "container_name/path"
+          },
+          "container": "Container",
+          "sourceDataCenter": "Source Data Center",
+          "destinationDataCenter": "Destination Data Center",
+          "service": "Service",
+          "directories": "Folder Path",
+          "databases": "Database",
+          "start_date": "Start Date",
+          "end_date": "End Date (Optional)",
+          "start_time": "Start Time (24-Hour Clock)",
+          "end_time": "End Time (24-Hour Clock)",
+          "date_format": "yyyy-mm-dd",
+          "queue_name": "Queue Name",
+          "queue_name_hint": "Yarn queue name of cluster {{clusterName}} to which replication job will be submitted.",
+          "max_bandwidth": "Maximum Bandwidth (Optional)",
+          "max_bandwidth_hint": "Each map task will be throttled to consume only the specified bandwidth such that the net bandwidth used tends towards the specified value.",
+          "max_maps": "Maximum Maps (Optional)",
+          "max_maps_hint": "Maximum number of map tasks (simultaneous copies) per replication job.",
+          "max_bandwidth_name": "Maximum Bandwidth",
+          "max_maps_name": "Maximum Maps",
+          "bandwidth_unit": "MBps",
+          "repeat": "Repeat",
+          "timezone": "Selected Timezone",
+          "timezone_hint": "Selected timezone can be edited from the user menu on the top",
+          "start": {
+            "self": "Start",
+            "schedule": "On Schedule",
+            "start_now": "From Now"
+          }
+        },
+        "schedule": {
+          "immediate": "One Time",
+          "schedule": "On Schedule"
+        }
+      },
+      "subpage": {
+        "create_policy": {
+          "help_url": "http://horton.works/dlm120_h0005a",
+          "help_text": "Policy Guidelines",
+          "policy_does_not_exist": "Requested policy does not exist",
+          "buttons": {
+            "save_policy": "Save Policy",
+            "create_policy": "Create Policy",
+            "edit_advanced_settings": "Edit Advanced Settings",
+            "edit_schedule": "Edit Schedule"
+          }
+        },
+        "review": {
+          "error": {
+            "create_policy": "Create policy failed",
+            "check_error_details": "Check error details"
+          },
+          "create_policy": {
+            "notification": {
+              "success": {
+                "title": "Creating Policy Successful",
+                "body": "Policy {{policyName}} created successfully"
+              }
+            }
+          }
+        }
+      }
+    },
+    "pairings": {
+      "header": "Pairings",
+      "create_button_text": "Add Pairing",
+      "active": "Active Pairings",
+      "suspended": "Suspended Pairings",
+      "help_url": "http://horton.works/dlm120_h0002a",
+      "help_text": "How Pairing Works",
+      "content": {
+        "header": {
+          "first_cluster": "FIRST CLUSTER",
+          "status": "STATUS",
+          "second_cluster": "SECOND CLUSTER",
+          "unpair": "UNPAIR"
+        },
+        "no_pairs": "There are currently no pairs available."
+      },
+      "unpair": {
+        "confirmation": {
+          "title": "Unpair confirmation",
+          "body": "Are you sure you want to unpair {{firstCluster}} and {{secondCluster}} ?",
+          "primaryButton": "Unpair"
+        },
+        "notification": {
+          "success": {
+            "title": "Unpairing Clusters Successful",
+            "body": "Unpairing clusters {{firstCluster}} and {{secondCluster}} completed successfully"
+          },
+          "error": {
+            "title": "Unpairing Clusters Failed"
+          }
+        }
+      },
+      "create": {
+        "header": "Create Pairing",
+        "header_note": "Note: Pairings are bi-directional",
+        "help_text": "Pairing Guidelines",
+        "help_url": "http://horton.works/dlm120_h0003a",
+        "content": {
+          "no_clusters": "No clusters are registered with Data Lifecycle Manager. Click Add>Cluster and register at least two clusters for pairing. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
+          "header": {
+            "step_one": "STEP 1: SELECT CLUSTER",
+            "step_two": "STEP 2: SELECT CLUSTER TO PAIR WITH",
+            "in_progress": "IN PROGRESS"
+          },
+          "cluster_disabled": "The clusters that are already paired with the selected cluster",
+          "incompatible_clusters_disabled": "Incompatible clusters running different version of DLM Engine that is in the selected cluster",
+          "ready_clusters": "Ready Clusters",
+          "unhealthy_clusters": "Unhealthy Clusters",
+          "unhealthy_clusters_hint": "Ambari service or needed cluster services are either unhealthy or not reachable.",
+          "paired_clusters": "Paired Clusters",
+          "incompatible_clusters": "Incompatible Clusters",
+          "lack_privilege": "Unauthorized Clusters",
+          "lack_privilege_hint": "The user {{username}} does not have sufficient privileges on Ambari for this cluster. Assign \"Cluster User\" or higher role in Ambari for user {{username}}"
+        },
+        "notification": {
+          "success": {
+            "title": "Pairing Successful",
+            "body": "Pairing completed successfully"
+          },
+          "error": {
+            "title": "Pairing Failed"
+          }
+        }
+      }
+    },
+    "jobs": {
+      "header": "Jobs",
+      "header_note": "",
+      "prev_jobs": "Jobs",
+      "next_run": "Next Run",
+      "job_ignored": "Prior instance was still executing so this instance was not triggered and ignored."
+    },
+    "notifications": {
+      "header": "Notifications",
+      "table": {
+        "column": {
+          "status": "Status",
+          "message": "Notification",
+          "created": "Created",
+          "entity": "Entity",
+          "log": "Log"
+        }
+      },
+      "view_log": "View Log"
+    }
+  },
+  "help_url": "http://horton.works/dlm120_h0001a"
+}

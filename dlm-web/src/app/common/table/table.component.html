@@ -1,0 +1,83 @@
+<!--
+  ~ HORTONWORKS DATAPLANE SERVICE AND ITS CONSTITUENT SERVICES
+  ~
+  ~ (c) 2016-2018 Hortonworks, Inc. All rights reserved.
+  ~
+  ~ This code is provided to you pursuant to your written agreement with Hortonworks, which may be the terms
+  ~ of the Affero General Public License version 3 (AGPLv3), or pursuant to a written agreement with a third party
+  ~ authorized to distribute this code.  If you do not have a written agreement with Hortonworks or with
+  ~ an authorized and properly licensed third party, you do not have any rights to this code.
+  ~
+  ~ If this code is provided to you under the terms of the AGPLv3: A) HORTONWORKS PROVIDES THIS CODE TO YOU
+  ~ WITHOUT WARRANTIES OF ANY KIND; (B) HORTONWORKS DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED WARRANTIES WITH
+  ~ RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY
+  ~ AND FITNESS FOR A PARTICULAR PURPOSE; (C) HORTONWORKS IS NOT LIABLE TO YOU, AND WILL NOT DEFEND, INDEMNIFY,
+  ~ OR HOLD YOU HARMLESS FOR ANY CLAIMS ARISING FROM OR RELATED TO THE CODE; AND (D) WITH RESPECT
+  ~ TO YOUR EXERCISE OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, HORTONWORKS IS NOT LIABLE FOR ANY DIRECT,
+  ~ INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO,
+  ~ DAMAGES RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF BUSINESS ADVANTAGE OR UNAVAILABILITY,
+  ~ OR LOSS OR CORRUPTION OF DATA.
+  -->
+
+
+<div class="ngx-datatable-wrapper" #tableWrapper>
+  <ngx-datatable
+    #table
+    [rows]="rows"
+    [columns]="columns"
+    [count]="count"
+    [headerHeight]="headerHeight"
+    [rowHeight]="rowHeight"
+    [footerHeight]="footerHeight"
+    [columnMode]="columnMode"
+    [selectionType]="selectionType"
+    [cssClasses]="cssClasses"
+    [trackByProp]="trackByProp"
+    [sorts]="sorts"
+    [offset]="offset"
+    [limit]="limit"
+    [loadingIndicator]="loadingIndicator"
+    [externalSorting]="externalSorting"
+    [externalPaging]="externalPaging"
+    [selectCheck]="selectCheck"
+    [scrollbarV]="scrollbarV"
+    [scrollbarH]="scrollbarH"
+    [reorderable]="reorderable"
+    [rowClass]="rowClass"
+    (select)="onSelectAction($event)"
+    (activate)="onActivate($event)"
+    (page)="onPage($event)"
+    (sort)="onSort($event)">
+    <ngx-datatable-row-detail [rowHeight]="rowDetailHeight" [template]="rowDetailTemplate">
+    </ngx-datatable-row-detail>
+    <ngx-datatable-footer *ngIf="showFooter">
+      <ng-template
+        ngx-datatable-footer-template
+        let-rowCount="rowCount"
+        let-pageSize="pageSize"
+        let-selectedCount="selectedCount"
+        let-curPage="curPage"
+        let-offset="offset">
+        <dlm-table-footer
+          [dropdownContainer]="footerDropdownContainer"
+          [rowsCount]="rowsCount"
+          [filteredRowsCount]="rowCount"
+          [pageSize]="pageSize"
+          [selectedCount]="selectedCount"
+          [curPage]="curPage"
+          [offset]="offset"
+          [options]="footerOptions"
+          (changePage)="changePage($event)"
+          (changePageSize)="changePageSize($event)"></dlm-table-footer>
+      </ng-template>
+    </ngx-datatable-footer>
+  </ngx-datatable>
+  <dlm-checkbox-column
+    (selectCell)="handleSelectedCell($event)"
+    (selectHeader)="handleAllChecked($event)">
+  </dlm-checkbox-column>
+  <dlm-action-column
+    [actions]="actions"
+    (selectAction)="selectColumnAction.emit($event)">
+  </dlm-action-column>
+</div>
